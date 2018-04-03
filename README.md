@@ -3,6 +3,8 @@ uberCad
 
 Run `yarn start`
 
+To check codestyle
+
 #### create-react-app 
 
     npx create-react-app client

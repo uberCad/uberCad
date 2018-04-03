@@ -1,0 +1,11 @@
+check_cs:
+  image: node:7
+  stage: test
+  tags:
+    - docker
+  script:
+    - npm i
+    - npm test
+  cache:
+    paths:
+      - node_modules

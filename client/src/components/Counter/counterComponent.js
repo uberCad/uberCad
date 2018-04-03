@@ -91,7 +91,9 @@ export default class CounterComponent extends Component {
                 }
 
             })
-    }
+    };
+
+
 
     start = () => {
         if (!this.frameId) {
