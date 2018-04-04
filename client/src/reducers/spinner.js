@@ -1,31 +1,31 @@
 // import update from 'immutability-helper'
 
 import {
-    SPINNER_SHOW,
-    SPINNER_HIDE
+  SPINNER_SHOW,
+  SPINNER_HIDE
 } from '../actions/spinner'
 
 let initialState = {
-    active: false
+  active: false
 }
 
 export default function spinner (state = initialState, action) {
-    switch (action.type) {
-        case SPINNER_SHOW:
+  switch (action.type) {
+    case SPINNER_SHOW:
 
-            return {
-                ...state,
-                active: true
-            }
+      return {
+        ...state,
+        active: true
+      }
 
-        case SPINNER_HIDE:
-            return {
-                ...state,
-                active: false
-            }
+    case SPINNER_HIDE:
+      return {
+        ...state,
+        active: false
+      }
 
-        default:
-            // ALWAYS have a default case in a reducer
-            return state
-    }
+    default:
+      // ALWAYS have a default case in a reducer
+      return state
+  }
 }

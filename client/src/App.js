@@ -8,9 +8,7 @@ import Spinner from './components/Spinner/spinnerComponentContainer'
 // import Home from './components/Home/Home'
 // import Demo from './components/Demo/Demo'
 
-
 import Counter from './components/Counter/counterComponentContainer'
-
 
 class App extends Component {
   render () {

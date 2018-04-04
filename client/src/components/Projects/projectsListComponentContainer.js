@@ -4,13 +4,13 @@ import { connect } from 'react-redux'
 import ProjectsListComponent from './projectsListComponent'
 
 const mapStateToProps = (state, ownProps) => {
-    console.log('mapStateToProps(state, ownProps)', state, ownProps)
-    return {
-        items: state.projects.items,
-        loading: state.projects.loading,
-        error: state.projects.error,
-        ...ownProps
-    }
+  console.log('mapStateToProps(state, ownProps)', state, ownProps)
+  return {
+    items: state.projects.items,
+    loading: state.projects.loading,
+    error: state.projects.error,
+    ...ownProps
+  }
 }
 
 // const mapDispatchToProps = (dispatch, ownProps) => {
