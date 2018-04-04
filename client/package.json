@@ -5,7 +5,9 @@
   "dependencies": {
     "dxf-parser": "^0.5.1",
     "immutability-helper": "^2.6.5",
+    "jest": "^22.4.3",
     "lodash": "^4.17.5",
+    "prop-types": "^15.6.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.7",
@@ -13,16 +15,22 @@
     "react-scripts": "1.1.1",
     "redux": "^3.7.2",
     "redux-persist": "^5.9.1",
+    "redux-thunk": "^2.2.0",
     "socket.io-client": "^2.0.4",
     "standard": "^11.0.1",
     "three": "^0.90.0",
     "three-dxf": "^0.3.1",
     "three-orbit-controls": "^82.1.0"
   },
+  "devDependencies": {
+    "node-sass": "^4.8.3"
+  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "start \"\" yarn run sass:watch && react-scripts start",
+    "build": "yarn sass:build && react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "sass:watch": "node-sass -w src/styles/scss -o src/styles/css",
+    "sass:build": "node-sass src/styles/scss -o src/styles/css --source-map true",
     "eject": "react-scripts eject"
   },
   "proxy": "http://localhost:5000"

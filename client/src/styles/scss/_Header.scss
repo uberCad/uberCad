@@ -1,0 +1,135 @@
+@import "_variables";
+
+header {
+  height: $header-height;
+  //background-color: gray;
+  font-size: 14px;
+  box-shadow: 0 0 24px rgba(153, 153, 153, 0.5);
+
+  .logo {
+    float: left;
+    height: 100%;
+    background-color: $blue;
+    color: white;
+    text-decoration: none;
+    font-size: 28px;
+    line-height: $header-height;
+    padding: 0 20px;
+
+    img {
+      width: 24px;
+      margin-left: 10px;
+    }
+  }
+
+  ul.nav {
+    &.nav-right {
+      float: right;
+
+      li {
+        a {
+          margin: 0 10px 0 0;
+        }
+      }
+    }
+
+    li {
+      float: left;
+
+      a {
+        color: $gray-dark;
+        line-height: $header-height;
+        height: $header-height;
+        text-align: center;
+        margin: 0 0 0 15px;
+        display: inline-block;
+
+        .img-circle {
+          float: left;
+          height: 50px;
+
+          border-radius: 50%;
+          margin: #{($header-height - 50px) / 2} 10px 0 0;
+          display: inline-block;
+          box-shadow: 0 0 24px rgba(153, 153, 153, 0.3);
+        }
+
+        &.active, &:hover, &:focus {
+          color: $blue;
+          background-color: transparent;
+          outline: none;
+        }
+      }
+
+      &.separator {
+        &:after {
+          content: " ";
+          color: transparent;
+          border-right: 1px solid $gray;
+          height: 25px;
+          display: inline-block;
+          margin: 0 10px -8px 0;
+        }
+      }
+
+      &.drop-down {
+        & > a {
+          //margin: 0;
+
+          &:after {
+            content: " ";
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 4px 4px 0 4px;
+            border-color: $gray-dark transparent transparent transparent;
+            margin: 0 5px 3px 5px;
+          }
+        }
+
+        ul {
+          display: none;
+          position: absolute;
+          list-style-type: none;
+          background-color: #ffffff;
+          min-width: 160px;
+          box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+
+          z-index: 10;
+
+          li {
+            display: block;
+            float: none;
+            padding: 0 16px;
+            height: 35px;
+
+            &:hover {
+              background-color: #f9f9f9;
+            }
+
+            a {
+              line-height: 35px;
+              display: block;
+              width: 100%;
+              height: 100%;
+              padding: 0;
+              margin: 0;
+              text-align: left;
+
+              &:hover {
+                text-decoration: none;
+                background-color: #f9f9f9;
+                color: #3399fa;
+              }
+            }
+          }
+        }
+
+        &:hover ul {
+          display: block;
+        }
+      }
+    }
+  }
+}

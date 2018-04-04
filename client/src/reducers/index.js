@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 // import main from './main'
 import counter from './counter'
+import projects from './projects'
+import spinner from './spinner'
 
-// export default combineReducers({main, counter})
-export default combineReducers({counter})
+export default combineReducers({counter, projects, spinner})

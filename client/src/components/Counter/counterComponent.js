@@ -19,7 +19,7 @@ export default class CounterComponent extends Component {
     }
 
     componentDidMount() {
-        console.log('componentDidMount() props in component', this.props);
+        // console.log('componentDidMount() props in component', this.props);
 
 
         let width = this.container.clientWidth,
@@ -74,7 +74,7 @@ export default class CounterComponent extends Component {
         fetch('/api/file.dxf')
             .then(req => req.text())
             .then(data => {
-                console.log(data.length);
+                // console.log(data.length);
 
 
                 let parser = new DxfParser();
@@ -83,7 +83,7 @@ export default class CounterComponent extends Component {
                     // let cadCanvas = new ThreeDxf.Viewer(this.dxf, document.getElementById('cad-view'), 400, 400);
 
 
-                    console.log(data.length, parser);
+                    // console.log(data.length, parser);
 
 
                 } catch (e) {
@@ -123,7 +123,7 @@ export default class CounterComponent extends Component {
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
-        console.log('resizeWindow()');
+        // console.log('resizeWindow()');
     };
 
     componentWillUnmount() {
@@ -133,7 +133,7 @@ export default class CounterComponent extends Component {
     }
 
     render() {
-        console.log('CounterComponent: render()', this.dxf)
+        // console.log('HeaderComponent: render()', this.dxf)
 
         return (
             <div>

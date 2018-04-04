@@ -1,32 +1,26 @@
 import React, {Component} from 'react'
-import logo from './logo.svg'
-import './App.css'
-import {Link, Route, Switch, Redirect} from 'react-router-dom'
-import Home from './components/Home/Home'
-import Demo from './components/Demo/Demo'
+
+import {Route, Switch, Redirect} from 'react-router-dom'
+import Header from './components/Header/headerComponentContainer'
+import Projects from './components/Projects/projectsListComponentContainer'
+
+import Spinner from './components/Spinner/spinnerComponentContainer'
+// import Home from './components/Home/Home'
+// import Demo from './components/Demo/Demo'
+
 
 import Counter from './components/Counter/counterComponentContainer'
+
 
 class App extends Component {
   render () {
     return (
-      <div className='App'>
-        <header className='App-header'>
-          <img src={logo} className='App-logo' alt='logo' />
-          <nav>
-            <Link to='/'>Home</Link>
-            <Link to='/demo'>Demo</Link>
-          </nav>
-          <h1 className='App-title'>Welcome to React</h1>
-        </header>
-        <div>
-          <Counter />
-        </div>
-
+      <div className='uberCad'>
+        <Header />
         <div className='content'>
           <Switch>
-            <Route path='/' exact component={Home} />
-            <Route path='/demo' component={Demo} />
+            <Route path='/' exact component={Projects} />
+            <Route path='/demo' component={Counter} />
             <Route path='*' render={() => {
               return (
                 <Redirect to='/' />
@@ -35,9 +29,7 @@ class App extends Component {
             />
           </Switch>
         </div>
-        <footer>
-                    &copy; 2018 - GeekHub JS
-        </footer>
+        <Spinner />
       </div>
     )
   }

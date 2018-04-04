@@ -5,6 +5,12 @@
   "repository": "git@github.com:Dubiy/react-three-socket.git",
   "author": "Gary <netzver@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "start node index.js && cd client && yarn start",
+    "heroku-postbuild": "cd client && yarn --production=false && yarn run build",
+    "build": "cd client && react-scripts build",
+    "test": "standard"
+  },
   "dependencies": {
     "express": "^4.16.2",
     "socket.io": "^2.0.4",
@@ -12,10 +18,5 @@
   },
   "devDependencies": {
     "nodemon": "^1.15.1"
-  },
-  "scripts": {
-    "start": "start node index.js && cd client && yarn start",
-    "heroku-postbuild": "cd client && yarn --production=false && yarn run build",
-    "test": "standard"
   }
 }
