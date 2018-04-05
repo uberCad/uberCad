@@ -95,9 +95,6 @@ export default class CadComponent extends Component {
     this.setState({
       [target.name]: parseFloat(target.value)
     });
-    this.socket.emit('update-delta', {
-      [target.name]: parseFloat(target.value)
-    })
   };
 
   // componentWillReceiveProps(nextProps) {
