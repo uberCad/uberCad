@@ -28,6 +28,7 @@ const project = (state = projectsInitialState, action) => {
             let project = projects.find(project => parseInt(project.id) === parseInt(action.payload.id))
             project.title += ' LOADING!!!'
             if (project) {
+
               throw project
             }
           }

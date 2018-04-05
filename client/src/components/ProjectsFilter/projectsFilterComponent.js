@@ -5,19 +5,15 @@ export default class ProjectsFilterComponent extends Component {
 
   render () {
     return (
-      <span>
-        <h1>{this.props.value}</h1>
-        <select onChange={e => this.props.onChange(e.target.value)}
-                value={this.props.value}>
-          {
-            this.props.options.map(option =>
-              <option value={option} key={option}>
-                {option}
-              </option>
-            )
-          }
-        </select>
-      </span>
+      <ul className='ProjectsFilter'>
+        {
+          this.props.options.map(option =>
+            <li className={this.props.value === option ? 'active': ''} key={option} onClick={e => this.props.onChange(option)}>
+              {option}
+            </li>
+          )
+        }
+      </ul>
     )
   }
 

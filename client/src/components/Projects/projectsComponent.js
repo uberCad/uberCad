@@ -34,7 +34,7 @@ export default class ProjectsComponent extends Component {
 
     const isEmpty = 0 && items.length === 0
     return (
-      <div>
+      <div className='Projects'>
         <ProjectsFilter value={selectedFilter}
                         onChange={this.handleChange}
                         options={['all', 'shared', 'archive', '[some bad filter...]']}/>
