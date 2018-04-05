@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { fetchProject } from '../../actions/project'
+import {Link} from 'react-router-dom'
 
 export default class ProjectComponent extends Component {
 
@@ -28,16 +29,18 @@ export default class ProjectComponent extends Component {
         {JSON.stringify(project)}
         <p>Loading {loading ? 'true': 'false'}</p>
         <p>Error {error ? 'true': 'false'}</p>
+
+        {!loading && <Link to={`/cad/${project.id}`}>Open cad</Link>}
       </div>
     )
 
   }
 
   static propTypes = {
-    projectsList: PropTypes.array.isRequired,
+    projectsList: PropTypes.object.isRequired,
     loading: PropTypes.bool.isRequired,
     error: PropTypes.object,
-    project: PropTypes.string.isRequired,
+    project: PropTypes.object.isRequired,
     lastUpdated: PropTypes.number
   }
 }
