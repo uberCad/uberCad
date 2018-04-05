@@ -1,0 +1,74 @@
+[
+  {
+    "id": 251,
+    "title": "Sample-20",
+    "description": "Lorem ipsum ....",
+    "versions": [
+      1,
+      56,
+      64,
+      98
+    ],
+    "archive": false,
+    "members": [
+      {
+        "id": 1,
+        "username": "Gary",
+        "role": "owner"
+      },
+      {
+        "id": 4,
+        "username": "Francesco",
+        "role": "constructor"
+      }
+    ]
+  },
+  {
+    "id": 320,
+    "title": "Slide system",
+    "description": "Lorem ipsum .... slide system description",
+    "versions": [
+      5,
+      54,
+      99,
+      113
+    ],
+    "archive": true,
+    "members": [
+      {
+        "id": 1,
+        "username": "Gary",
+        "role": "owner"
+      },
+      {
+        "id": 4,
+        "username": "Francesco",
+        "role": "constructor"
+      }
+    ]
+  },
+  {
+    "id": 999,
+    "title": "Scüco Slide system",
+    "description": "Lorem ipsum .... Scüco slide system description",
+    "versions": [
+      9,
+      68,
+      101,
+      131
+    ],
+    "archive": false,
+    "members": [
+      {
+        "id": 4,
+        "username": "Francesco",
+        "role": "owner"
+      },
+      {
+        "id": 4,
+        "username": "Angelo",
+        "role": "constructor"
+      }
+    ]
+  }
+]

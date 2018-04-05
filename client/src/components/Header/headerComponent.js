@@ -6,8 +6,6 @@ import config from '../../config'
 
 export default class HeaderComponent extends Component {
   render () {
-    console.log('HeaderComponent: render()')
-
     return (
       <header className='App-header'>
         <Link to='/' className='logo'>

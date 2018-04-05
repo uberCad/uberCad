@@ -1,7 +1,13 @@
 import { combineReducers } from 'redux'
-// import main from './main'
 import counter from './counter'
-import projects from './projects'
+import { projectsByFilter, selectedFilter } from './projects'
+import project from './project'
 import spinner from './spinner'
 
-export default combineReducers({counter, projects, spinner})
+export default combineReducers({
+  counter,
+  projectsByFilter,
+  selectedFilter,
+  project,
+  spinner
+})
