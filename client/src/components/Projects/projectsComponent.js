@@ -1,45 +1,46 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { selectFilter, fetchProjectsIfNeeded, invalidateFilter } from '../../actions/projects'
 import ProjectsFilter from '../ProjectsFilter/projectsFilterComponentContainer'
 import ProjectsList from '../ProjectsList/projectsListComponentContainer'
 
 export default class ProjectsComponent extends Component {
 
   componentDidMount () {
-    const {dispatch, selectedFilter} = this.props
-    dispatch(fetchProjectsIfNeeded(selectedFilter))
+    const { projectsFilter } = this.props
+    this.props.fetchProjectsIfNeeded(projectsFilter)
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.selectedFilter !== this.props.selectedFilter) {
-      const { dispatch, selectedFilter } = nextProps
-      dispatch(fetchProjectsIfNeeded(selectedFilter))
+
+
+
+    if (nextProps.projectsFilter !== this.props.projectsFilter) {
+      const { projectsFilter } = nextProps
+      this.props.fetchProjectsIfNeeded(projectsFilter)
     }
   }
 
+
   handleChange = nextFilter => {
-    this.props.dispatch(selectFilter(nextFilter))
+    this.props.selectFilter(nextFilter)
   }
 
   handleRefreshClick = e => {
     e.preventDefault()
-    const { dispatch, selectedFilter } = this.props
-    dispatch(invalidateFilter(selectedFilter))
-    dispatch(fetchProjectsIfNeeded(selectedFilter))
+    const { projectsFilter } = this.props
+    this.props.fetchProjectsIfNeeded(projectsFilter, true)
   }
 
   render () {
-    const {selectedFilter, items, loading, error, lastUpdated} = this.props
+    const {projectsFilter, items, loading, error, lastUpdated} = this.props
 
     const isEmpty = 0 && items.length === 0
     return (
       <div className='Projects'>
-        <ProjectsFilter value={selectedFilter}
+        <ProjectsFilter value={projectsFilter}
                         onChange={this.handleChange}
                         options={['all', 'shared', 'archive', '[some bad filter...]']}/>
         <p>
-
 
           {lastUpdated &&
           <span>
@@ -74,7 +75,7 @@ export default class ProjectsComponent extends Component {
     items: PropTypes.array.isRequired,
     loading: PropTypes.bool.isRequired,
     error: PropTypes.object,
-    selectedFilter: PropTypes.string.isRequired,
+    projectsFilter: PropTypes.string.isRequired,
     lastUpdated: PropTypes.number
   }
 }

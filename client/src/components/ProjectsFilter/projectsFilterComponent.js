@@ -8,7 +8,7 @@ export default class ProjectsFilterComponent extends Component {
       <ul className='ProjectsFilter'>
         {
           this.props.options.map(option =>
-            <li className={this.props.value === option ? 'active': ''} key={option} onClick={e => this.props.onChange(option)}>
+            <li className={this.props.value === option ? 'active': ''} key={option} onClick={e => this.props.selectFilter(option)}>
               {option}
             </li>
           )

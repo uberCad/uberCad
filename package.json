@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "express": "^4.16.2",
+    "reselect": "^3.0.1",
     "socket.io": "^2.0.4",
     "standard": "^11.0.1"
   },

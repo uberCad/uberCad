@@ -8,6 +8,7 @@ import {
 
 let projectsInitialState = {
   loading: false,
+  id: null,
   project: null,
   error: null,
   lastUpdated: null
@@ -16,38 +17,14 @@ let projectsInitialState = {
 const project = (state = projectsInitialState, action) => {
   switch (action.type) {
     case PROJECT_FETCH_BEGIN:
-
-      // try to find basic info about project in storage
-      try {
-        let keys = Object.keys(action.payload.projectsList)
-
-        for (let key of keys) {
-          let projects = action.payload.projectsList[key].items
-          // console.error(projects)
-          if (Array.isArray(projects)) {
-            let project = projects.find(project => parseInt(project.id, 10) === parseInt(action.payload.id, 10))
-            if (project) {
-              let projectToThrow = {
-                ...project,
-                title: project.title + ' LOADING!!!'
-              }
-              throw projectToThrow
-            }
-          }
-        }
-      } catch (project) {
-        return {
-          ...state,
-          loading: true,
-          project
-        }
-      }
+      let preloadedProject = action.payload.preloadedProject
 
       return {
         ...state,
+        id: action.payload.id,
         loading: true,
+        ...preloadedProject && {project: preloadedProject},
       }
-
     case PROJECT_FETCH_SUCCESS:
       return {
         ...state,

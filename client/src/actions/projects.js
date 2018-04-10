@@ -1,20 +1,16 @@
 import { spinnerShow, spinnerHide } from './spinner'
 
-export const PROJECTS_SELECT_FILTER = 'PROJECTS_SELECT_FILTER'
 export const PROJECTS_INVALIDATE_FILTER = 'PROJECTS_INVALIDATE_FILTER'
 export const PROJECTS_FETCH_BEGIN = 'PROJECTS_FETCH_BEGIN'
 export const PROJECTS_FETCH_SUCCESS = 'PROJECTS_FETCH_SUCCESS'
 export const PROJECTS_FETCH_FAILURE = 'PROJECTS_FETCH_FAILURE'
 
-export const selectFilter = filter => ({
-  type: PROJECTS_SELECT_FILTER,
-  payload: {filter}
-})
-
-export const invalidateFilter = filter => ({
-  type: PROJECTS_INVALIDATE_FILTER,
-  payload: {filter}
-})
+export const invalidateFilter = filter => {
+  return dispatch => dispatch({
+    type: PROJECTS_INVALIDATE_FILTER,
+    payload: {filter}
+  })
+}
 
 export const requestProjects = filter => ({
   type: PROJECTS_FETCH_BEGIN,
@@ -64,19 +60,8 @@ function handleErrors (response) {
   return response
 }
 
-const shouldFetchProjects = (state, filter) => {
-  const projects = state.projectsByFilter[filter]
-  if (!projects) {
-    return true
-  }
-  if (projects.loading) {
-    return false
-  }
-  return projects.didInvalidate
-}
-
-export const fetchProjectsIfNeeded = filter => (dispatch, getState) => {
-  if (shouldFetchProjects(getState(), filter)) {
+export const fetchProjectsIfNeeded = (filter) => {
+  return dispatch => {
     return dispatch(fetchProjects(filter))
   }
 }

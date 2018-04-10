@@ -4,9 +4,9 @@ export const PROJECT_FETCH_BEGIN = 'PROJECT_FETCH_BEGIN'
 export const PROJECT_FETCH_SUCCESS = 'PROJECT_FETCH_SUCCESS'
 export const PROJECT_FETCH_FAILURE = 'PROJECT_FETCH_FAILURE'
 
-export const requestProject = (id, projectsList) => ({
+export const requestProject = (id, preloadedProject) => ({
   type: PROJECT_FETCH_BEGIN,
-  payload: {id, projectsList}
+  payload: {id, preloadedProject}
 })
 
 export const receiveProject = (id, project) => {
@@ -28,9 +28,9 @@ export const receiveProjectError = (id, error) => ({
   }
 })
 
-export const fetchProject = (id, projectsList) => dispatch => {
+export const fetchProject = (id, preloadedProject) => dispatch => {
   dispatch(spinnerShow())
-  dispatch(requestProject(id, projectsList))
+  dispatch(requestProject(id, preloadedProject))
   return fetch(`/api/project/${id}`)
     .then(handleErrors)
     .then(res => res.json())

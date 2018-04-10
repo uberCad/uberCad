@@ -1,5 +1,7 @@
 import { connect } from 'react-redux'
 import CadComponent from './cadComponent'
+import { fetchProject } from '../../actions/project'
+import { getPreloadedProject } from '../Project/projectComponentContainer'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -7,10 +9,17 @@ const mapStateToProps = (state, ownProps) => {
     error: state.project.error,
     project: state.project.project,
     lastUpdated: state.project.lastUpdated,
-    projectsList: state.projectsByFilter,
+    preloadedProject: getPreloadedProject(state, ownProps),
     ...ownProps
   }
 }
 
-export default connect(mapStateToProps)(CadComponent)
-// export default connect(mapStateToProps, mapDispatchToProps)(ProjectsFilterComponent)
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchProject: function (id) {
+      fetchProject(id)(dispatch)
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CadComponent)

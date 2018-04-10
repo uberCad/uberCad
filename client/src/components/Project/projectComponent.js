@@ -1,22 +1,21 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { fetchProject } from '../../actions/project'
 import {Link} from 'react-router-dom'
 
 export default class ProjectComponent extends Component {
 
   componentDidMount () {
     const { id } = this.props.match.params
-    const {dispatch, projectsList} = this.props
-    dispatch(fetchProject(id, projectsList))
+    const { preloadedProject } = this.props
+    this.props.fetchProject(id, preloadedProject)
   }
 
   componentWillReceiveProps(nextProps) {
 
     if (nextProps.match.params.id !== this.props.match.params.id) {
       const { id } = nextProps.match.params
-      const { dispatch, projectsList } = nextProps
-      dispatch(fetchProject(id, projectsList))
+      const { preloadedProject } = nextProps
+      this.props.fetchProject(id, preloadedProject)
     }
   }
 
@@ -30,17 +29,17 @@ export default class ProjectComponent extends Component {
         <p>Loading {loading ? 'true': 'false'}</p>
         <p>Error {error ? 'true': 'false'}</p>
 
-        {!loading && <Link to={`/cad/${project.id}`}>Open cad</Link>}
+        {!loading && project && <Link to={`/cad/${project.id}`}>Open cad</Link>}
       </div>
     )
 
   }
 
   static propTypes = {
-    projectsList: PropTypes.object.isRequired,
+    // projectsList: PropTypes.object.isRequired,
     loading: PropTypes.bool.isRequired,
     error: PropTypes.object,
-    project: PropTypes.object.isRequired,
+    project: PropTypes.object,
     lastUpdated: PropTypes.number
   }
 }

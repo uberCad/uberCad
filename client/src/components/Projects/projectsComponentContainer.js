@@ -1,20 +1,20 @@
 import { connect } from 'react-redux'
 import ProjectsComponent from './projectsComponent'
+import { fetchProjectsIfNeeded } from '../../actions/projects'
 
 const mapStateToProps = (state, ownProps) => {
-  // console.error('mapStateToProps(state, ownProps)', state, ownProps)
-  const { selectedFilter, projectsByFilter } = state
+  const { projectsFilter, projectsByFilter } = state
   const {
     loading,
     lastUpdated,
     items
-  } = projectsByFilter[selectedFilter] || {
+  } = projectsByFilter[projectsFilter] || {
     loading: true,
     items: []
   }
 
   return {
-    selectedFilter,
+    projectsFilter,
     items,
     loading,
     lastUpdated,
@@ -22,5 +22,13 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps)(ProjectsComponent)
-// export default connect(mapStateToProps, mapDispatchToProps)(ProjectsFilterComponent)
+const mapDispatchToProps = (dispatch) => {
+  return {
+
+    fetchProjectsIfNeeded: function (filter, force = false) {
+      fetchProjectsIfNeeded(filter, force)(dispatch)
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectsComponent)

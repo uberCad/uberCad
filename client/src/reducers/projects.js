@@ -1,24 +1,11 @@
 // import update from 'immutability-helper'
 
 import {
-  PROJECTS_SELECT_FILTER,
   PROJECTS_INVALIDATE_FILTER,
   PROJECTS_FETCH_BEGIN,
   PROJECTS_FETCH_SUCCESS,
   PROJECTS_FETCH_FAILURE
-  // FETCH_PROJECTS_BEGIN,
-  // FETCH_PROJECTS_SUCCESS,
-  // FETCH_PROJECTS_FAILURE
 } from '../actions/projects'
-
-const selectedFilter = (state = 'all', action) => {
-  switch (action.type) {
-    case PROJECTS_SELECT_FILTER:
-      return action.payload.filter
-    default:
-      return state
-  }
-}
 
 let projectsInitialState = {
   loading: false,
@@ -76,10 +63,7 @@ const projectsByFilter = (state = {}, action) => {
   }
 }
 
-export {
-  projectsByFilter,
-  selectedFilter
-}
+export default projectsByFilter
 
 // let initialState = {
 //   items: [],

@@ -3,9 +3,7 @@ import * as THREE from 'three'
 import OrbitControlsLib from 'three-orbit-controls'
 import throttle from 'lodash/throttle'
 import PropTypes from 'prop-types'
-import { fetchProject } from '../../actions/project'
-import './../Demo/Demo.css'
-import socketIOClient from 'socket.io-client'
+import './Demo.css'
 
 const OrbitControls = OrbitControlsLib(THREE);
 
@@ -23,8 +21,8 @@ export default class CadComponent extends Component {
 
   componentDidMount() {
     const { id } = this.props.match.params
-    const {dispatch, projectsList} = this.props
-    dispatch(fetchProject(id, projectsList))
+    const { preloadedProject } = this.props
+    this.props.fetchProject(id, preloadedProject)
 
     let width = this.container.clientWidth,
       height = this.container.clientHeight;

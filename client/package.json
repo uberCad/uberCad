@@ -28,7 +28,7 @@
   "scripts": {
     "start": "start \"\" yarn run sass:watch && react-scripts start",
     "build": "yarn sass:build && react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test --env=jsdom --coverage --collectCoverageFrom=src/**/*js --collectCoverageFrom=!src/registerServiceWorker.js",
     "sass:watch": "node-sass -w src/styles/scss -o src/styles/css",
     "sass:build": "node-sass src/styles/scss -o src/styles/css --source-map true",
     "eject": "react-scripts eject"
