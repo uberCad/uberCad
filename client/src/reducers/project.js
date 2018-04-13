@@ -23,7 +23,7 @@ const project = (state = projectsInitialState, action) => {
         ...state,
         id: action.payload.id,
         loading: true,
-        ...preloadedProject && {project: preloadedProject},
+        ...preloadedProject && {project: preloadedProject}
       }
     case PROJECT_FETCH_SUCCESS:
       return {

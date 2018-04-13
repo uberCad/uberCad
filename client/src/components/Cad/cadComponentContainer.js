@@ -1,10 +1,17 @@
 import { connect } from 'react-redux'
 import CadComponent from './cadComponent'
 import { fetchProject } from '../../actions/project'
+import { fetchDxf, parseDxf, drawDxf } from '../../actions/cad'
+import { spinnerShow, spinnerHide } from '../../actions/spinner'
 import { getPreloadedProject } from '../Project/projectComponentContainer'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    scene: state.cad.scene,
+    camera: state.cad.camera,
+    renderer: state.cad.renderer,
+
+
     loading: state.project.loading,
     error: state.project.error,
     project: state.project.project,
@@ -18,6 +25,25 @@ const mapDispatchToProps = (dispatch) => {
   return {
     fetchProject: function (id) {
       fetchProject(id)(dispatch)
+    },
+    // fetchDxf: function (url) {
+    //   fetchDxf(url)(dispatch)
+    // },
+
+    spinnerShow: function () {
+      spinnerShow()(dispatch)
+    },
+
+    spinnerHide: function () {
+      spinnerHide()(dispatch)
+    },
+
+    // parseDxf: function (dxf) {
+    //   parseDxf(dxf)(dispatch)
+    // }
+
+    drawDxf: (data, container) => {
+      drawDxf(data, container)(dispatch)
     }
   }
 }

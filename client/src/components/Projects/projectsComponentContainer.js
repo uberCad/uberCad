@@ -3,6 +3,9 @@ import ProjectsComponent from './projectsComponent'
 import { fetchProjectsIfNeeded } from '../../actions/projects'
 
 const mapStateToProps = (state, ownProps) => {
+
+  console.warn(/state/, state)
+
   const { projectsFilter, projectsByFilter } = state
   const {
     loading,

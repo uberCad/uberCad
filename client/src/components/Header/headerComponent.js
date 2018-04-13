@@ -2,14 +2,14 @@ import React, {Component} from 'react'
 import logo from './logo.svg'
 import userPic from './userPhoto.png'
 import {Link} from 'react-router-dom'
-import config from '../../config'
+import {appName} from './../../config'
 
 export default class HeaderComponent extends Component {
   render () {
     return (
       <header className='App-header'>
         <Link to='/' className='logo'>
-          {config.appName}
+          {appName}
           <img src={logo} alt='logo' />
 
         </Link>

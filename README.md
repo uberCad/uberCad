@@ -50,7 +50,7 @@ create file `index.js`
     // Serve static files from the React app
     app.use(express.static(path.join(__dirname, 'client/build')));
 
-    // Put all API endpoints under '/api'
+    // Put all ApiService endpoints under '/api'
     app.get('/api/data', (req, res) => {
         res.json({users: [
             {username: 'John', id: 251},

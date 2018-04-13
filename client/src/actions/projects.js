@@ -37,18 +37,18 @@ export const receiveProjectsError = (filter, error) => ({
 })
 
 const fetchProjects = filter => dispatch => {
-  dispatch(spinnerShow())
+  spinnerShow()(dispatch)
   dispatch(requestProjects(filter))
   return fetch(`/api/projects/${filter}`)
     .then(handleErrors)
     .then(res => res.json())
     .then(json => {
-      dispatch(spinnerHide())
+      spinnerHide()(dispatch)
       return dispatch(receiveProjects(filter, json.projects))
     })
     .catch(error => {
       dispatch(receiveProjectsError(filter, error))
-      dispatch(spinnerHide())
+      spinnerHide()(dispatch)
     })
 }
 

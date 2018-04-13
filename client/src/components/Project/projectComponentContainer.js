@@ -26,10 +26,10 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectComponent)
 
 export const getPreloadedProject = createSelector(
-  function getId(state, props) {
+  function getId (state, props) {
     return props.match.params.id
   },
-  function getList(state) {
+  function getList (state) {
     return state.projectsByFilter
   },
   (id, projectsByFilter) => {
@@ -55,6 +55,6 @@ export const getPreloadedProject = createSelector(
     } catch (project) {
       return project
     }
-    return null;
+    return null
   }
 )

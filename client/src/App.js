@@ -8,7 +8,6 @@ import Projects from './components/Projects/projectsComponentContainer'
 import Project from './components/Project/projectComponentContainer'
 import Cad from './components/Cad/cadComponentContainer'
 
-
 class App extends Component {
   render () {
     return (
@@ -19,7 +18,7 @@ class App extends Component {
             <Route path='/' exact component={Projects} />
             <Route path='/project/:id' component={Project} />
             <Route path='/cad/:id' component={Cad} />
-            {/*<Route path='/demo' component={Demo} />*/}
+            {/* <Route path='/demo' component={Demo} /> */}
             <Route path='*' render={() => {
               return (
                 <Redirect to='/' />
