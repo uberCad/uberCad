@@ -3,9 +3,6 @@ import ProjectsComponent from './projectsComponent'
 import { fetchProjectsIfNeeded } from '../../actions/projects'
 
 const mapStateToProps = (state, ownProps) => {
-
-  console.warn(/state/, state)
-
   const { projectsFilter, projectsByFilter } = state
   const {
     loading,
@@ -27,7 +24,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-
     fetchProjectsIfNeeded: function (filter, force = false) {
       fetchProjectsIfNeeded(filter, force)(dispatch)
     }

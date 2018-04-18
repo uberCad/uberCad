@@ -3,6 +3,7 @@ import logo from './logo.svg'
 import userPic from './userPhoto.png'
 import {Link} from 'react-router-dom'
 import {appName} from './../../config'
+import './Header.css'
 
 export default class HeaderComponent extends Component {
   render () {

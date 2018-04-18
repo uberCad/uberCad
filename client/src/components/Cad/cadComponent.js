@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
-// import * as THREE  from '../../extend/THREE'
-
 import throttle from 'lodash/throttle'
 import PropTypes from 'prop-types'
 import Api from '../../services/apiService'
 import Dxf from '../../services/dxfService'
+import Toolbar from '../Toolbar/toolbarComponentContainer'
+// import * as THREE  from '../../extend/THREE'
+
+import './Cad.css'
 
 export default class CadComponent extends Component {
   constructor (props) {
@@ -28,19 +30,7 @@ export default class CadComponent extends Component {
         this.props.spinnerHide()
       })
 
-    this.start()
     window.addEventListener('resize', this.resizeWindow)
-  }
-
-  start = () => {
-    if (!this.frameId) {
-      this.frameId = requestAnimationFrame(this.animate)
-    }
-  }
-
-  animate = () => {
-    // this.props.renderer.render(this.props.scene, this.props.camera)
-    // this.frameId = requestAnimationFrame(this.animate)
   }
 
   resizeWindow = () => {
@@ -63,12 +53,8 @@ export default class CadComponent extends Component {
 
     return (
       <div className='threejs-app'>
-        {this.props.camera ? 'true' : 'false'}
-        {/*<h1>Project:</h1>*/}
-        {/*{JSON.stringify(project)}*/}
-        {/*<p>Loading {loading ? 'true': 'false'}</p>*/}
-        {/*<p>Error {error ? 'true': 'false'}</p>*/}
         <div className='scene' ref={container => this.container = container}/>
+        <Toolbar />
       </div>
     )
   }

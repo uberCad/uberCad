@@ -7,6 +7,7 @@ import Spinner from './components/Spinner/spinnerComponentContainer'
 import Projects from './components/Projects/projectsComponentContainer'
 import Project from './components/Project/projectComponentContainer'
 import Cad from './components/Cad/cadComponentContainer'
+import './App.css'
 
 class App extends Component {
   render () {

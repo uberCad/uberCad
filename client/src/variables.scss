@@ -1,0 +1,124 @@
+$header-height: 70px;
+$sidebar-width: 300px;
+$toolbar-width: 40px;
+$toolSize: 36px;
+$options-height: 35px;
+$blue: #51a7f9;
+$gray: #ebeff2;
+$gray-dark: #999999;
+
+
+
+
+//
+//// main
+//$font-family: "Avenir Book";
+//
+//// header navbar
+//$header-background-color: #3A3F53;
+//$nav-bar-background-color: #f2f3f5;
+//$nav-bar-text-color: rgba(255, 255, 255, 0.70);
+//$nav-bar-search-text-color: #2a5a69;
+//
+//// buttons
+//$bar-button-background-color: #008AB4;
+//$bar-button-background-color-hover: #007da3;
+//$button-cancel-background-color: #4e546c;
+//$button-cancel-background-hover: #474c62;
+//
+//// inputs
+//$inputs-border: 1px solid #d2cde4;
+//
+//// plate
+//$plate-backgroud-color-hover: rgba(#eceaf4, .8);
+//
+//// sidebar
+//$side-bar-background-color: #4E546C;
+//$side-bar-link-text-color: rgba(255, 255, 255, 0.9);
+//$side-bar-link-active-text-color: #F69918;
+//$side-bar-link-border: 1px solid rgba(255, 255, 255, 0.1);
+//$side-bar-link-border-color: rgba(255, 255, 255, 0.2);
+//$side-bar-link-border-color: rgba(255, 255, 255, 0.2);
+//
+//// profile
+//$profile-logout-text-color: #4a4a4a;
+//$profile-position-text-color: #4a4a4a;
+//$profile-change-password-text-color: white;
+//$profile-form-label-text-color: #424242;
+//$profile-form-error-text-color: red;
+//$profile-form-help-block-text-color: #d0172e;
+//$profile-form-help-block-border: 1px solid #ccc6e0;
+//$profile-form-help-block-border-after-color: rgba(255, 255, 255, 0);
+//$profile-form-help-block-border-after-bottom-color: #ffffff;
+//$profile-form-help-block-border-before-color: rgba(182, 245, 159, 0);
+//$profile-form-help-block-border-before-bottom-color: #ccc6e0;
+//
+//// upload
+//$upload-message-bar-text-color: white;
+//$upload-message-bar-active-text-color: #00b47e;
+//$upload-message-bar-error-background-color: #e54e4f;
+//$upload-plate-box-shadow: 0 2px 2px #dadada;
+//$upload-plate-background-color: white;
+//$upload-header-border: 1px solid #eceaf4;
+//$upload-select-control-border: 2px solid #eceaf4;
+//$upload-select-control-value-text-color: #323c47;
+//$upload-add-files-border: 1px solid #a0a0a0;
+//$upload-add-files-text-color: #4a4a4a;
+//$upload-main-label-text-color: black;
+//$upload-main-create-case-text-color: #4a4a4a;
+//$upload-drop-section-border: 2px dashed #0095bc;
+//$upload-drop-section-text-color: #0095bc;
+//
+//// cases
+//$tr-header-border: 3px solid transparent;
+//$table-header-text-color: #9e9e9e;
+//$tr-border: 5px solid #f2f3f5;
+//$tr-box-shadow: 0 -1px 2px 2px rgba(218, 218, 218, 1);
+//$tr-background-color: #ffffff;
+//$tag-border: 1px solid #d2cde4;
+//$tag-text-color: rgba(74, 74, 74, 0.68);
+//$td-text-color: rgba(74, 74, 74, 0.68);
+//$td-name-text-color: #4a4a4a;
+//$view-text-color: #1083ae;
+//$cases-edit-text-color: #1083ae;
+//$cases-remove-text-color: #868686;
+//$cases-pagination-text-color: #cbd1d9;
+//$cases-pagination-border-color: #cbd1d9;
+//$cases-pagination-active-background-color: #0095bc;
+//
+//// users
+//$users-edit-text-color: #1083ae;
+//$users-remove-text-color: #868686;
+//$users-pagination-text-color: #cbd1d9;
+//$users-pagination-border-color: #cbd1d9;
+//$users-pagination-active-background-color: #0095bc;
+//
+//// modal
+//$modal-create-case-error-text-error: #d0172e;
+//$modal-header-border: 1px solid #d2cde4;
+//$modal-body-label-color-text: #323c47;
+//$modal-body-input-color-text: #323c47;
+//$modal-body-placeholder-color-text: #898989;
+//$modal-body-input-border: 1px solid #d2cde4;
+//$modal-body-select-value-border: 1px solid #d2cde4;
+//$modal-body-select-value-background-color: #ffffff;
+//$modal-body-select-value-icon-color-text: #4a4a4a;
+//$modal-body-select-value-icon-background-color: #ffffff;
+//$modal-body-select-value-label-color-text: #4a4a4a;
+//$modal-body-button-background-color: grey;
+//$modal-body-button-color-text: #ffffff;
+//$modal-body-button-cancel-background-color: #4e546c;
+//$modal-body-button-save-color-text: #ffffff;
+//$modal-body-button-cancel-color-text: #ffffff;
+//$modal-body-not-valid-border: #d0172e;
+//
+//// case
+//$case-back-button-text-color: #004e64;
+//$case-main-description-text-color: #262d37;
+//$case-main-tag-border: 1px solid #d2cde4;
+//$case-main-tag-background-color: #ffffff;
+//$case-main-file-status-border: 2px solid grey;
+//$case-main-file-status-background-color: #ffffff;
+//$case-main-finished-border-color: #00bc89;
+//$case-main-failed-border-color: #e54e4f;
+//$case-main-panding-border-color: #F5A623;

@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "antd": "^3.1.4",
+    "bootstrap": "^3.3.7",
     "axios": "^0.18.0",
     "dxf-parser": "^0.5.1",
     "immutability-helper": "^2.6.5",
@@ -49,7 +51,7 @@
     "build": "npm run build:css && react-scripts build",
     "start": "npm-run-all -p watch:css start:js",
     "build:css": "node-sass src/ -o src/ --source-map true",
-    "watch:css": "npm run build:css && node-sass -w src/styles/scss -o src/styles/css --recursive",
+    "watch:css": "npm run build:css && node-sass -w src/ -o src/ --recursive",
     "start:js": "node_modules/.bin/react-scripts start",
     "test": "standard --verbose && babel-node ./node_modules/.bin/tape ./test/**/*.js --require ignore-styles --require ./test/setup.js | faucet",
     "fix": "standard --verbose --fix | snazzy",

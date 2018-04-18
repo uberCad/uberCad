@@ -1,13 +1,16 @@
-@import "_variables";
+@import "../../variables.scss";
 
 .threejs-app {
   .scene {
-    width: 100%;
-    height: calc(100% - #{$header-height});
     display: block;
     position: absolute;
-    left: 0;
-    top: $header-height;
+
+    top: $header-height + $options-height;
+    left: $toolbar-width;
+
+    width: calc(100% - #{$toolbar-width + $sidebar-width});
+    height: calc(100% - #{$header-height + $options-height});
+    outline: 1px solid #666;
     overflow: hidden;
   }
 

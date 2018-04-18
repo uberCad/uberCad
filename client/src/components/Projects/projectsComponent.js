@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import ProjectsFilter from '../ProjectsFilter/projectsFilterComponentContainer'
 import ProjectsList from '../ProjectsList/projectsListComponentContainer'
+import './Projects.css'
 
 export default class ProjectsComponent extends Component {
 
@@ -11,9 +12,6 @@ export default class ProjectsComponent extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-
-
-
     if (nextProps.projectsFilter !== this.props.projectsFilter) {
       const { projectsFilter } = nextProps
       this.props.fetchProjectsIfNeeded(projectsFilter)

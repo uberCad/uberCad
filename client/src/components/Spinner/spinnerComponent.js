@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import gif from './spinner.gif'
+import './Spinner.css'
 
 export default class SpinnerComponent extends Component {
   render () {

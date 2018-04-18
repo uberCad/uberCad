@@ -1,0 +1,59 @@
+@import "../../variables.scss";
+
+#toolbar {
+  position: absolute;
+  left: 0;
+  top: $header-height + $options-height;
+  width: $toolbar-width;
+  height: calc(100% - #{$header-height + $options-height});
+  background: url("bars.png") no-repeat top center $blue;
+  padding-top: 27px;
+  z-index: 10;
+
+  //box-shadow: red 0 0 20px;
+  box-shadow: 0 0 12px rgba(153, 153, 153, 0.4);
+
+
+  //padding-right: 5px;
+  //margin-right: 5px;
+  //border-right: 2px solid lavender;
+  //border: 1px solid red;
+  //float: left;
+  //
+  button {
+    float: left;
+    width: $toolSize;
+    height: $toolSize;
+    padding: 0;
+    border-radius: 0;
+    background-color: transparent;
+    border: none;
+    margin: 2px 2px 0 2px;
+    transition: All 0.2s;
+
+
+
+    &:active, &:focus, &:hover {
+      outline: none;
+      box-shadow: none;
+      color: white;
+      border-radius: 3px;
+      background-color: rgba(255,255,255,0.2);
+    }
+
+    &[disabled] {
+      opacity: 0.5;
+      background-color: transparent;
+    }
+
+    color: white;
+
+
+
+    &.btn-success {
+      color: white;
+      border-radius: 3px;
+      background-color: rgba(255,255,255,0.2);
+    }
+  }
+}
