@@ -8,6 +8,7 @@ let initialState = {
   scene: null,
   camera: null,
   renderer: null,
+  cadCanvas: null,
 
   loading: false,
   didInvalidate: false,
@@ -24,6 +25,7 @@ const cad = (state = initialState, action) => {
         scene: action.payload.scene,
         camera: action.payload.camera,
         renderer: action.payload.renderer,
+        cadCanvas: action.payload.cadCanvas,
       }
 
     default:

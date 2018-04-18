@@ -11,11 +11,10 @@ export const PROJECT_FETCH_SUCCESS = 'PROJECT_FETCH_SUCCESS'
 export const PROJECT_FETCH_FAILURE = 'PROJECT_FETCH_FAILURE'
 
 export const drawDxf = (data, container) => {
-  console.log(dxfService)
-  let {scene, camera, renderer} = dxfService.renderDxf(data, container)
-  // cadCanvas = new ThreeDxf.Viewer(data, document.getElementById('cad-view'), 800, 600);
-
-  console.log('cad action', scene, camera, renderer);
+  let cadCanvas = new dxfService.Viewer(data, container);
+  let scene = cadCanvas.getScene();
+  let camera = cadCanvas.getCamera();
+  let renderer = cadCanvas.getRenderer();
 
   container.appendChild(renderer.domElement)
 
@@ -24,7 +23,8 @@ export const drawDxf = (data, container) => {
     payload: {
       scene,
       camera,
-      renderer
+      renderer,
+      cadCanvas
     }
   })
 }
