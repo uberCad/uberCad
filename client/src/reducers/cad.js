@@ -1,7 +1,8 @@
 // import update from 'immutability-helper'
 
 import {
-  CAD_DRAW_DXF
+  CAD_DRAW_DXF,
+  CAD_DO_SELECTION
 } from '../actions/cad'
 
 let initialState = {
@@ -9,6 +10,7 @@ let initialState = {
   camera: null,
   renderer: null,
   cadCanvas: null,
+  activeEntities: [],
 
   loading: false,
   didInvalidate: false,
@@ -27,6 +29,12 @@ const cad = (state = initialState, action) => {
         renderer: action.payload.renderer,
         cadCanvas: action.payload.cadCanvas,
       }
+    case CAD_DO_SELECTION:
+      return {
+        ...state,
+        activeEntities: action.payload.activeEntities
+      }
+
 
     default:
       return state

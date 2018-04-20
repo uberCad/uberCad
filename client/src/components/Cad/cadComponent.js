@@ -53,10 +53,18 @@ export default class CadComponent extends Component {
 
     return (
       <div className='threejs-app'>
-        <div className='scene' ref={container => this.container = container}/>
+        <div className='scene'
+             ref={container => this.container = container}
+             onClick={this.onClick}
+        />
         <Toolbar />
       </div>
     )
+  }
+
+  onClick = (event) => {
+    
+    this.props.onClick(event, this.props.editor)
   }
 
   static propTypes = {

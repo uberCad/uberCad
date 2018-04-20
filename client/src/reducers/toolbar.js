@@ -3,9 +3,10 @@
 import {
   TOOLBAR_CHOOSE_TOOL
 } from '../actions/toolbar'
+import { TOOL_POINT } from '../components/Toolbar/toolbarComponent'
 
 let toolbarInitialState = {
-  tool: false,
+  tool: TOOL_POINT,
 }
 
 const toolbar = (state = toolbarInitialState, action) => {

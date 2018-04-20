@@ -1,22 +1,30 @@
 import { connect } from 'react-redux'
 import CadComponent from './cadComponent'
 import { fetchProject } from '../../actions/project'
-import { drawDxf } from '../../actions/cad'
+import { drawDxf, cadClick } from '../../actions/cad'
 import { spinnerShow, spinnerHide } from '../../actions/spinner'
-import { getPreloadedProject } from '../Project/projectComponentContainer'
+import { TOOL_POINT } from '../Toolbar/toolbarComponent'
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    scene: state.cad.scene,
-    camera: state.cad.camera,
-    renderer: state.cad.renderer,
-    cadCanvas: state.cad.cadCanvas,
+    editor: {
+      scene: state.cad.scene,
+      camera: state.cad.camera,
+      renderer: state.cad.renderer,
+      cadCanvas: state.cad.cadCanvas,
+      tool: state.toolbar.tool,
+      activeEntities: state.cad.activeEntities,
+      options: {
+        selectMode: 'new'//state.options.mode
+      },
+      editMode: {
+        isEdit: false
+      }
+    },
 
     loading: state.project.loading,
     error: state.project.error,
     project: state.project.project,
-    lastUpdated: state.project.lastUpdated,
-    preloadedProject: getPreloadedProject(state, ownProps),
     ...ownProps
   }
 }
@@ -44,6 +52,10 @@ const mapDispatchToProps = (dispatch) => {
 
     drawDxf: (data, container) => {
       drawDxf(data, container)(dispatch)
+    },
+
+    onClick: (event, editor) => {
+      cadClick(event, editor)(dispatch)
     }
   }
 }

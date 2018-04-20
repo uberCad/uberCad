@@ -13,7 +13,7 @@ const rootPersistConfig = {
 const cadPersistConfig = {
   key: 'cad',
   storage: storage,
-  blacklist: ['scene', 'camera', 'renderer', 'cadCanvas']
+  blacklist: ['scene', 'camera', 'renderer', 'cadCanvas', 'activeEntities']
 }
 
 const persistedReducer = persistReducer(rootPersistConfig, combineReducers({
