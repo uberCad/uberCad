@@ -1,8 +1,7 @@
 import * as THREE from '../extend/THREE'
 
 let distanceToLine = (vertex, line) => {
-
-  //calculate distance to finite line segment
+  // calculate distance to finite line segment
 
   let x1 = line.geometry.vertices[0].x
   let y1 = line.geometry.vertices[0].y
@@ -11,7 +10,7 @@ let distanceToLine = (vertex, line) => {
 
   return distanceToLineSegment(x1, y1, x2, y2, vertex.x, vertex.y)
 
-  //old version calculates distance to infinite line in both directions.
+  // old version calculates distance to infinite line in both directions.
 
   // //line equation y = mx + b
   // // also - Ax + By + C = 0 (will be used)
@@ -40,11 +39,11 @@ let distanceToLine = (vertex, line) => {
 }
 
 let distanceToArc = (vertex, arc) => {
-  //https://bl.ocks.org/milkbread/11000965
+  // https://bl.ocks.org/milkbread/11000965
 
-  //http://www.analyzemath.com/Calculators/Circle_Line.html
-  //circle (x - h)^2 + (y - k)^2 = r^2
-  //line y = m*x + b
+  // http://www.analyzemath.com/Calculators/Circle_Line.html
+  // circle (x - h)^2 + (y - k)^2 = r^2
+  // line y = m*x + b
 
   let x1 = vertex.x
   let y1 = vertex.y
@@ -75,7 +74,7 @@ let distanceToArc = (vertex, arc) => {
     let arcAngle1 = circleIntersectionAngle(intersectPoint1, arc.position, r)
     let arcAngle2 = circleIntersectionAngle(intersectPoint2, arc.position, r)
 
-    //fix problem when thetaStart + thetaLength > 2pi AND arcAngle < thetastart
+    // fix problem when thetaStart + thetaLength > 2pi AND arcAngle < thetastart
     if (arc.geometry.parameters.thetaStart + arc.geometry.parameters.thetaLength > Math.PI * 2) {
       if (arc.geometry.parameters.thetaStart > arcAngle1) {
         arcAngle1 += Math.PI * 2
@@ -85,7 +84,7 @@ let distanceToArc = (vertex, arc) => {
       }
     }
 
-    //todo: handle tangent line to arc
+    // todo: handle tangent line to arc
 
     let intersect1Distance = null
     let intersect2Distance = null
@@ -102,7 +101,7 @@ let distanceToArc = (vertex, arc) => {
       return (intersect1Distance && intersect2Distance && Math.min(intersect1Distance, intersect2Distance)) || intersect1Distance || intersect2Distance
     }
 
-    //in case of no-intersection get distance to nearest arc-endpoint
+    // in case of no-intersection get distance to nearest arc-endpoint
     let arc1v1 = new THREE.Vector3(0, 0, 0)
     arc1v1.addVectors(arc.geometry.vertices[0], arc.position)
 
@@ -111,13 +110,12 @@ let distanceToArc = (vertex, arc) => {
 
     return Math.min(arc1v1.distanceTo(vertex), arc1v2.distanceTo(vertex))
   } else {
-    //no intersection
+    // no intersection
   }
   return false
-
 }
 
-let distanceToLineSegment = (lx1, ly1, lx2, ly2, px, py) => {
+function distanceToLineSegment (lx1, ly1, lx2, ly2, px, py) {
   // source from https://github.com/scottglz/distance-to-line-segment/blob/master/index.js
 
   let ldx = lx2 - lx1,
@@ -128,14 +126,10 @@ let distanceToLineSegment = (lx1, ly1, lx2, ly2, px, py) => {
   if (!lineLengthSquared) {
     // 0-length line segment. Any t will return same result
     t = 0
-  }
-  else {
+  } else {
     t = ((px - lx1) * ldx + (py - ly1) * ldy) / lineLengthSquared
 
-    if (t < 0)
-      t = 0
-    else if (t > 1)
-      t = 1
+    if (t < 0) { t = 0 } else if (t > 1) { t = 1 }
   }
 
   let lx = lx1 + t * ldx,
@@ -145,7 +139,7 @@ let distanceToLineSegment = (lx1, ly1, lx2, ly2, px, py) => {
   return Math.sqrt(dx * dx + dy * dy)
 }
 
-let circleIntersectionAngle = (vertex, circle, radius) => {
+function circleIntersectionAngle (vertex, circle, radius) {
   let projectionLine = Math.abs(vertex.x - circle.x)
   let angle = Math.acos(projectionLine / radius)
   // console.log({q}, Math.acos(q/r1), Math.acos(q/r1) / Math.PI * 180);
@@ -159,13 +153,75 @@ let circleIntersectionAngle = (vertex, circle, radius) => {
     // IV quadrant
     angle = 2 * Math.PI - angle
   } else {
-    //in I quadrant
-    //ok
+    // in I quadrant
+    // ok
   }
   return angle
+}
+
+/**
+ *
+ * @param entities []
+ * @param threshold number
+ * @return []
+ */
+function skipZeroLines (entities, threshold) {
+  // filter and remove zero lines like that:
+  // entity.geometry.vertices = [
+  //     THREE.Vector3 {x: -323.9003129597497, y: -131.8572032025505, z: 0},
+  //     THREE.Vector3 {x: -323.9003129597497, y: -131.8572032025505, z: 0}
+  // ]
+
+  return entities.filter(entity => {
+    if (!(entity.geometry instanceof THREE.CircleGeometry) && entity.geometry.vertices.length === 2) {
+      return (entity.geometry.vertices[0].distanceTo(entity.geometry.vertices[1]) > threshold)
+    }
+    return true
+  })
+}
+
+function getFirstVertex (entity) {
+  if (entity.geometry instanceof THREE.CircleGeometry) {
+    // arc
+    let vertex = new THREE.Vector3(0, 0, 0)
+    return vertex.addVectors(entity.geometry.vertices[0], entity.position)
+  } else {
+    // line?
+    return entity.geometry.vertices[0]
+  }
+}
+
+function getAnotherVertex (entity, vertex) {
+  let vertices = []
+  if (entity.geometry instanceof THREE.CircleGeometry) {
+    // arc
+    let vertex = new THREE.Vector3(0, 0, 0)
+    vertices.push(vertex.addVectors(entity.geometry.vertices[0], entity.position))
+
+    vertex = new THREE.Vector3(0, 0, 0)
+    vertices.push(vertex.addVectors(entity.geometry.vertices[entity.geometry.vertices.length - 1], entity.position))
+  } else {
+    // line?
+    vertices = entity.geometry.vertices
+  }
+
+  let anotherVertex = vertices[0]
+  let distance = vertex.distanceTo(anotherVertex)
+
+  vertices.forEach(v => {
+    if (vertex.distanceTo(v) > distance) {
+      anotherVertex = v
+      distance = vertex.distanceTo(v)
+    }
+  })
+
+  return anotherVertex
 }
 
 export default {
   distanceToLine,
   distanceToArc,
+  skipZeroLines,
+  getFirstVertex,
+  getAnotherVertex
 }

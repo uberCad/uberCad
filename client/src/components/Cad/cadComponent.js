@@ -36,13 +36,15 @@ export default class CadComponent extends Component {
   resizeWindow = () => {
     let width = this.container.clientWidth,
       height = this.container.clientHeight
-    this.props.cadCanvas.resize(width, height);
 
+    try {
+      this.props.editor.cadCanvas.resize(width, height);
+    } catch (e) {}
   }
 
   componentWillUnmount () {
     // this.stop()
-    this.container.removeChild(this.props.renderer.domElement)
+    this.container.removeChild(this.props.editor.renderer.domElement)
     window.removeEventListener('resize', this.resizeWindow)
   }
 
@@ -56,6 +58,7 @@ export default class CadComponent extends Component {
         <div className='scene'
              ref={container => this.container = container}
              onClick={this.onClick}
+             onDoubleClick={this.onDoubleClick}
         />
         <Toolbar />
       </div>
@@ -63,8 +66,11 @@ export default class CadComponent extends Component {
   }
 
   onClick = (event) => {
-    
     this.props.onClick(event, this.props.editor)
+  }
+
+  onDoubleClick = (event) => {
+    this.props.onDoubleClick(event, this.props.editor)
   }
 
   static propTypes = {

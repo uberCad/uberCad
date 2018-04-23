@@ -35,7 +35,6 @@ THREE.Math.polar = function (point, distance, angle) {
  * @param segments - number of segments between the two given points
  */
 let BulgeGeometry = function (startPoint, endPoint, bulge, segments) {
-
   let vertex, i,
     center, p0, p1, angle,
     radius, startAngle,
@@ -61,7 +60,6 @@ let BulgeGeometry = function (startPoint, endPoint, bulge, segments) {
     vertex = THREE.Math.polar(center, Math.abs(radius), startAngle + thetaAngle * i)
     this.vertices.push(new THREE.Vector3(vertex.x, vertex.y, 0))
   }
-
 }
 
 export * from 'three'

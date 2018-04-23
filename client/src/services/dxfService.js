@@ -1,7 +1,5 @@
 import DxfParser from 'dxf-parser'
-import * as THREE  from '../extend/THREE'
-
-
+import * as THREE from '../extend/THREE'
 
 export default class DxfService {
   static parse (dxf) {
@@ -9,71 +7,107 @@ export default class DxfService {
     return parser.parseSync(dxf)
   }
 
-  static Viewer(data, container) {
-    createLineTypeShaders(data);
+  static Viewer (data, container) {
+    createLineTypeShaders(data)
 
-    let scene = new THREE.Scene();
+    let scene = new THREE.Scene()
+
+    let layers = {}
+    Object.keys(data.tables.layer.layers).forEach(layerName => {
+      layers[layerName] = new THREE.Object3D()
+
+      layers[layerName].name = layerName
+      layers[layerName].userData['container'] = true
+    })
 
     // Create scene from dxf object (data)
     let i, entity, obj
     let dims = {
       min: { x: false, y: false, z: false},
       max: { x: false, y: false, z: false}
-    };
-    for(i = 0; i < data.entities.length; i++) {
-      entity = data.entities[i];
+    }
+    for (i = 0; i < data.entities.length; i++) {
+      entity = data.entities[i]
 
-      if(entity.type === 'DIMENSION') {
-        if(entity.block) {
-          let block = data.blocks[entity.block];
-          if(!block) {
-            console.error('Missing referenced block "' + entity.block + '"');
-            continue;
+      if (entity.type === 'DIMENSION') {
+        if (entity.block) {
+          let block = data.blocks[entity.block]
+          if (!block) {
+            console.error('Missing referenced block "' + entity.block + '"')
+            continue
           }
-          for(let j = 0; j < block.entities.length; j++) {
-            obj = drawEntity(block.entities[j], data);
+          for (let j = 0; j < block.entities.length; j++) {
+            obj = drawEntity(block.entities[j], data)
           }
         } else {
-          console.log('WARNING: No block for DIMENSION entity');
+          console.log('WARNING: No block for DIMENSION entity')
         }
       } else {
-        obj = drawEntity(entity, data);
+        obj = drawEntity(entity, data)
       }
 
       if (obj) {
-        let bbox = new THREE.Box3().setFromObject(obj);
-        if (bbox.min.x && ((dims.min.x === false) || (dims.min.x > bbox.min.x))) dims.min.x = bbox.min.x;
-        if (bbox.min.y && ((dims.min.y === false) || (dims.min.y > bbox.min.y))) dims.min.y = bbox.min.y;
-        if (bbox.min.z && ((dims.min.z === false) || (dims.min.z > bbox.min.z))) dims.min.z = bbox.min.z;
-        if (bbox.max.x && ((dims.max.x === false) || (dims.max.x < bbox.max.x))) dims.max.x = bbox.max.x;
-        if (bbox.max.y && ((dims.max.y === false) || (dims.max.y < bbox.max.y))) dims.max.y = bbox.max.y;
-        if (bbox.max.z && ((dims.max.z === false) || (dims.max.z < bbox.max.z))) dims.max.z = bbox.max.z;
-        scene.add(obj);
+        let bbox = new THREE.Box3().setFromObject(obj)
+        if (bbox.min.x && ((dims.min.x === false) || (dims.min.x > bbox.min.x))) dims.min.x = bbox.min.x
+        if (bbox.min.y && ((dims.min.y === false) || (dims.min.y > bbox.min.y))) dims.min.y = bbox.min.y
+        if (bbox.min.z && ((dims.min.z === false) || (dims.min.z > bbox.min.z))) dims.min.z = bbox.min.z
+        if (bbox.max.x && ((dims.max.x === false) || (dims.max.x < bbox.max.x))) dims.max.x = bbox.max.x
+        if (bbox.max.y && ((dims.max.y === false) || (dims.max.y < bbox.max.y))) dims.max.y = bbox.max.y
+        if (bbox.max.z && ((dims.max.z === false) || (dims.max.z < bbox.max.z))) dims.max.z = bbox.max.z
+
+        if (Array.isArray(obj)) {
+          while (obj.length) {
+            let object = obj.pop()
+            layers[entity.layer].add(object)
+          }
+        } else {
+          layers[entity.layer].add(obj)
+        }
+        // scene.add(obj);
       }
-      obj = null;
+      obj = null
     }
+
+    let layersEntity = new THREE.Object3D()
+    layersEntity.name = 'Layers'
+    layersEntity.userData['container'] = true
+    scene.add(layersEntity)
+
+    let objectsEntity = new THREE.Object3D()
+    objectsEntity.name = 'Objects'
+    objectsEntity.userData['container'] = true
+    scene.add(objectsEntity)
+
+    let helpLayer = new THREE.Object3D()
+    helpLayer.name = 'HelpLayer'
+    helpLayer.userData['container'] = true
+    scene.add(helpLayer)
+
+    Object.keys(data.tables.layer.layers).forEach(layerName => {
+      layersEntity.add(layers[layerName])
+    })
 
     let width = container.clientWidth
     let height = container.clientHeight
-    let aspectRatio = width / height;
+    let aspectRatio = width / height
 
-    let upperRightCorner = { x: dims.max.x, y: dims.max.y };
-    let lowerLeftCorner = { x: dims.min.x, y: dims.min.y };
+    let upperRightCorner = { x: dims.max.x, y: dims.max.y }
+    let lowerLeftCorner = { x: dims.min.x, y: dims.min.y }
 
     // Figure out the current viewport extents
-    let vp_width = upperRightCorner.x - lowerLeftCorner.x;
-    let vp_height = upperRightCorner.y - lowerLeftCorner.y;
+    let vp_width = upperRightCorner.x - lowerLeftCorner.x
+    let vp_height = upperRightCorner.y - lowerLeftCorner.y
     let center = {
       x: vp_width / 2 + lowerLeftCorner.x,
       y: vp_height / 2 + lowerLeftCorner.y
-    };
+    }
 
     // Fit all objects into current ThreeDXF viewer
-    let extentsAspectRatio = Math.abs(vp_width / vp_height);
+    let extentsAspectRatio = Math.abs(vp_width / vp_height)
     if (aspectRatio > extentsAspectRatio) {
-      vp_width = vp_height * aspectRatio;
+      vp_width = vp_height * aspectRatio
     } else {
-      vp_height = vp_width / aspectRatio;
+      vp_height = vp_width / aspectRatio
     }
 
     let viewPort = {
@@ -85,38 +119,38 @@ export default class DxfService {
         x: center.x,
         y: center.y
       }
-    };
+    }
 
-    let camera = new THREE.OrthographicCamera(viewPort.left, viewPort.right, viewPort.top, viewPort.bottom, -10000, 190000);
-    camera.position.z = 10;
-    camera.position.x = viewPort.center.x;
-    camera.position.y = viewPort.center.y;
+    let camera = new THREE.OrthographicCamera(viewPort.left, viewPort.right, viewPort.top, viewPort.bottom, -10000, 190000)
+    camera.position.z = 10
+    camera.position.x = viewPort.center.x
+    camera.position.y = viewPort.center.y
 
-    let renderer = this.renderer = new THREE.WebGLRenderer();
-    renderer.setSize(width, height);
-    renderer.setClearColor(0xfffffff, 1);
+    let renderer = this.renderer = new THREE.WebGLRenderer()
+    renderer.setSize(width, height)
+    renderer.setClearColor(0xfffffff, 1)
 
     // $parent.append(renderer.domElement);
     // $parent.show();
 
-    let controls = new THREE.OrbitControls(camera, container);
-    controls.target.x = camera.position.x;
-    controls.target.y = camera.position.y;
-    controls.target.z = 0;
-    controls.zoomSpeed = 3;
+    let controls = new THREE.OrbitControls(camera, container)
+    controls.target.x = camera.position.x
+    controls.target.y = camera.position.y
+    controls.target.z = 0
+    controls.zoomSpeed = 3
 
     // Uncommend this to disable rotation (does not make much sense with 2D drawings).
-    controls.enableRotate = false;
+    controls.enableRotate = false
 
-    this.render = function() {
+    this.render = function () {
       renderer.render(scene, camera)
-    };
+    }
 
-    controls.addEventListener('change', this.render);
-    this.render();
-    controls.update();
+    controls.addEventListener('change', this.render)
+    this.render()
+    controls.update()
 
-    ////TODO uncomment
+    /// /TODO uncomment
     // $parent.on('click', function(event) {
     //   var $el = $(renderer.domElement);
     //
@@ -135,216 +169,212 @@ export default class DxfService {
     //   console.log(pos.x, pos.y); // Position in cad that is clicked
     // });
 
-    this.resize = function(width, height) {
-      let originalWidth = renderer.domElement.width;
-      let originalHeight = renderer.domElement.height;
+    this.resize = function (width, height) {
+      let originalWidth = renderer.domElement.width
+      let originalHeight = renderer.domElement.height
 
-      let hscale = width / originalWidth;
-      let vscale = height / originalHeight;
+      let hscale = width / originalWidth
+      let vscale = height / originalHeight
 
-      camera.top = (vscale * camera.top);
-      camera.bottom = (vscale * camera.bottom);
-      camera.left = (hscale * camera.left);
-      camera.right = (hscale * camera.right);
+      camera.top = (vscale * camera.top)
+      camera.bottom = (vscale * camera.bottom)
+      camera.left = (hscale * camera.left)
+      camera.right = (hscale * camera.right)
 
-      renderer.setSize(width, height);
-      renderer.setClearColor(0xfffffff, 1);
-      camera.updateProjectionMatrix();
-      this.render();
-    };
-
-    function drawEntity(entity, data) {
-      let mesh;
-      if(entity.type === 'CIRCLE' || entity.type === 'ARC') {
-        mesh = drawCircle(entity, data);
-      } else if(entity.type === 'LWPOLYLINE' || entity.type === 'LINE' || entity.type === 'POLYLINE') {
-        mesh = drawLine(entity, data);
-      } else if(entity.type === 'TEXT') {
-        mesh = drawText(entity, data);
-      } else if(entity.type === 'SOLID') {
-        mesh = drawSolid(entity, data);
-      } else if(entity.type === 'POINT') {
-        mesh = drawPoint(entity, data);
-      } else if(entity.type === 'INSERT') {
-        mesh = drawBlock(entity, data);
-      } else if(entity.type === 'SPLINE') {
-        mesh = drawSpline(entity, data);
-      } else if(entity.type === 'MTEXT') {
-        mesh = drawMtext(entity, data);
-      } else if(entity.type === 'ELLIPSE') {
-        mesh = drawEllipse(entity, data);
-      }
-      else {
-        console.log("Unsupported Entity Type: " + entity.type);
-      }
-      return mesh;
+      renderer.setSize(width, height)
+      renderer.setClearColor(0xfffffff, 1)
+      camera.updateProjectionMatrix()
+      this.render()
     }
 
-    function drawEllipse(entity, data) {
-      let color = getColor(entity, data);
+    function drawEntity (entity, data) {
+      let mesh
+      if (entity.type === 'CIRCLE' || entity.type === 'ARC') {
+        mesh = drawCircle(entity, data)
+      } else if (entity.type === 'LWPOLYLINE' || entity.type === 'LINE' || entity.type === 'POLYLINE') {
+        mesh = drawLine(entity, data)
+      } else if (entity.type === 'TEXT') {
+        mesh = drawText(entity, data)
+      } else if (entity.type === 'SOLID') {
+        mesh = drawSolid(entity, data)
+      } else if (entity.type === 'POINT') {
+        mesh = drawPoint(entity, data)
+      } else if (entity.type === 'INSERT') {
+        mesh = drawBlock(entity, data)
+      } else if (entity.type === 'SPLINE') {
+        mesh = drawSpline(entity, data)
+      } else if (entity.type === 'MTEXT') {
+        mesh = drawMtext(entity, data)
+      } else if (entity.type === 'ELLIPSE') {
+        mesh = drawEllipse(entity, data)
+      } else {
+        console.log('Unsupported Entity Type: ' + entity.type)
+      }
+      return mesh
+    }
 
-      let xrad = Math.sqrt(Math.pow(entity.majorAxisEndPoint.x,2) + Math.pow(entity.majorAxisEndPoint.y,2));
-      let yrad = xrad*entity.axisRatio;
-      let rotation = Math.atan2(entity.majorAxisEndPoint.y, entity.majorAxisEndPoint.x);
+    function drawEllipse (entity, data) {
+      let color = getColor(entity, data)
+
+      let xrad = Math.sqrt(Math.pow(entity.majorAxisEndPoint.x, 2) + Math.pow(entity.majorAxisEndPoint.y, 2))
+      let yrad = xrad * entity.axisRatio
+      let rotation = Math.atan2(entity.majorAxisEndPoint.y, entity.majorAxisEndPoint.x)
 
       let curve = new THREE.EllipseCurve(
-        entity.center.x,  entity.center.y,
+        entity.center.x, entity.center.y,
         xrad, yrad,
         entity.startAngle, entity.endAngle,
         false, // Always counterclockwise
         rotation
-      );
+      )
 
-      let points = curve.getPoints( 50 );
-      let geometry = new THREE.BufferGeometry().setFromPoints( points );
-      let material = new THREE.LineBasicMaterial( {  linewidth: 1, color : color } );
+      let points = curve.getPoints(50)
+      let geometry = new THREE.BufferGeometry().setFromPoints(points)
+      let material = new THREE.LineBasicMaterial({ linewidth: 1, color: color })
 
       // Create the final object to add to the scene
       // ellipse
-      return new THREE.Line( geometry, material );
+      return new THREE.Line(geometry, material)
     }
 
-    function drawMtext(entity, data) {
-      let color = getColor(entity, data);
+    function drawMtext (entity, data) {
+      let color = getColor(entity, data)
 
-      let geometry = new THREE.TextGeometry( entity.text, {
-        ////TODO uncomment
+      let geometry = new THREE.TextGeometry(entity.text, {
+        /// /TODO uncomment
         // font: font,
-        size: entity.height * (4/5),
+        size: entity.height * (4 / 5),
         height: 1
-      });
-      let material = new THREE.MeshBasicMaterial( {color: color} );
-      let text = new THREE.Mesh( geometry, material );
+      })
+      let material = new THREE.MeshBasicMaterial({color: color})
+      let text = new THREE.Mesh(geometry, material)
 
       // Measure what we rendered.
-      let measure = new THREE.Box3();
-      measure.setFromObject( text );
+      let measure = new THREE.Box3()
+      measure.setFromObject(text)
 
-      let textWidth  = measure.max.x - measure.min.x;
+      let textWidth = measure.max.x - measure.min.x
 
       // If the text ends up being wider than the box, it's supposed
       // to be multiline. Doing that in threeJS is overkill.
       if (textWidth > entity.width) {
-        console.log("Can't render this multipline MTEXT entity, sorry.", entity);
-        return undefined;
+        console.log("Can't render this multipline MTEXT entity, sorry.", entity)
+        return undefined
       }
 
-      text.position.z = 0;
+      text.position.z = 0
       switch (entity.attachmentPoint) {
         case 1:
           // Top Left
-          text.position.x = entity.position.x;
-          text.position.y = entity.position.y - entity.height;
-          break;
+          text.position.x = entity.position.x
+          text.position.y = entity.position.y - entity.height
+          break
         case 2:
           // Top Center
-          text.position.x = entity.position.x - textWidth/2;
-          text.position.y = entity.position.y - entity.height;
-          break;
+          text.position.x = entity.position.x - textWidth / 2
+          text.position.y = entity.position.y - entity.height
+          break
         case 3:
           // Top Right
-          text.position.x = entity.position.x - textWidth;
-          text.position.y = entity.position.y - entity.height;
-          break;
+          text.position.x = entity.position.x - textWidth
+          text.position.y = entity.position.y - entity.height
+          break
 
         case 4:
           // Middle Left
-          text.position.x = entity.position.x;
-          text.position.y = entity.position.y - entity.height/2;
-          break;
+          text.position.x = entity.position.x
+          text.position.y = entity.position.y - entity.height / 2
+          break
         case 5:
           // Middle Center
-          text.position.x = entity.position.x - textWidth/2;
-          text.position.y = entity.position.y - entity.height/2;
-          break;
+          text.position.x = entity.position.x - textWidth / 2
+          text.position.y = entity.position.y - entity.height / 2
+          break
         case 6:
           // Middle Right
-          text.position.x = entity.position.x - textWidth;
-          text.position.y = entity.position.y - entity.height/2;
-          break;
+          text.position.x = entity.position.x - textWidth
+          text.position.y = entity.position.y - entity.height / 2
+          break
 
         case 7:
           // Bottom Left
-          text.position.x = entity.position.x;
-          text.position.y = entity.position.y;
-          break;
+          text.position.x = entity.position.x
+          text.position.y = entity.position.y
+          break
         case 8:
           // Bottom Center
-          text.position.x = entity.position.x - textWidth/2;
-          text.position.y = entity.position.y;
-          break;
+          text.position.x = entity.position.x - textWidth / 2
+          text.position.y = entity.position.y
+          break
         case 9:
           // Bottom Right
-          text.position.x = entity.position.x - textWidth;
-          text.position.y = entity.position.y;
-          break;
+          text.position.x = entity.position.x - textWidth
+          text.position.y = entity.position.y
+          break
 
         default:
-          return undefined;
+          return undefined
       }
 
-      return text;
+      return text
     }
 
-    function drawSpline(entity, data) {
-      let color = getColor(entity, data);
+    function drawSpline (entity, data) {
+      let color = getColor(entity, data)
 
-      let points = entity.controlPoints.map(function(vec) {
-        return new THREE.Vector2(vec.x, vec.y);
-      });
+      let points = entity.controlPoints.map(function (vec) {
+        return new THREE.Vector2(vec.x, vec.y)
+      })
 
-      let interpolatedPoints = [];
+      let interpolatedPoints = []
       if (entity.degreeOfSplineCurve === 2) {
-        for(let i = 0; i + 2 < points.length; i = i + 2) {
-          let curve = new THREE.QuadraticBezierCurve(points[i], points[i + 1], points[i + 2]);
-          interpolatedPoints.push.apply(interpolatedPoints, curve.getPoints(50));
+        for (let i = 0; i + 2 < points.length; i = i + 2) {
+          let curve = new THREE.QuadraticBezierCurve(points[i], points[i + 1], points[i + 2])
+          interpolatedPoints.push.apply(interpolatedPoints, curve.getPoints(50))
         }
       } else {
-        let curve = new THREE.SplineCurve(points);
-        interpolatedPoints = curve.getPoints( 100 );
+        let curve = new THREE.SplineCurve(points)
+        interpolatedPoints = curve.getPoints(100)
       }
 
-      let geometry = new THREE.BufferGeometry().setFromPoints( interpolatedPoints );
-      let material = new THREE.LineBasicMaterial( { linewidth: 1, color : color } );
-      //splineObject
-      return new THREE.Line( geometry, material )
+      let geometry = new THREE.BufferGeometry().setFromPoints(interpolatedPoints)
+      let material = new THREE.LineBasicMaterial({ linewidth: 1, color: color })
+      // splineObject
+      return new THREE.Line(geometry, material)
     }
 
-    function drawLine(entity, data) {
+    function drawLine (entity, data) {
       let geometry = new THREE.Geometry(),
         color = getColor(entity, data),
         material, lineType, vertex, startPoint, endPoint, bulgeGeometry,
-        bulge, i, line;
+        bulge, i, line
 
       // create geometry
-      for(i = 0; i < entity.vertices.length; i++) {
+      for (i = 0; i < entity.vertices.length; i++) {
+        if (entity.vertices[i].bulge) {
+          bulge = entity.vertices[i].bulge
+          startPoint = entity.vertices[i]
+          endPoint = i + 1 < entity.vertices.length ? entity.vertices[i + 1] : geometry.vertices[0]
 
-        if(entity.vertices[i].bulge) {
-          bulge = entity.vertices[i].bulge;
-          startPoint = entity.vertices[i];
-          endPoint = i + 1 < entity.vertices.length ? entity.vertices[i + 1] : geometry.vertices[0];
+          bulgeGeometry = new THREE.BulgeGeometry(startPoint, endPoint, bulge)
 
-          bulgeGeometry = new THREE.BulgeGeometry(startPoint, endPoint, bulge);
-
-          geometry.vertices.push.apply(geometry.vertices, bulgeGeometry.vertices);
+          geometry.vertices.push.apply(geometry.vertices, bulgeGeometry.vertices)
         } else {
-          vertex = entity.vertices[i];
-          geometry.vertices.push(new THREE.Vector3(vertex.x, vertex.y, 0));
+          vertex = entity.vertices[i]
+          geometry.vertices.push(new THREE.Vector3(vertex.x, vertex.y, 0))
         }
-
       }
-      if(entity.shape) geometry.vertices.push(geometry.vertices[0]);
-
+      if (entity.shape) geometry.vertices.push(geometry.vertices[0])
 
       // set material
-      if(entity.lineType) {
-        lineType = data.tables.lineType.lineTypes[entity.lineType];
+      if (entity.lineType) {
+        lineType = data.tables.lineType.lineTypes[entity.lineType]
       }
 
-      if(lineType && lineType.pattern && lineType.pattern.length !== 0) {
-        material = new THREE.LineDashedMaterial({ color: color, gapSize: 4, dashSize: 4});
+      if (lineType && lineType.pattern && lineType.pattern.length !== 0) {
+        material = new THREE.LineDashedMaterial({ color: color, gapSize: 4, dashSize: 4})
       } else {
-        material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
+        material = new THREE.LineBasicMaterial({ linewidth: 1, color: color })
       }
 
       // if(lineType && lineType.pattern && lineType.pattern.length !== 0) {
@@ -364,63 +394,61 @@ export default class DxfService {
       // 	material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
       // }
 
-      line = new THREE.Line(geometry, material);
-      return line;
+      line = new THREE.Line(geometry, material)
+      return line
     }
 
-    function drawCircle(entity, data) {
-      let geometry, material, circle;
+    function drawCircle (entity, data) {
+      let geometry, material, circle
 
-      geometry = new THREE.CircleGeometry(entity.radius, 32, entity.startAngle, entity.angleLength);
-      geometry.vertices.shift();
+      geometry = new THREE.CircleGeometry(entity.radius, 32, entity.startAngle, entity.angleLength)
+      geometry.vertices.shift()
 
-      material = new THREE.LineBasicMaterial({ color: getColor(entity, data) });
+      material = new THREE.LineBasicMaterial({ color: getColor(entity, data) })
 
-      circle = new THREE.Line(geometry, material);
-      circle.position.x = entity.center.x;
-      circle.position.y = entity.center.y;
-      circle.position.z = entity.center.z;
+      circle = new THREE.Line(geometry, material)
+      circle.position.x = entity.center.x
+      circle.position.y = entity.center.y
+      circle.position.z = entity.center.z
 
-      return circle;
+      return circle
     }
 
-    function drawSolid(entity, data) {
+    function drawSolid (entity, data) {
       let material, verts,
-        geometry = new THREE.Geometry();
+        geometry = new THREE.Geometry()
 
-      verts = geometry.vertices;
-      verts.push(new THREE.Vector3(entity.points[0].x, entity.points[0].y, entity.points[0].z));
-      verts.push(new THREE.Vector3(entity.points[1].x, entity.points[1].y, entity.points[1].z));
-      verts.push(new THREE.Vector3(entity.points[2].x, entity.points[2].y, entity.points[2].z));
-      verts.push(new THREE.Vector3(entity.points[3].x, entity.points[3].y, entity.points[3].z));
+      verts = geometry.vertices
+      verts.push(new THREE.Vector3(entity.points[0].x, entity.points[0].y, entity.points[0].z))
+      verts.push(new THREE.Vector3(entity.points[1].x, entity.points[1].y, entity.points[1].z))
+      verts.push(new THREE.Vector3(entity.points[2].x, entity.points[2].y, entity.points[2].z))
+      verts.push(new THREE.Vector3(entity.points[3].x, entity.points[3].y, entity.points[3].z))
 
       // Calculate which direction the points are facing (clockwise or counter-clockwise)
-      let vector1 = new THREE.Vector3();
-      let vector2 = new THREE.Vector3();
-      vector1.subVectors(verts[1], verts[0]);
-      vector2.subVectors(verts[2], verts[0]);
-      vector1.cross(vector2);
+      let vector1 = new THREE.Vector3()
+      let vector2 = new THREE.Vector3()
+      vector1.subVectors(verts[1], verts[0])
+      vector2.subVectors(verts[2], verts[0])
+      vector1.cross(vector2)
 
       // If z < 0 then we must draw these in reverse order
-      if(vector1.z < 0) {
-        geometry.faces.push(new THREE.Face3(2, 1, 0));
-        geometry.faces.push(new THREE.Face3(2, 3, 1));
+      if (vector1.z < 0) {
+        geometry.faces.push(new THREE.Face3(2, 1, 0))
+        geometry.faces.push(new THREE.Face3(2, 3, 1))
       } else {
-        geometry.faces.push(new THREE.Face3(0, 1, 2));
-        geometry.faces.push(new THREE.Face3(1, 3, 2));
+        geometry.faces.push(new THREE.Face3(0, 1, 2))
+        geometry.faces.push(new THREE.Face3(1, 3, 2))
       }
 
+      material = new THREE.MeshBasicMaterial({ color: getColor(entity, data) })
 
-      material = new THREE.MeshBasicMaterial({ color: getColor(entity, data) });
-
-      return new THREE.Mesh(geometry, material);
-
+      return new THREE.Mesh(geometry, material)
     }
 
-    function drawText(entity, data) {
-      return false;
+    function drawText (entity, data) {
+      return false
 
-      //TODO uncomment
+      // TODO uncomment
       // let geometry, material, text;
 
       // if(!font)
@@ -438,92 +466,91 @@ export default class DxfService {
       // return text;
     }
 
-    function drawPoint(entity, data) {
-      let geometry, material, point;
+    function drawPoint (entity, data) {
+      let geometry, material, point
 
-      geometry = new THREE.Geometry();
+      geometry = new THREE.Geometry()
 
-      geometry.vertices.push(new THREE.Vector3(entity.position.x, entity.position.y, entity.position.z));
+      geometry.vertices.push(new THREE.Vector3(entity.position.x, entity.position.y, entity.position.z))
 
       // TODO: could be more efficient. PointCloud per layer?
 
-      let numPoints = 1;
+      let numPoints = 1
 
-      let color = getColor(entity, data);
-      let colors = new Float32Array( numPoints*3 );
-      colors[0] = color.r;
-      colors[1] = color.g;
-      colors[2] = color.b;
+      let color = getColor(entity, data)
+      let colors = new Float32Array(numPoints * 3)
+      colors[0] = color.r
+      colors[1] = color.g
+      colors[2] = color.b
 
-      geometry.colors = colors;
-      geometry.computeBoundingBox();
+      geometry.colors = colors
+      geometry.computeBoundingBox()
 
-      material = new THREE.PointsMaterial( { size: 0.05, vertexColors: THREE.VertexColors } );
-      point = new THREE.Points(geometry, material);
-      scene.add(point);
+      material = new THREE.PointsMaterial({ size: 0.05, vertexColors: THREE.VertexColors })
+      point = new THREE.Points(geometry, material)
+      scene.add(point)
     }
 
-    function drawBlock(entity, data) {
-      let block = data.blocks[entity.name];
+    function drawBlock (entity, data) {
+      let block = data.blocks[entity.name]
 
-      if (!block.entities) return null;
+      if (!block.entities) return null
 
       let group = new THREE.Object3D()
 
-      if(entity.xScale) group.scale.x = entity.xScale;
-      if(entity.yScale) group.scale.y = entity.yScale;
+      if (entity.xScale) group.scale.x = entity.xScale
+      if (entity.yScale) group.scale.y = entity.yScale
 
-      if(entity.rotation) {
-        group.rotation.z = entity.rotation * Math.PI / 180;
+      if (entity.rotation) {
+        group.rotation.z = entity.rotation * Math.PI / 180
       }
 
-      if(entity.position) {
-        group.position.x = entity.position.x;
-        group.position.y = entity.position.y;
-        group.position.z = entity.position.z;
+      if (entity.position) {
+        group.position.x = entity.position.x
+        group.position.y = entity.position.y
+        group.position.z = entity.position.z
       }
 
-      for(let i = 0; i < block.entities.length; i++) {
-        let childEntity = drawEntity(block.entities[i], data, group);
+      for (let i = 0; i < block.entities.length; i++) {
+        let childEntity = drawEntity(block.entities[i], data, group)
         if (childEntity) {
-          group.add(childEntity);
+          group.add(childEntity)
         }
       }
 
-      return group;
+      return group
     }
 
-    function getColor(entity, data) {
-      let color = 0x000000; //default
-      if(entity.color) color = entity.color;
-      else if(data.tables && data.tables.layer && data.tables.layer.layers[entity.layer])
-        color = data.tables.layer.layers[entity.layer].color;
+    function getColor (entity, data) {
+      let color = 0x000000 // default
+      if (entity.color) color = entity.color
+      else if (data.tables && data.tables.layer && data.tables.layer.layers[entity.layer]) { color = data.tables.layer.layers[entity.layer].color }
 
-      if(color == null || color === 0xffffff) {
-        color = 0x000000;
+      if (color == null || color === 0xffffff) {
+        color = 0x000000
       }
-      return color;
+      return color
     }
 
-    function createLineTypeShaders(data) {
-      let ltype, type;
-      if(!data.tables || !data.tables.lineType) return;
-      let ltypes = data.tables.lineType.lineTypes;
+    function createLineTypeShaders (data) {
+      let ltype, type
+      if (!data.tables || !data.tables.lineType) return
+      let ltypes = data.tables.lineType.lineTypes
 
-      for(type in ltypes) {
-        ltype = ltypes[type];
-        if(!ltype.pattern) continue;
-        ltype.material = createDashedLineShader(ltype.pattern);
+      for (type in ltypes) {
+        ltype = ltypes[type]
+        if (!ltype.pattern) continue
+        ltype.material = createDashedLineShader(ltype.pattern)
       }
     }
 
-    function createDashedLineShader(pattern) {
+    function createDashedLineShader (pattern) {
       let i,
         dashedLineShader = {},
-        totalLength = 0.0;
+        totalLength = 0.0
 
-      for(i = 0; i < pattern.length; i++) {
-        totalLength += Math.abs(pattern[i]);
+      for (i = 0; i < pattern.length; i++) {
+        totalLength += Math.abs(pattern[i])
       }
 
       dashedLineShader.uniforms = THREE.UniformsUtils.merge([
@@ -536,7 +563,7 @@ export default class DxfService {
           'patternLength': { type: 'f', value: totalLength }
         }
 
-      ]);
+      ])
 
       dashedLineShader.vertexShader = [
         'attribute float lineDistance;',
@@ -554,7 +581,7 @@ export default class DxfService {
         'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
         '}'
-      ].join('\n');
+      ].join('\n')
 
       dashedLineShader.fragmentShader = [
         'uniform vec3 diffuse;',
@@ -588,13 +615,13 @@ export default class DxfService {
         THREE.ShaderChunk[ 'fog_fragment' ],
 
         '}'
-      ].join('\n');
+      ].join('\n')
 
-      return dashedLineShader;
+      return dashedLineShader
     }
 
-    this.getScene = () => scene;
-    this.getCamera = () => camera;
-    this.getRenderer = () => renderer;
+    this.getScene = () => scene
+    this.getCamera = () => camera
+    this.getRenderer = () => renderer
   }
 }

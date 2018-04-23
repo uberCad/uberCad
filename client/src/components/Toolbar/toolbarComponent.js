@@ -1,9 +1,17 @@
+// ICONS: https://www.flaticon.com/free-icon/computer-mouse-cursor_70358#term=cursor&page=1&position=11
+
 import React, { Component } from 'react'
 // import PropTypes from 'prop-types'
 import './Toolbar.css'
+import toolPoint from './point.svg'
+import toolSelect from './select.svg'
+import toolUndo from './undo.svg'
+import toolRedo from './redo.svg'
 
 export const TOOL_POINT = 'TOOL_POINT';
 export const TOOL_SELECT = 'TOOL_SELECT';
+export const TOOL_UNDO = 'TOOL_UNDO';
+export const TOOL_REDO = 'TOOL_REDO';
 
 export default class ToolbarComponent extends Component {
   onClick = ({target: {dataset: {tool}}}) => {
@@ -21,7 +29,7 @@ export default class ToolbarComponent extends Component {
                 onClick={this.onClick}
                 title="Point (v)"
         >
-          <i className="fa fa-mouse-pointer" />
+          <img src={toolPoint} alt="Point" />
         </button>
 
         <button className={`btn ${tool === TOOL_SELECT ? 'btn-success' : ''}`}
@@ -29,18 +37,35 @@ export default class ToolbarComponent extends Component {
                 onClick={this.onClick}
                 title="Select (m)"
         >
-          <i className="fa fa-clone" />
+          <img src={toolSelect} alt="Select" />
         </button>
+
+
+        <button className={`btn ${tool === TOOL_UNDO ? 'btn-success' : ''}`}
+                data-tool={TOOL_UNDO}
+                onClick={this.onClick}
+                title="Undo"
+        >
+          <img src={toolUndo} alt="Undo" />
+        </button>
+        <button className={`btn ${tool === TOOL_REDO ? 'btn-success' : ''}`}
+                data-tool={TOOL_REDO}
+                onClick={this.onClick}
+                title="Redo"
+        >
+          <img src={toolRedo} alt="Redo" />
+        </button>
+
+        {/*<button className="btn" id="back" type="submit" disabled="true" ng-click="back()" title="Back"><i*/}
+        {/*class="fa fa-rotate-left"></i></button>*/}
+        {/*<button className="btn" id="forward" type="submit" disabled="true" ng-click="forward()" title="Forward"><i*/}
+        {/*class="fa fa-rotate-right"></i></button>*/}
 
 
 
         {/*<button className="btn" ng-class="{'btn-success': tools.eraser == editor.tool}"*/}
                 {/*ng-click="selectTool(tools.eraser)"*/}
                 {/*title="Erase (e)"><i class="fa fa-trash-o"></i></button>*/}
-        {/*<button className="btn" id="back" type="submit" disabled="true" ng-click="back()" title="Back"><i*/}
-          {/*class="fa fa-rotate-left"></i></button>*/}
-        {/*<button className="btn" id="forward" type="submit" disabled="true" ng-click="forward()" title="Forward"><i*/}
-          {/*class="fa fa-rotate-right"></i></button>*/}
 
         {/*<!--line-->*/}
         {/*<!--arc-->*/}

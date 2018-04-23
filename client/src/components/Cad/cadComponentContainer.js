@@ -1,9 +1,12 @@
 import { connect } from 'react-redux'
 import CadComponent from './cadComponent'
 import { fetchProject } from '../../actions/project'
-import { drawDxf, cadClick } from '../../actions/cad'
+import {
+  drawDxf,
+  cadClick,
+  cadDoubleClick
+} from '../../actions/cad'
 import { spinnerShow, spinnerHide } from '../../actions/spinner'
-import { TOOL_POINT } from '../Toolbar/toolbarComponent'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -15,7 +18,9 @@ const mapStateToProps = (state, ownProps) => {
       tool: state.toolbar.tool,
       activeEntities: state.cad.activeEntities,
       options: {
-        selectMode: 'new'//state.options.mode
+        selectMode: 'new', // state.options.mode,
+        singleLayerSelect: true,
+        threshold: 0.0001
       },
       editMode: {
         isEdit: false
@@ -56,6 +61,10 @@ const mapDispatchToProps = (dispatch) => {
 
     onClick: (event, editor) => {
       cadClick(event, editor)(dispatch)
+    },
+
+    onDoubleClick: (event, editor) => {
+      cadDoubleClick(event, editor)(dispatch)
     }
   }
 }

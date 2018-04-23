@@ -8,12 +8,11 @@ export const CAD_DRAW_DXF = 'CAD_DRAW_DXF'
 export const CAD_CLICK = 'CAD_CLICK'
 export const CAD_DO_SELECTION = 'CAD_DO_SELECTION'
 
-
 export const drawDxf = (data, container) => {
-  let cadCanvas = new dxfService.Viewer(data, container);
-  let scene = cadCanvas.getScene();
-  let camera = cadCanvas.getCamera();
-  let renderer = cadCanvas.getRenderer();
+  let cadCanvas = new dxfService.Viewer(data, container)
+  let scene = cadCanvas.getScene()
+  let camera = cadCanvas.getCamera()
+  let renderer = cadCanvas.getRenderer()
 
   container.appendChild(renderer.domElement)
 
@@ -30,35 +29,30 @@ export const drawDxf = (data, container) => {
 
 export const cadClick = (event, editor) => {
   return dispatch => {
-    let {scene, camera, tool} = editor;
+    let {scene, camera, tool} = editor
 
     switch (tool) {
       case TOOL_POINT: {
-        let clickResult = sceneService.onClick(event, scene, camera);
-        console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult);
+        let clickResult = sceneService.onClick(event, scene, camera)
+        console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
 
         let payload = {
           ...clickResult,
           object: null
         }
 
-        let selectResult = clickResult.activeEntities;
+        let selectResult = clickResult.activeEntities
         // $scope.editor.lastClickResult.activeEntities = ArrayUtils.clone(clickResult.activeEntities);
 
         if (selectResult.length) {
-          //check if entity belongs to object
+          // check if entity belongs to object
           if (selectResult[0].userData.belongsToObject) {
-            payload.object = selectResult[0].parent;
+            payload.object = selectResult[0].parent
           }
         }
 
-
-        console.log('editor',editor)
-
-
-
         if (!editor.editMode.isEdit) {
-          let activeEntities = sceneService.doSelection(selectResult, editor);
+          let activeEntities = sceneService.doSelection(selectResult, editor)
           dispatch({
             type: CAD_DO_SELECTION,
             payload: {
@@ -80,26 +74,53 @@ export const cadClick = (event, editor) => {
         //   }
         // }
 
-        console.log('Click RESULT', clickResult);
-
-
-
+        //console.log('Click RESULT', clickResult)
 
         dispatch({
           type: CAD_CLICK,
           payload
         })
-      } break;
-      default: {
+      }
+        break
+      default:
         console.log(`cadClick not handled for tool: ${tool}`)
-      } break;
+        break
     }
-
-
   }
+}
 
+export const cadDoubleClick = (event, editor) => {
+  return dispatch => {
+    let {scene, camera, tool} = editor
 
+    // console.warn('Double click: TODO recursive select entities')
 
+    switch (tool) {
+      case TOOL_POINT:
+        if (!editor.editMode.isEdit) {
+          let clickResult = sceneService.onClick(event, scene, camera)
+          console.log(`DOUBLE Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
+
+          if (clickResult.activeEntities.length) {
+            console.log('has active entities')
+            // check if entity belongs to object
+            if (clickResult.activeEntities[0].userData.belongsToObject) {
+              // completely select object
+              // $scope.editor.activeEntities = $scope.editor.activeEntities[0].parent.children;
+              sceneService.doSelection(clickResult.activeEntities[0].parent.children, editor)
+            } else {
+              let activeEntities = sceneService.recursiveSelect(clickResult.activeEntities[0], editor)
+              sceneService.doSelection(activeEntities, editor)
+            }
+          }
+        }
+
+        break
+      default:
+        console.log(`cadDoubleClick not handled for tool: ${tool}`)
+        break
+    }
+  }
 }
 
 export const parseDxf = dxf => {

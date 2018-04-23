@@ -6,7 +6,6 @@ import spinner from './spinner'
 import cad from './cad'
 import toolbar from './toolbar'
 
-
 export default {
   counter,
   projectsByFilter,
@@ -16,7 +15,3 @@ export default {
   cad,
   toolbar
 }
-
-
-
-

@@ -2,29 +2,29 @@ export default {
   union: (target, source) => {
     source.forEach(item => {
       if (target.indexOf(item) === -1) {
-        target.push(item);
+        target.push(item)
       }
-    });
+    })
 
-    return target;
+    return target
   },
   intersection: (arr1, arr2) => {
-    let res = [];
+    let res = []
     arr1.forEach(item => {
       if (arr2.indexOf(item) > -1) {
-        res.push(item);
+        res.push(item)
       }
-    });
-    return res;
+    })
+    return res
   },
   subtract: (arr1, arr2) => {
-    let res = [];
+    let res = []
     arr1.forEach(item => {
       if (arr2.indexOf(item) === -1) {
-        res.push(item);
+        res.push(item)
       }
-    });
-    return res;
+    })
+    return res
   },
   /**
    * @param source

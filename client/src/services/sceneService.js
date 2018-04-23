@@ -4,119 +4,361 @@ import GeometryUtils from './GeometryUtils'
 
 let onClick = (event, scene, camera) => {
   let result = {
-    point: undefined, //new THREE.Vector3
+    point: undefined, // new THREE.Vector3
     activeEntities: []
-  };
-  let canvas = event.target.tagName === "CANVAS" && event.target;
+  }
+  let canvas = event.target.tagName === 'CANVAS' && event.target
   if (!canvas) {
-    return;
+    return
   }
 
-  let canvasOffset = getOffset(canvas);
+  let canvasOffset = getOffset(canvas)
 
-  let rayCaster = new THREE.Raycaster(); // create once
-  let mouse = new THREE.Vector3((event.pageX - canvasOffset.left) / (canvas.clientWidth - 1) * 2 - 1, -((event.pageY - canvasOffset.top) / (canvas.clientHeight - 1)) * 2 + 1, 0);
-  rayCaster.setFromCamera(mouse, camera);
+  let rayCaster = new THREE.Raycaster() // create once
+  let mouse = new THREE.Vector3((event.pageX - canvasOffset.left) / (canvas.clientWidth - 1) * 2 - 1, -((event.pageY - canvasOffset.top) / (canvas.clientHeight - 1)) * 2 + 1, 0)
+  rayCaster.setFromCamera(mouse, camera)
 
-  //get mouse coordinates
-  mouse.unproject(camera);
-  result.point = mouse;
+  // get mouse coordinates
+  mouse.unproject(camera)
+  result.point = mouse
 
   rayCaster.intersectObjects(scene.children, true).forEach(intersection => {
     if (result.activeEntities.indexOf(intersection.object) < 0) {
-      result.activeEntities.push(intersection.object);
+      result.activeEntities.push(intersection.object)
     }
-  });
+  })
 
   result.activeEntities.forEach(function (line) {
-    if (line.geometry.type === "Geometry") {
-      line.userData.mouseDistance = GeometryUtils.distanceToLine(result.point, line);
-    } else if (line.geometry.type === "CircleGeometry") {
-      line.userData.mouseDistance = GeometryUtils.distanceToArc(result.point, line);
+    if (line.geometry.type === 'Geometry') {
+      line.userData.mouseDistance = GeometryUtils.distanceToLine(result.point, line)
+    } else if (line.geometry.type === 'CircleGeometry') {
+      line.userData.mouseDistance = GeometryUtils.distanceToArc(result.point, line)
     }
-  });
+  })
   let compare = (a, b) => {
-    if (a.userData.mouseDistance > b.userData.mouseDistance) return 1;
-    if (a.userData.mouseDistance < b.userData.mouseDistance) return -1;
-  };
-  result.activeEntities.sort(compare);
+    if (a.userData.mouseDistance > b.userData.mouseDistance) return 1
+    if (a.userData.mouseDistance < b.userData.mouseDistance) return -1
+  }
+  result.activeEntities.sort(compare)
 
-  return result;
+  return result
 }
 
 let doSelection = (selectResult, editor) => {
-  highlightEntities(editor, true, undefined, false);
+  highlightEntities(editor, true, undefined, false)
   switch (editor.options.selectMode) {
     case 'new': {
-      editor.activeEntities = selectResult;
+      editor.activeEntities = selectResult
     }
-      break;
+      break
     case 'add': {
-      editor.activeEntities = ArrayUtils.union(editor.activeEntities, selectResult);
+      editor.activeEntities = ArrayUtils.union(editor.activeEntities, selectResult)
     }
-      break;
+      break
     case 'sub': {
-      editor.activeEntities = ArrayUtils.subtract(editor.activeEntities, selectResult);
+      editor.activeEntities = ArrayUtils.subtract(editor.activeEntities, selectResult)
     }
-      break;
+      break
     case 'intersect': {
-      editor.activeEntities = ArrayUtils.intersection(editor.activeEntities, selectResult);
+      editor.activeEntities = ArrayUtils.intersection(editor.activeEntities, selectResult)
     }
-      break;
+      break
   }
-  highlightEntities(editor);
+  highlightEntities(editor)
 
-  return editor.activeEntities;
+  return editor.activeEntities
 }
 
 let render = (editor) => {
-  let {renderer, scene, camera} = editor;
-  renderer.render(scene, camera);
+  let {renderer, scene, camera} = editor
+  renderer.render(scene, camera)
 }
 
 let highlightEntities = (editor, restoreColor = false, color = 0x0000FF, doRender = true) => {
-  let entities = editor.activeEntities;
+  let entities = editor.activeEntities
   entities.forEach(entity => {
-    //upd color
+    // upd color
     if (restoreColor) {
-      delete entity.userData.showInTop;
+      delete entity.userData.showInTop
       if (entity.userData.originalColor) {
-        entity.material.color = entity.userData.originalColor;
-        delete entity.userData.originalColor;
+        entity.material.color = entity.userData.originalColor
+        delete entity.userData.originalColor
       }
     } else {
       if (!entity.userData.originalColor) {
-        entity.userData.originalColor = entity.material.color;
+        entity.userData.originalColor = entity.material.color
       }
-      entity.material.color = new THREE.Color(color);
+      entity.material.color = new THREE.Color(color)
     }
     // entity.geometry.computeLineDistances();
-    entity.material.needUpdate = true;
-  });
+    entity.material.needUpdate = true
+  })
   if (doRender) {
-    render(editor);
+    render(editor)
   }
 }
 
+function shotPoints (vertex, distance = 0.1) {
+  let vertices = []
+
+  let tmp = vertex.clone()
+  tmp.x += distance
+  vertices.push(tmp)
+
+  tmp = vertex.clone()
+  tmp.x -= distance
+  vertices.push(tmp)
+
+  tmp = vertex.clone()
+  tmp.y += distance
+  vertices.push(tmp)
+
+  tmp = vertex.clone()
+  tmp.y -= distance
+  vertices.push(tmp)
+
+  return vertices
+}
+
+function getNeighbours (entity, editor, entities = []) {
+  let {scene} = editor
+
+  let vertices = []
+
+  if (entity.geometry instanceof THREE.CircleGeometry) {
+    // arc
+
+    let vertex = new THREE.Vector3(0, 0, 0)
+    vertices.push(vertex.addVectors(entity.geometry.vertices[0], entity.position))
+
+    vertex = new THREE.Vector3(0, 0, 0)
+    vertices.push(vertex.addVectors(entity.geometry.vertices[entity.geometry.vertices.length - 1], entity.position))
+  } else {
+    // line?
+    vertices = entity.geometry.vertices
+  }
+
+  vertices.forEach(vertex => {
+    let tmpVertices = [vertex].concat(shotPoints(vertex, 0.1))
+
+    tmpVertices.forEach(tmpVertex => {
+      let rayCaster = new THREE.Raycaster(tmpVertex, new THREE.Vector3(0, 0, 1))
+
+      // TODO: intersection on same layer
+
+      let objects = scene.children
+      if (editor.options.singleLayerSelect) {
+        let layerName = entity.parent.name
+        scene.children.forEach(child => {
+          if (child.name === 'Layers') {
+            child.children.forEach(layer => {
+              if (layer.name === layerName) {
+                objects = layer.children
+              }
+            })
+          }
+        })
+      }
+
+      let intersections = rayCaster.intersectObjects(objects, true)
+
+      intersections.forEach(intersect => {
+        if (entities.indexOf(intersect.object) < 0) {
+          // object not in array yet, check
+
+          let checkVertices = []
+          if (intersect.object.geometry instanceof THREE.CircleGeometry) {
+            let vertex = new THREE.Vector3(0, 0, 0)
+            checkVertices.push(vertex.addVectors(intersect.object.geometry.vertices[0], intersect.object.position))
+
+            vertex = new THREE.Vector3(0, 0, 0)
+            checkVertices.push(vertex.addVectors(intersect.object.geometry.vertices[intersect.object.geometry.vertices.length - 1], intersect.object.position))
+          } else {
+            checkVertices = intersect.object.geometry.vertices
+          }
+
+          checkVertices.forEach(checkVertex => {
+            if (checkVertex.distanceTo(vertex) < editor.options.threshold) {
+              entities.push(intersect.object)
+              getNeighbours(intersect.object, editor, entities)
+            }
+          })
+        }
+      })
+    })
+  })
+
+  return entities
+}
+
+let recursiveSelect = (object, editor) => {
+  console.log('RECURSIVE SELECT ', editor.options.threshold)
+
+  let entities = getNeighbours(object, editor)
+  entities.push(object)
+
+  entities = GeometryUtils.skipZeroLines(entities, editor.options.threshold)
+
+  let area = calcArea(entities)
+  let lineLength = calcLength(entities)
+  let size = calcSize(entities)
+  console.log('object area: ' + area.toFixed(4) + '<br />length: ' + lineLength.toFixed(4) + '<br /><b>Size:</b><br />Width: ' + size.x.toFixed(4) + '<br />Height: ' + size.y.toFixed(4))
+
+  return entities
+}
+
+let calcArea = (entities) => {
+  let vertices = getSerialVertices(entities)
+
+  let sumX = 0,
+    sumY = 0,
+    multipleIdx = 0
+  for (let i = 0; i < vertices.length; i++) {
+    multipleIdx = i + 1
+    if (multipleIdx >= vertices.length) {
+      multipleIdx = 0
+    }
+    sumX += vertices[i].x * vertices[multipleIdx].y
+    sumY += vertices[multipleIdx].x * vertices[i].y
+  }
+  return Math.abs((sumY - sumX) / 2)
+}
+
+let calcLength = entities => {
+  let total = 0
+  entities.forEach(entity => {
+    entity.computeLineDistances()
+    total += entity.geometry.lineDistances[entity.geometry.lineDistances.length - 1]
+  })
+  return total
+}
+
+let calcSize = entities => {
+  let init = false,
+    left, top, right, bottom
+
+  entities.forEach(entity => {
+    getVertices(entity, true).forEach(vertex => {
+      if (!init) {
+        init = true
+        left = right = vertex.x
+        top = bottom = vertex.y
+      }
+      if (left < vertex.x) { left = vertex.x }
+      if (right > vertex.x) { right = vertex.x }
+      if (top < vertex.y) { top = vertex.y }
+      if (bottom > vertex.y) { bottom = vertex.y }
+    })
+  })
+
+  // ACHTUNG!
+  // swap width and height
+
+  return new THREE.Vector2(Math.abs(top - bottom), Math.abs(left - right))
+}
 
 export default {
   onClick,
   doSelection,
   highlightEntities,
+  recursiveSelect,
+  calcArea,
+  calcLength,
+  calcSize,
+
   render
 
 }
 
-
-function getOffset(elem) {
-  let offset = null;
+function getOffset (elem) {
+  let offset = null
   if (elem) {
-    offset = {left: 0, top: 0};
+    offset = {left: 0, top: 0}
     do {
-      offset.top += elem.offsetTop;
-      offset.left += elem.offsetLeft;
-      elem = elem.offsetParent;
-    } while (elem);
+      offset.top += elem.offsetTop
+      offset.left += elem.offsetLeft
+      elem = elem.offsetParent
+    } while (elem)
   }
-  return offset;
+  return offset
+}
+
+function getVertices (entity, allVertices = false) {
+  let vertices = []
+  if (entity.geometry instanceof THREE.CircleGeometry) {
+    // arc
+    let vertex = new THREE.Vector3(0, 0, 0)
+    if (allVertices) {
+      entity.geometry.vertices.forEach(v => {
+        vertices.push(vertex.addVectors(v, entity.position))
+      })
+    } else {
+      vertices.push(vertex.addVectors(entity.geometry.vertices[0], entity.position))
+      vertex = new THREE.Vector3(0, 0, 0)
+      vertices.push(vertex.addVectors(entity.geometry.vertices[entity.geometry.vertices.length - 1], entity.position))
+    }
+  } else {
+    // line?
+    vertices = entity.geometry.vertices
+  }
+  return vertices
+}
+
+function getSerialVertices (entities) {
+  function buildChain (entities, vertices, currentEntity, vertex, stopVertex) {
+    // console.log('buildChain. ENTITIES:', entities, 'VERTICES:', vertices, 'CURRENT_ENTITY', currentEntity, 'VERTEX', vertex, 'STOP_VERTEX', stopVertex);
+    if (!currentEntity) {
+      if (entities.length) {
+        currentEntity = entities[0]
+        stopVertex = GeometryUtils.getFirstVertex(currentEntity)
+        vertex = stopVertex
+        vertices.push(stopVertex)
+
+        if (entities.length === 1) {
+          // polygon
+          return currentEntity.geometry.vertices
+        }
+      } else {
+        return vertices
+      }
+    }
+
+    vertex = GeometryUtils.getAnotherVertex(currentEntity, vertex)
+
+    // if current vertex is closely to stopVertex than finish
+    if (vertex.distanceTo(stopVertex) < 0.001) {
+      // console.log('FIRED STOP VERTEX');
+      return vertices
+    }
+
+    // find entity (not current)
+    let distances = []
+    entities.forEach(entity => {
+      if (entity === currentEntity) {
+        return false
+      }
+
+      getVertices(entity).forEach(v => {
+        distances.push({
+          entity: entity,
+          vertex,
+          v,
+          distance: vertex.distanceTo(v)
+        })
+      })
+    })
+
+    // get closest vertex
+    let minDistance = distances.pop()
+    distances.forEach(distance => {
+      if (distance.distance < minDistance.distance) {
+        minDistance = distance
+      }
+    })
+
+    vertices.push(vertex)
+    return buildChain(entities, vertices, minDistance.entity, minDistance.v, stopVertex)
+  }
+
+  return buildChain(entities, [])
 }

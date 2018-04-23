@@ -31,7 +31,10 @@
     margin: 2px 2px 0 2px;
     transition: All 0.2s;
 
-
+    img {
+      max-width: 20px;
+      max-height: 20px;
+    }
 
     &:active, &:focus, &:hover {
       outline: none;

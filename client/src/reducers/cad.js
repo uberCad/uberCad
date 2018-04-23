@@ -27,14 +27,13 @@ const cad = (state = initialState, action) => {
         scene: action.payload.scene,
         camera: action.payload.camera,
         renderer: action.payload.renderer,
-        cadCanvas: action.payload.cadCanvas,
+        cadCanvas: action.payload.cadCanvas
       }
     case CAD_DO_SELECTION:
       return {
         ...state,
         activeEntities: action.payload.activeEntities
       }
-
 
     default:
       return state
