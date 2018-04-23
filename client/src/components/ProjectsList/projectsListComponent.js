@@ -20,6 +20,6 @@ export default class ProjectsListComponent extends Component {
   }
 
   static propTypes = {
-    projects: PropTypes.array.isRequired,
+    projects: PropTypes.array.isRequired
   }
 }

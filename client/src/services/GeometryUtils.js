@@ -118,10 +118,10 @@ let distanceToArc = (vertex, arc) => {
 function distanceToLineSegment (lx1, ly1, lx2, ly2, px, py) {
   // source from https://github.com/scottglz/distance-to-line-segment/blob/master/index.js
 
-  let ldx = lx2 - lx1,
-    ldy = ly2 - ly1,
-    lineLengthSquared = ldx * ldx + ldy * ldy,
-    t // t===0 at line pt 1 and t ===1 at line pt 2
+  let ldx = lx2 - lx1
+  let ldy = ly2 - ly1
+  let lineLengthSquared = ldx * ldx + ldy * ldy
+  let t // t===0 at line pt 1 and t ===1 at line pt 2
 
   if (!lineLengthSquared) {
     // 0-length line segment. Any t will return same result
@@ -132,10 +132,10 @@ function distanceToLineSegment (lx1, ly1, lx2, ly2, px, py) {
     if (t < 0) { t = 0 } else if (t > 1) { t = 1 }
   }
 
-  let lx = lx1 + t * ldx,
-    ly = ly1 + t * ldy,
-    dx = px - lx,
-    dy = py - ly
+  let lx = lx1 + t * ldx
+  let ly = ly1 + t * ldy
+  let dx = px - lx
+  let dy = py - ly
   return Math.sqrt(dx * dx + dy * dy)
 }
 

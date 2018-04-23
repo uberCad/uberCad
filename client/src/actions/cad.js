@@ -74,7 +74,7 @@ export const cadClick = (event, editor) => {
         //   }
         // }
 
-        //console.log('Click RESULT', clickResult)
+        // console.log('Click RESULT', clickResult)
 
         dispatch({
           type: CAD_CLICK,

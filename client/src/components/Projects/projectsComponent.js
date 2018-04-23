@@ -5,19 +5,17 @@ import ProjectsList from '../ProjectsList/projectsListComponentContainer'
 import './Projects.css'
 
 export default class ProjectsComponent extends Component {
-
   componentDidMount () {
     const { projectsFilter } = this.props
     this.props.fetchProjectsIfNeeded(projectsFilter)
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps (nextProps) {
     if (nextProps.projectsFilter !== this.props.projectsFilter) {
       const { projectsFilter } = nextProps
       this.props.fetchProjectsIfNeeded(projectsFilter)
     }
   }
-
 
   handleChange = nextFilter => {
     this.props.selectFilter(nextFilter)
@@ -36,15 +34,15 @@ export default class ProjectsComponent extends Component {
     return (
       <div className='Projects'>
         <ProjectsFilter value={projectsFilter}
-                        onChange={this.handleChange}
-                        options={['all', 'shared', 'archive', '[some bad filter...]']}/>
+          onChange={this.handleChange}
+          options={['all', 'shared', 'archive', '[some bad filter...]']} />
         <p>
 
           {lastUpdated &&
           <span>
               Last updated at {new Date(lastUpdated).toLocaleTimeString()}.
             {' '}
-            </span>
+          </span>
           }
           {!loading &&
           <button onClick={this.handleRefreshClick}>
@@ -60,13 +58,12 @@ export default class ProjectsComponent extends Component {
         {isEmpty
           ? (loading ? <h2>Loading...</h2> : <h2>Empty.</h2>)
           : <div style={{opacity: loading ? 0.5 : 1}}>
-            {/*{JSON.stringify(items)}*/}
+            {/* {JSON.stringify(items)} */}
             <ProjectsList projects={items} />
           </div>
         }
       </div>
     )
-
   }
 
   static propTypes = {

@@ -34,11 +34,11 @@ export default class CadComponent extends Component {
   }
 
   resizeWindow = () => {
-    let width = this.container.clientWidth,
-      height = this.container.clientHeight
+    let width = this.container.clientWidth
+    let height = this.container.clientHeight
 
     try {
-      this.props.editor.cadCanvas.resize(width, height);
+      this.props.editor.cadCanvas.resize(width, height)
     } catch (e) {}
   }
 
@@ -56,9 +56,9 @@ export default class CadComponent extends Component {
     return (
       <div className='threejs-app'>
         <div className='scene'
-             ref={container => this.container = container}
-             onClick={this.onClick}
-             onDoubleClick={this.onDoubleClick}
+          ref={container => { this.container = container }}
+          onClick={this.onClick}
+          onDoubleClick={this.onDoubleClick}
         />
         <Toolbar />
       </div>

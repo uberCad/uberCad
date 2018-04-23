@@ -47,21 +47,17 @@ let onClick = (event, scene, camera) => {
 let doSelection = (selectResult, editor) => {
   highlightEntities(editor, true, undefined, false)
   switch (editor.options.selectMode) {
-    case 'new': {
+    case 'new':
       editor.activeEntities = selectResult
-    }
       break
-    case 'add': {
+    case 'add':
       editor.activeEntities = ArrayUtils.union(editor.activeEntities, selectResult)
-    }
       break
-    case 'sub': {
+    case 'sub':
       editor.activeEntities = ArrayUtils.subtract(editor.activeEntities, selectResult)
-    }
       break
-    case 'intersect': {
+    case 'intersect':
       editor.activeEntities = ArrayUtils.intersection(editor.activeEntities, selectResult)
-    }
       break
   }
   highlightEntities(editor)
@@ -209,10 +205,9 @@ let recursiveSelect = (object, editor) => {
 
 let calcArea = (entities) => {
   let vertices = getSerialVertices(entities)
-
-  let sumX = 0,
-    sumY = 0,
-    multipleIdx = 0
+  let sumX = 0
+  let sumY = 0
+  let multipleIdx = 0
   for (let i = 0; i < vertices.length; i++) {
     multipleIdx = i + 1
     if (multipleIdx >= vertices.length) {
@@ -234,8 +229,8 @@ let calcLength = entities => {
 }
 
 let calcSize = entities => {
-  let init = false,
-    left, top, right, bottom
+  let init = false
+  let left, top, right, bottom
 
   entities.forEach(entity => {
     getVertices(entity, true).forEach(vertex => {

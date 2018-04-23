@@ -21,10 +21,12 @@ export default class DxfService {
     })
 
     // Create scene from dxf object (data)
-    let i, entity, obj
+    let i
+    let entity
+    let obj
     let dims = {
-      min: { x: false, y: false, z: false},
-      max: { x: false, y: false, z: false}
+      min: {x: false, y: false, z: false},
+      max: {x: false, y: false, z: false}
     }
     for (i = 0; i < data.entities.length; i++) {
       entity = data.entities[i]
@@ -91,30 +93,30 @@ export default class DxfService {
     let height = container.clientHeight
     let aspectRatio = width / height
 
-    let upperRightCorner = { x: dims.max.x, y: dims.max.y }
-    let lowerLeftCorner = { x: dims.min.x, y: dims.min.y }
+    let upperRightCorner = {x: dims.max.x, y: dims.max.y}
+    let lowerLeftCorner = {x: dims.min.x, y: dims.min.y}
 
     // Figure out the current viewport extents
-    let vp_width = upperRightCorner.x - lowerLeftCorner.x
-    let vp_height = upperRightCorner.y - lowerLeftCorner.y
+    let vpWidth = upperRightCorner.x - lowerLeftCorner.x
+    let vpHeight = upperRightCorner.y - lowerLeftCorner.y
     let center = {
-      x: vp_width / 2 + lowerLeftCorner.x,
-      y: vp_height / 2 + lowerLeftCorner.y
+      x: vpWidth / 2 + lowerLeftCorner.x,
+      y: vpHeight / 2 + lowerLeftCorner.y
     }
 
     // Fit all objects into current ThreeDXF viewer
-    let extentsAspectRatio = Math.abs(vp_width / vp_height)
+    let extentsAspectRatio = Math.abs(vpWidth / vpHeight)
     if (aspectRatio > extentsAspectRatio) {
-      vp_width = vp_height * aspectRatio
+      vpWidth = vpHeight * aspectRatio
     } else {
-      vp_height = vp_width / aspectRatio
+      vpHeight = vpWidth / aspectRatio
     }
 
     let viewPort = {
-      bottom: -vp_height / 2,
-      left: -vp_width / 2,
-      top: vp_height / 2,
-      right: vp_width / 2,
+      bottom: -vpHeight / 2,
+      left: -vpWidth / 2,
+      top: vpHeight / 2,
+      right: vpWidth / 2,
       center: {
         x: center.x,
         y: center.y
@@ -230,7 +232,7 @@ export default class DxfService {
 
       let points = curve.getPoints(50)
       let geometry = new THREE.BufferGeometry().setFromPoints(points)
-      let material = new THREE.LineBasicMaterial({ linewidth: 1, color: color })
+      let material = new THREE.LineBasicMaterial({linewidth: 1, color: color})
 
       // Create the final object to add to the scene
       // ellipse
@@ -258,7 +260,7 @@ export default class DxfService {
       // If the text ends up being wider than the box, it's supposed
       // to be multiline. Doing that in threeJS is overkill.
       if (textWidth > entity.width) {
-        console.log("Can't render this multipline MTEXT entity, sorry.", entity)
+        console.log('Can\'t render this multipline MTEXT entity, sorry.', entity)
         return undefined
       }
 
@@ -338,15 +340,15 @@ export default class DxfService {
       }
 
       let geometry = new THREE.BufferGeometry().setFromPoints(interpolatedPoints)
-      let material = new THREE.LineBasicMaterial({ linewidth: 1, color: color })
+      let material = new THREE.LineBasicMaterial({linewidth: 1, color: color})
       // splineObject
       return new THREE.Line(geometry, material)
     }
 
     function drawLine (entity, data) {
-      let geometry = new THREE.Geometry(),
-        color = getColor(entity, data),
-        material, lineType, vertex, startPoint, endPoint, bulgeGeometry,
+      let geometry = new THREE.Geometry()
+      let color = getColor(entity, data)
+      let material, lineType, vertex, startPoint, endPoint, bulgeGeometry,
         bulge, i, line
 
       // create geometry
@@ -372,26 +374,25 @@ export default class DxfService {
       }
 
       if (lineType && lineType.pattern && lineType.pattern.length !== 0) {
-        material = new THREE.LineDashedMaterial({ color: color, gapSize: 4, dashSize: 4})
+        material = new THREE.LineDashedMaterial({color: color, gapSize: 4, dashSize: 4})
       } else {
-        material = new THREE.LineBasicMaterial({ linewidth: 1, color: color })
+        material = new THREE.LineBasicMaterial({linewidth: 1, color: color})
       }
 
-      // if(lineType && lineType.pattern && lineType.pattern.length !== 0) {
-
-      //           geometry.computeLineDistances();
-
-      //           // Ugly hack to add diffuse to this. Maybe copy the uniforms object so we
-      //           // don't add diffuse to a material.
-      //           lineType.material.uniforms.diffuse = { type: 'c', value: new THREE.Color(color) };
-
-      // 	material = new THREE.ShaderMaterial({
-      // 		uniforms: lineType.material.uniforms,
-      // 		vertexShader: lineType.material.vertexShader,
-      // 		fragmentShader: lineType.material.fragmentShader
-      // 	});
-      // }else {
-      // 	material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
+      // if (lineType && lineType.pattern && lineType.pattern.length !== 0) {
+      //   geometry.computeLineDistances()
+      //
+      //   // Ugly hack to add diffuse to this. Maybe copy the uniforms object so we
+      //   // don't add diffuse to a material.
+      //   lineType.material.uniforms.diffuse = {type: 'c', value: new THREE.Color(color)}
+      //   //
+      //   material = new THREE.ShaderMaterial({
+      //     uniforms: lineType.material.uniforms,
+      //     vertexShader: lineType.material.vertexShader,
+      //     fragmentShader: lineType.material.fragmentShader
+      //   })
+      // } else {
+      //   material = new THREE.LineBasicMaterial({linewidth: 1, color: color})
       // }
 
       line = new THREE.Line(geometry, material)
@@ -404,7 +405,7 @@ export default class DxfService {
       geometry = new THREE.CircleGeometry(entity.radius, 32, entity.startAngle, entity.angleLength)
       geometry.vertices.shift()
 
-      material = new THREE.LineBasicMaterial({ color: getColor(entity, data) })
+      material = new THREE.LineBasicMaterial({color: getColor(entity, data)})
 
       circle = new THREE.Line(geometry, material)
       circle.position.x = entity.center.x
@@ -415,20 +416,20 @@ export default class DxfService {
     }
 
     function drawSolid (entity, data) {
-      let material, verts,
-        geometry = new THREE.Geometry()
+      let geometry = new THREE.Geometry()
+      let material, vertices
 
-      verts = geometry.vertices
-      verts.push(new THREE.Vector3(entity.points[0].x, entity.points[0].y, entity.points[0].z))
-      verts.push(new THREE.Vector3(entity.points[1].x, entity.points[1].y, entity.points[1].z))
-      verts.push(new THREE.Vector3(entity.points[2].x, entity.points[2].y, entity.points[2].z))
-      verts.push(new THREE.Vector3(entity.points[3].x, entity.points[3].y, entity.points[3].z))
+      vertices = geometry.vertices
+      vertices.push(new THREE.Vector3(entity.points[0].x, entity.points[0].y, entity.points[0].z))
+      vertices.push(new THREE.Vector3(entity.points[1].x, entity.points[1].y, entity.points[1].z))
+      vertices.push(new THREE.Vector3(entity.points[2].x, entity.points[2].y, entity.points[2].z))
+      vertices.push(new THREE.Vector3(entity.points[3].x, entity.points[3].y, entity.points[3].z))
 
       // Calculate which direction the points are facing (clockwise or counter-clockwise)
       let vector1 = new THREE.Vector3()
       let vector2 = new THREE.Vector3()
-      vector1.subVectors(verts[1], verts[0])
-      vector2.subVectors(verts[2], verts[0])
+      vector1.subVectors(vertices[1], vertices[0])
+      vector2.subVectors(vertices[2], vertices[0])
       vector1.cross(vector2)
 
       // If z < 0 then we must draw these in reverse order
@@ -440,7 +441,7 @@ export default class DxfService {
         geometry.faces.push(new THREE.Face3(1, 3, 2))
       }
 
-      material = new THREE.MeshBasicMaterial({ color: getColor(entity, data) })
+      material = new THREE.MeshBasicMaterial({color: getColor(entity, data)})
 
       return new THREE.Mesh(geometry, material)
     }
@@ -486,7 +487,7 @@ export default class DxfService {
       geometry.colors = colors
       geometry.computeBoundingBox()
 
-      material = new THREE.PointsMaterial({ size: 0.05, vertexColors: THREE.VertexColors })
+      material = new THREE.PointsMaterial({size: 0.05, vertexColors: THREE.VertexColors})
       point = new THREE.Points(geometry, material)
       scene.add(point)
     }
@@ -545,9 +546,9 @@ export default class DxfService {
     }
 
     function createDashedLineShader (pattern) {
-      let i,
-        dashedLineShader = {},
-        totalLength = 0.0
+      let i
+      let dashedLineShader = {}
+      let totalLength = 0.0
 
       for (i = 0; i < pattern.length; i++) {
         totalLength += Math.abs(pattern[i])
@@ -555,12 +556,12 @@ export default class DxfService {
 
       dashedLineShader.uniforms = THREE.UniformsUtils.merge([
 
-        THREE.UniformsLib[ 'common' ],
-        THREE.UniformsLib[ 'fog' ],
+        THREE.UniformsLib['common'],
+        THREE.UniformsLib['fog'],
 
         {
-          'pattern': { type: 'fv1', value: pattern },
-          'patternLength': { type: 'f', value: totalLength }
+          'pattern': {type: 'fv1', value: pattern},
+          'patternLength': {type: 'f', value: totalLength}
         }
 
       ])
@@ -570,11 +571,11 @@ export default class DxfService {
 
         'varying float vLineDistance;',
 
-        THREE.ShaderChunk[ 'color_pars_vertex' ],
+        THREE.ShaderChunk['color_pars_vertex'],
 
         'void main() {',
 
-        THREE.ShaderChunk[ 'color_vertex' ],
+        THREE.ShaderChunk['color_vertex'],
 
         'vLineDistance = lineDistance;',
 
@@ -592,8 +593,8 @@ export default class DxfService {
 
         'varying float vLineDistance;',
 
-        THREE.ShaderChunk[ 'color_pars_fragment' ],
-        THREE.ShaderChunk[ 'fog_pars_fragment' ],
+        THREE.ShaderChunk['color_pars_fragment'],
+        THREE.ShaderChunk['fog_pars_fragment'],
 
         'void main() {',
 
@@ -611,8 +612,8 @@ export default class DxfService {
 
         '}',
 
-        THREE.ShaderChunk[ 'color_fragment' ],
-        THREE.ShaderChunk[ 'fog_fragment' ],
+        THREE.ShaderChunk['color_fragment'],
+        THREE.ShaderChunk['fog_fragment'],
 
         '}'
       ].join('\n')
