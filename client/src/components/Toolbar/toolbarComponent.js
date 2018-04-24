@@ -14,8 +14,7 @@ export const TOOL_UNDO = 'TOOL_UNDO'
 export const TOOL_REDO = 'TOOL_REDO'
 
 export default class ToolbarComponent extends Component {
-  onClick = ({target: {dataset: {tool}}}) => {
-    // console.log('target', tool)
+  onClick = ({currentTarget: {dataset: {tool}}}) => {
     this.props.chooseTool(tool)
   }
 

@@ -18,12 +18,12 @@ const mapStateToProps = (state, ownProps) => {
       tool: state.toolbar.tool,
       activeEntities: state.cad.activeEntities,
       options: {
-        selectMode: 'new', // state.options.mode,
-        singleLayerSelect: true,
-        threshold: 0.0001
+        selectMode: state.options.selectMode,
+        singleLayerSelect: state.options.singleLayerSelect,
+        threshold: state.options.threshold
       },
       editMode: {
-        isEdit: false
+        isEdit: state.cad.editMode.isEdit
       }
     },
 

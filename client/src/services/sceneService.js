@@ -1,6 +1,12 @@
 import * as THREE from '../extend/THREE'
 import ArrayUtils from './arrayUtils'
 import GeometryUtils from './GeometryUtils'
+import {
+  SELECT_MODE_NEW,
+  SELECT_MODE_ADD,
+  SELECT_MODE_SUB,
+  SELECT_MODE_INTERSECT
+} from '../components/Options/optionsComponent'
 
 let onClick = (event, scene, camera) => {
   let result = {
@@ -47,18 +53,20 @@ let onClick = (event, scene, camera) => {
 let doSelection = (selectResult, editor) => {
   highlightEntities(editor, true, undefined, false)
   switch (editor.options.selectMode) {
-    case 'new':
+    case SELECT_MODE_NEW:
       editor.activeEntities = selectResult
       break
-    case 'add':
+    case SELECT_MODE_ADD:
       editor.activeEntities = ArrayUtils.union(editor.activeEntities, selectResult)
       break
-    case 'sub':
+    case SELECT_MODE_SUB:
       editor.activeEntities = ArrayUtils.subtract(editor.activeEntities, selectResult)
       break
-    case 'intersect':
+    case SELECT_MODE_INTERSECT:
       editor.activeEntities = ArrayUtils.intersection(editor.activeEntities, selectResult)
       break
+    default:
+      console.warn(`Unhandled select mode ${editor.options.selectMode}`)
   }
   highlightEntities(editor)
 

@@ -5,6 +5,7 @@ import project from './project'
 import spinner from './spinner'
 import cad from './cad'
 import toolbar from './toolbar'
+import options from './options'
 
 export default {
   counter,
@@ -13,5 +14,6 @@ export default {
   project,
   spinner,
   cad,
-  toolbar
+  toolbar,
+  options
 }

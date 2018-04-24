@@ -1,0 +1,101 @@
+@import "../../variables.scss";
+
+#options {
+  position: absolute;
+  top: $header-height;
+  left: 0;
+  width: calc(100% - #{$sidebar-width});
+  height: $options-height;
+  background-color: $gray;
+  border: none;
+  box-shadow: 0 0 12px rgba(153, 153, 153, 0.4);
+  z-index: 0;
+  padding-left: 5px;
+
+  .list-group {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    float: left;
+
+    li {
+      //background-color: royalblue;
+      padding: 0 5px 0 0;
+      margin: 0 5px 0 0;
+      border-right: 2px solid lavender;
+      height: $toolSize;
+      line-height: $toolSize;
+
+      float: left;
+
+      label {
+        font-weight: normal;
+        display: inline-block;
+        line-height: $toolSize;
+        vertical-align: top;
+        height: 100%;
+        font-size: 11px;
+      }
+
+      input {
+        margin: 0;
+        vertical-align: middle;
+
+        &:active, &:focus {
+          outline: none;
+        }
+      }
+
+      input[type=radio] {
+        -webkit-appearance: none;
+        -moz-appearance:    none;
+        appearance:         none;
+
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        background: url("select_icons.png") no-repeat;
+
+        &.mode-new {
+          background-position: -4px -2px;
+        }
+
+        &.mode-add {
+          background-position: -27px -2px;
+        }
+
+        &.mode-sub {
+          background-position: -51px -2px;
+        }
+
+        &.mode-intersect {
+          background-position: -75px -2px;
+        }
+
+        &:checked {
+          background-color: rgba(0,0,0,0.1);
+          border-radius: 3px;
+          border: 1px solid rgba(0,0,0,0.3);
+          outline: none;
+        }
+
+
+      }
+
+      input[type=text], input[type=number] {
+        width: 70px;
+        height: 20px;
+        border-radius: 2px;
+        background-color: white;
+        border: 1px solid rgba(0,0,0,0.3);
+      }
+
+      button {
+        height: 100%;
+        line-height: $options-height;
+        border: none;
+      }
+    }
+  }
+}

@@ -11,6 +11,9 @@ let initialState = {
   renderer: null,
   cadCanvas: null,
   activeEntities: [],
+  editMode: {
+    isEdit: false
+  },
 
   loading: false,
   didInvalidate: false,

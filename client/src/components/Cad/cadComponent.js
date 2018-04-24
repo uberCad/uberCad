@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import Api from '../../services/apiService'
 import Dxf from '../../services/dxfService'
 import Toolbar from '../Toolbar/toolbarComponentContainer'
+import Options from '../Options/optionsComponentContainer'
 // import * as THREE  from '../../extend/THREE'
 
 import './Cad.css'
@@ -61,6 +62,7 @@ export default class CadComponent extends Component {
           onDoubleClick={this.onDoubleClick}
         />
         <Toolbar />
+        <Options />
       </div>
     )
   }
