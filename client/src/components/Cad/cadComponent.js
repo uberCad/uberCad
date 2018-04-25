@@ -5,6 +5,7 @@ import Api from '../../services/apiService'
 import Dxf from '../../services/dxfService'
 import Toolbar from '../Toolbar/toolbarComponentContainer'
 import Options from '../Options/optionsComponentContainer'
+import Selection from '../Selection/selectionComponentContainer'
 // import * as THREE  from '../../extend/THREE'
 
 import './Cad.css'
@@ -60,7 +61,11 @@ export default class CadComponent extends Component {
           ref={container => { this.container = container }}
           onClick={this.onClick}
           onDoubleClick={this.onDoubleClick}
+          onMouseDown={this.onMouseDown}
+          onMouseMove={this.onMouseMove}
+          onMouseUp={this.onMouseUp}
         />
+        <Selection />
         <Toolbar />
         <Options />
       </div>
@@ -73,6 +78,18 @@ export default class CadComponent extends Component {
 
   onDoubleClick = (event) => {
     this.props.onDoubleClick(event, this.props.editor)
+  }
+
+  onMouseDown = (event) => {
+    this.props.onMouseDown(event, this.props.editor)
+  }
+
+  onMouseMove = (event) => {
+    this.props.onMouseMove(event, this.props.editor)
+  }
+
+  onMouseUp = (event) => {
+    this.props.onMouseUp(event, this.props.editor)
   }
 
   static propTypes = {

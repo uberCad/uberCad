@@ -7,7 +7,7 @@ import reducers from './reducers'
 const rootPersistConfig = {
   key: 'root',
   storage: storage,
-  blacklist: ['cad', 'options']
+  blacklist: ['cad', 'options', 'selection']
 }
 
 const cadPersistConfig = {
@@ -15,6 +15,8 @@ const cadPersistConfig = {
   storage: storage,
   blacklist: ['scene', 'camera', 'renderer', 'cadCanvas', 'activeEntities']
 }
+
+// https://github.com/reactjs/redux/issues/749
 
 const persistedReducer = persistReducer(rootPersistConfig, combineReducers({
   ...reducers,

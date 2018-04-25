@@ -8,14 +8,18 @@ import {
   SELECT_MODE_INTERSECT
 } from '../components/Options/optionsComponent'
 
-let onClick = (event, scene, camera) => {
+let onClick = (event, scene, camera, renderer) => {
   let result = {
     point: undefined, // new THREE.Vector3
     activeEntities: []
   }
   let canvas = event.target.tagName === 'CANVAS' && event.target
   if (!canvas) {
-    return
+    if (renderer.domElement) {
+      canvas = renderer.domElement
+    } else {
+      return
+    }
   }
 
   let canvasOffset = getOffset(canvas)
@@ -260,6 +264,133 @@ let calcSize = entities => {
   return new THREE.Vector2(Math.abs(top - bottom), Math.abs(left - right))
 }
 
+function selectInFrustum (area, container, editor) {
+  let planes = [
+    new THREE.Plane(new THREE.Vector3(-1, 0, 0), Math.max(area.x1, area.x2)),
+    new THREE.Plane(new THREE.Vector3(1, 0, 0), -Math.min(area.x1, area.x2)),
+
+    new THREE.Plane(new THREE.Vector3(0, -1, 0), Math.max(area.y1, area.y2)),
+    new THREE.Plane(new THREE.Vector3(0, 1, 0), -Math.min(area.y1, area.y2)),
+
+    new THREE.Plane(new THREE.Vector3(0, 0, 1), 0),
+    new THREE.Plane(new THREE.Vector3(0, 0, -1), 0)
+  ]
+
+  let frustum = new THREE.Frustum(
+    ...planes
+  )
+
+  let iterator = entityIterator(container)
+
+  let frustumIntersects = []
+
+  let entity = iterator.next()
+  while (!entity.done) {
+    try {
+      if (frustum.intersectsObject(entity.value)) {
+        frustumIntersects.push(entity.value)
+      }
+      entity = iterator.next()
+    } catch (e) {
+      // debugger;
+      console.error(e, 'problem with frustrum intersects, at selectInFrustum()')
+    }
+  }
+
+  let frustumIntersectsFiltered = []
+
+  let geometries = {}
+
+  frustumIntersects.forEach((entity, idx) => {
+    // if (idx < 50 || idx > 60 ) return;
+
+    // console.log('item', entity);
+    if (entityIntersectArea(entity, area, geometries)) {
+      frustumIntersectsFiltered.push(entity)
+    }
+  })
+
+  // console.timeEnd('selectInFrustum');
+  return frustumIntersectsFiltered
+}
+
+function entityIntersectArea (entity, area) {
+// console.log('ENTITY', entity, 'AREA', area);
+  // console.count(entity.geometry.type);
+
+  if (entity.geometry instanceof THREE.CircleGeometry) {
+    // arc
+    try {
+      entity.geometry.vertices.forEach((vertex, idx) => {
+        // TODO optimize code
+        // skip even vertex for calculation speed. I think three is possibility to check evert fifth vertex...
+        if (idx % 2 === 1 && vertexInArea((new THREE.Vector3(0, 0, 0)).addVectors(vertex, entity.position), area)) {
+          throw new Error('true')
+        }
+      })
+    } catch (e) {
+      return true
+    }
+
+    return false
+  } else {
+    // console.log('LINE', entity);
+
+    // check if any vertex in selected area;
+    try {
+      entity.geometry.vertices.forEach(vertex => {
+        if (vertexInArea(vertex, area)) {
+          throw new Error('true')
+        }
+      })
+    } catch (e) {
+      return true
+    }
+
+    // check if line intersect area
+    try {
+      let prevVertex
+
+      entity.geometry.vertices.forEach(vertex => {
+        if (prevVertex) {
+          // console.log(area);
+          // x1,y1 - x2,y1
+          // x1,y1 - x1,y2
+          // x1,y2 - x2,y2
+          // x2,y1 - x2,y2
+          if (
+            GeometryUtils.linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x1, area.y1, 0), new THREE.Vector3(area.x2, area.y1, 0)) ||
+            GeometryUtils.linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x1, area.y1, 0), new THREE.Vector3(area.x1, area.y2, 0)) ||
+            GeometryUtils.linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x1, area.y2, 0), new THREE.Vector3(area.x2, area.y2, 0)) ||
+            GeometryUtils.linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x2, area.y1, 0), new THREE.Vector3(area.x2, area.y2, 0))
+          ) {
+            throw new Error('true')
+          }
+        }
+        prevVertex = vertex
+      })
+    } catch (e) {
+      return true
+    }
+
+    return false
+  }
+
+  // alert('Unexpected geometry @ThreeDxf.entityIntersectArea()');
+}
+
+function * entityIterator (container) {
+  for (let child in container.children) {
+    if (container.children.hasOwnProperty(child)) {
+      if (container.children[child].children.length || container.children[child].userData.container) {
+        yield * entityIterator(container.children[child])
+      } else {
+        yield container.children[child]
+      }
+    }
+  }
+}
+
 export default {
   onClick,
   doSelection,
@@ -268,9 +399,13 @@ export default {
   calcArea,
   calcLength,
   calcSize,
+  selectInFrustum,
+  render,
+  entityIterator
+}
 
-  render
-
+function vertexInArea (vertex, area) {
+  return ((vertex.x >= Math.min(area.x1, area.x2) && vertex.x <= Math.max(area.x1, area.x2)) && (vertex.y >= Math.min(area.y1, area.y2) && vertex.y <= Math.max(area.y1, area.y2)))
 }
 
 function getOffset (elem) {

@@ -6,6 +6,7 @@ import spinner from './spinner'
 import cad from './cad'
 import toolbar from './toolbar'
 import options from './options'
+import selection from './selection'
 
 export default {
   counter,
@@ -15,5 +16,6 @@ export default {
   spinner,
   cad,
   toolbar,
-  options
+  options,
+  selection
 }

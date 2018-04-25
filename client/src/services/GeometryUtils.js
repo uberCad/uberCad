@@ -218,10 +218,144 @@ function getAnotherVertex (entity, vertex) {
   return anotherVertex
 }
 
+let linesIntersect = (a, b, c, d, detailedResult = false) => {
+  // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+  // https://ideone.com/PnPJgb
+  // https://github.com/pgkelley4/line-segments-intersect/blob/master/js/line-segments-intersect.js
+
+  // Determines if the lines AB and CD intersect.
+  let CmP = new THREE.Vector3(c.x - a.x, c.y - a.y)
+  let r = new THREE.Vector3(b.x - a.x, b.y - a.y)
+  let s = new THREE.Vector3(d.x - c.x, d.y - c.y)
+
+  let CmPxr = CmP.x * r.y - CmP.y * r.x
+  let CmPxs = CmP.x * s.y - CmP.y * s.x
+  let rxs = r.x * s.y - r.y * s.x
+
+  // if (debug) {
+  //     debugger;
+  // }
+
+  if (CmPxr === 0 && CmPxs === 0) {
+    // Lines are collinear, and so intersect if they have any overlap
+    // return ((c.x - a.x < 0) != (c.x - b.x < 0)) || ((c.y - a.y < 0) != (c.y - b.y < 0));
+
+    // check if any vertex in line segment
+    // a
+    let inA = ((a.x - c.x < 0) !== (a.x - d.x < 0)) || ((a.y - c.y < 0) !== (a.y - d.y < 0))
+    // b
+    let inB = ((b.x - c.x < 0) !== (b.x - d.x < 0)) || ((b.y - c.y < 0) !== (b.y - d.y < 0))
+    // c
+    let inC = ((c.x - a.x < 0) !== (c.x - b.x < 0)) || ((c.y - a.y < 0) !== (c.y - b.y < 0))
+    // d
+    let inD = ((d.x - a.x < 0) !== (d.x - b.x < 0)) || ((d.y - a.y < 0) !== (d.y - b.y < 0))
+
+    let isIntersects = (inA || inB || inC || inD)
+
+    if (!detailedResult) {
+      return isIntersects
+    }
+
+    let distance, point
+
+    if (isIntersects) {
+      point = inA ? a : (inB ? b : (inC ? c : d))
+      distance = 0
+    }
+
+    if (!isIntersects) {
+      // get distance between nearest points
+      distance = Math.min(
+        getDistance(a, c),
+        getDistance(a, d),
+        getDistance(b, c),
+        getDistance(b, d)
+      )
+    }
+
+    return {
+      isIntersects,
+      point,
+      distance,
+      collinear: true
+    }
+    //
+    //
+  }
+
+  if (rxs === 0) {
+    // Lines are parallel.
+    return false
+  }
+
+  let rxsr = 1 / rxs
+  let t = CmPxs * rxsr
+  let u = CmPxr * rxsr
+
+  let isIntersects = (t >= 0) && (t <= 1) && (u >= 0) && (u <= 1)
+
+  if (!detailedResult) {
+    return isIntersects
+  }
+
+  // else detailed result
+
+  let point
+  let distance = 0
+
+  if (isIntersects) {
+    // intersection point
+
+    point = r.clone().multiplyScalar(t)
+    point.addVectors(point, a)
+  } else {
+    // nearest point
+
+    let lineVertices
+    if (Math.abs(t % 1) < Math.abs(u % 1)) {
+      lineVertices = [c, d]
+      point = t < 0 ? a : b
+    } else {
+      lineVertices = [a, b]
+      point = u < 0 ? c : d
+    }
+
+    distance = distanceToLine(point, {geometry: {vertices: lineVertices}})
+    if (distance === 0) {
+      // point on line path, so distance to line is 0. now calc distance to nearest vertex
+      distance = Math.min(
+        getDistance(point, lineVertices[0]),
+        getDistance(point, lineVertices[1])
+      )
+    }
+  }
+
+  return {
+    isIntersects,
+    point,
+    distance,
+    collinear: false
+  }
+}
+
+let getDistance = (a, b) => {
+  return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
+}
+
+let isBetween = (a, b, c, threshold = 0) => {
+  // return getDistance(a, c) + getDistance(c, b) === getDistance(a, b);
+  return Math.abs(getDistance(a, c) + getDistance(c, b) - getDistance(a, b)) <= threshold
+
+  // return getDistance(a, c) + getDistance(c, b) === getDistance(a, b);
+}
+
 export default {
   distanceToLine,
   distanceToArc,
   skipZeroLines,
   getFirstVertex,
-  getAnotherVertex
+  getAnotherVertex,
+  linesIntersect,
+  getDistance,
+  isBetween
 }
