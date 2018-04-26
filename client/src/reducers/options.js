@@ -7,13 +7,13 @@ import {
 } from '../actions/options'
 import { SELECT_MODE_NEW, DEFAULT_THRESHOLD } from '../components/Options/optionsComponent'
 
-let optionsInitialState = {
+let initialState = {
   selectMode: SELECT_MODE_NEW,
   singleLayerSelect: true,
   threshold: DEFAULT_THRESHOLD
 }
 
-const options = (state = optionsInitialState, action) => {
+const options = (state = initialState, action) => {
   switch (action.type) {
     case OPTIONS_SELECT_MODE:
       return {

@@ -1,10 +1,18 @@
 export const TOOLBAR_CHOOSE_TOOL = 'TOOLBAR_CHOOSE_TOOL'
 
 export const chooseTool = tool => {
-  return dispatch => dispatch({
-    type: TOOLBAR_CHOOSE_TOOL,
-    payload: {
-      tool
-    }
-  })
+  return (dispatch) => {
+    //sdgdsgsdg
+    // sdgdsgdsg
+    // sghsdhsdhsdhsd
+
+    dispatch({
+      type: TOOLBAR_CHOOSE_TOOL,
+      payload: {
+        tool
+      }
+    })
+
+
+  }
 }

@@ -6,7 +6,7 @@ import {
   PROJECT_FETCH_FAILURE
 } from '../actions/project'
 
-let projectsInitialState = {
+let initialState = {
   loading: false,
   id: null,
   project: null,
@@ -14,7 +14,7 @@ let projectsInitialState = {
   lastUpdated: null
 }
 
-const project = (state = projectsInitialState, action) => {
+const project = (state = initialState, action) => {
   switch (action.type) {
     case PROJECT_FETCH_BEGIN:
       let preloadedProject = action.payload.preloadedProject

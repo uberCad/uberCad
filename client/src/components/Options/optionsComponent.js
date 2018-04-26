@@ -28,10 +28,7 @@ export default class OptionsComponent extends Component {
       selectMode,
       singleLayerSelect,
       threshold
-
     } = this.props
-
-    console.log('singleLayerSelect', singleLayerSelect)
 
     return (
       <div id='options'>

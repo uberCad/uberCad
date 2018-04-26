@@ -5,7 +5,9 @@
   left: 40px;
   width: calc(100% - 340px);
   height: calc(100% - 105px);
-  outline: 1px solid #666;
   overflow: hidden; }
+
+.threejs-app.sidebar-collapsed .scene {
+  width: calc(100% - 90px); }
 
 /*# sourceMappingURL=Cad.css.map */

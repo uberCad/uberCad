@@ -2,7 +2,9 @@
 
 header {
   height: $header-height;
-  //background-color: gray;
+  background-color: white;
+  z-index: 2;
+
   font-size: 14px;
   box-shadow: 0 0 24px rgba(153, 153, 153, 0.5);
 

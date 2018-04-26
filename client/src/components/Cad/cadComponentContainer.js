@@ -37,6 +37,8 @@ const mapStateToProps = (state, ownProps) => {
       selection: state.selection
     },
 
+    sidebarExpanded: state.sidebar.active,
+
     loading: state.project.loading,
     error: state.project.error,
     project: state.project.project,

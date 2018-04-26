@@ -5,6 +5,7 @@ import Api from '../../services/apiService'
 import Dxf from '../../services/dxfService'
 import Toolbar from '../Toolbar/toolbarComponentContainer'
 import Options from '../Options/optionsComponentContainer'
+import Sidebar from '../Sidebar/sidebarComponentContainer'
 import Selection from '../Selection/selectionComponentContainer'
 // import * as THREE  from '../../extend/THREE'
 
@@ -51,12 +52,8 @@ export default class CadComponent extends Component {
   }
 
   render () {
-    // const {project, loading, error} = this.props
-
-    // console.log(/props/, this.props)
-
     return (
-      <div className='threejs-app'>
+      <div className={`threejs-app ${this.props.sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
         <div className='scene'
           ref={container => { this.container = container }}
           onClick={this.onClick}
@@ -68,6 +65,12 @@ export default class CadComponent extends Component {
         <Selection />
         <Toolbar />
         <Options />
+        <Sidebar>
+
+          <h2>Panel 1</h2>
+          <h2>Panel 2</h2>
+          <h2>Panel 3</h2>
+        </Sidebar>
       </div>
     )
   }

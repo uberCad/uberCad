@@ -5,11 +5,11 @@ import {
 } from '../actions/toolbar'
 import { TOOL_POINT } from '../components/Toolbar/toolbarComponent'
 
-let toolbarInitialState = {
+let initialState = {
   tool: TOOL_POINT
 }
 
-const toolbar = (state = toolbarInitialState, action) => {
+const toolbar = (state = initialState, action) => {
   switch (action.type) {
     case TOOLBAR_CHOOSE_TOOL:
       return {

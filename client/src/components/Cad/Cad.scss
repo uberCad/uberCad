@@ -4,14 +4,18 @@
   .scene {
     display: block;
     position: absolute;
-
     top: $header-height + $options-height;
     left: $toolbar-width;
-
     width: calc(100% - #{$toolbar-width + $sidebar-width});
     height: calc(100% - #{$header-height + $options-height});
-    outline: 1px solid #666;
+    //outline: 1px solid #666;
     overflow: hidden;
+  }
+
+  &.sidebar-collapsed {
+    .scene {
+      width: calc(100% - #{$toolbar-width + $sidebar-collapsed-width});
+    }
   }
 
   //.panel {

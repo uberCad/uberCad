@@ -7,7 +7,7 @@ import {
   PROJECTS_FETCH_FAILURE
 } from '../actions/projects'
 
-let projectsInitialState = {
+let initialState = {
   loading: false,
   didInvalidate: false,
   items: [],
@@ -15,7 +15,7 @@ let projectsInitialState = {
   lastUpdated: null
 }
 
-const projects = (state = projectsInitialState, action) => {
+const projects = (state = initialState, action) => {
   switch (action.type) {
     case PROJECTS_INVALIDATE_FILTER:
       return {

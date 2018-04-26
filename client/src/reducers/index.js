@@ -7,6 +7,7 @@ import cad from './cad'
 import toolbar from './toolbar'
 import options from './options'
 import selection from './selection'
+import sidebar from './sidebar'
 
 export default {
   counter,
@@ -17,5 +18,6 @@ export default {
   cad,
   toolbar,
   options,
-  selection
+  selection,
+  sidebar,
 }

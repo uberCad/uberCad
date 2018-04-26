@@ -6,7 +6,7 @@ import {
   SELECTION_END
 } from '../actions/selection'
 
-let selectionInitialState = {
+let initialState = {
   active: false,
   style: {
     left: 0,
@@ -28,7 +28,7 @@ let selectionInitialState = {
   }
 }
 
-const selection = (state = selectionInitialState, action) => {
+const selection = (state = initialState, action) => {
   switch (action.type) {
     case SELECTION_BEGIN:
       return {
