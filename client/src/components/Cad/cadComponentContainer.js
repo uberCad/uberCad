@@ -108,16 +108,18 @@ const mapDispatchToProps = (dispatch) => {
       // console.log('onMouseUp', event, editor)
 
       if (editor.tool === TOOL_SELECT) {
-        // begin select
-        let drawRectangle = selectionEnd(event, editor)(dispatch)
-        let selectResult = sceneService.selectInFrustum(drawRectangle, editor.scene)
-        let activeEntities = sceneService.doSelection(selectResult, editor)
-        dispatch({
-          type: CAD_DO_SELECTION,
-          payload: {
-            activeEntities
-          }
-        })
+        // end select
+        if (editor.selection.active) {
+          let drawRectangle = selectionEnd(event, editor)(dispatch)
+          let selectResult = sceneService.selectInFrustum(drawRectangle, editor.scene)
+          let activeEntities = sceneService.doSelection(selectResult, editor)
+          dispatch({
+            type: CAD_DO_SELECTION,
+            payload: {
+              activeEntities
+            }
+          })
+        }
         // console.warn('selectResult', selectResult)
       }
     }

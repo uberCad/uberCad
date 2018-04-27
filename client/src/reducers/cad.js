@@ -1,4 +1,4 @@
-// import update from 'immutability-helper'
+import update from 'immutability-helper'
 
 import {
   CAD_DRAW_DXF,
@@ -34,10 +34,15 @@ const cad = (state = initialState, action) => {
       }
     case CAD_DO_SELECTION:
       console.error(CAD_DO_SELECTION, 'TIME TO IMPLEMENT IMMUTABILITY-HELPER', action.payload.activeEntities)
-      return {
-        ...state,
-        activeEntities: action.payload.activeEntities
-      }
+      return update(state, {
+        activeEntities: {$set: action.payload.activeEntities}
+      })
+
+      // console.error(CAD_DO_SELECTION, 'TIME TO IMPLEMENT IMMUTABILITY-HELPER', action.payload.activeEntities)
+      // return {
+      //   ...state,
+      //   activeEntities: action.payload.activeEntities
+      // }
 
     default:
       return state
