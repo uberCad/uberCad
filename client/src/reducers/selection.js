@@ -12,7 +12,8 @@ let initialState = {
     left: 0,
     top: 0,
     width: 0,
-    height: 0
+    height: 0,
+    display: 'none'
   },
   selectionStartPos: {
     x: 0,
@@ -70,7 +71,6 @@ const selection = (state = initialState, action) => {
           display: action.payload.active ? 'block' : 'none'
         },
         drawEndPos: action.payload.drawEndPos
-        // threshold: action.payload.value
       }
     default:
       return state

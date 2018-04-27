@@ -80,8 +80,6 @@ const mapDispatchToProps = (dispatch) => {
     },
 
     onMouseDown: (event, editor) => {
-      // console.log('onMouseDown', event, editor)
-
       // on left button
       if (event.button === 0) {
         if (editor.tool === TOOL_POINT) {

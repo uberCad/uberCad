@@ -22,7 +22,7 @@ export const selectionBegin = (event, editor) => {
   })
 }
 
-export const selectionUpdate = (event, editor) => {
+export const selectionUpdate = (event) => {
   return dispatch => {
     dispatch({
       type: SELECTION_UPDATE,

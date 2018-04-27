@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
 import './Selection.css'
 
 export default class SelectionComponent extends Component {
@@ -9,30 +9,26 @@ export default class SelectionComponent extends Component {
     }
   }
 
-  onMouseUp = (event) => {
-    this.props.onMouseUp(event, this.props.editor)
-  }
-
   render () {
-    let {style} = this.props.editor.selection
+    let {style} = this.props
 
     return (
       <div id='selection'
         onMouseMove={this.onMouseMove}
-        onMouseUp={this.onMouseUp}
         style={style}
       />
     )
   }
 
-  // static propTypes = {
-  //   tool: PropTypes.string.isRequired,
-  //   editMode: PropTypes.shape({
-  //     isEdit: PropTypes.bool.isRequired
-  //   }),
-  //
-  //   selectMode: PropTypes.string.isRequired,
-  //   singleLayerSelect: PropTypes.bool.isRequired,
-  //   threshold: PropTypes.number.isRequired
-  // }
+  static propTypes = {
+    active: PropTypes.bool.isRequired,
+    style: PropTypes.shape({
+      left: PropTypes.number.isRequired,
+      top: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+      height: PropTypes.number.isRequired,
+      display: PropTypes.string.isRequired
+    })
+
+  }
 }

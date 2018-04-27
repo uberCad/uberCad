@@ -84,6 +84,8 @@ let render = (editor) => {
 
 let highlightEntities = (editor, restoreColor = false, color = 0x0000FF, doRender = true) => {
   let entities = editor.activeEntities
+  // console.warn({editor, activeEntities: editor.activeEntities})
+
   entities.forEach(entity => {
     // upd color
     if (restoreColor) {
