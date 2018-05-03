@@ -1,10 +1,20 @@
-export const ACTIVE_ENTITIES_action = 'ACTIVE_ENTITIES_action'
+import { CAD_TOGGLE_VISIBLE } from './cad'
+import sceneService from '../services/sceneService'
 
-export const someAction = data => {
-  return dispatch => dispatch({
-    type: ACTIVE_ENTITIES_action,
-    payload: {
-      data
-    }
-  })
+export const toggleVisible = (entity, visible, editor) => {
+
+
+
+  return dispatch => {
+    entity.visible = visible;
+    sceneService.render(editor);
+
+    dispatch({
+      type: CAD_TOGGLE_VISIBLE,
+      payload: {
+        entity
+      }
+    })
+  }
+
 }

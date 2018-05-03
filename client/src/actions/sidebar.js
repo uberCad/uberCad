@@ -1,4 +1,5 @@
 export const SIDEBAR_TOGGLE = 'SIDEBAR_TOGGLE'
+export const TOGGLE_TAB = 'TOGGLE_TAB'
 
 export const toggleSidebar = (active, editor) => {
   return dispatch => {
@@ -19,5 +20,17 @@ export const toggleSidebar = (active, editor) => {
         } catch (e) {}
       })
     }
+  }
+}
+
+export const toggleTab = (panelIdx, tabIdx) => {
+  return dispatch => {
+    dispatch({
+      type: TOGGLE_TAB,
+      payload: {
+        panelIdx,
+        tabIdx
+      }
+    })
   }
 }

@@ -54,7 +54,7 @@ export default class CadComponent extends Component {
   render () {
     return (
       <div className={`threejs-app ${this.props.sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}
-           onMouseUp={this.onMouseUp}
+        onMouseUp={this.onMouseUp}
       >
         <div className='scene'
           ref={container => { this.container = container }}
@@ -64,15 +64,10 @@ export default class CadComponent extends Component {
           onMouseMove={this.onMouseMove}
 
         />
-        <Selection />
-        <Toolbar />
-        <Options />
-        <Sidebar>
-
-          <h2>Panel 1</h2>
-          <h2>Panel 2</h2>
-          <h2>Panel 3</h2>
-        </Sidebar>
+        <Selection/>
+        <Toolbar/>
+        <Options/>
+        <Sidebar/>
       </div>
     )
   }

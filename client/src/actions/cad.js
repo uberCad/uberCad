@@ -7,6 +7,7 @@ export const CAD_PARSE_DXF = 'CAD_PARSE_DXF'
 export const CAD_DRAW_DXF = 'CAD_DRAW_DXF'
 export const CAD_CLICK = 'CAD_CLICK'
 export const CAD_DO_SELECTION = 'CAD_DO_SELECTION'
+export const CAD_TOGGLE_VISIBLE = 'CAD_TOGGLE_VISIBLE'
 
 export const drawDxf = (data, container) => {
   let cadCanvas = new dxfService.Viewer(data, container)
@@ -104,14 +105,22 @@ export const cadDoubleClick = (event, editor) => {
           if (clickResult.activeEntities.length) {
             console.log('has active entities')
             // check if entity belongs to object
+            let activeEntities
             if (clickResult.activeEntities[0].userData.belongsToObject) {
               // completely select object
               // $scope.editor.activeEntities = $scope.editor.activeEntities[0].parent.children;
-              sceneService.doSelection(clickResult.activeEntities[0].parent.children, editor)
+              activeEntities = clickResult.activeEntities[0].parent.children
             } else {
-              let activeEntities = sceneService.recursiveSelect(clickResult.activeEntities[0], editor)
-              sceneService.doSelection(activeEntities, editor)
+              activeEntities = sceneService.recursiveSelect(clickResult.activeEntities[0], editor)
             }
+
+            sceneService.doSelection(activeEntities, editor)
+            dispatch({
+              type: CAD_DO_SELECTION,
+              payload: {
+                activeEntities
+              }
+            })
           }
         }
 

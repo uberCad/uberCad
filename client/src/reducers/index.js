@@ -19,5 +19,5 @@ export default {
   toolbar,
   options,
   selection,
-  sidebar,
+  sidebar
 }
