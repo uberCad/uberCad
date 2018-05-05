@@ -57,7 +57,7 @@ const options = (state = initialState, action) => {
           panel.forEach((tab, tabIdx) => {
             if (panelIdx === action.payload.panelIdx) {
               if (tabIdx === action.payload.tabIdx) {
-                tab.active = !tab.active
+                tab.active = state.active ? !tab.active : true
               } else {
                 tab.active = false
               }
