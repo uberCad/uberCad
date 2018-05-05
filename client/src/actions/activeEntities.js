@@ -1,10 +1,7 @@
-import { CAD_TOGGLE_VISIBLE, CAD_DO_SELECTION } from './cad'
+import { CAD_TOGGLE_VISIBLE, CAD_DO_SELECTION, CAD_SHOW_ALL } from './cad'
 import sceneService from '../services/sceneService'
 
 export const toggleVisible = (entity, visible, editor) => {
-
-
-
   return dispatch => {
     entity.visible = visible;
     sceneService.render(editor);
@@ -54,7 +51,7 @@ export const showAll = editor => {
   return dispatch => {
     sceneService.showAll(editor)
     dispatch({
-      type: CAD_DO_SELECTION,
+      type: CAD_SHOW_ALL,
       payload: {
         activeEntities: editor.activeEntities
       }

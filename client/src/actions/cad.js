@@ -10,6 +10,7 @@ export const CAD_CLICK = 'CAD_CLICK'
 export const CAD_DO_SELECTION = 'CAD_DO_SELECTION'
 export const CAD_TOGGLE_VISIBLE = 'CAD_TOGGLE_VISIBLE'
 export const CAD_TOGGLE_VISIBLE_LAYER = 'CAD_TOGGLE_VISIBLE_LAYER'
+export const CAD_SHOW_ALL = 'CAD_SHOW_ALL'
 
 export const drawDxf = (data, container) => {
   let cadCanvas = new dxfService.Viewer(data, container)

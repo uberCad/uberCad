@@ -10,7 +10,7 @@ const mapStateToProps = (state, ownProps) => {
       camera: state.cad.camera,
       renderer: state.cad.renderer,
       cadCanvas: state.cad.cadCanvas,
-      // activeEntities: state.cad.activeEntities,
+      activeEntities: state.cad.activeEntities,
       options: state.options
     },
     ...ownProps

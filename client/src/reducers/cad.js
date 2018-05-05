@@ -4,7 +4,8 @@ import {
   CAD_DRAW_DXF,
   CAD_DO_SELECTION,
   CAD_TOGGLE_VISIBLE,
-  CAD_TOGGLE_VISIBLE_LAYER
+  CAD_TOGGLE_VISIBLE_LAYER,
+  CAD_SHOW_ALL
 } from '../actions/cad'
 
 let initialState = {
@@ -40,6 +41,11 @@ const cad = (state = initialState, action) => {
       return update(state, {activeEntities: {$set: [...state.activeEntities]}})
     case CAD_TOGGLE_VISIBLE_LAYER:
       return update(state, {scene: {children: {$set: [...state.scene.children]}}})
+    case CAD_SHOW_ALL:
+      return update(state, {
+        scene: {children: {$set: [...state.scene.children]}},
+        activeEntities: {$set: [...state.activeEntities]}
+      })
     default:
       return state
   }

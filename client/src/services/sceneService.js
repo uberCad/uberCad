@@ -387,11 +387,14 @@ function entityIntersectArea (entity, area) {
   // alert('Unexpected geometry @ThreeDxf.entityIntersectArea()');
 }
 
-function * entityIterator (container) {
+function * entityIterator (container, iterateContainers = false) {
+  if (iterateContainers) {
+    yield container
+  }
   for (let child in container.children) {
     if (container.children.hasOwnProperty(child)) {
       if (container.children[child].children.length || container.children[child].userData.container) {
-        yield * entityIterator(container.children[child])
+        yield * entityIterator(container.children[child], iterateContainers)
       } else {
         yield container.children[child]
       }
@@ -454,7 +457,7 @@ let setPointOfInterest = (editor, object) => {
 
 let showAll = editor => {
   let {scene} = editor
-  let iterator = entityIterator(scene)
+  let iterator = entityIterator(scene, true)
 
   let entity = iterator.next()
   while (!entity.done) {
