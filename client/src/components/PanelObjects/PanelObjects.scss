@@ -1,0 +1,56 @@
+@import "../../variables.scss";
+
+#panel-layers {
+  height: 100%;
+
+  .content {
+    height: calc(100% - #{$sidebar-toolbar-size});
+    max-height: calc(100% - #{$sidebar-toolbar-size});
+    overflow: auto;
+
+    .item {
+      padding: 3px;
+      transition: All 0.2s;
+
+      &:hover {
+        background-color: rgba(0,0,0,0.1);
+      }
+
+      span {
+        float: right;
+        background-color: $gray;
+        border-radius: 8px;
+        padding: 0 5px;
+      }
+    }
+  }
+
+  .toolbar {
+    button {
+      float: left;
+      opacity: 0.7;
+      transition: All 0.3s;
+      display: inline-block;
+      width: $sidebar-toolbar-size;
+      height: $sidebar-toolbar-size;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &:active, &:focus {
+        outline: none;
+      }
+
+      &.group {
+        //background: url("group.svg") no-repeat center transparent;
+        //background-size: $sidebar-toolbar-size - 8px;
+      }
+
+      &.show-all {
+        background: url("../ActiveEntities/show-all.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
+    }
+  }
+}

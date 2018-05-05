@@ -42,7 +42,9 @@
     //max-height: 33%;
     //overflow: hidden;
 
-
+    &:last-child .tabs{
+      border: none;
+    }
 
     .tabs {
       list-style: none;
@@ -51,6 +53,7 @@
       height: 25px;
       line-height: 25px;
       padding: 0 0 0 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
 
       li {
         display: inline-block;
@@ -80,6 +83,8 @@
       height: 30vh;
       overflow: auto;
     }
+
+
   }
 
   .tabs-rotated {

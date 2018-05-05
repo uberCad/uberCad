@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import './PanelLayers.css'
+import './PanelObjects.css'
 import sceneService from '../../services/sceneService'
 
-export default class PanelLayersComponent extends Component {
+export default class PanelObjectsComponent extends Component {
   onChangeVisible = ({currentTarget: {checked, dataset: {id}}}) => {
     const {scene} = this.props.editor
     if (scene) {
@@ -12,8 +12,8 @@ export default class PanelLayersComponent extends Component {
     }
   }
 
-  showAll = () => {
-    this.props.showAll(this.props.editor)
+  combineEdgeModels = () => {
+    this.props.combineEdgeModels(this.props.editor)
   }
 
   shouldComponentUpdate (nextProps) {
@@ -25,45 +25,45 @@ export default class PanelLayersComponent extends Component {
     console.debug('render:', this)
 
     const {scene} = this.props.editor
-    let layers
+    let objects
     if (scene) {
-      layers = sceneService.getLayers(scene)
+      objects = sceneService.getObjects(scene)
     }
 
     return (
       <div id='panel-layers'>
         <div className='content'>
-          {layers
-            ? layers.children.filter(layer => layer.children.length).map((layer, idx) => (
+          {objects
+            ? objects.children.map((object, idx) => (
               <div className='item'
                    key={idx}
               >
-                <input type='checkbox' data-id={layer.id}
+                <input type='checkbox' data-id={object.id}
                        title='Visibility'
-                       checked={layer.visible}
+                       checked={object.visible}
                        onChange={this.onChangeVisible}
                 />
-                {layer.name}
-                <span>{layer.children.length}</span>
+                {object.name}
+                <span>{object.children.length}</span>
               </div>
             ))
             : (
-              <span>No layers</span>
+              <span>No objects</span>
             )
           }
         </div>
-        <div className='toolbar'>
+        {/*<div className='toolbar'>*/}
           {/*{activeEntities.length > 1 && (*/}
             {/*<button onClick={this.groupEntities}*/}
                     {/*className="group"*/}
                     {/*title="Group to object"*/}
             {/*/>*/}
           {/*)}*/}
-          <button onClick={this.showAll}
-                  className="show-all"
-                  title="Show all"
+          <button onClick={this.combineEdgeModels}
+                  className="combine"
+                  title="Combine edge models"
           />
-        </div>
+        {/*</div>*/}
       </div>
     )
   }

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import './Sidebar.css'
 import ActiveEntities from '../ActiveEntities/activeEntitiesComponentContainer'
 import PanelLayers from '../PanelLayers/panelLayersComponentContainer'
+import PanelObjects from '../PanelObjects/panelObjectsComponentContainer'
 
 export default class SidebarComponent extends Component {
   toggleSidebar = () => {
@@ -54,6 +55,9 @@ export default class SidebarComponent extends Component {
                       // break
                       case 'PanelLayers':
                         component = <PanelLayers />
+                        break
+                      case 'PanelObjects':
+                        component = <PanelObjects />
                         break
                       default:
                         component = `[COMPONENT "${tab.component}" NOT FOUND]`
