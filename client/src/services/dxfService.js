@@ -171,6 +171,8 @@ export default class DxfService {
     //   console.log(pos.x, pos.y); // Position in cad that is clicked
     // });
 
+    this.getControls = () => controls;
+
     this.resize = function (width, height) {
       let originalWidth = renderer.domElement.width
       let originalHeight = renderer.domElement.height

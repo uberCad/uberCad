@@ -39,6 +39,9 @@
 
   .panel {
     position: relative;
+    //max-height: 33%;
+    //overflow: hidden;
+
 
 
     .tabs {
@@ -70,6 +73,12 @@
           content: "";
         }
       }
+    }
+
+    .panel-content {
+      max-height: 30vh;
+      height: 30vh;
+      overflow: auto;
     }
   }
 

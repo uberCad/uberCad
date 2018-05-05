@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './Sidebar.css'
 import ActiveEntities from '../ActiveEntities/activeEntitiesComponentContainer'
+import PanelLayers from '../PanelLayers/panelLayersComponentContainer'
 
 export default class SidebarComponent extends Component {
   toggleSidebar = () => {
@@ -51,6 +52,9 @@ export default class SidebarComponent extends Component {
                       // case 'PanelSnapshots':
                       // component = <PanelSnapshots/>
                       // break
+                      case 'PanelLayers':
+                        component = <PanelLayers />
+                        break
                       default:
                         component = `[COMPONENT "${tab.component}" NOT FOUND]`
                         console.error(component)

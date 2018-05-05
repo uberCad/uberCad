@@ -2,20 +2,120 @@ import DxfParser from 'dxf-parser'
 import dxfService from './../services/dxfService'
 import sceneService from './../services/sceneService'
 import { TOOL_POINT } from '../components/Toolbar/toolbarComponent'
+import { SELECT_MODE_NEW } from '../components/Options/optionsComponent'
 
 export const CAD_PARSE_DXF = 'CAD_PARSE_DXF'
 export const CAD_DRAW_DXF = 'CAD_DRAW_DXF'
 export const CAD_CLICK = 'CAD_CLICK'
 export const CAD_DO_SELECTION = 'CAD_DO_SELECTION'
 export const CAD_TOGGLE_VISIBLE = 'CAD_TOGGLE_VISIBLE'
+export const CAD_TOGGLE_VISIBLE_LAYER = 'CAD_TOGGLE_VISIBLE_LAYER'
 
 export const drawDxf = (data, container) => {
   let cadCanvas = new dxfService.Viewer(data, container)
   let scene = cadCanvas.getScene()
   let camera = cadCanvas.getCamera()
   let renderer = cadCanvas.getRenderer()
-
   container.appendChild(renderer.domElement)
+
+  /**
+   * init
+   */
+
+  let editor = {scene, camera, renderer, cadCanvas, options: {threshold: 0.0001, selectMode: SELECT_MODE_NEW, singleLayerSelect: true}}
+
+  // 463, 316
+
+  //
+
+  let objectsDraft = [
+    [316, 471, -1041],
+    [370, 429],
+    [239],
+    [284],
+    [191],
+    [544],
+    [494],
+    [741],
+    [1025],
+    [773, 825],
+    [878, 960],
+    [650, 659],
+    [698],
+    [1092, 1097, 1102],
+    [97, 92, 87],
+    [1047, 1057, 1054],
+    // [1040, -32, -33, -34],
+    // [163, 173, 149],
+    // [1041],
+
+  ]
+  let idsToFind = [];
+  objectsDraft.forEach(entityContainer => idsToFind.push(...entityContainer.map(id => Math.abs(id))));
+  let result = {};
+
+  let iterator = sceneService.entityIterator(scene);
+  let entity = iterator.next();
+  while (!entity.done) {
+
+    if (idsToFind.indexOf(entity.value.id) >= 0) {
+      result[entity.value.id] = entity.value;
+    }
+    entity = iterator.next();
+  }
+
+  let frames = [];
+
+
+
+  objectsDraft.forEach((frameData, frameId) => {
+    let entities = [];
+    editor.options.selectMode = SELECT_MODE_NEW;
+
+    frameData.forEach(entityId => {
+      if (entityId < 0) {
+        entities.splice(entities.indexOf(result[Math.abs(entityId)]), 1);
+      } else {
+        entities = [...entities, ...sceneService.recursiveSelect(result[entityId], editor)]
+        console.error(entities.map(e => e.id))
+      }
+    });
+
+    sceneService.highlightEntities(editor, entities)
+    frames.push(sceneService.groupEntities(editor, entities, `Frame${frameId + 1}`));
+  });
+
+  //
+  //
+  // let entities = [];
+  //
+  //
+  // let iterator = sceneService.entityIterator(scene)
+  //
+  // let entity = iterator.next()
+  // while (!entity.done) {
+  //     if (
+  //       entity.value.id === 370
+  //       ||
+  //       entity.value.id === 429
+  //
+  //     ) {
+  //       entities = [...entities, ...sceneService.recursiveSelect(entity.value, editor)]
+  //       // entities = sceneService.recursiveSelect(entity.value, editor)
+  //     }
+  //     entity = iterator.next()
+  // }
+  //
+  // sceneService.highlightEntities(editor, entities)
+  //
+  // // console.warn('recursiveSelect entities', entities)
+  // let object = sceneService.groupEntities(editor, entities, 'inner')
+  // //
+  // // let object = sceneService.createObject(editor, 'inner', entities, 0.0001)
+  // console.warn('object111', object)
+
+
+
 
   return dispatch => dispatch({
     type: CAD_DRAW_DXF,

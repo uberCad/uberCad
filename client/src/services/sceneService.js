@@ -1,6 +1,8 @@
 import * as THREE from '../extend/THREE'
 import ArrayUtils from './arrayUtils'
 import GeometryUtils from './GeometryUtils'
+import ConsoleUtils from './consoleUtils'
+import ToastService from './ToastService'
 import {
   SELECT_MODE_NEW,
   SELECT_MODE_ADD,
@@ -55,7 +57,7 @@ let onClick = (event, scene, camera, renderer) => {
 }
 
 let doSelection = (selectResult, editor) => {
-  highlightEntities(editor, true, undefined, false)
+  highlightEntities(editor, editor.activeEntities, true, undefined, false)
   switch (editor.options.selectMode) {
     case SELECT_MODE_NEW:
       editor.activeEntities = selectResult
@@ -72,7 +74,7 @@ let doSelection = (selectResult, editor) => {
     default:
       console.warn(`Unhandled select mode ${editor.options.selectMode}`)
   }
-  highlightEntities(editor)
+  highlightEntities(editor, editor.activeEntities)
 
   return editor.activeEntities
 }
@@ -82,9 +84,12 @@ let render = (editor) => {
   renderer.render(scene, camera)
 }
 
-let highlightEntities = (editor, restoreColor = false, color = 0x0000FF, doRender = true) => {
-  let entities = editor.activeEntities
+let highlightEntities = (editor, entities, restoreColor = false, color = 0x0000FF, doRender = true) => {
   // console.warn({editor, activeEntities: editor.activeEntities})
+
+  if (!Array.isArray(entities)) {
+    entities = [entities]
+  }
 
   entities.forEach(entity => {
     // upd color
@@ -202,10 +207,11 @@ function getNeighbours (entity, editor, entities = []) {
 }
 
 let recursiveSelect = (object, editor) => {
-  console.log('RECURSIVE SELECT ', editor.options.threshold)
-
   let entities = getNeighbours(object, editor)
   entities.push(object)
+
+  // unique entities
+  entities = [...new Set(entities)]
 
   entities = GeometryUtils.skipZeroLines(entities, editor.options.threshold)
 
@@ -393,6 +399,272 @@ function * entityIterator (container) {
   }
 }
 
+let setPointOfInterest = (editor, object) => {
+  let STEPS_COUNT = 25
+  let {camera} = editor
+
+  console.log(editor)
+  console.log(editor.cadCanvas)
+  console.log(editor.cadCanvas.getControls())
+
+  let controls = editor.cadCanvas.getControls()
+
+  let pointOfInterests
+  if (object.geometry instanceof THREE.CircleGeometry) {
+    pointOfInterests = object.position
+  } else {
+    object.geometry.computeBoundingSphere()
+    pointOfInterests = object.geometry.boundingSphere.center
+  }
+  let step = (new THREE.Vector3(0, 0, 0)).subVectors(pointOfInterests, camera.position).divideScalar(STEPS_COUNT)
+
+  let radius = object.geometry.boundingSphere.radius
+  let canvasDimension
+  if (camera.right > camera.top) {
+    canvasDimension = camera.top
+  } else {
+    canvasDimension = camera.right
+  }
+  let factor = Math.pow(radius / canvasDimension * 2, 1 / STEPS_COUNT)
+
+  let steps_left = STEPS_COUNT
+
+  function animateCameraMove () {
+    steps_left--
+    if (steps_left > 0) {
+      requestAnimationFrame(animateCameraMove)
+    }
+
+    step.z = 0
+    controls.target.add(step)
+    camera.position.add(step)
+
+    camera.left *= factor
+    camera.right *= factor
+    camera.top *= factor
+    camera.bottom *= factor
+    camera.updateProjectionMatrix()
+
+    camera.needUpdate = true
+    controls.update()
+  }
+
+  animateCameraMove()
+}
+
+let showAll = editor => {
+  let {scene} = editor
+  let iterator = entityIterator(scene)
+
+  let entity = iterator.next()
+  while (!entity.done) {
+    try {
+      entity.value.visible = true
+      entity = iterator.next()
+    } catch (e) {
+      // debugger
+      console.error(e, 'problem with showing all, at showAll()')
+    }
+  }
+  render(editor)
+}
+
+let createObject = (editor, name, entities, threshold = 0.000001) => {
+  let object;
+  let {scene} = editor
+
+  let usedEntities = entities.length;
+  entities = entities.filter(e => !e.userData.belongsToObject);
+  usedEntities -= entities.length;
+
+  try {
+    scene.children.forEach(objectsContainer => {
+      if (objectsContainer.name === 'Objects') {
+        objectsContainer.children.forEach(object => {
+          if (object.name === name) {
+
+            let error = new Error(`Object with name "${name}" already exists`)
+            error.userData = {
+              error: 'duplicate name',
+              msg: `Object with name "${name}" already exists`,
+              name: name
+            }
+            throw error
+
+            // throw {
+            //   error: 'duplicate name',
+            //   msg: `Object with name "${name}" already exists`,
+            //   name: name
+            // }
+          }
+        });
+
+        //create object (entities container)
+        //move entities from layers to object
+        //render
+
+        // object = new THREE.Object3D();
+        object = new THREE.Group();
+        object.name = name;
+        object.userData['container'] = true;
+        object.userData['object'] = true;
+        // object.visible = false;
+
+        try {
+          object.userData['edgeModel'] = GeometryUtils.buildEdgeModel({children: entities}, threshold);
+          ConsoleUtils.previewObjectInConsole(object)
+        } catch (e) {
+          console.warn('BUILD EDGE MODEL IN threeDXF');
+          console.warn(e);
+
+          let error = new Error('Problem building edge model')
+          error.userData = {
+            error: 'edge model',
+            data: e,
+            msg: 'Problem building edge model'
+          }
+          throw error
+
+          // throw {
+          //   error: 'edge model',
+          //   data: e,
+          //   msg: 'Problem building edge model'
+          // }
+        }
+
+
+
+        entities.forEach(entity => {
+          // let idx = entity.parent.children.indexOf(entity);
+          // entity.parent.children.splice(idx, 1);
+          entity.userData.belongsToObject = true;
+          object.add(entity);
+        });
+
+        if (object.children.length) {
+          objectsContainer.add(object);
+        } else {
+          let error = new Error(usedEntities ? 'Selected entities already belongs to object' : 'No entities selected')
+          error.userData = {
+            error: 'empty object',
+            msg: usedEntities ? 'Selected entities already belongs to object' : 'No entities selected'
+          }
+          throw error
+
+          // throw {
+          //   error: 'empty object',
+          //   msg: usedEntities ? 'Selected entities already belongs to object' : 'No entities selected'
+          // };
+        }
+      }
+    });
+  } catch (e) {
+    console.error('errore', e);
+
+    switch (e.userData.error) {
+      case 'edge model':
+        if (e.userData.data && e.userData.data.error) {
+          switch (e.userData.data.error) {
+            case 'interruption':
+              //show problem line
+              console.error('show problem line', e);
+
+              this.highlightEntities(entities, true);
+              // cadCanvas.highlightEntities($scope.editor.activeEntities, true);
+
+              e.userData.data.entity.userData.showInTop = true;
+              this.highlightEntities([e.data.entity]);
+              setPointOfInterest(editor, e.data.entity);
+
+              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg);
+
+
+
+              break;
+
+            case 'intersection':
+              //show problem line
+              console.error('show intersected lines', e);
+
+              this.highlightEntities(entities, true);
+              // cadCanvas.highlightEntities($scope.editor.activeEntities, true);
+
+              // e.data.entity.userData.showInTop = true;
+              this.highlightEntities(e.userData.data.entities);
+              setPointOfInterest(editor, e.userData.data.entities[0]);
+
+              // this.render();
+              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg);
+
+
+              break;
+
+            case 'unused entities':
+              //show unused entity
+              console.error('show unused entity', e);
+              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg);
+
+              break;
+            default:
+              let text = e.userData.msg;
+              if (e.userData.data && e.userData.data.msg) {
+                text += `<br />${e.userData.data.msg}`;
+              }
+              // alert(text);
+              ToastService.msg(text);
+              break;
+          }
+        } else {
+          let text = e.userData.msg;
+          if (e.userData.data && e.userData.data.msg) {
+            text += `<br />${e.userData.data.msg}`;
+          }
+          // alert(text);
+          ToastService.msg(text);
+        }
+
+        // console.error(e);
+        break
+      case 'duplicate name':
+        // alert(e.msg);
+        ToastService.msg(e.userData.msg);
+        break
+      case 'empty object':
+        ToastService.msg(e.userData.msg);
+        break
+      default:
+        throw e;
+        // break;
+    }
+    return false;
+  }
+
+  render(editor);
+  return object;
+
+}
+
+let lastObjectName = ''
+let groupEntities = (editor, entities, objectName) => {
+  if (!objectName) {
+    objectName = prompt('Set object name', lastObjectName)
+  }
+
+  if (objectName) {
+    lastObjectName = objectName
+    try {
+      let object = createObject(editor, objectName, entities, editor.options.threshold)
+      if (object) {
+        lastObjectName = ''
+      }
+      return object
+    } catch (e) {
+      console.error(e)
+      return false
+    }
+  }
+}
+
 export default {
   onClick,
   doSelection,
@@ -403,7 +675,11 @@ export default {
   calcSize,
   selectInFrustum,
   render,
-  entityIterator
+  entityIterator,
+  setPointOfInterest,
+  showAll,
+  groupEntities,
+  createObject
 }
 
 function vertexInArea (vertex, area) {

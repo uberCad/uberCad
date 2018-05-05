@@ -3,7 +3,8 @@ import update from 'immutability-helper'
 import {
   CAD_DRAW_DXF,
   CAD_DO_SELECTION,
-  CAD_TOGGLE_VISIBLE
+  CAD_TOGGLE_VISIBLE,
+  CAD_TOGGLE_VISIBLE_LAYER
 } from '../actions/cad'
 
 let initialState = {
@@ -37,6 +38,8 @@ const cad = (state = initialState, action) => {
       return update(state, {activeEntities: {$set: [...action.payload.activeEntities]}})
     case CAD_TOGGLE_VISIBLE:
       return update(state, {activeEntities: {$set: [...state.activeEntities]}})
+    case CAD_TOGGLE_VISIBLE_LAYER:
+      return update(state, {scene: {children: {$set: [...state.scene.children]}}})
     default:
       return state
   }

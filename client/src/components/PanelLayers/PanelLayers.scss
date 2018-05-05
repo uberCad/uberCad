@@ -1,6 +1,6 @@
 @import "../../variables.scss";
 
-#activeEntities {
+#panel-layers {
   height: 100%;
 
   .content {
@@ -16,22 +16,11 @@
         background-color: rgba(0,0,0,0.1);
       }
 
-      input[type=checkbox] {
+      span {
         float: right;
-        margin-right: 4px;
-      }
-
-      .un-select {
-        float: right;
-        background: url("delete.svg") no-repeat center transparent;
-        background-size: 10px;
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-
-        &:active, &:focus {
-          outline: none;
-        }
+        background-color: $gray;
+        border-radius: 8px;
+        padding: 0 5px;
       }
     }
   }
@@ -54,16 +43,14 @@
       }
 
       &.group {
-        background: url("group.svg") no-repeat center transparent;
-        background-size: $sidebar-toolbar-size - 8px;
+        //background: url("group.svg") no-repeat center transparent;
+        //background-size: $sidebar-toolbar-size - 8px;
       }
 
       &.show-all {
-        background: url("show-all.svg") no-repeat center transparent;
+        background: url("../ActiveEntities/show-all.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
     }
-
-
   }
 }
