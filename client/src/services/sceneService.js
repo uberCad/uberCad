@@ -668,6 +668,26 @@ let groupEntities = (editor, entities, objectName) => {
   }
 }
 
+let getObjects = (scene, returnObjects = false) => {
+  for (let container of scene.children) {
+    if (container.name === 'Objects') {
+      if (returnObjects) {
+        return container.children
+      } else {
+        return container
+      }
+    }
+  }
+}
+
+let getLayers = scene => {
+  for (let container of scene.children) {
+    if (container.name === 'Layers') {
+      return container
+    }
+  }
+}
+
 export default {
   onClick,
   doSelection,
@@ -682,7 +702,9 @@ export default {
   setPointOfInterest,
   showAll,
   groupEntities,
-  createObject
+  createObject,
+  getObjects,
+  getLayers
 }
 
 function vertexInArea (vertex, area) {
