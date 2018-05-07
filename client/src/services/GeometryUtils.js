@@ -797,31 +797,40 @@ let arcsIntersect = (arc1, arc2) => {
   }
 }
 
-let getVertices = entities => {
+let getVertices = (entities, allVertices = false) => {
+  if (!Array.isArray(entities)) {
+    entities = [entities]
+  }
+
   let vertices = []
   entities.forEach(entity => {
     if (entity.geometry instanceof THREE.CircleGeometry) {
       // arc
-
-      let vertice = new THREE.Vector3(0, 0, 0)
-      vertice.parent = entity
-      vertices.push(vertice.addVectors(entity.geometry.vertices[0], entity.position))
-
-      vertice = new THREE.Vector3(0, 0, 0)
-      vertice.parent = entity
-      vertices.push(vertice.addVectors(entity.geometry.vertices[entity.geometry.vertices.length - 1], entity.position))
+      if (allVertices) {
+        entity.geometry.vertices.forEach(v => {
+          let vertex = new THREE.Vector3(0, 0, 0)
+          vertex.parent = entity
+          vertices.push(vertex.addVectors(v, entity.position))
+        })
+      } else {
+        let vertex = new THREE.Vector3(0, 0, 0)
+        vertex.parent = entity
+        vertices.push(vertex.addVectors(entity.geometry.vertices[0], entity.position))
+        vertex = new THREE.Vector3(0, 0, 0)
+        vertex.parent = entity
+        vertices.push(vertex.addVectors(entity.geometry.vertices[entity.geometry.vertices.length - 1], entity.position))
+      }
     } else {
       // line
       let src = entity.geometry.vertices[0]
-
-      let vertice = new THREE.Vector3(src.x, src.y, 0)
-      vertice.parent = entity
-      vertices.push(vertice)
+      let vertex = new THREE.Vector3(src.x, src.y, 0)
+      vertex.parent = entity
+      vertices.push(vertex)
 
       src = entity.geometry.vertices[1]
-      vertice = new THREE.Vector3(src.x, src.y, 0)
-      vertice.parent = entity
-      vertices.push(vertice)
+      vertex = new THREE.Vector3(src.x, src.y, 0)
+      vertex.parent = entity
+      vertices.push(vertex)
     }
   })
   return vertices
@@ -1911,6 +1920,171 @@ let pathArea = path => {
   return Math.abs((sumY - sumX) / 2)
 }
 
+let calcArea = (entities) => {
+  return pathArea(getSerialVertices(entities))
+}
+
+let calcLength = entities => {
+  let total = 0
+  entities.forEach(entity => {
+    entity.computeLineDistances()
+    total += entity.geometry.lineDistances[entity.geometry.lineDistances.length - 1]
+  })
+  return total
+}
+
+let calcSize = entities => {
+  let init = false
+  let left, top, right, bottom
+
+  entities.forEach(entity => {
+    getVertices(entity, true).forEach(vertex => {
+      if (!init) {
+        init = true
+        left = right = vertex.x
+        top = bottom = vertex.y
+      }
+      if (left < vertex.x) { left = vertex.x }
+      if (right > vertex.x) { right = vertex.x }
+      if (top < vertex.y) { top = vertex.y }
+      if (bottom > vertex.y) { bottom = vertex.y }
+    })
+  })
+
+  // ACHTUNG!
+  // swap width and height
+
+  return new THREE.Vector2(Math.abs(top - bottom), Math.abs(left - right))
+}
+
+function vertexInArea (vertex, area) {
+  return ((vertex.x >= Math.min(area.x1, area.x2) && vertex.x <= Math.max(area.x1, area.x2)) && (vertex.y >= Math.min(area.y1, area.y2) && vertex.y <= Math.max(area.y1, area.y2)))
+}
+
+function getSerialVertices (entities) {
+  function buildChain (entities, vertices, currentEntity, vertex, stopVertex) {
+    // console.log('buildChain. ENTITIES:', entities, 'VERTICES:', vertices, 'CURRENT_ENTITY', currentEntity, 'VERTEX', vertex, 'STOP_VERTEX', stopVertex);
+    if (!currentEntity) {
+      if (entities.length) {
+        currentEntity = entities[0]
+        stopVertex = getFirstVertex(currentEntity)
+        vertex = stopVertex
+        vertices.push(stopVertex)
+
+        if (entities.length === 1) {
+          // polygon
+          return currentEntity.geometry.vertices
+        }
+      } else {
+        return vertices
+      }
+    }
+
+    vertex = getAnotherVertex(currentEntity, vertex)
+
+    // if current vertex is closely to stopVertex than finish
+    if (vertex.distanceTo(stopVertex) < 0.001) {
+      // console.log('FIRED STOP VERTEX');
+      return vertices
+    }
+
+    // find entity (not current)
+    let distances = []
+    entities.forEach(entity => {
+      if (entity === currentEntity) {
+        return false
+      }
+
+      getVertices(entity).forEach(v => {
+        distances.push({
+          entity: entity,
+          vertex,
+          v,
+          distance: vertex.distanceTo(v)
+        })
+      })
+    })
+
+    // get closest vertex
+    let minDistance = distances.pop()
+    distances.forEach(distance => {
+      if (distance.distance < minDistance.distance) {
+        minDistance = distance
+      }
+    })
+
+    vertices.push(vertex)
+    return buildChain(entities, vertices, minDistance.entity, minDistance.v, stopVertex)
+  }
+
+  return buildChain(entities, [])
+}
+
+function entityIntersectArea (entity, area) {
+// console.log('ENTITY', entity, 'AREA', area);
+  // console.count(entity.geometry.type);
+
+  if (entity.geometry instanceof THREE.CircleGeometry) {
+    // arc
+    try {
+      entity.geometry.vertices.forEach((vertex, idx) => {
+        // TODO optimize code
+        // skip even vertex for calculation speed. I think three is possibility to check evert fifth vertex...
+        if (idx % 2 === 1 && vertexInArea((new THREE.Vector3(0, 0, 0)).addVectors(vertex, entity.position), area)) {
+          throw new Error('true')
+        }
+      })
+    } catch (e) {
+      return true
+    }
+
+    return false
+  } else {
+    // console.log('LINE', entity);
+
+    // check if any vertex in selected area;
+    try {
+      entity.geometry.vertices.forEach(vertex => {
+        if (vertexInArea(vertex, area)) {
+          throw new Error('true')
+        }
+      })
+    } catch (e) {
+      return true
+    }
+
+    // check if line intersect area
+    try {
+      let prevVertex
+
+      entity.geometry.vertices.forEach(vertex => {
+        if (prevVertex) {
+          // console.log(area);
+          // x1,y1 - x2,y1
+          // x1,y1 - x1,y2
+          // x1,y2 - x2,y2
+          // x2,y1 - x2,y2
+          if (
+            linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x1, area.y1, 0), new THREE.Vector3(area.x2, area.y1, 0)) ||
+            linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x1, area.y1, 0), new THREE.Vector3(area.x1, area.y2, 0)) ||
+            linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x1, area.y2, 0), new THREE.Vector3(area.x2, area.y2, 0)) ||
+            linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x2, area.y1, 0), new THREE.Vector3(area.x2, area.y2, 0))
+          ) {
+            throw new Error('true')
+          }
+        }
+        prevVertex = vertex
+      })
+    } catch (e) {
+      return true
+    }
+
+    return false
+  }
+
+  // alert('Unexpected geometry @ThreeDxf.entityIntersectArea()');
+}
+
 export default {
   distanceToLine,
   distanceToArc,
@@ -1928,6 +2102,10 @@ export default {
   generateCollisionBranches,
   generateAllPaths,
   queueIterator,
-  checkCavity
-
+  checkCavity,
+  calcLength,
+  calcArea,
+  calcSize,
+  vertexInArea,
+  entityIntersectArea
 }

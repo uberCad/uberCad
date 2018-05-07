@@ -31,22 +31,26 @@ export const drawDxf = (data, container) => {
   //
 
   let objectsDraft = [
-    [316, 471, -1041],
-    [370, 429],
-    [239],
-    [284],
     [191],
-    [544],
-    [494],
-    [741],
-    [1025],
-    [773, 825],
-    [878, 960],
-    [650, 659],
-    [698],
-    [1092, 1097, 1102],
-    [97, 92, 87],
-    [1047, 1057, 1054]
+    [239],
+
+    // [316, 471, -1041],
+    // [370, 429],
+    //
+    // [650, 659],
+    // [544],
+    // [698],
+    // [1092, 1097, 1102],
+    // [1047, 1057, 1054],
+
+    // [284],
+    // [494],
+    // [741],
+    // [1025],
+    // [773, 825],
+    // [878, 960],
+
+    // [97, 92, 87],
     // [1040, -32, -33, -34],
     // [163, 173, 149],
     // [1041],
@@ -76,7 +80,7 @@ export const drawDxf = (data, container) => {
         entities.splice(entities.indexOf(result[Math.abs(entityId)]), 1)
       } else {
         entities = [...entities, ...sceneService.recursiveSelect(result[entityId], editor)]
-        console.error(entities.map(e => e.id))
+        // console.error(entities.map(e => e.id))
       }
     })
 

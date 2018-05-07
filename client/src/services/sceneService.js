@@ -215,61 +215,12 @@ let recursiveSelect = (object, editor) => {
 
   entities = GeometryUtils.skipZeroLines(entities, editor.options.threshold)
 
-  let area = calcArea(entities)
-  let lineLength = calcLength(entities)
-  let size = calcSize(entities)
-  console.log('object area: ' + area.toFixed(4) + '<br />length: ' + lineLength.toFixed(4) + '<br /><b>Size:</b><br />Width: ' + size.x.toFixed(4) + '<br />Height: ' + size.y.toFixed(4))
+  let area = GeometryUtils.calcArea(entities)
+  let lineLength = GeometryUtils.calcLength(entities)
+  let size = GeometryUtils.calcSize(entities)
+  console.log('object area: ' + area.toFixed(4) + '\nlength: ' + lineLength.toFixed(4) + '\nSize:\n\tWidth: ' + size.x.toFixed(4) + '\n\tHeight: ' + size.y.toFixed(4))
 
   return entities
-}
-
-let calcArea = (entities) => {
-  let vertices = getSerialVertices(entities)
-  let sumX = 0
-  let sumY = 0
-  let multipleIdx = 0
-  for (let i = 0; i < vertices.length; i++) {
-    multipleIdx = i + 1
-    if (multipleIdx >= vertices.length) {
-      multipleIdx = 0
-    }
-    sumX += vertices[i].x * vertices[multipleIdx].y
-    sumY += vertices[multipleIdx].x * vertices[i].y
-  }
-  return Math.abs((sumY - sumX) / 2)
-}
-
-let calcLength = entities => {
-  let total = 0
-  entities.forEach(entity => {
-    entity.computeLineDistances()
-    total += entity.geometry.lineDistances[entity.geometry.lineDistances.length - 1]
-  })
-  return total
-}
-
-let calcSize = entities => {
-  let init = false
-  let left, top, right, bottom
-
-  entities.forEach(entity => {
-    getVertices(entity, true).forEach(vertex => {
-      if (!init) {
-        init = true
-        left = right = vertex.x
-        top = bottom = vertex.y
-      }
-      if (left < vertex.x) { left = vertex.x }
-      if (right > vertex.x) { right = vertex.x }
-      if (top < vertex.y) { top = vertex.y }
-      if (bottom > vertex.y) { bottom = vertex.y }
-    })
-  })
-
-  // ACHTUNG!
-  // swap width and height
-
-  return new THREE.Vector2(Math.abs(top - bottom), Math.abs(left - right))
 }
 
 function selectInFrustum (area, container, editor) {
@@ -313,78 +264,13 @@ function selectInFrustum (area, container, editor) {
     // if (idx < 50 || idx > 60 ) return;
 
     // console.log('item', entity);
-    if (entityIntersectArea(entity, area, geometries)) {
+    if (GeometryUtils.entityIntersectArea(entity, area, geometries)) {
       frustumIntersectsFiltered.push(entity)
     }
   })
 
   // console.timeEnd('selectInFrustum');
   return frustumIntersectsFiltered
-}
-
-function entityIntersectArea (entity, area) {
-// console.log('ENTITY', entity, 'AREA', area);
-  // console.count(entity.geometry.type);
-
-  if (entity.geometry instanceof THREE.CircleGeometry) {
-    // arc
-    try {
-      entity.geometry.vertices.forEach((vertex, idx) => {
-        // TODO optimize code
-        // skip even vertex for calculation speed. I think three is possibility to check evert fifth vertex...
-        if (idx % 2 === 1 && vertexInArea((new THREE.Vector3(0, 0, 0)).addVectors(vertex, entity.position), area)) {
-          throw new Error('true')
-        }
-      })
-    } catch (e) {
-      return true
-    }
-
-    return false
-  } else {
-    // console.log('LINE', entity);
-
-    // check if any vertex in selected area;
-    try {
-      entity.geometry.vertices.forEach(vertex => {
-        if (vertexInArea(vertex, area)) {
-          throw new Error('true')
-        }
-      })
-    } catch (e) {
-      return true
-    }
-
-    // check if line intersect area
-    try {
-      let prevVertex
-
-      entity.geometry.vertices.forEach(vertex => {
-        if (prevVertex) {
-          // console.log(area);
-          // x1,y1 - x2,y1
-          // x1,y1 - x1,y2
-          // x1,y2 - x2,y2
-          // x2,y1 - x2,y2
-          if (
-            GeometryUtils.linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x1, area.y1, 0), new THREE.Vector3(area.x2, area.y1, 0)) ||
-            GeometryUtils.linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x1, area.y1, 0), new THREE.Vector3(area.x1, area.y2, 0)) ||
-            GeometryUtils.linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x1, area.y2, 0), new THREE.Vector3(area.x2, area.y2, 0)) ||
-            GeometryUtils.linesIntersect(prevVertex, vertex, new THREE.Vector3(area.x2, area.y1, 0), new THREE.Vector3(area.x2, area.y2, 0))
-          ) {
-            throw new Error('true')
-          }
-        }
-        prevVertex = vertex
-      })
-    } catch (e) {
-      return true
-    }
-
-    return false
-  }
-
-  // alert('Unexpected geometry @ThreeDxf.entityIntersectArea()');
 }
 
 function * entityIterator (container, iterateContainers = false) {
@@ -816,14 +702,14 @@ let combineEdgeModels = editor => {
     <g id="group_d">${
   objects.map(object => {
     // console.log('SVG BUILDER', object);
-    return `<path d="${object.userData.edgeModel.svgData.pathD} " style="fill:rgb(200,240,200);stroke:black;stroke-width:0.00001">
-                         <matprop type="const" id="O-1036" lambda="160" eps="0.9" density="2800"></matprop>
+    return `<path d="${object.userData.edgeModel.svgData.pathD} " style="fill:rgb(200,240,200);stroke:black;stroke-width:0.00001mm">
+                         <matprop type="const" id="O-1036" lambda="160" eps="0.9" density="2800"/>
                          <area value="0.002" />
                        </path>
                        <circle cx="${(object.userData.edgeModel.svgData.insidePoint.x / 1000).toFixed(4)}" cy="${(object.userData.edgeModel.svgData.insidePoint.y / 1000).toFixed(4)}" r="0.0005" style="fill:rgb(150,255,150); stroke:black;stroke-width:0.00001" />` +
         object.userData.edgeModel.svgData.subRegionsPathD.map(pathD => {
-          return `<path d="${pathD} " style="fill:rgb(200,200,240);opacity:0.5; stroke:black;stroke-width:0.00001">
-                             <matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>
+          return `<path d="${pathD} " style="fill:rgb(200,200,240);opacity:0.5; stroke:black;stroke-width:0.00001mm">
+                             <matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"/>
                              <area value="0.01" />
                            </path>`
         }).join('')
@@ -923,9 +809,6 @@ export default {
   doSelection,
   highlightEntities,
   recursiveSelect,
-  calcArea,
-  calcLength,
-  calcSize,
   selectInFrustum,
   render,
   entityIterator,
@@ -936,10 +819,6 @@ export default {
   getObjects,
   getLayers,
   combineEdgeModels
-}
-
-function vertexInArea (vertex, area) {
-  return ((vertex.x >= Math.min(area.x1, area.x2) && vertex.x <= Math.max(area.x1, area.x2)) && (vertex.y >= Math.min(area.y1, area.y2) && vertex.y <= Math.max(area.y1, area.y2)))
 }
 
 function getOffset (elem) {
@@ -953,84 +832,4 @@ function getOffset (elem) {
     } while (elem)
   }
   return offset
-}
-
-function getVertices (entity, allVertices = false) {
-  let vertices = []
-  if (entity.geometry instanceof THREE.CircleGeometry) {
-    // arc
-    let vertex = new THREE.Vector3(0, 0, 0)
-    if (allVertices) {
-      entity.geometry.vertices.forEach(v => {
-        vertices.push(vertex.addVectors(v, entity.position))
-      })
-    } else {
-      vertices.push(vertex.addVectors(entity.geometry.vertices[0], entity.position))
-      vertex = new THREE.Vector3(0, 0, 0)
-      vertices.push(vertex.addVectors(entity.geometry.vertices[entity.geometry.vertices.length - 1], entity.position))
-    }
-  } else {
-    // line?
-    vertices = entity.geometry.vertices
-  }
-  return vertices
-}
-
-function getSerialVertices (entities) {
-  function buildChain (entities, vertices, currentEntity, vertex, stopVertex) {
-    // console.log('buildChain. ENTITIES:', entities, 'VERTICES:', vertices, 'CURRENT_ENTITY', currentEntity, 'VERTEX', vertex, 'STOP_VERTEX', stopVertex);
-    if (!currentEntity) {
-      if (entities.length) {
-        currentEntity = entities[0]
-        stopVertex = GeometryUtils.getFirstVertex(currentEntity)
-        vertex = stopVertex
-        vertices.push(stopVertex)
-
-        if (entities.length === 1) {
-          // polygon
-          return currentEntity.geometry.vertices
-        }
-      } else {
-        return vertices
-      }
-    }
-
-    vertex = GeometryUtils.getAnotherVertex(currentEntity, vertex)
-
-    // if current vertex is closely to stopVertex than finish
-    if (vertex.distanceTo(stopVertex) < 0.001) {
-      // console.log('FIRED STOP VERTEX');
-      return vertices
-    }
-
-    // find entity (not current)
-    let distances = []
-    entities.forEach(entity => {
-      if (entity === currentEntity) {
-        return false
-      }
-
-      getVertices(entity).forEach(v => {
-        distances.push({
-          entity: entity,
-          vertex,
-          v,
-          distance: vertex.distanceTo(v)
-        })
-      })
-    })
-
-    // get closest vertex
-    let minDistance = distances.pop()
-    distances.forEach(distance => {
-      if (distance.distance < minDistance.distance) {
-        minDistance = distance
-      }
-    })
-
-    vertices.push(vertex)
-    return buildChain(entities, vertices, minDistance.entity, minDistance.v, stopVertex)
-  }
-
-  return buildChain(entities, [])
 }
