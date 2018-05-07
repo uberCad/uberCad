@@ -88,34 +88,7 @@ export const drawDxf = (data, container) => {
     frames.push(sceneService.groupEntities(editor, entities, `Frame${frameId + 1}`))
   })
 
-  //
-  //
-  // let entities = [];
-  //
-  //
-  // let iterator = sceneService.entityIterator(scene)
-  //
-  // let entity = iterator.next()
-  // while (!entity.done) {
-  //     if (
-  //       entity.value.id === 370
-  //       ||
-  //       entity.value.id === 429
-  //
-  //     ) {
-  //       entities = [...entities, ...sceneService.recursiveSelect(entity.value, editor)]
-  //       // entities = sceneService.recursiveSelect(entity.value, editor)
-  //     }
-  //     entity = iterator.next()
-  // }
-  //
-  // sceneService.highlightEntities(editor, entities)
-  //
-  // // console.warn('recursiveSelect entities', entities)
-  // let object = sceneService.groupEntities(editor, entities, 'inner')
-  // //
-  // // let object = sceneService.createObject(editor, 'inner', entities, 0.0001)
-  // console.warn('object111', object)
+  sceneService.combineEdgeModels(editor)
 
   return dispatch => dispatch({
     type: CAD_DRAW_DXF,
