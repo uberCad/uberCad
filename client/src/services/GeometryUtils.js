@@ -433,13 +433,12 @@ let getInsidePoint = (regions, threshold) => {
         if (insidePolygon(path, midPoint)) {
           //try to do it simplest way...
           let minDistance = 999999999;
-          entities.forEach(entity => {
+          for (let entity of entities) {
             let distance = distanceToEntity(midPoint, entity);
             if (distance < minDistance) {
               minDistance = distance;
             }
-          });
-
+          }
           points.push({
             minDistance,
             point: midPoint
@@ -451,12 +450,13 @@ let getInsidePoint = (regions, threshold) => {
           if (bestPoints >= 2) {
             //if there are 2+ points, select one farest from border (that far enough: 10000*threshold)
             let maxDistance = 0;
-            points.forEach(point => {
+
+            for (let point of points) {
               if (point.minDistance > maxDistance) {
                 maxDistance = point.minDistance;
                 farestPoint = point.point;
               }
-            });
+            }
 
             // if there are no vertex further than 10000*threshold, scripts after that cycle find farest
             return farestPoint;
@@ -479,6 +479,73 @@ let getInsidePoint = (regions, threshold) => {
 
     return farestPoint;
   }
+}
+
+let getCollisionPoints = (objects, threshold = 0.000001) => {
+  let collisionPoints = [];
+  // if object bounding boxes intersect or tangent then
+  //     find intersections between object
+  //     find tangent points between objects
+  //     find new regions
+
+  objects.forEach(object => {
+    object.userData.checkedIntersection = true;
+
+    let objectOuterEntities = [];
+    object.userData.edgeModel.regions[0].path.forEach(vertex => {
+      if (!objectOuterEntities.includes(vertex.parent)) {
+        objectOuterEntities.push(vertex.parent);
+      }
+    });
+
+    // console.log('outer region', object.userData.edgeModel.regions[0].path, objectOuterEntities);
+
+    //filter, to process collided objects once
+    objects.filter((obj) => {
+      return !obj.userData.checkedIntersection &&
+        isBoundingBoxesCollide(
+          object.userData.edgeModel.regions[0].boundingBox,
+          obj.userData.edgeModel.regions[0].boundingBox,
+          threshold
+        );
+    }).forEach(obj => {
+      // console.log('obj', obj);
+      //check for intersections between object
+      //entity to entity
+
+      let objOuterEntities = [];
+      obj.userData.edgeModel.regions[0].path.forEach(vertex => {
+        if (!objOuterEntities.includes(vertex.parent)) {
+          objOuterEntities.push(vertex.parent);
+        }
+      });
+
+      // return;
+
+      // check for intersections
+
+      console.time('CHECK OBJECTS INTERSECTION');
+
+      objectOuterEntities.forEach(entityObject => {
+        objOuterEntities.forEach(entityObj => {
+          let info = entitiesIntersectInfo(entityObject, entityObj, threshold);
+
+          if (info) {
+            info.id = collisionPoints.length;
+            collisionPoints.push(info);
+          }
+        });
+      });
+
+      // console.timeEnd('CHECK OBJECTS INTERSECTION');
+    })
+  });
+
+  objects.forEach(object => {
+    delete object.userData.checkedIntersection;
+  });
+
+  return collisionPoints;
 }
 
 let insidePolygon = (polygon = [], vertex) => {
@@ -1151,6 +1218,751 @@ let isBetween = (a, b, c, threshold = 0) => {
   // return getDistance(a, c) + getDistance(c, b) === getDistance(a, b);
 }
 
+let pointInBox = (point, box, threshold = 0.000001) => {
+  return (
+    point.x >= box.x1 - threshold &&
+    point.x <= box.x2 + threshold &&
+    point.y >= box.y1 - threshold &&
+    point.y <= box.y2 + threshold
+  )
+}
+
+let isBoundingBoxesCollide = (boundingBox1, boundingBox2, threshold = 0.000001) => {
+  return (
+    pointInBox({x: boundingBox1.x1, y: boundingBox1.y1}, boundingBox2, threshold) ||
+    pointInBox({x: boundingBox1.x1, y: boundingBox1.y2}, boundingBox2, threshold) ||
+    pointInBox({x: boundingBox1.x2, y: boundingBox1.y1}, boundingBox2, threshold) ||
+    pointInBox({x: boundingBox1.x2, y: boundingBox1.y2}, boundingBox2, threshold) ||
+    pointInBox({x: boundingBox2.x1, y: boundingBox2.y1}, boundingBox1, threshold) ||
+    pointInBox({x: boundingBox2.x1, y: boundingBox2.y2}, boundingBox1, threshold) ||
+    pointInBox({x: boundingBox2.x2, y: boundingBox2.y1}, boundingBox1, threshold) ||
+    pointInBox({x: boundingBox2.x2, y: boundingBox2.y2}, boundingBox1, threshold)
+  );
+}
+
+let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001) => {
+  if (!(entity1.geometry instanceof THREE.CircleGeometry) && !(entity2.geometry instanceof THREE.CircleGeometry)) {
+    //line to line
+
+    let intersectionResult = linesIntersect(entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1], true);
+
+    if (intersectionResult.isIntersects || intersectionResult.distance < threshold) {
+      return {
+        isIntersects: intersectionResult.isIntersects,
+        point: intersectionResult.point,
+        distance: intersectionResult.distance,
+        entities: [entity1, entity2],
+        ids: [entity1.id, entity2.id]
+      }
+    }
+
+
+  } else if (entity1.geometry instanceof THREE.CircleGeometry && entity2.geometry instanceof THREE.CircleGeometry) {
+    //arc to arc
+
+    // console.count('ARC TO ARC check');
+
+    let intersectionResult = arcsIntersect(entity1, entity2);
+    if (intersectionResult) {
+      // debugger;
+
+      let arc1v1 = new THREE.Vector3(0, 0, 0);
+      arc1v1.addVectors(intersectionResult.arc1.geometry.vertices[0], intersectionResult.arc1.position);
+
+      let arc1v2 = new THREE.Vector3(0, 0, 0);
+      arc1v2.addVectors(intersectionResult.arc1.geometry.vertices[intersectionResult.arc1.geometry.vertices.length - 1], intersectionResult.arc1.position);
+
+      let arc2v1 = new THREE.Vector3(0, 0, 0);
+      arc2v1.addVectors(intersectionResult.arc2.geometry.vertices[0], intersectionResult.arc2.position);
+
+      let arc2v2 = new THREE.Vector3(0, 0, 0);
+      arc2v2.addVectors(intersectionResult.arc2.geometry.vertices[intersectionResult.arc2.geometry.vertices.length - 1], intersectionResult.arc2.position);
+
+
+      if (
+        arc1v1.distanceTo(intersectionResult.intersectPoint) > threshold &&
+        arc1v2.distanceTo(intersectionResult.intersectPoint) > threshold &&
+        arc2v1.distanceTo(intersectionResult.intersectPoint) > threshold &&
+        arc2v2.distanceTo(intersectionResult.intersectPoint) > threshold
+      ) {
+        // console.warn('INTERSECTION!', intersectionResult);
+
+
+        return {
+          isIntersects: true,
+          point: intersectionResult.intersectPoint,
+          distance: 0,
+          // distance: intersectionResult.distance,
+          entities: [entity1, entity2],
+          ids: [entity1.id, entity2.id]
+        }
+      }
+    }
+  } else {
+    //line to arc
+
+    let arc, line;
+
+    if (entity1.geometry instanceof THREE.CircleGeometry) {
+      arc = entity1;
+      line = entity2;
+    } else {
+      arc = entity2;
+      line = entity1;
+    }
+
+    let intersectionResult = lineArcIntersect(line, arc, threshold);
+    if (intersectionResult) {
+      //possibly intersection. check for threshold
+
+      // console.warn('INTERSECTION', arc, line);
+
+      return {
+        isIntersects: true,
+        point: intersectionResult.intersectPoint,
+        distance: 0,
+        // distance: intersectionResult.distance,
+        entities: [arc, line],
+        ids: [arc.id, line.id]
+      }
+    }
+
+    // console.count('LINE TO ARC check');
+  }
+
+  return false;
+}
+
+let filterCollisionPoints = (collisionPoints, threshold = 0.000001) => {
+  let goodCp = [];
+
+  collisionPoints.forEach(collisionPoint => {
+    collisionPoint.entities.forEach(entity => {
+      for (let isLast = 0; isLast <= 1; isLast++) {
+        //only first and last vertex need
+        let vertex = fixArcVertex(entity.geometry.vertices[(entity.geometry.vertices.length - 1) * isLast], entity);
+
+        if (getDistance(vertex, collisionPoint.point) < threshold) {
+          continue;
+        }
+
+        let isGood = true;
+
+        // console.log({entity});
+        // debugger;
+
+        let objOuterEntities = [];
+        collisionPoint.entities.forEach(entityToCheck => {
+          if (entityToCheck === entity) {
+            return;
+          }
+
+          if (entityToCheck.parent && entityToCheck.parent.userData && entityToCheck.parent.userData.edgeModel) {
+            entityToCheck.parent.userData.edgeModel.regions[0].path.forEach(vertex => {
+              if (!objOuterEntities.includes(vertex.parent)) {
+                objOuterEntities.push(vertex.parent);
+              }
+            });
+          } else {
+            console.error('bad container');
+          }
+        });
+
+        objOuterEntities.forEach(entityToCheck => {
+          if (distanceToEntity(vertex, entityToCheck) < threshold) {
+            isGood = false;
+          }
+        });
+
+        if (isGood) {
+          if (!goodCp.includes(collisionPoint)) {
+            goodCp.push(collisionPoint);
+          }
+        }
+      }
+    });
+  });
+  return goodCp;
+}
+
+let filterOverlappingCollisionPoints = (collisionPoints, threshold = 0.000001) => {
+  let uniqueCollisionPoints = [];
+
+  collisionPoints.forEach(collisionPoint => {
+    try {
+      uniqueCollisionPoints.forEach(uniqueCollisionPoint => {
+        if (getDistance(collisionPoint.point, uniqueCollisionPoint.point) < threshold) {
+          throw "point is overlapping"
+        }
+      });
+      //if no-throw, then cp is unique
+      uniqueCollisionPoints.push(collisionPoint);
+    } catch (e) {
+      //point is overlapping
+    }
+  });
+
+  return uniqueCollisionPoints;
+}
+
+let fixArcVertex = (vertex, entity) => {
+  if (entity.geometry instanceof THREE.CircleGeometry) {
+    //arc
+    let v = new THREE.Vector3(0, 0, 0);
+    v.addVectors(vertex, entity.position);
+    vertex = v;
+  }
+  return vertex;
+}
+
+let filterCollisionPointsWithSharedEntities = (collisionPoints, threshold = 0.000001) => {
+  let chunks = [];
+
+  collisionPoints.forEach(collisionPoint => {
+    if (collisionPoint.inChunk) {
+      return;
+    }
+
+    let chunk = [collisionPoint];
+    collisionPoint.inChunk = true;
+
+    //find collisionPoints with shared entities
+    collisionPoints.forEach(checkCp => {
+      if (checkCp.inChunk) {
+        return;
+      }
+
+      //one of the entities shared (check if array intersects)
+      if (collisionPoint.entities.filter(n => checkCp.entities.includes(n)).length) {
+        chunk.push(checkCp);
+        checkCp.inChunk = true;
+      }
+    });
+    chunks.push(chunk);
+  });
+  collisionPoints.forEach(collisionPoint => {
+    delete collisionPoint.inChunk;
+  });
+
+  let betterCollisionPoints = [];
+  chunks.forEach(chunk => {
+    if (!chunk.length) {
+      return;
+    }
+
+    if (chunk.length === 1) {
+      betterCollisionPoints.push(chunk.pop());
+      return;
+    }
+
+    // chunk
+
+    //find shared entity
+    let sharedEntity = chunk[0].entities.find(en => chunk[1].entities.includes(en));
+
+    //find which vertex of sharedEntity further from another object
+    let anotherObject = getParentObject(chunk[0].entities.find(en => en !== sharedEntity));
+
+
+    let objOuterEntities = [];
+    anotherObject.userData.edgeModel.regions[0].path.forEach(vertex => {
+      if (!objOuterEntities.includes(vertex.parent)) {
+        objOuterEntities.push(vertex.parent);
+      }
+    });
+
+    let distances = [];
+    for (let isLast = 0; isLast <= 1; isLast++) {
+      //only first and last vertex need
+      let vertex = fixArcVertex(sharedEntity.geometry.vertices[(sharedEntity.geometry.vertices.length - 1) * isLast], sharedEntity);
+
+      distances.push({
+        vertex,
+        minDistance: 99999999999
+      });
+
+      objOuterEntities.forEach(entityToCheck => {
+        let distance = distanceToEntity(vertex, entityToCheck);
+        if (distance < distances[isLast].minDistance) {
+          distances[isLast].minDistance = distance
+        }
+      });
+    }
+
+    //sort: further vertex first
+    distances.sort((a, b) => {
+      return a.minDistance < b.minDistance;
+    });
+
+
+    // console.error({distances})
+
+    distances.forEach(distance => {
+      if (distance.minDistance > threshold) {
+        let furtherVertex = distance.vertex;
+
+        //get nearest collisionPoint to further vertex (of shared entity)
+        let distancesToCollisionPoints = [];
+        chunk.forEach(collisionPoint => {
+          distancesToCollisionPoints.push({
+            collisionPoint,
+            distance: getDistance(collisionPoint.point, furtherVertex)
+          });
+        });
+
+        //nearest first
+        distancesToCollisionPoints.sort((a, b) => {
+          return a.distance > b.distance;
+        });
+
+        // console.error('distancesToCollisionPoints', distancesToCollisionPoints);
+        betterCollisionPoints.push(distancesToCollisionPoints[0].collisionPoint);
+      }
+    })
+
+
+
+  });
+
+  return betterCollisionPoints;
+}
+
+let getParentObject = entity => {
+  if (entity.type === "Group") {
+    return entity;
+  }
+
+  if (entity.parent) {
+    return getParentObject(entity.parent);
+  }
+
+  return undefined;
+}
+
+let generateCollisionBranches = (collisionPoints, threshold) => {
+  let branches = [],
+    collisionMembers = [];
+
+  collisionPoints.forEach(collisionPoint => {
+    collisionPoint.entities.forEach(entity => {
+      if (!collisionMembers.includes(entity)) {
+        collisionMembers.push(entity);
+      }
+    })
+  });
+
+  collisionPoints.forEach(collisionPoint => {
+    branches.push({
+      startPoint: collisionPoint,
+      branches: getCollisionPointBranches(collisionPoint, collisionMembers, collisionPoints, threshold)
+    });
+    // collisionPoint.processed = true;
+  });
+
+  return branches;
+}
+
+let getCollisionPointBranches = (collisionPoint, collisionMembers = [], collisionPoints = [], threshold, startEntity, currentObject, deep = 0, parentBranch = null) => {
+  // collisionPoint.processed = true;
+
+  if (deep > 0) {
+    // debugger;
+  }
+
+  if (deep > 20) {
+    return [];
+  }
+
+  let currentStartEntity = collisionPoint.entities[0];
+  let startObject = getParentObject(currentStartEntity);
+  if (currentObject === startObject) {
+    currentStartEntity = collisionPoint.entities[1];
+    startObject = getParentObject(currentStartEntity);
+  }
+
+  if (!startEntity) {
+    startEntity = currentStartEntity;
+  }
+
+  let branches = [];
+
+  //get nearest vertice in outer region (outer region always with index 0)
+  let path = startObject.userData.edgeModel.regions[0].path;
+
+  for (let direction = 0; direction <= 1; direction++) {
+    // debugger;
+
+
+
+    let iterator = vertexIterator(path, collisionPoint, direction);
+
+    let branchPath = [];
+    let vertex = iterator.next();
+    while (!vertex.done) {
+      // console.log('VERTEX ITERATOR', vertex);
+
+      branchPath.push(vertex.value);
+
+
+      if (collisionMembers.includes(vertex.value.parent)) {
+        let nextCollisionPoint = ((collisionPoints, vertex) => {
+          let nextCollisionPoints = collisionPoints.filter(cp => {
+            return cp.entities.includes(vertex.parent)
+          });
+          if (nextCollisionPoints.length === 1) {
+            return nextCollisionPoints.pop();
+          }
+
+          let result = {
+            collisionPoint: undefined,
+            minDistance: undefined
+          };
+
+          nextCollisionPoints.forEach(collisionPoint => {
+            let minDistance = collisionPoint.point.distanceTo(vertex);
+            if (result.minDistance === undefined || minDistance < result.minDistance) {
+              result = {
+                minDistance,
+                collisionPoint
+              }
+            }
+          });
+
+          return result.collisionPoint;
+        })(collisionPoints, vertex.value);
+
+        //if collision point is between 2 latest points in chain, then remove latest, and put collisionPoint coordinates instead
+        if (nextCollisionPoint.entities.includes(startEntity)) {
+          // console.log('LOOPED', nextCollisionPoint, startEntity);
+
+          // branchPath.pop();
+
+          branches.push({
+            collisionPoint: nextCollisionPoint,
+            path: branchPath,
+            branches: [],
+            parent: parentBranch
+          });
+          break;
+        } else {
+          let tmpParentBranch = parentBranch;
+
+          try {
+            while (tmpParentBranch) {
+              if (tmpParentBranch.collisionPoint === nextCollisionPoint) {
+                throw 'Collision point already in chain';
+              }
+              tmpParentBranch = tmpParentBranch.parent;
+            }
+
+
+            let branch = {
+              collisionPoint: nextCollisionPoint,
+              path: branchPath,
+              // branches: 'getCollisionPointBranches(nextCollisionPoint, startEntity, deep + 1)',
+              parent: parentBranch
+            };
+            branch.branches = getCollisionPointBranches(nextCollisionPoint, collisionMembers, collisionPoints, threshold, startEntity, startObject, deep + 1, branch);
+
+            branches.push(branch);
+          } catch (e) {
+            //point already in chain... skip
+          }
+
+        }
+
+        nextCollisionPoint.processed = true;
+
+        // nextCollisionPoints.forEach(nextCollisionPoint => {
+        //     nextCollisionPoint.processed = true;
+        // });
+
+        break;
+      }
+      vertex = iterator.next();
+    }
+  }
+
+  return branches;
+}
+
+let vertexIterator = function* iterator(path, collisionPoint, reverse = false, threshold = 0.000001)  {
+  yield {
+    // ...collisionPoint.point, // babel still not recognizes spread operator((
+    x: collisionPoint.point.x,
+    y: collisionPoint.point.y,
+    z: collisionPoint.point.z,
+    parent: null
+  };
+
+
+  let startVertex = path.find(vertex => {
+    return collisionPoint.entities.includes(vertex.parent);
+  });
+  let previousEntity = startVertex.parent;
+
+  let startIdx = path.indexOf(startVertex);
+  if (startIdx >= 0) {
+
+    // debugger;
+
+    for (let i = 1; i < path.length; i++) {
+      let vertex = path[getIdx(startIdx, i, reverse)];
+      let nextEntity = vertex.parent;
+      // debugger;
+      //get shared vertex
+
+      if (nextEntity === previousEntity) {
+        yield vertex;
+      } else {
+        let sharedVertex = getSharedVertex(previousEntity, nextEntity);
+        if (sharedVertex) {
+          yield sharedVertex
+        }
+      }
+
+
+
+      previousEntity = nextEntity;
+    }
+  }
+
+
+  function getSharedVertex(entityPrev, entityNext) {
+    let [entityPrev1, entityPrev2] = getVertices([entityPrev]),
+      [entityNext1, entityNext2] = getVertices([entityNext]);
+
+    if (getDistance(entityNext1, entityPrev1) < threshold || getDistance(entityNext1, entityPrev2) < threshold) {
+      return {
+        x: entityNext1.x,
+        y: entityNext1.y,
+        z: entityNext1.z,
+        parent: entityNext
+      }
+    } else if (getDistance(entityNext2, entityPrev1) < threshold || getDistance(entityNext2, entityPrev2) < threshold) {
+      return {
+        x: entityNext2.x,
+        y: entityNext2.y,
+        z: entityNext2.z,
+        parent: entityNext
+      }
+    }
+
+    return false;
+  }
+
+  function getIdx(startIdx, i, reverse) {
+    let idx;
+    if (reverse) {
+      idx = startIdx - i;
+      if (idx < 0) {
+        idx = path.length + idx;
+      }
+    } else {
+      idx = (startIdx + i) % path.length;
+    }
+    return idx;
+  }
+}
+
+let queueIterator = function* iterator(queue = [])  {
+  let endQueue = [];
+
+  for (let item of queue) {
+    let addToEndQueue = yield item;
+    if (addToEndQueue) {
+      endQueue.push(addToEndQueue);
+    }
+  }
+
+  for (let item of endQueue) {
+    yield item;
+  }
+}
+
+let generateAllPaths = branches => {
+  function generatePaths(branch, branchId, startPoint, path = [], collisionPoints = []) {
+    if (!startPoint) {
+      startPoint = branch.startPoint;
+    }
+
+    if (branch.collisionPoint && !collisionPoints.includes(branch.collisionPoint)) {
+      collisionPoints.push(branch.collisionPoint);
+    }
+
+    branch.branches.forEach(childBranch => {
+      let nextPath = path.concat(childBranch.path);
+
+      if (childBranch.collisionPoint === startPoint) {
+        paths.push({
+          path: nextPath,
+          branchId,
+          collisionPoints: collisionPoints.concat([startPoint])
+        });
+      } else {
+        generatePaths(childBranch, branchId, startPoint, nextPath, collisionPoints.concat([]));
+      }
+    })
+
+  }
+
+  let paths = [];
+  branches.forEach((branch, branchId) => {
+    generatePaths(branch, branchId)
+  });
+
+  return paths;
+}
+
+let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavityArea = 1) => {
+  let result = {
+    cavity: cavityToCheck,
+    valid: false,
+    needToCheckAgain: false,
+    error: ''
+  };
+
+  let objects = [];
+
+  // CameraUtils.previewPathInConsole(cavityToCheck.path);
+
+  cavityToCheck.collisionPoints.forEach(collisionPoint => {
+    collisionPoint.entities.forEach(entity => {
+      let object = getParentObject(entity);
+      if (!objects.includes(object)) {
+        objects.push(object);
+      }
+    })
+  });
+
+  try {
+    ////////// if collision points has been already used, skip this path.
+    if (cavityToCheck.collisionPoints.some(collisionPoint => usedCollisionPoints.includes(collisionPoint))) {
+      throw 'collision point already used in another cavity';
+    }
+
+    objects.forEach(object => {
+      object.userData.edgeModel.regions.forEach((region, idx) => {
+        if (idx) {
+          //inner regions
+          region.path.forEach(vertex => {
+            if (insidePolygon(cavityToCheck.path, vertex)) {
+              throw 'inner region intersects with "cavity". bad cavity';
+            }
+          });
+        }
+      });
+
+      // check if cavity intersects/contains object
+      //check if object's insidePoint lies on cavity
+      if (insidePolygon(cavityToCheck.path, object.userData.edgeModel.svgData.insidePoint)) {
+        throw `object's insidePoint intersects with "cavity". probably, cavity covered region`;
+      }
+
+    });
+
+
+    //this operation is slower, so it putted after check if inner region intersected to cavity
+    if (selfIntersects(cavityToCheck.path)) {
+      throw 'cavity has bad path (self intersects)';
+    }
+
+    //check if cavity not too small
+    if (!isEnoughVertices(cavityToCheck, threshold)) {
+      throw 'bad cavity, a lot of same vertices. probably rounding error'
+    }
+
+    if (pathArea(cavityToCheck.path) < minCavityArea) {
+      // CameraUtils.previewPathInConsole(cavityToCheck.path);
+      // console.warn('cavityToCheck (low area)', cavityToCheck, pathArea(cavityToCheck.path));
+
+      result.needToCheckAgain = true;
+      throw 'area to small, move this cavity to end of queue'
+    }
+
+    result.valid = true;
+
+    // cavities.push(cavityToCheck);
+    // usedCollisionPoints.push(...cavityToCheck.collisionPoints);
+  } catch (e) {
+    result.error = e;
+    //inner region intersects with 'cavity'. bad cavity
+  }
+
+  return result;
+}
+
+let selfIntersects = (region, threshold = 0.000001) => {
+  for (let segmentId = 0; segmentId < region.length; segmentId++) {
+    let segmentA = region[segmentId],
+      segmentB = region[(segmentId + 1) % region.length];
+
+    if (getDistance(segmentA, segmentB) < threshold) {
+      continue;
+    }
+
+    for (let checkSegmentId = segmentId + 1; checkSegmentId < region.length; checkSegmentId++) {
+      let checkSegmentA = region[checkSegmentId],
+        checkSegmentB = region[(checkSegmentId + 1) % region.length];
+
+      if (getDistance(checkSegmentA, checkSegmentB) < threshold) {
+        continue;
+      }
+
+      if (getDistance(segmentB, checkSegmentA) < threshold || getDistance(segmentA, checkSegmentB) < threshold) {
+        //one point of segment is close to another segment
+        continue;
+      }
+
+      let intersectionResult = linesIntersect(segmentA, segmentB, checkSegmentA, checkSegmentB, true);
+
+      if (intersectionResult.isIntersects) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+let isEnoughVertices = (cavity, threshold) => {
+  let path = [];
+  cavity.path.forEach((v, idx) => {
+    let prevVertex = path.length ? path[path.length - 1] : cavity.path[cavity.path.length - 1];
+    let distance = getDistance(v, prevVertex);
+    if (distance < threshold) {
+      // if current and next vertices close to each other, than skip one of them
+      return false;
+    }
+    path.push(v);
+  });
+
+  // if (path.length >= 3) {
+  //     console.log('CAVITY', cavity, cavity.path, path)
+  // }
+
+  // CameraUtils.previewPathInConsole(path);
+  // console.warn('PATH AREA', pathArea(path))
+
+
+  return path.length >= 3
+}
+
+let pathArea = path => {
+  let sumX = 0,
+    sumY = 0,
+    multipleIdx = 0;
+  for (let i = 0; i < path.length; i++) {
+    multipleIdx = i + 1;
+    if (multipleIdx >= path.length) {
+      multipleIdx = 0;
+    }
+    sumX += path[i].x * path[multipleIdx].y;
+    sumY += path[multipleIdx].x * path[i].y;
+  }
+  return Math.abs((sumY - sumX) / 2);
+}
+
 export default {
   distanceToLine,
   distanceToArc,
@@ -1160,5 +1972,14 @@ export default {
   linesIntersect,
   getDistance,
   isBetween,
-  buildEdgeModel
+  buildEdgeModel,
+  getCollisionPoints,
+  filterOverlappingCollisionPoints,
+  filterCollisionPoints,
+  filterCollisionPointsWithSharedEntities,
+  generateCollisionBranches,
+  generateAllPaths,
+  queueIterator,
+  checkCavity,
+
 }

@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
 import PanelObjectsComponent from './panelObjectsComponent'
 import { toggleVisible, combineEdgeModels } from '../../actions/panelObjects'
+import { showAll } from '../../actions/activeEntities'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -27,6 +28,9 @@ const mapDispatchToProps = (dispatch) => {
     combineEdgeModels: function (editor) {
       combineEdgeModels(editor)(dispatch)
     },
+    showAll: function (editor) {
+      showAll(editor)(dispatch)
+    }
   }
 }
 

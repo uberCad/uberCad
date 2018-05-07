@@ -42,9 +42,9 @@
         outline: none;
       }
 
-      &.group {
-        //background: url("group.svg") no-repeat center transparent;
-        //background-size: $sidebar-toolbar-size - 8px;
+      &.combine {
+        background: url("combine.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
       }
 
       &.show-all {

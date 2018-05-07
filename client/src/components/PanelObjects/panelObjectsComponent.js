@@ -16,6 +16,10 @@ export default class PanelObjectsComponent extends Component {
     this.props.combineEdgeModels(this.props.editor)
   }
 
+  showAll = () => {
+    this.props.showAll(this.props.editor)
+  }
+
   shouldComponentUpdate (nextProps) {
     return (this.props.editor.scene !== nextProps.editor.scene) ||
       (nextProps.editor.scene && nextProps.editor.scene.children !== this.props.editor.scene.children)
@@ -52,18 +56,18 @@ export default class PanelObjectsComponent extends Component {
             )
           }
         </div>
-        {/*<div className='toolbar'>*/}
-          {/*{activeEntities.length > 1 && (*/}
-            {/*<button onClick={this.groupEntities}*/}
-                    {/*className="group"*/}
-                    {/*title="Group to object"*/}
-            {/*/>*/}
-          {/*)}*/}
-          <button onClick={this.combineEdgeModels}
-                  className="combine"
-                  title="Combine edge models"
+        <div className='toolbar'>
+          {objects && objects.children.length > 1 && (
+            <button onClick={this.combineEdgeModels}
+                    className="combine"
+                    title="Combine edge models"
+            />
+          )}
+          <button onClick={this.showAll}
+                  className="show-all"
+                  title="Show all"
           />
-        {/*</div>*/}
+        </div>
       </div>
     )
   }

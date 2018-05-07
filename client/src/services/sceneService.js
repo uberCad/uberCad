@@ -688,6 +688,255 @@ let getLayers = scene => {
   }
 }
 
+let combineEdgeModels = editor => {
+  let {scene, options: {threshold}} = editor;
+  let objects = getObjects(scene, true)
+  // console.log('combineEdgeModels', scene, threshold, objects)
+
+  if (!objects.length) {
+    throw {
+      error: 'no objects',
+      msg: 'No objects for edge-model'
+    };
+  }
+
+  let viewBox = objects[0].userData.edgeModel.svgData.viewBox;
+  let box = {
+    x: viewBox.x,
+    y: viewBox.y,
+    x2: +viewBox.x + +viewBox.width,
+    y2: +viewBox.y + +viewBox.height,
+  };
+
+  //width, height, x, y
+  objects.forEach(object => {
+    let objViewBox = object.userData.edgeModel.svgData.viewBox;
+
+    box.x = Math.min(box.x, objViewBox.x);
+    box.y = Math.min(box.y, objViewBox.y);
+    box.x2 = Math.max(box.x2, +objViewBox.x + +objViewBox.width);
+    box.y2 = Math.max(box.y2, +objViewBox.y + +objViewBox.height);
+  });
+
+  viewBox = {
+    x: box.x,
+    y: box.y,
+    width: Math.abs(+box.x2 - +box.x),
+    height: Math.abs(+box.y2 - +box.y)
+  };
+
+  let mul = 25 / Math.max(viewBox.width, viewBox.height);
+
+
+  let collisionPoints = GeometryUtils.getCollisionPoints(objects, threshold);
+
+  collisionPoints = GeometryUtils.filterOverlappingCollisionPoints(collisionPoints);
+
+  collisionPoints = GeometryUtils.filterCollisionPoints(collisionPoints);
+
+  collisionPoints = GeometryUtils.filterCollisionPointsWithSharedEntities(collisionPoints);
+
+  let branches = GeometryUtils.generateCollisionBranches(collisionPoints, threshold);
+
+
+  // let branches = [];
+
+  // DEVELOPMENT ONLY: generate tree
+  // {
+  //
+  //     function generateTree(branches) {
+  //         return branches.map(branch => {
+  //             return {
+  //                 name: branch.collisionPoint.id,
+  //                 children: generateTree(branch.branches)
+  //             }
+  //         })
+  //     }
+  //
+  //     let tree = [];
+  //     branches.forEach(branch => {
+  //         tree.push({
+  //             name: branch.startPoint.id,
+  //             children: generateTree(branch.branches)
+  //         });
+  //     });
+  //     console.log('JSON', JSON.stringify([{'name': 'root', children: tree}]));
+  // }
+
+  let paths = GeometryUtils.generateAllPaths(branches);
+
+  // TODO TODO TODO
+  // TODO TODO TODO
+  // TODO TODO TODO
+  // check all paths, one by one.
+  //     primary order them by count of collisionPoints
+  //     secondary check if path is ok:
+  //         - cavity must not intersects with internal regions of object.
+  //         - cavity can't by intersected by itself
+  //     tertiary if region is ok - skip other regions with that collisionPoints
+
+
+  paths = paths
+    .filter(path => path.collisionPoints.length > 1)
+    .sort((pathA, pathB) => pathA.collisionPoints.length - pathB.collisionPoints.length)
+  ;
+
+  // function shuffleArray(array) {
+  //     for (let i = array.length - 1; i > 0; i--) {
+  //         let j = Math.floor(Math.random() * (i + 1));
+  //         [array[i], array[j]] = [array[j], array[i]];
+  //     }
+  // }
+  //
+  // shuffleArray(paths);
+
+
+  let cavities = [];
+  // filter paths - check if every used object not in cavity;
+  let usedCollisionPoints = [];
+
+  // debugger;
+  let iterator = GeometryUtils.queueIterator(paths);
+  let queue = iterator.next();
+  while (!queue.done) {
+    let cavityToCheck = queue.value;
+
+    let result = GeometryUtils.checkCavity(cavityToCheck, usedCollisionPoints, threshold);
+    if (result.needToCheckAgain) {
+      queue = iterator.next(cavityToCheck);
+    } else {
+      if (result.valid) {
+        cavities.push(cavityToCheck);
+        usedCollisionPoints.push(...cavityToCheck.collisionPoints);
+      }
+      queue = iterator.next();
+    }
+  }
+
+
+
+  // debugger;
+
+  console.warn('PATHS', paths, branches, {cavities});
+
+  let svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${(viewBox.width * mul).toFixed(4)}cm" height="${(viewBox.height * mul).toFixed(4)}cm" viewBox="${viewBox.x.toFixed(4)} ${viewBox.y.toFixed(4)} ${viewBox.width.toFixed(4)} ${viewBox.height.toFixed(4)}">
+<desc>
+      <schema desc="BuildingSVG" version="1.1"></schema>
+      <constr id="Dummy" scale="1"></constr>
+    </desc>
+    <g id="group_d">${
+    objects.map(object => {
+      // console.log('SVG BUILDER', object);
+      return `<path d="${object.userData.edgeModel.svgData.pathD} " style="fill:rgb(200,240,200);stroke:black;stroke-width:0.00001">
+                         <matprop type="const" id="O-1036" lambda="160" eps="0.9" density="2800"></matprop>
+                         <area value="0.002" />
+                       </path>
+                       <circle cx="${(object.userData.edgeModel.svgData.insidePoint.x / 1000).toFixed(4)}" cy="${(object.userData.edgeModel.svgData.insidePoint.y / 1000).toFixed(4)}" r="0.0005" style="fill:rgb(150,255,150); stroke:black;stroke-width:0.00001" />` +
+        object.userData.edgeModel.svgData.subRegionsPathD.map(pathD => {
+          return `<path d="${pathD} " style="fill:rgb(200,200,240);opacity:0.5; stroke:black;stroke-width:0.00001">
+                             <matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>
+                             <area value="0.01" />
+                           </path>`;
+        }).join('')
+        ;
+    }).join('')
+    }
+  <g id="temperature">
+<bcprop id="External" x="-0.3606" y="-0.1793" temp="273.15" rs="0.04" rel_img="SvgjsImage1089" rel_id="0" rel="min"></bcprop>
+<bcprop id="External" x="-0.1796" y="-0.1793" temp="273.15" rs="0.04" rel_img="SvgjsImage1090" rel_id="1" rel="max"></bcprop>
+<bcprop id="Interior" x="-0.2036" y="-0.1073" temp="293.15" rs="0.13" rel_img="SvgjsImage1091" rel_id="2" rel="min"></bcprop>
+<bcprop id="Interior" x="-0.3606" y="-0.1073" temp="293.15" rs="0.13" rel_img="SvgjsImage1092" rel_id="3" rel="max"></bcprop>
+  </g>
+  <g id="collisions">
+    ${
+    collisionPoints.map(collisionPoint => {
+      let dot = '';
+      for (let i = 0; i <= collisionPoint.id; i++) {
+        // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
+      }
+      return `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(collisionPoint.point.y / 1000).toFixed(4)}" r="${collisionPoint.processed ? '0.0005' : '0.0005'}" style="fill:rgb(${collisionPoint.processed ? '255,200,200' : '200,200,255'}); stroke:black;stroke-width:0.00001" />` + dot;
+    }).join('')
+    }
+  </g>
+  <g id="cavities">
+    ${
+    cavities.map(pathData => {
+      let path = pathData.path;
+      // console.warn('PATH render', path, cavities.length);
+      let circles = '';
+
+      {
+        let vertexList = [];
+
+        let last = path[path.length - 1];
+        let lastVertex = `${(last.x / 1000).toFixed(4)},${(last.y / 1000).toFixed(4)}`;
+        let pathD = `M${lastVertex} L`;
+
+        path.forEach(v => {
+          let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
+          if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+            pathD += `${vertex} `;
+            lastVertex = vertex;
+            vertexList.push(vertex);
+          }
+
+
+          circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`;
+        });
+        return `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001"></path>`
+      }
+    }).join('')
+    }
+  </g>
+  </g>
+  </svg>`;
+
+  // $http.post('http://localhost:4000/api/flixo', {
+  //     id: 204406510,
+  //     jsonrpc: "2.0",
+  //     method: "call",
+  //     params: {
+  //         frame: "external",
+  //
+  //         // material_list: flixoExample.material_list,
+  //         // svg: flixoExample.svg,
+  //         // svg_w_h: flixoExample.svg_w_h,
+  //         //
+  //         material_list: '[{"id":"0","material":"O-1036"},{"id":"1","material":"O-2000"}]',
+  //         svg: svg,
+  //         svg_w_h: [{"w": "0.06", "h": "0.04"}, {"w": "0.04", "h": "0.02"}], //objects.map(object => {return {"w": "2.100000", "h": "6.799999"};}),
+  //         //
+  //         token: "651,ef70663ba61ac6838d127257a284188d38a42314b7193340e8052bf843f889ec,1"
+  //
+  //     }
+  // }).then(response => {
+  //     // console.log('RESPO', response.data.message.result);
+  //     if (response.data.message.error) {
+  //         console.error('FLIXO',response.data.message.error);
+  //         console.log(JSON.stringify(response.data.message.error));
+  //     } else {
+  //         console.log('FLIXO response', response.data.message.result);
+  //     }
+  //
+  //     // console.log('RESPO', response.data.message.error ? response.data.message.error : response.data.message.result);
+  // });
+
+  // console.log('data:image/svg+xml;base64,' + window.btoa(svg));
+  // console.log('SVG ', svg);
+
+  ConsoleUtils.previewInConsole('data:image/svg+xml;base64,' + window.btoa(svg));
+  // CameraUtils.previewInConsole('data:image/svg+xml;base64,' + window.btoa(flixoExample.svg));
+
+  return {
+    svg,
+    viewBox
+  };
+
+
+}
+
+
 export default {
   onClick,
   doSelection,
@@ -704,7 +953,8 @@ export default {
   groupEntities,
   createObject,
   getObjects,
-  getLayers
+  getLayers,
+  combineEdgeModels
 }
 
 function vertexInArea (vertex, area) {
