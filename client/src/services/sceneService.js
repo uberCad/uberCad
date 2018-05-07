@@ -473,12 +473,12 @@ let showAll = editor => {
 }
 
 let createObject = (editor, name, entities, threshold = 0.000001) => {
-  let object;
+  let object
   let {scene} = editor
 
-  let usedEntities = entities.length;
-  entities = entities.filter(e => !e.userData.belongsToObject);
-  usedEntities -= entities.length;
+  let usedEntities = entities.length
+  entities = entities.filter(e => !e.userData.belongsToObject)
+  usedEntities -= entities.length
 
   try {
     scene.children.forEach(objectsContainer => {
@@ -489,7 +489,7 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
             let error = new Error(`Object with name "${name}" already exists`)
             error.userData = {
               error: 'duplicate name',
-              msg: `Object with name "${name}" already exists`,
+              msg: error.message,
               name: name
             }
             throw error
@@ -500,31 +500,31 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
             //   name: name
             // }
           }
-        });
+        })
 
         //create object (entities container)
         //move entities from layers to object
         //render
 
         // object = new THREE.Object3D();
-        object = new THREE.Group();
-        object.name = name;
-        object.userData['container'] = true;
-        object.userData['object'] = true;
+        object = new THREE.Group()
+        object.name = name
+        object.userData['container'] = true
+        object.userData['object'] = true
         // object.visible = false;
 
         try {
-          object.userData['edgeModel'] = GeometryUtils.buildEdgeModel({children: entities}, threshold);
+          object.userData['edgeModel'] = GeometryUtils.buildEdgeModel({children: entities}, threshold)
           ConsoleUtils.previewObjectInConsole(object)
         } catch (e) {
-          console.warn('BUILD EDGE MODEL IN threeDXF');
-          console.warn(e);
+          console.warn('BUILD EDGE MODEL IN threeDXF')
+          console.warn(e)
 
           let error = new Error('Problem building edge model')
           error.userData = {
             error: 'edge model',
             data: e,
-            msg: 'Problem building edge model'
+            msg: error.message
           }
           throw error
 
@@ -535,22 +535,20 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
           // }
         }
 
-
-
         entities.forEach(entity => {
           // let idx = entity.parent.children.indexOf(entity);
           // entity.parent.children.splice(idx, 1);
-          entity.userData.belongsToObject = true;
-          object.add(entity);
-        });
+          entity.userData.belongsToObject = true
+          object.add(entity)
+        })
 
         if (object.children.length) {
-          objectsContainer.add(object);
+          objectsContainer.add(object)
         } else {
           let error = new Error(usedEntities ? 'Selected entities already belongs to object' : 'No entities selected')
           error.userData = {
             error: 'empty object',
-            msg: usedEntities ? 'Selected entities already belongs to object' : 'No entities selected'
+            msg: error.message
           }
           throw error
 
@@ -560,9 +558,9 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
           // };
         }
       }
-    });
+    })
   } catch (e) {
-    console.error('errore', e);
+    console.error('errore', e)
 
     switch (e.userData.error) {
       case 'edge model':
@@ -570,80 +568,77 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
           switch (e.userData.data.error) {
             case 'interruption':
               //show problem line
-              console.error('show problem line', e);
+              console.error('show problem line', e)
 
-              this.highlightEntities(entities, true);
+              this.highlightEntities(entities, true)
               // cadCanvas.highlightEntities($scope.editor.activeEntities, true);
 
-              e.userData.data.entity.userData.showInTop = true;
-              this.highlightEntities([e.data.entity]);
-              setPointOfInterest(editor, e.data.entity);
+              e.userData.data.entity.userData.showInTop = true
+              this.highlightEntities([e.data.entity])
+              setPointOfInterest(editor, e.data.entity)
 
-              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg);
+              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg)
 
-
-
-              break;
+              break
 
             case 'intersection':
               //show problem line
-              console.error('show intersected lines', e);
+              console.error('show intersected lines', e)
 
-              this.highlightEntities(entities, true);
+              this.highlightEntities(entities, true)
               // cadCanvas.highlightEntities($scope.editor.activeEntities, true);
 
               // e.data.entity.userData.showInTop = true;
-              this.highlightEntities(e.userData.data.entities);
-              setPointOfInterest(editor, e.userData.data.entities[0]);
+              this.highlightEntities(e.userData.data.entities)
+              setPointOfInterest(editor, e.userData.data.entities[0])
 
               // this.render();
-              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg);
+              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg)
 
-
-              break;
+              break
 
             case 'unused entities':
               //show unused entity
-              console.error('show unused entity', e);
-              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg);
+              console.error('show unused entity', e)
+              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg)
 
-              break;
+              break
             default:
-              let text = e.userData.msg;
+              let text = e.userData.msg
               if (e.userData.data && e.userData.data.msg) {
-                text += `<br />${e.userData.data.msg}`;
+                text += `<br />${e.userData.data.msg}`
               }
               // alert(text);
-              ToastService.msg(text);
-              break;
+              ToastService.msg(text)
+              break
           }
         } else {
-          let text = e.userData.msg;
+          let text = e.userData.msg
           if (e.userData.data && e.userData.data.msg) {
-            text += `<br />${e.userData.data.msg}`;
+            text += `<br />${e.userData.data.msg}`
           }
           // alert(text);
-          ToastService.msg(text);
+          ToastService.msg(text)
         }
 
         // console.error(e);
         break
       case 'duplicate name':
         // alert(e.msg);
-        ToastService.msg(e.userData.msg);
+        ToastService.msg(e.userData.msg)
         break
       case 'empty object':
-        ToastService.msg(e.userData.msg);
+        ToastService.msg(e.userData.msg)
         break
       default:
-        throw e;
-        // break;
+        throw e
+      // break;
     }
-    return false;
+    return false
   }
 
-  render(editor);
-  return object;
+  render(editor)
+  return object
 
 }
 
@@ -689,55 +684,55 @@ let getLayers = scene => {
 }
 
 let combineEdgeModels = editor => {
-  let {scene, options: {threshold}} = editor;
+  let {scene, options: {threshold}} = editor
   let objects = getObjects(scene, true)
   // console.log('combineEdgeModels', scene, threshold, objects)
 
   if (!objects.length) {
-    throw {
+    let error = new Error('No objects for edge-model')
+    error.userData = {
       error: 'no objects',
-      msg: 'No objects for edge-model'
-    };
+      msg: error.message
+    }
+    throw error
   }
 
-  let viewBox = objects[0].userData.edgeModel.svgData.viewBox;
+  let viewBox = objects[0].userData.edgeModel.svgData.viewBox
   let box = {
     x: viewBox.x,
     y: viewBox.y,
     x2: +viewBox.x + +viewBox.width,
     y2: +viewBox.y + +viewBox.height,
-  };
+  }
 
   //width, height, x, y
   objects.forEach(object => {
-    let objViewBox = object.userData.edgeModel.svgData.viewBox;
+    let objViewBox = object.userData.edgeModel.svgData.viewBox
 
-    box.x = Math.min(box.x, objViewBox.x);
-    box.y = Math.min(box.y, objViewBox.y);
-    box.x2 = Math.max(box.x2, +objViewBox.x + +objViewBox.width);
-    box.y2 = Math.max(box.y2, +objViewBox.y + +objViewBox.height);
-  });
+    box.x = Math.min(box.x, objViewBox.x)
+    box.y = Math.min(box.y, objViewBox.y)
+    box.x2 = Math.max(box.x2, +objViewBox.x + +objViewBox.width)
+    box.y2 = Math.max(box.y2, +objViewBox.y + +objViewBox.height)
+  })
 
   viewBox = {
     x: box.x,
     y: box.y,
     width: Math.abs(+box.x2 - +box.x),
     height: Math.abs(+box.y2 - +box.y)
-  };
+  }
 
-  let mul = 25 / Math.max(viewBox.width, viewBox.height);
+  let mul = 25 / Math.max(viewBox.width, viewBox.height)
 
+  let collisionPoints = GeometryUtils.getCollisionPoints(objects, threshold)
 
-  let collisionPoints = GeometryUtils.getCollisionPoints(objects, threshold);
+  collisionPoints = GeometryUtils.filterOverlappingCollisionPoints(collisionPoints)
 
-  collisionPoints = GeometryUtils.filterOverlappingCollisionPoints(collisionPoints);
+  collisionPoints = GeometryUtils.filterCollisionPoints(collisionPoints)
 
-  collisionPoints = GeometryUtils.filterCollisionPoints(collisionPoints);
+  collisionPoints = GeometryUtils.filterCollisionPointsWithSharedEntities(collisionPoints)
 
-  collisionPoints = GeometryUtils.filterCollisionPointsWithSharedEntities(collisionPoints);
-
-  let branches = GeometryUtils.generateCollisionBranches(collisionPoints, threshold);
-
+  let branches = GeometryUtils.generateCollisionBranches(collisionPoints, threshold)
 
   // let branches = [];
 
@@ -763,7 +758,7 @@ let combineEdgeModels = editor => {
   //     console.log('JSON', JSON.stringify([{'name': 'root', children: tree}]));
   // }
 
-  let paths = GeometryUtils.generateAllPaths(branches);
+  let paths = GeometryUtils.generateAllPaths(branches)
 
   // TODO TODO TODO
   // TODO TODO TODO
@@ -775,11 +770,10 @@ let combineEdgeModels = editor => {
   //         - cavity can't by intersected by itself
   //     tertiary if region is ok - skip other regions with that collisionPoints
 
-
   paths = paths
     .filter(path => path.collisionPoints.length > 1)
     .sort((pathA, pathB) => pathA.collisionPoints.length - pathB.collisionPoints.length)
-  ;
+
 
   // function shuffleArray(array) {
   //     for (let i = array.length - 1; i > 0; i--) {
@@ -790,34 +784,31 @@ let combineEdgeModels = editor => {
   //
   // shuffleArray(paths);
 
-
-  let cavities = [];
+  let cavities = []
   // filter paths - check if every used object not in cavity;
-  let usedCollisionPoints = [];
+  let usedCollisionPoints = []
 
   // debugger;
-  let iterator = GeometryUtils.queueIterator(paths);
-  let queue = iterator.next();
+  let iterator = GeometryUtils.queueIterator(paths)
+  let queue = iterator.next()
   while (!queue.done) {
-    let cavityToCheck = queue.value;
+    let cavityToCheck = queue.value
 
-    let result = GeometryUtils.checkCavity(cavityToCheck, usedCollisionPoints, threshold);
+    let result = GeometryUtils.checkCavity(cavityToCheck, usedCollisionPoints, threshold)
     if (result.needToCheckAgain) {
-      queue = iterator.next(cavityToCheck);
+      queue = iterator.next(cavityToCheck)
     } else {
       if (result.valid) {
-        cavities.push(cavityToCheck);
-        usedCollisionPoints.push(...cavityToCheck.collisionPoints);
+        cavities.push(cavityToCheck)
+        usedCollisionPoints.push(...cavityToCheck.collisionPoints)
       }
-      queue = iterator.next();
+      queue = iterator.next()
     }
   }
 
-
-
   // debugger;
 
-  console.warn('PATHS', paths, branches, {cavities});
+  console.warn('PATHS', paths, branches, {cavities})
 
   let svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${(viewBox.width * mul).toFixed(4)}cm" height="${(viewBox.height * mul).toFixed(4)}cm" viewBox="${viewBox.x.toFixed(4)} ${viewBox.y.toFixed(4)} ${viewBox.width.toFixed(4)} ${viewBox.height.toFixed(4)}">
@@ -837,9 +828,9 @@ let combineEdgeModels = editor => {
           return `<path d="${pathD} " style="fill:rgb(200,200,240);opacity:0.5; stroke:black;stroke-width:0.00001">
                              <matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>
                              <area value="0.01" />
-                           </path>`;
+                           </path>`
         }).join('')
-        ;
+        
     }).join('')
     }
   <g id="temperature">
@@ -851,46 +842,44 @@ let combineEdgeModels = editor => {
   <g id="collisions">
     ${
     collisionPoints.map(collisionPoint => {
-      let dot = '';
+      let dot = ''
       for (let i = 0; i <= collisionPoint.id; i++) {
         // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
       }
-      return `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(collisionPoint.point.y / 1000).toFixed(4)}" r="${collisionPoint.processed ? '0.0005' : '0.0005'}" style="fill:rgb(${collisionPoint.processed ? '255,200,200' : '200,200,255'}); stroke:black;stroke-width:0.00001" />` + dot;
+      return `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(collisionPoint.point.y / 1000).toFixed(4)}" r="${collisionPoint.processed ? '0.0005' : '0.0005'}" style="fill:rgb(${collisionPoint.processed ? '255,200,200' : '200,200,255'}); stroke:black;stroke-width:0.00001" />` + dot
     }).join('')
     }
   </g>
   <g id="cavities">
     ${
     cavities.map(pathData => {
-      let path = pathData.path;
+      let path = pathData.path
       // console.warn('PATH render', path, cavities.length);
-      let circles = '';
+      // let circles = ''
 
-      {
-        let vertexList = [];
+      let vertexList = []
 
-        let last = path[path.length - 1];
-        let lastVertex = `${(last.x / 1000).toFixed(4)},${(last.y / 1000).toFixed(4)}`;
-        let pathD = `M${lastVertex} L`;
+      let last = path[path.length - 1]
+      let lastVertex = `${(last.x / 1000).toFixed(4)},${(last.y / 1000).toFixed(4)}`
+      let pathD = `M${lastVertex} L`
 
-        path.forEach(v => {
-          let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
-          if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-            pathD += `${vertex} `;
-            lastVertex = vertex;
-            vertexList.push(vertex);
-          }
+      path.forEach(v => {
+        let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`
+        if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+          pathD += `${vertex} `
+          lastVertex = vertex
+          vertexList.push(vertex)
+        }
 
+        // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
+      })
+      return `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" />`
 
-          circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`;
-        });
-        return `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001"></path>`
-      }
     }).join('')
     }
   </g>
   </g>
-  </svg>`;
+  </svg>`
 
   // $http.post('http://localhost:4000/api/flixo', {
   //     id: 204406510,
@@ -925,17 +914,15 @@ let combineEdgeModels = editor => {
   // console.log('data:image/svg+xml;base64,' + window.btoa(svg));
   // console.log('SVG ', svg);
 
-  ConsoleUtils.previewInConsole('data:image/svg+xml;base64,' + window.btoa(svg));
+  ConsoleUtils.previewInConsole('data:image/svg+xml;base64,' + window.btoa(svg))
   // CameraUtils.previewInConsole('data:image/svg+xml;base64,' + window.btoa(flixoExample.svg));
 
   return {
     svg,
     viewBox
-  };
-
+  }
 
 }
-
 
 export default {
   onClick,

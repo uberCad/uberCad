@@ -1392,7 +1392,7 @@ let filterOverlappingCollisionPoints = (collisionPoints, threshold = 0.000001) =
     try {
       uniqueCollisionPoints.forEach(uniqueCollisionPoint => {
         if (getDistance(collisionPoint.point, uniqueCollisionPoint.point) < threshold) {
-          throw "point is overlapping"
+          throw new Error("point is overlapping")
         }
       });
       //if no-throw, then cp is unique
@@ -1650,7 +1650,7 @@ let getCollisionPointBranches = (collisionPoint, collisionMembers = [], collisio
           try {
             while (tmpParentBranch) {
               if (tmpParentBranch.collisionPoint === nextCollisionPoint) {
-                throw 'Collision point already in chain';
+                throw new Error('Collision point already in chain')
               }
               tmpParentBranch = tmpParentBranch.parent;
             }
@@ -1838,7 +1838,7 @@ let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavity
   try {
     ////////// if collision points has been already used, skip this path.
     if (cavityToCheck.collisionPoints.some(collisionPoint => usedCollisionPoints.includes(collisionPoint))) {
-      throw 'collision point already used in another cavity';
+      throw new Error('collision point already used in another cavity');
     }
 
     objects.forEach(object => {
@@ -1847,7 +1847,7 @@ let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavity
           //inner regions
           region.path.forEach(vertex => {
             if (insidePolygon(cavityToCheck.path, vertex)) {
-              throw 'inner region intersects with "cavity". bad cavity';
+              throw new Error('inner region intersects with "cavity". bad cavity')
             }
           });
         }
@@ -1856,7 +1856,7 @@ let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavity
       // check if cavity intersects/contains object
       //check if object's insidePoint lies on cavity
       if (insidePolygon(cavityToCheck.path, object.userData.edgeModel.svgData.insidePoint)) {
-        throw `object's insidePoint intersects with "cavity". probably, cavity covered region`;
+        throw new Error(`object's insidePoint intersects with "cavity". probably, cavity covered region`)
       }
 
     });
@@ -1864,12 +1864,12 @@ let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavity
 
     //this operation is slower, so it putted after check if inner region intersected to cavity
     if (selfIntersects(cavityToCheck.path)) {
-      throw 'cavity has bad path (self intersects)';
+      throw new Error('cavity has bad path (self intersects)')
     }
 
     //check if cavity not too small
     if (!isEnoughVertices(cavityToCheck, threshold)) {
-      throw 'bad cavity, a lot of same vertices. probably rounding error'
+      throw new Error('bad cavity, a lot of same vertices. probably rounding error')
     }
 
     if (pathArea(cavityToCheck.path) < minCavityArea) {
@@ -1877,7 +1877,7 @@ let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavity
       // console.warn('cavityToCheck (low area)', cavityToCheck, pathArea(cavityToCheck.path));
 
       result.needToCheckAgain = true;
-      throw 'area to small, move this cavity to end of queue'
+      throw new Error('area to small, move this cavity to end of queue')
     }
 
     result.valid = true;
@@ -1885,7 +1885,8 @@ let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavity
     // cavities.push(cavityToCheck);
     // usedCollisionPoints.push(...cavityToCheck.collisionPoints);
   } catch (e) {
-    result.error = e;
+    // e.getMessa
+    result.error = e.message;
     //inner region intersects with 'cavity'. bad cavity
   }
 
