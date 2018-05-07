@@ -5,13 +5,13 @@ import './ActiveEntities.css'
 export default class ActiveEntitiesComponent extends Component {
   onChangeVisible = (event) => {
     event.stopPropagation()
-    let {currentTarget: {checked, dataset: {idx}}} = event;
+    let {currentTarget: {checked, dataset: {idx}}} = event
     this.props.toggleVisible(this.props.editor.activeEntities[idx], checked, this.props.editor)
   }
 
   unSelect = (event) => {
-    event.stopPropagation();
-    let {currentTarget: {dataset: {idx}}} = event;
+    event.stopPropagation()
+    let {currentTarget: {dataset: {idx}}} = event
     this.props.unSelect(idx, this.props.editor.activeEntities, this.props.editor)
   }
 
@@ -24,12 +24,11 @@ export default class ActiveEntitiesComponent extends Component {
   }
 
   stopPropagation = event => {
-    event.stopPropagation();
+    event.stopPropagation()
   }
 
   groupEntities = () => {
     this.props.groupEntities(this.props.editor)
-
   }
 
   showAll = () => {
@@ -45,20 +44,20 @@ export default class ActiveEntitiesComponent extends Component {
           {activeEntities.length
             ? activeEntities.map((entity, idx) => (
               <div className='item'
-                   key={idx}
-                   data-idx={idx}
-                   onClick={this.selectEntity}
+                key={idx}
+                data-idx={idx}
+                onClick={this.selectEntity}
               >
                 id: {entity.id} parent: {entity.parent.name}
 
                 <button className='un-select' data-idx={idx}
-                        onClick={this.unSelect}
+                  onClick={this.unSelect}
                 />
                 <input type='checkbox' data-idx={idx}
-                       title='Visibility'
-                       checked={entity.visible}
-                       onChange={this.onChangeVisible}
-                       onClick={this.stopPropagation}
+                  title='Visibility'
+                  checked={entity.visible}
+                  onChange={this.onChangeVisible}
+                  onClick={this.stopPropagation}
                 />
               </div>
             ))
@@ -70,13 +69,13 @@ export default class ActiveEntitiesComponent extends Component {
         <div className='toolbar'>
           {activeEntities.length > 1 && (
             <button onClick={this.groupEntities}
-                    className="group"
-                    title="Group to object"
+              className='group'
+              title='Group to object'
             />
           )}
           <button onClick={this.showAll}
-                  className="show-all"
-                  title="Show all"
+            className='show-all'
+            title='Show all'
           />
         </div>
       </div>
@@ -88,7 +87,7 @@ export default class ActiveEntitiesComponent extends Component {
       activeEntities: PropTypes.array.isRequired,
       scene: PropTypes.object,
       camera: PropTypes.object,
-      renderer: PropTypes.object,
+      renderer: PropTypes.object
     })
   }
 }

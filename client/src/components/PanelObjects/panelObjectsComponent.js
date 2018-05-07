@@ -40,12 +40,12 @@ export default class PanelObjectsComponent extends Component {
           {objects
             ? objects.children.map((object, idx) => (
               <div className='item'
-                   key={idx}
+                key={idx}
               >
                 <input type='checkbox' data-id={object.id}
-                       title='Visibility'
-                       checked={object.visible}
-                       onChange={this.onChangeVisible}
+                  title='Visibility'
+                  checked={object.visible}
+                  onChange={this.onChangeVisible}
                 />
                 {object.name}
                 <span>{object.children.length}</span>
@@ -59,13 +59,13 @@ export default class PanelObjectsComponent extends Component {
         <div className='toolbar'>
           {objects && objects.children.length > 1 && (
             <button onClick={this.combineEdgeModels}
-                    className="combine"
-                    title="Combine edge models"
+              className='combine'
+              title='Combine edge models'
             />
           )}
           <button onClick={this.showAll}
-                  className="show-all"
-                  title="Show all"
+            className='show-all'
+            title='Show all'
           />
         </div>
       </div>
@@ -76,7 +76,7 @@ export default class PanelObjectsComponent extends Component {
     editor: PropTypes.shape({
       scene: PropTypes.object,
       camera: PropTypes.object,
-      renderer: PropTypes.object,
+      renderer: PropTypes.object
     })
   }
 }

@@ -64,10 +64,10 @@ export default class CadComponent extends Component {
           onMouseMove={this.onMouseMove}
 
         />
-        <Selection/>
-        <Toolbar/>
-        <Options/>
-        <Sidebar/>
+        <Selection />
+        <Toolbar />
+        <Options />
+        <Sidebar />
       </div>
     )
   }

@@ -16,10 +16,10 @@ export default class SidebarComponent extends Component {
 
   tabTitle = (tab, panelIdx, tabIdx) => (
     <li key={tabIdx}
-        onClick={this.setActiveTab}
-        data-panel-idx={panelIdx}
-        data-tab-idx={tabIdx}
-        className={tab.active ? 'active' : ''}
+      onClick={this.setActiveTab}
+      data-panel-idx={panelIdx}
+      data-tab-idx={tabIdx}
+      className={tab.active ? 'active' : ''}
     >{tab.title}</li>
   )
 
@@ -28,7 +28,7 @@ export default class SidebarComponent extends Component {
 
     return (
       <div id='sidebar' className={active ? 'active' : ''}>
-        <span onClick={this.toggleSidebar} className='toggleSidebar'/>
+        <span onClick={this.toggleSidebar} className='toggleSidebar' />
 
         {!active && (
           <ul className='tabs-rotated'>{
@@ -37,44 +37,44 @@ export default class SidebarComponent extends Component {
         )}
 
         {active && panels.map((panel, panelIdx) => (
-            <div className='panel' key={panelIdx}>
-              <ul className='tabs'>{
-                panel.map((tab, tabIdx) => this.tabTitle(tab, panelIdx, tabIdx))
-              }</ul>
+          <div className='panel' key={panelIdx}>
+            <ul className='tabs'>{
+              panel.map((tab, tabIdx) => this.tabTitle(tab, panelIdx, tabIdx))
+            }</ul>
 
-              {
-                panel.map((tab, idx) => {
-                  if (tab.active) {
-                    let component
-                    switch (tab.component) {
-                      case 'PanelActiveEntities':
-                        component = <ActiveEntities/>
-                        break
+            {
+              panel.map((tab, idx) => {
+                if (tab.active) {
+                  let component
+                  switch (tab.component) {
+                    case 'PanelActiveEntities':
+                      component = <ActiveEntities />
+                      break
                       // case 'PanelSnapshots':
                       // component = <PanelSnapshots/>
                       // break
-                      case 'PanelLayers':
-                        component = <PanelLayers />
-                        break
-                      case 'PanelObjects':
-                        component = <PanelObjects />
-                        break
-                      default:
-                        component = `[COMPONENT "${tab.component}" NOT FOUND]`
-                        console.error(component)
-                    }
-
-                    return (
-                      <div className='panel-content' key={idx}>
-                        {component}
-                      </div>
-                    )
+                    case 'PanelLayers':
+                      component = <PanelLayers />
+                      break
+                    case 'PanelObjects':
+                      component = <PanelObjects />
+                      break
+                    default:
+                      component = `[COMPONENT "${tab.component}" NOT FOUND]`
+                      console.error(component)
                   }
-                  return null
-                })
-              }
-            </div>
-          )
+
+                  return (
+                    <div className='panel-content' key={idx}>
+                      {component}
+                    </div>
+                  )
+                }
+                return null
+              })
+            }
+          </div>
+        )
         )}
 
         {this.props.children}

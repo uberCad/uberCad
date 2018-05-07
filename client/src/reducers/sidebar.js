@@ -17,7 +17,7 @@ let initialState = {
         title: 'Layers',
         component: 'PanelLayers',
         active: false
-      },
+      }
     ],
     [
       {
@@ -29,14 +29,14 @@ let initialState = {
         title: 'Edit',
         component: 'PanelEdit',
         active: false
-      },
+      }
     ],
     [
       {
         title: 'Snapshots',
         component: 'PanelSnapshots',
         active: true
-      },
+      }
     ]
 
   ]
@@ -53,7 +53,7 @@ const options = (state = initialState, action) => {
       let active = false
 
       try {
-        state.panels.forEach((panel, panelIdx )=> {
+        state.panels.forEach((panel, panelIdx) => {
           panel.forEach((tab, tabIdx) => {
             if (panelIdx === action.payload.panelIdx) {
               if (tabIdx === action.payload.tabIdx) {
@@ -69,12 +69,9 @@ const options = (state = initialState, action) => {
           })
         })
 
-
-
         if (!state.active) {
           active = true
         }
-
       } catch (e) {}
 
       return update(state, {

@@ -3,8 +3,8 @@ import sceneService from '../services/sceneService'
 
 export const toggleVisible = (entity, visible, editor) => {
   return dispatch => {
-    entity.visible = visible;
-    sceneService.render(editor);
+    entity.visible = visible
+    sceneService.render(editor)
 
     dispatch({
       type: CAD_TOGGLE_VISIBLE,
@@ -13,14 +13,13 @@ export const toggleVisible = (entity, visible, editor) => {
       }
     })
   }
-
 }
 
 export const unSelect = (idx, activeEntities, editor) => {
   return dispatch => {
     sceneService.highlightEntities(editor, editor.activeEntities, true, undefined, false)
-    activeEntities.splice(idx, 1);
-    sceneService.highlightEntities(editor, editor.activeEntities);
+    activeEntities.splice(idx, 1)
+    sceneService.highlightEntities(editor, editor.activeEntities)
 
     dispatch({
       type: CAD_DO_SELECTION,
@@ -33,10 +32,10 @@ export const unSelect = (idx, activeEntities, editor) => {
 
 export const selectEntity = (idx, activeEntities, editor) => {
   return dispatch => {
-    sceneService.highlightEntities(editor, editor.activeEntities, true, undefined, false);
-    sceneService.highlightEntities(editor, activeEntities[idx]);
-    sceneService.setPointOfInterest(editor, activeEntities[idx]);
-    console.log('selectEntity', activeEntities[idx]);
+    sceneService.highlightEntities(editor, editor.activeEntities, true, undefined, false)
+    sceneService.highlightEntities(editor, activeEntities[idx])
+    sceneService.setPointOfInterest(editor, activeEntities[idx])
+    console.log('selectEntity', activeEntities[idx])
 
     // dispatch({
     //   type: CAD_SELECT_ENTITY,
@@ -62,7 +61,6 @@ export const showAll = editor => {
 export const groupEntities = editor => {
   return dispatch => {
     sceneService.groupEntities(editor)
-
 
     // dispatch({
     //   type: CAD_DO_SELECTION,

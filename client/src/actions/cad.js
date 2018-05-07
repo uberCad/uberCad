@@ -46,46 +46,43 @@ export const drawDxf = (data, container) => {
     [698],
     [1092, 1097, 1102],
     [97, 92, 87],
-    [1047, 1057, 1054],
+    [1047, 1057, 1054]
     // [1040, -32, -33, -34],
     // [163, 173, 149],
     // [1041],
 
   ]
-  let idsToFind = [];
-  objectsDraft.forEach(entityContainer => idsToFind.push(...entityContainer.map(id => Math.abs(id))));
-  let result = {};
+  let idsToFind = []
+  objectsDraft.forEach(entityContainer => idsToFind.push(...entityContainer.map(id => Math.abs(id))))
+  let result = {}
 
-  let iterator = sceneService.entityIterator(scene);
-  let entity = iterator.next();
+  let iterator = sceneService.entityIterator(scene)
+  let entity = iterator.next()
   while (!entity.done) {
-
     if (idsToFind.indexOf(entity.value.id) >= 0) {
-      result[entity.value.id] = entity.value;
+      result[entity.value.id] = entity.value
     }
-    entity = iterator.next();
+    entity = iterator.next()
   }
 
-  let frames = [];
-
-
+  let frames = []
 
   objectsDraft.forEach((frameData, frameId) => {
-    let entities = [];
-    editor.options.selectMode = SELECT_MODE_NEW;
+    let entities = []
+    editor.options.selectMode = SELECT_MODE_NEW
 
     frameData.forEach(entityId => {
       if (entityId < 0) {
-        entities.splice(entities.indexOf(result[Math.abs(entityId)]), 1);
+        entities.splice(entities.indexOf(result[Math.abs(entityId)]), 1)
       } else {
         entities = [...entities, ...sceneService.recursiveSelect(result[entityId], editor)]
         console.error(entities.map(e => e.id))
       }
-    });
+    })
 
     sceneService.highlightEntities(editor, entities)
-    frames.push(sceneService.groupEntities(editor, entities, `Frame${frameId + 1}`));
-  });
+    frames.push(sceneService.groupEntities(editor, entities, `Frame${frameId + 1}`))
+  })
 
   //
   //
@@ -115,9 +112,6 @@ export const drawDxf = (data, container) => {
   // //
   // // let object = sceneService.createObject(editor, 'inner', entities, 0.0001)
   // console.warn('object111', object)
-
-
-
 
   return dispatch => dispatch({
     type: CAD_DRAW_DXF,

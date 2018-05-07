@@ -1,35 +1,34 @@
 import * as THREE from '../extend/THREE'
 
 let buildEdgeModel = (object, threshold = 0.000001) => {
-  let vertices = getVertices(object.children);
-  let regions = [];
+  let vertices = getVertices(object.children)
+  let regions = []
 
-  //get entities without vertices in paths
-  let entities = skipZeroLines([...object.children], threshold);
+  // get entities without vertices in paths
+  let entities = skipZeroLines([...object.children], threshold)
 
   // check for intersections
   entities.forEach(entityToCheck => {
-    delete entityToCheck.userData.noIntersections;
+    delete entityToCheck.userData.noIntersections
 
     entities.forEach(entity => {
       if (entity === entityToCheck || entity.userData.noIntersections) {
-        return;
+        return
       }
 
       if (!(entity.geometry instanceof THREE.CircleGeometry) && !(entityToCheck.geometry instanceof THREE.CircleGeometry)) {
-        //line to line
+        // line to line
 
         // console.count('check for intersection');
         if (linesIntersect(entity.geometry.vertices[0], entity.geometry.vertices[1], entityToCheck.geometry.vertices[0], entityToCheck.geometry.vertices[1])) {
-
-          //check if all vertices far enough from each other
+          // check if all vertices far enough from each other
           if (
-            entity.geometry.vertices[0].distanceTo(entityToCheck.geometry.vertices[0]) > threshold
-            && entity.geometry.vertices[0].distanceTo(entityToCheck.geometry.vertices[1]) > threshold
-            && entity.geometry.vertices[1].distanceTo(entityToCheck.geometry.vertices[0]) > threshold
-            && entity.geometry.vertices[1].distanceTo(entityToCheck.geometry.vertices[1]) > threshold
+            entity.geometry.vertices[0].distanceTo(entityToCheck.geometry.vertices[0]) > threshold &&
+            entity.geometry.vertices[0].distanceTo(entityToCheck.geometry.vertices[1]) > threshold &&
+            entity.geometry.vertices[1].distanceTo(entityToCheck.geometry.vertices[0]) > threshold &&
+            entity.geometry.vertices[1].distanceTo(entityToCheck.geometry.vertices[1]) > threshold
           ) {
-            console.error('INTERSECTION', entityToCheck, entity);
+            console.error('INTERSECTION', entityToCheck, entity)
             // console.warn(entity.geometry.vertices[0], entity.geometry.vertices[1], entityToCheck.geometry.vertices[0], entityToCheck.geometry.vertices[1]);
             // [entityToCheck, entity]
 
@@ -49,28 +48,24 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
             //   entities: [entityToCheck, entity]
             // }
           }
-
-
         }
       } else if (entity.geometry instanceof THREE.CircleGeometry && entityToCheck.geometry instanceof THREE.CircleGeometry) {
-        //arc to arc
-        let intersectionResult = arcsIntersect(entity, entityToCheck);
+        // arc to arc
+        let intersectionResult = arcsIntersect(entity, entityToCheck)
         if (intersectionResult) {
           // alert('ARC INTERSECTION!!! YEAH!!!');
 
+          let arc1v1 = new THREE.Vector3(0, 0, 0)
+          arc1v1.addVectors(intersectionResult.arc1.geometry.vertices[0], intersectionResult.arc1.position)
 
-          let arc1v1 = new THREE.Vector3(0, 0, 0);
-          arc1v1.addVectors(intersectionResult.arc1.geometry.vertices[0], intersectionResult.arc1.position);
+          let arc1v2 = new THREE.Vector3(0, 0, 0)
+          arc1v2.addVectors(intersectionResult.arc1.geometry.vertices[intersectionResult.arc1.geometry.vertices.length - 1], intersectionResult.arc1.position)
 
-          let arc1v2 = new THREE.Vector3(0, 0, 0);
-          arc1v2.addVectors(intersectionResult.arc1.geometry.vertices[intersectionResult.arc1.geometry.vertices.length - 1], intersectionResult.arc1.position);
+          let arc2v1 = new THREE.Vector3(0, 0, 0)
+          arc2v1.addVectors(intersectionResult.arc2.geometry.vertices[0], intersectionResult.arc2.position)
 
-          let arc2v1 = new THREE.Vector3(0, 0, 0);
-          arc2v1.addVectors(intersectionResult.arc2.geometry.vertices[0], intersectionResult.arc2.position);
-
-          let arc2v2 = new THREE.Vector3(0, 0, 0);
-          arc2v2.addVectors(intersectionResult.arc2.geometry.vertices[intersectionResult.arc2.geometry.vertices.length - 1], intersectionResult.arc2.position);
-
+          let arc2v2 = new THREE.Vector3(0, 0, 0)
+          arc2v2.addVectors(intersectionResult.arc2.geometry.vertices[intersectionResult.arc2.geometry.vertices.length - 1], intersectionResult.arc2.position)
 
           if (
             arc1v1.distanceTo(intersectionResult.intersectPoint) > threshold &&
@@ -78,7 +73,7 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
             arc2v1.distanceTo(intersectionResult.intersectPoint) > threshold &&
             arc2v2.distanceTo(intersectionResult.intersectPoint) > threshold
           ) {
-            console.error('INTERSECTION', entityToCheck, entity);
+            console.error('INTERSECTION', entityToCheck, entity)
             // console.warn(entity.geometry.vertices[0], entity.geometry.vertices[1], entityToCheck.geometry.vertices[0], entityToCheck.geometry.vertices[1]);
             // [entityToCheck, entity]
 
@@ -99,33 +94,31 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
             // }
           }
         }
-
-
       } else {
-        //line to arc
-        let arc, line;
+        // line to arc
+        let arc, line
 
         if (entity.geometry instanceof THREE.CircleGeometry) {
-          arc = entity;
-          line = entityToCheck;
+          arc = entity
+          line = entityToCheck
         } else {
-          arc = entityToCheck;
-          line = entity;
+          arc = entityToCheck
+          line = entity
         }
 
-        let intersectionResult = lineArcIntersect(line, arc);
+        let intersectionResult = lineArcIntersect(line, arc)
         if (intersectionResult) {
-          //possibly intersection. check for threshold
+          // possibly intersection. check for threshold
 
-          let arc1v1 = new THREE.Vector3(0, 0, 0);
-          arc1v1.addVectors(arc.geometry.vertices[0], arc.position);
+          let arc1v1 = new THREE.Vector3(0, 0, 0)
+          arc1v1.addVectors(arc.geometry.vertices[0], arc.position)
 
-          let arc1v2 = new THREE.Vector3(0, 0, 0);
-          arc1v2.addVectors(arc.geometry.vertices[arc.geometry.vertices.length - 1], arc.position);
+          let arc1v2 = new THREE.Vector3(0, 0, 0)
+          arc1v2.addVectors(arc.geometry.vertices[arc.geometry.vertices.length - 1], arc.position)
 
-          let line1v1 = line.geometry.vertices[0].clone();
+          let line1v1 = line.geometry.vertices[0].clone()
 
-          let line1v2 = line.geometry.vertices[1].clone();
+          let line1v2 = line.geometry.vertices[1].clone()
 
           if (
             arc1v1.distanceTo(line1v1) > threshold &&
@@ -133,7 +126,7 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
             arc1v2.distanceTo(line1v1) > threshold &&
             arc1v2.distanceTo(line1v2) > threshold
           ) {
-            console.error('INTERSECTION', entityToCheck, entity);
+            console.error('INTERSECTION', entityToCheck, entity)
             // console.warn(entity.geometry.vertices[0], entity.geometry.vertices[1], entityToCheck.geometry.vertices[0], entityToCheck.geometry.vertices[1]);
             // [entityToCheck, entity]
 
@@ -154,29 +147,26 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
             // }
           }
         }
-
       }
-    });
-    entityToCheck.userData.noIntersections = true;
-  });
+    })
+    entityToCheck.userData.noIntersections = true
+  })
 
-
-
-  let prevEntitiesCount = -1;
+  let prevEntitiesCount = -1
   do {
     regions.forEach(region => {
       region.path.forEach(vertex => {
-        let idx = entities.indexOf(vertex.parent);
+        let idx = entities.indexOf(vertex.parent)
         if (idx > -1) {
-          entities.splice(idx, 1);
+          entities.splice(idx, 1)
         }
-      });
-    });
+      })
+    })
 
-    let startVertex = vertices.find(v => entities.indexOf(v.parent) >= 0);
+    let startVertex = vertices.find(v => entities.indexOf(v.parent) >= 0)
 
     if (prevEntitiesCount !== entities.length) {
-      prevEntitiesCount = entities.length;
+      prevEntitiesCount = entities.length
     } else {
       let error = new Error('Not all entities in use!')
       error.userData = {
@@ -194,157 +184,144 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
     }
 
     if (entities.length) {
-      let path = buildChain(vertices, startVertex, threshold);
+      let path = buildChain(vertices, startVertex, threshold)
       regions.push({
         path,
         boundingBox: buildBoundingBox(path)
-      });
-
-
+      })
     }
 
-
-
-
-
     // console.log('entities', entities.length);
-  } while (entities.length);
-
+  } while (entities.length)
 
   if (regions.length) {
-    //make outer region clockwise. other regions counterclockwise
-    let outerRegion = regions[0];
+    // make outer region clockwise. other regions counterclockwise
+    let outerRegion = regions[0]
 
     regions.forEach(region => {
       if (region.boundingBox.area > outerRegion.boundingBox.area) {
-        outerRegion = region;
+        outerRegion = region
       }
-    });
+    })
 
-    //set outer region first
-    regions.unshift(...regions.splice(regions.indexOf(outerRegion), 1));
+    // set outer region first
+    regions.unshift(...regions.splice(regions.indexOf(outerRegion), 1))
 
     regions.forEach(region => {
       if (isClockwise(region.path)) {
         if (region === outerRegion) {
-          //make outer region counterclockwise
-          region.path.reverse();
+          // make outer region counterclockwise
+          region.path.reverse()
         }
       } else {
-        //counterclockwise
+        // counterclockwise
 
         if (region !== outerRegion) {
           // make inner region clockwise
-          region.path.reverse();
+          region.path.reverse()
         }
       }
-    });
+    })
   }
-
 
   // console.log('regions', regions);
 
-  let pathD = '';
-  let subRegionsPathD = [];
-  let vertexList = [];
+  let pathD = ''
+  let subRegionsPathD = []
+  let vertexList = []
   regions.forEach((region, idx) => {
-    let last = region.path[region.path.length - 1];
-    let lastVertex = `${(last.x / 1000).toFixed(4)},${(last.y / 1000).toFixed(4)}`;
+    let last = region.path[region.path.length - 1]
+    let lastVertex = `${(last.x / 1000).toFixed(4)},${(last.y / 1000).toFixed(4)}`
 
-    let p = `M${lastVertex} L`;
+    let p = `M${lastVertex} L`
 
     region.path.forEach(v => {
-      let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
+      let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`
       if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-        p += `${vertex} `;
-        lastVertex = vertex;
-        vertexList.push(vertex);
+        p += `${vertex} `
+        lastVertex = vertex
+        vertexList.push(vertex)
       }
-    });
-    pathD += p;
+    })
+    pathD += p
     if (idx) {
-      subRegionsPathD.push(p);
+      subRegionsPathD.push(p)
     }
-  });
+  })
 
   let viewBox = {
     x: (Math.min(...vertices.map(v => v.x)) / 1000).toFixed(4),
     y: (Math.min(...vertices.map(v => v.y)) / 1000).toFixed(4),
     width: ((Math.max(...vertices.map(v => v.x)) - Math.min(...vertices.map(v => v.x))) / 1000).toFixed(4),
     height: ((Math.max(...vertices.map(v => v.y)) - Math.min(...vertices.map(v => v.y))) / 1000).toFixed(4)
-  };
+  }
 
   return {
-    regions, //outer region goes first
+    regions, // outer region goes first
     svgData: {
       viewBox,
       pathD,
       subRegionsPathD,
       insidePoint: getInsidePoint(regions, threshold)
     }
-  };
+  }
 }
 
 let buildChain = (vertices, startVertex, threshold = 0.000001, vertex, path = []) => {
-    if (!vertex) {
-    vertex = startVertex;
+  if (!vertex) {
+    vertex = startVertex
   }
 
-  let entity = vertex.parent;
+  let entity = vertex.parent
   if (entity.geometry instanceof THREE.CircleGeometry) {
-    //arc
+    // arc
 
-    let v = new THREE.Vector3(0, 0, 0);
-    v.addVectors(entity.geometry.vertices[0], entity.position);
+    let v = new THREE.Vector3(0, 0, 0)
+    v.addVectors(entity.geometry.vertices[0], entity.position)
 
-    let vertices = [...entity.geometry.vertices];
+    let vertices = [...entity.geometry.vertices]
     if (vertex.distanceTo(v) > threshold) {
-      //reverse order
-      vertices.reverse();
+      // reverse order
+      vertices.reverse()
     }
 
     vertices.forEach((v, idx, array) => {
       if (idx >= array.length - 1) {
-        //skip last element
-        return;
+        // skip last element
+        return
       }
-      let vertice = new THREE.Vector3(0, 0, 0);
-      vertice.parent = entity;
-      path.push(vertice.addVectors(v, entity.position));
-    });
+      let vertice = new THREE.Vector3(0, 0, 0)
+      vertice.parent = entity
+      path.push(vertice.addVectors(v, entity.position))
+    })
   } else {
-    //line
-    path.push(vertex);
+    // line
+    path.push(vertex)
   }
 
+  let anotherVertex = vertices.find(item => item.parent === vertex.parent && item !== vertex)
 
-
-
-
-  let anotherVertex = vertices.find(item => item.parent === vertex.parent && item !== vertex);
-
-  let nearestVertex;
-  let distances = [];
+  let nearestVertex
+  let distances = []
   vertices.forEach(v => {
     if (v === anotherVertex) {
-      return false;
+      return false
     }
     distances.push({
       vertex: v,
       distance: anotherVertex.distanceTo(v)
-    });
-  });
+    })
+  })
 
-  //get closest vertex
-  let minDistance = distances.pop();
+  // get closest vertex
+  let minDistance = distances.pop()
   distances.forEach(distance => {
     if (distance.distance < minDistance.distance) {
-      minDistance = distance;
+      minDistance = distance
     }
-  });
+  })
 
   if (minDistance.distance > threshold) {
-
     let error = new Error('Interruption detected. Operation canceled')
     error.userData = {
       error: 'interruption',
@@ -364,13 +341,13 @@ let buildChain = (vertices, startVertex, threshold = 0.000001, vertex, path = []
     // };
   }
 
-  nearestVertex = minDistance.vertex;
+  nearestVertex = minDistance.vertex
 
   if (anotherVertex === startVertex || nearestVertex === startVertex) {
-    return path;
+    return path
   }
 
-  return buildChain(vertices.filter(v => v !== anotherVertex && v !== nearestVertex), startVertex, threshold, nearestVertex, path);
+  return buildChain(vertices.filter(v => v !== anotherVertex && v !== nearestVertex), startVertex, threshold, nearestVertex, path)
 }
 
 let buildBoundingBox = vertices => {
@@ -379,197 +356,195 @@ let buildBoundingBox = vertices => {
     y1: Math.min(...vertices.map(v => v.y)),
     x2: Math.max(...vertices.map(v => v.x)),
     y2: Math.max(...vertices.map(v => v.y))
-  };
-  boundingBox.area = Math.abs((boundingBox.x1 - boundingBox.x2) * (boundingBox.y1 - boundingBox.y2));
-  return boundingBox;
+  }
+  boundingBox.area = Math.abs((boundingBox.x1 - boundingBox.x2) * (boundingBox.y1 - boundingBox.y2))
+  return boundingBox
 }
 
 let isClockwise = vertices => {
-  let sum = 0;
+  let sum = 0
 
   if (vertices) {
-    let prevVertex = vertices[vertices.length - 1];
+    let prevVertex = vertices[vertices.length - 1]
 
     vertices.forEach(vertex => {
-      sum += (vertex.x - prevVertex.x) * (vertex.y + prevVertex.y);
-      prevVertex = vertex;
-    });
+      sum += (vertex.x - prevVertex.x) * (vertex.y + prevVertex.y)
+      prevVertex = vertex
+    })
   }
 
-  return sum > 0;
+  return sum > 0
 }
 
 let getInsidePoint = (regions, threshold) => {
-  let farestPoint = false;
+  let farestPoint = false
 
   if (regions.length) {
-    let path = regions[0].path;
+    let path = regions[0].path
+    let width = Math.max(...path.map(v => v.x)) - Math.min(...path.map(v => v.x))
+    let height = Math.max(...path.map(v => v.y)) - Math.min(...path.map(v => v.y))
+    let minDistanceFromBorder = Math.min(width, height) / 20
+    let points = []
+    let firstPoint = path[0]
 
-    let width = Math.max(...path.map(v => v.x)) - Math.min(...path.map(v => v.x)),
-      height = Math.max(...path.map(v => v.y)) - Math.min(...path.map(v => v.y));
-    let minDistanceFromBorder = Math.min(width, height) / 20;
-    let points = [];
-    let firstPoint = path[0];
-
-    let entities = [];
+    let entities = []
     path.forEach(vertex => {
       if (!entities.includes(vertex.parent)) {
-        entities.push(vertex.parent);
+        entities.push(vertex.parent)
       }
-    });
+    })
 
-    let bestPoints = 0;
+    let bestPoints = 0
     for (let i = 0; i < 3; i++) {
-      let attempts = 0;
-      while (points.length < i*3 + 3 || attempts < 20) {
-        let secondPoint = path[parseInt(Math.random() * path.length, 10)];
+      let attempts = 0
+      while (points.length < i * 3 + 3 || attempts < 20) {
+        let secondPoint = path[parseInt(Math.random() * path.length, 10)]
 
         let midPoint = {
           x: (firstPoint.x + secondPoint.x) / 2,
           y: (firstPoint.y + secondPoint.y) / 2,
           z: 0
-        };
+        }
 
         if (insidePolygon(path, midPoint)) {
-          //try to do it simplest way...
-          let minDistance = 999999999;
+          // try to do it simplest way...
+          let minDistance = 999999999
           for (let entity of entities) {
-            let distance = distanceToEntity(midPoint, entity);
+            let distance = distanceToEntity(midPoint, entity)
             if (distance < minDistance) {
-              minDistance = distance;
+              minDistance = distance
             }
           }
           points.push({
             minDistance,
             point: midPoint
-          });
+          })
 
           if (minDistance > minDistanceFromBorder) {
             bestPoints++
           }
           if (bestPoints >= 2) {
-            //if there are 2+ points, select one farest from border (that far enough: 10000*threshold)
-            let maxDistance = 0;
+            // if there are 2+ points, select one farest from border (that far enough: 10000*threshold)
+            let maxDistance = 0
 
             for (let point of points) {
               if (point.minDistance > maxDistance) {
-                maxDistance = point.minDistance;
-                farestPoint = point.point;
+                maxDistance = point.minDistance
+                farestPoint = point.point
               }
             }
 
             // if there are no vertex further than 10000*threshold, scripts after that cycle find farest
-            return farestPoint;
+            return farestPoint
           }
         }
-        attempts++;
+        attempts++
       }
-      firstPoint = path[parseInt(Math.random() * path.length, 10)];
+      firstPoint = path[parseInt(Math.random() * path.length, 10)]
     }
 
     if (points.length) {
-      let maxDistance = 0;
+      let maxDistance = 0
       points.forEach(point => {
         if (point.minDistance > maxDistance) {
-          maxDistance = point.minDistance;
-          farestPoint = point.point;
+          maxDistance = point.minDistance
+          farestPoint = point.point
         }
-      });
+      })
     }
 
-    return farestPoint;
+    return farestPoint
   }
 }
 
 let getCollisionPoints = (objects, threshold = 0.000001) => {
-  let collisionPoints = [];
+  let collisionPoints = []
   // if object bounding boxes intersect or tangent then
   //     find intersections between object
   //     find tangent points between objects
   //     find new regions
 
   objects.forEach(object => {
-    object.userData.checkedIntersection = true;
+    object.userData.checkedIntersection = true
 
-    let objectOuterEntities = [];
+    let objectOuterEntities = []
     object.userData.edgeModel.regions[0].path.forEach(vertex => {
       if (!objectOuterEntities.includes(vertex.parent)) {
-        objectOuterEntities.push(vertex.parent);
+        objectOuterEntities.push(vertex.parent)
       }
-    });
+    })
 
     // console.log('outer region', object.userData.edgeModel.regions[0].path, objectOuterEntities);
 
-    //filter, to process collided objects once
+    // filter, to process collided objects once
     objects.filter((obj) => {
       return !obj.userData.checkedIntersection &&
         isBoundingBoxesCollide(
           object.userData.edgeModel.regions[0].boundingBox,
           obj.userData.edgeModel.regions[0].boundingBox,
           threshold
-        );
+        )
     }).forEach(obj => {
       // console.log('obj', obj);
-      //check for intersections between object
-      //entity to entity
+      // check for intersections between object
+      // entity to entity
 
-      let objOuterEntities = [];
+      let objOuterEntities = []
       obj.userData.edgeModel.regions[0].path.forEach(vertex => {
         if (!objOuterEntities.includes(vertex.parent)) {
-          objOuterEntities.push(vertex.parent);
+          objOuterEntities.push(vertex.parent)
         }
-      });
+      })
 
       // return;
 
       // check for intersections
 
-      console.time('CHECK OBJECTS INTERSECTION');
+      console.time('CHECK OBJECTS INTERSECTION')
 
       objectOuterEntities.forEach(entityObject => {
         objOuterEntities.forEach(entityObj => {
-          let info = entitiesIntersectInfo(entityObject, entityObj, threshold);
+          let info = entitiesIntersectInfo(entityObject, entityObj, threshold)
 
           if (info) {
-            info.id = collisionPoints.length;
-            collisionPoints.push(info);
+            info.id = collisionPoints.length
+            collisionPoints.push(info)
           }
-        });
-      });
+        })
+      })
 
       // console.timeEnd('CHECK OBJECTS INTERSECTION');
     })
-  });
+  })
 
   objects.forEach(object => {
-    delete object.userData.checkedIntersection;
-  });
+    delete object.userData.checkedIntersection
+  })
 
-  return collisionPoints;
+  return collisionPoints
 }
 
 let insidePolygon = (polygon = [], vertex) => {
   // There must be at least 3 vertices in polygon[]
   if (polygon.length < 3) {
-    return false;
+    return false
   }
 
   // Create a point for line segment from p to infinite
   let extreme = {
     x: 99999999999,
-    y: vertex.y+9999999999
-  };
+    y: vertex.y + 9999999999
+  }
 
   // Count intersections of the above line with sides of polygon
   let count = 0
 
-
   for (let i = 0; i < polygon.length; i++) {
-    let next = (i + 1) % polygon.length;
+    let next = (i + 1) % polygon.length
 
     // Check if the line segment from 'vertex' to 'extreme' intersects
     // with the line segment from 'polygon[i]' to 'polygon[next]'
-    let intersectResult = linesIntersect(polygon[i], polygon[next], vertex, extreme, true);
+    let intersectResult = linesIntersect(polygon[i], polygon[next], vertex, extreme, true)
     if (intersectResult.isIntersects) {
       // If the point 'p' is colinear with line segment 'i-next',
       // then check if it lies on segment. If it lies, return true,
@@ -577,73 +552,73 @@ let insidePolygon = (polygon = [], vertex) => {
       if (intersectResult.collinear) {
         return true
       }
-      count++;
+      count++
     }
   }
 
   // Return true if count is odd, false otherwise
-  return count % 2 === 1;
+  return count % 2 === 1
 }
 
 let lineArcIntersect = (line, arc, threshold = 0) => {
-  //https://bl.ocks.org/milkbread/11000965
+  // https://bl.ocks.org/milkbread/11000965
 
-  //http://www.analyzemath.com/Calculators/Circle_Line.html
-  //circle (x - h)^2 + (y - k)^2 = r^2
-  //line y = m*x + b
+  // http://www.analyzemath.com/Calculators/Circle_Line.html
+  // circle (x - h)^2 + (y - k)^2 = r^2
+  // line y = m*x + b
 
-  let x1 = line.geometry.vertices[0].x;
-  let y1 = line.geometry.vertices[0].y;
-  let x2 = line.geometry.vertices[1].x;
-  let y2 = line.geometry.vertices[1].y;
+  let x1 = line.geometry.vertices[0].x
+  let y1 = line.geometry.vertices[0].y
+  let x2 = line.geometry.vertices[1].x
+  let y2 = line.geometry.vertices[1].y
 
-  let m = (y2 - y1) / (x2 - x1);
-  let b = y1 - m * x1;
+  let m = (y2 - y1) / (x2 - x1)
+  let b = y1 - m * x1
 
-  let h = arc.position.x;
-  let k = arc.position.y;
-  let r = arc.geometry.parameters.radius;
+  let h = arc.position.x
+  let k = arc.position.y
+  let r = arc.geometry.parameters.radius
 
-  let A = 1 + m * m;
-  let B = -2 * h + 2 * m * b - 2 * k * m;
-  let C = h * h + b * b + k * k - 2 * k * b - r * r;
-  let delta = B * B - 4 * A * C;
+  let A = 1 + m * m
+  let B = -2 * h + 2 * m * b - 2 * k * m
+  let C = h * h + b * b + k * k - 2 * k * b - r * r
+  let delta = B * B - 4 * A * C
 
   if (delta < 0 && delta + threshold >= 0) {
-    delta = 0;
+    delta = 0
   }
 
   if (delta >= 0) {
-    let x1 = (-B + Math.sqrt(delta)) / (2 * A);
-    let x2 = (-B - Math.sqrt(delta)) / (2 * A);
-    let y1 = m * x1 + b;
-    let y2 = m * x2 + b;
+    let x1 = (-B + Math.sqrt(delta)) / (2 * A)
+    let x2 = (-B - Math.sqrt(delta)) / (2 * A)
+    let y1 = m * x1 + b
+    let y2 = m * x2 + b
 
-    let intersectPoint1 = new THREE.Vector3(x1, y1, 0);
-    let intersectPoint2 = new THREE.Vector3(x2, y2, 0);
+    let intersectPoint1 = new THREE.Vector3(x1, y1, 0)
+    let intersectPoint2 = new THREE.Vector3(x2, y2, 0)
 
-    let arcAngle1 = circleIntersectionAngle(intersectPoint1, arc.position, r);
-    let arcAngle2 = circleIntersectionAngle(intersectPoint2, arc.position, r);
+    let arcAngle1 = circleIntersectionAngle(intersectPoint1, arc.position, r)
+    let arcAngle2 = circleIntersectionAngle(intersectPoint2, arc.position, r)
 
     if (!isBetween(line.geometry.vertices[0], line.geometry.vertices[1], intersectPoint1, threshold)) {
-      intersectPoint1 = null;
+      intersectPoint1 = null
     }
 
     if (!isBetween(line.geometry.vertices[0], line.geometry.vertices[1], intersectPoint2, threshold)) {
-      intersectPoint2 = null;
+      intersectPoint2 = null
     }
 
-    //fix problem when thetaStart + thetaLength > 2pi AND arcAngle < thetastart
+    // fix problem when thetaStart + thetaLength > 2pi AND arcAngle < thetastart
     if (arc.geometry.parameters.thetaStart + arc.geometry.parameters.thetaLength > Math.PI * 2) {
       if (arc.geometry.parameters.thetaStart > arcAngle1) {
-        arcAngle1 += Math.PI * 2;
+        arcAngle1 += Math.PI * 2
       }
       if (arc.geometry.parameters.thetaStart > arcAngle2) {
-        arcAngle2 += Math.PI * 2;
+        arcAngle2 += Math.PI * 2
       }
     }
 
-    //todo: handle tangent line to arc
+    // todo: handle tangent line to arc
 
     if (intersectPoint1 && arcAngle1 >= arc.geometry.parameters.thetaStart && arcAngle1 <= arc.geometry.parameters.thetaStart + arc.geometry.parameters.thetaLength) {
       return {
@@ -653,7 +628,7 @@ let lineArcIntersect = (line, arc, threshold = 0) => {
         line: line,
         arcAngle: arcAngle1,
         distance: 0
-      };
+      }
     }
 
     if (intersectPoint2 && arcAngle2 >= arc.geometry.parameters.thetaStart && arcAngle2 <= arc.geometry.parameters.thetaStart + arc.geometry.parameters.thetaLength) {
@@ -664,19 +639,19 @@ let lineArcIntersect = (line, arc, threshold = 0) => {
         line: line,
         arcAngle: arcAngle2,
         distance: 0
-      };
+      }
     }
 
-    //in case of threshold-error
+    // in case of threshold-error
     if (threshold) {
-      let arc1v1 = new THREE.Vector3(0, 0, 0);
-      arc1v1.addVectors(arc.geometry.vertices[0], arc.position);
+      let arc1v1 = new THREE.Vector3(0, 0, 0)
+      arc1v1.addVectors(arc.geometry.vertices[0], arc.position)
 
-      let arc1v2 = new THREE.Vector3(0, 0, 0);
-      arc1v2.addVectors(arc.geometry.vertices[arc.geometry.vertices.length - 1], arc.position);
+      let arc1v2 = new THREE.Vector3(0, 0, 0)
+      arc1v2.addVectors(arc.geometry.vertices[arc.geometry.vertices.length - 1], arc.position)
 
       if (intersectPoint1) {
-        let distance = Math.min(arc1v1.distanceTo(intersectPoint1), arc1v2.distanceTo(intersectPoint1));
+        let distance = Math.min(arc1v1.distanceTo(intersectPoint1), arc1v2.distanceTo(intersectPoint1))
         if (distance < threshold) {
           return {
             mode: 'intersection',
@@ -685,12 +660,12 @@ let lineArcIntersect = (line, arc, threshold = 0) => {
             line: line,
             arcAngle: arcAngle1,
             distance
-          };
+          }
         }
       }
 
       if (intersectPoint2) {
-        let distance = Math.min(arc1v1.distanceTo(intersectPoint2), arc1v2.distanceTo(intersectPoint2));
+        let distance = Math.min(arc1v1.distanceTo(intersectPoint2), arc1v2.distanceTo(intersectPoint2))
         if (distance < threshold) {
           return {
             mode: 'intersection',
@@ -699,86 +674,83 @@ let lineArcIntersect = (line, arc, threshold = 0) => {
             line: line,
             arcAngle: arcAngle2,
             distance
-          };
+          }
         }
       }
     }
-
   } else {
-    //no intersection
+    // no intersection
   }
-  return false;
+  return false
 }
 
 let arcsIntersect = (arc1, arc2) => {
-  //http://www.ambrsoft.com/TrigoCalc/Circles2/circle2intersection/CircleCircleIntersection.htm
+  // http://www.ambrsoft.com/TrigoCalc/Circles2/circle2intersection/CircleCircleIntersection.htm
 
-
-  let x1 = arc1.position.x, //a
-    y1 = arc1.position.y, //b
-    x2 = arc2.position.x, //c
-    y2 = arc2.position.y; //d
+  let x1 = arc1.position.x // a
+  let y1 = arc1.position.y // b
+  let x2 = arc2.position.x // c
+  let y2 = arc2.position.y // d
   //
   // let x1 = 3, //a
   //     y1 = 3, //b
   //     x2 = 6, //c
   //     y2 = 3; //d
 
-  let r1 = arc1.geometry.parameters.radius;
-  let r2 = arc2.geometry.parameters.radius;
+  let r1 = arc1.geometry.parameters.radius
+  let r2 = arc2.geometry.parameters.radius
 
   // let a = 3, b = 3, c = 6, d = 3;
   // let r1 = 3, r2 = 3;
 
   // Distance between two circles centers
-  let D = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  let D = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
 
   // Conditions for intersection between two circles
   if (D < r1 + r2 && D > Math.abs(r1 - r2)) {
-    //intersection of two circles
+    // intersection of two circles
 
-    //intersection coordinates
-    let z = Math.sqrt((D + r1 + r2) * (D + r1 - r2) * (D - r1 + r2) * (-D + r1 + r2)) / 4;
+    // intersection coordinates
+    let z = Math.sqrt((D + r1 + r2) * (D + r1 - r2) * (D - r1 + r2) * (-D + r1 + r2)) / 4
 
     let intersectPoint1 = new THREE.Vector3(
       (x1 + x2) / 2 + ((x2 - x1) * (r1 * r1 - r2 * r2)) / (2 * D * D) + 2 * z * (y1 - y2) / (D * D),
       (y1 + y2) / 2 + ((y2 - y1) * (r1 * r1 - r2 * r2)) / (2 * D * D) - 2 * z * (x1 - x2) / (D * D),
       0
-    );
+    )
 
     let intersectPoint2 = new THREE.Vector3(
       (x1 + x2) / 2 + ((x2 - x1) * (r1 * r1 - r2 * r2)) / (2 * D * D) - 2 * z * (y1 - y2) / (D * D),
       (y1 + y2) / 2 + ((y2 - y1) * (r1 * r1 - r2 * r2)) / (2 * D * D) + 2 * z * (x1 - x2) / (D * D),
       0
-    );
+    )
 
     // let angle = circleIntersectionAngle(intersectPoint1, arc1.position, r1);
     // console.log({angle}, angle/ Math.PI * 180);
 
-    let arc1angle1 = circleIntersectionAngle(intersectPoint1, arc1.position, r1);
-    let arc1angle2 = circleIntersectionAngle(intersectPoint2, arc1.position, r1);
-    let arc2angle1 = circleIntersectionAngle(intersectPoint1, arc2.position, r2);
-    let arc2angle2 = circleIntersectionAngle(intersectPoint2, arc2.position, r2);
+    let arc1angle1 = circleIntersectionAngle(intersectPoint1, arc1.position, r1)
+    let arc1angle2 = circleIntersectionAngle(intersectPoint2, arc1.position, r1)
+    let arc2angle1 = circleIntersectionAngle(intersectPoint1, arc2.position, r2)
+    let arc2angle2 = circleIntersectionAngle(intersectPoint2, arc2.position, r2)
 
-    //fix problem when thetaStart + thetaLength > 2pi AND arcAngle < thetastart
+    // fix problem when thetaStart + thetaLength > 2pi AND arcAngle < thetastart
     if (arc1.geometry.parameters.thetaStart + arc1.geometry.parameters.thetaLength > Math.PI * 2) {
       if (arc1.geometry.parameters.thetaStart > arc1angle1) {
-        arc1angle1 += Math.PI * 2;
+        arc1angle1 += Math.PI * 2
       }
       if (arc1.geometry.parameters.thetaStart > arc1angle2) {
-        arc1angle2 += Math.PI * 2;
+        arc1angle2 += Math.PI * 2
       }
     }
 
     if (arc2.geometry.parameters.thetaStart + arc2.geometry.parameters.thetaLength > Math.PI * 2) {
       if (arc2.geometry.parameters.thetaStart > arc2angle1) {
-        arc2angle1 += Math.PI * 2;
+        arc2angle1 += Math.PI * 2
       }
       if (arc2.geometry.parameters.thetaStart > arc2angle2) {
-        arc2angle2 += Math.PI * 2;
+        arc2angle2 += Math.PI * 2
       }
     }
-
 
     if (
       arc1angle1 >= arc1.geometry.parameters.thetaStart && arc1angle1 <= arc1.geometry.parameters.thetaStart + arc1.geometry.parameters.thetaLength &&
@@ -791,7 +763,7 @@ let arcsIntersect = (arc1, arc2) => {
         arc2: arc2,
         arc1angle: arc1angle1,
         arc2angle: arc2angle1
-      };
+      }
     }
 
     if (
@@ -805,56 +777,54 @@ let arcsIntersect = (arc1, arc2) => {
         arc2: arc2,
         arc1angle: arc1angle2,
         arc2angle: arc2angle2
-      };
+      }
       // alert('intersection of arcs!!!');
     }
-
   } else if (D === r1 + r2 || Math.abs(r1 - r2) === D) {
-    console.warn('Two circles tangency');
+    console.warn('Two circles tangency')
 
     // let x = ((a-c) * (r1*r1-r2*r2)) / (2*(Math.pow(c-a,2)+ Math.pow(d-b,2))) - (a + c) / 2;
 
     // let x = ((a - c) * (r1 * r1 - r2 * r2)) / (2 * (Math.pow(c - a, 2) + Math.pow(d - b, 2))) - (a + c) / 2;
     // let y = ((b - d) * (r1 * r1 - r2 * r2)) / (2 * (Math.pow(c - a, 2) + Math.pow(d - b, 2))) - (d + b) / 2;
     // console.log({x, y});
-    //TODO handle arcs tagnency
-    alert('arcs tagnency. How to handle?')
-    //calculate tangency point
+    // TODO handle arcs tagnency
+    window.alert('arcs tagnency. How to handle?')
+    // calculate tangency point
   } else {
     // console.warn('no intersection');
-    return false;
+    return false
   }
 }
 
 let getVertices = entities => {
-  let vertices = [];
+  let vertices = []
   entities.forEach(entity => {
     if (entity.geometry instanceof THREE.CircleGeometry) {
-      //arc
+      // arc
 
-      let vertice = new THREE.Vector3(0, 0, 0);
-      vertice.parent = entity;
-      vertices.push(vertice.addVectors(entity.geometry.vertices[0], entity.position));
+      let vertice = new THREE.Vector3(0, 0, 0)
+      vertice.parent = entity
+      vertices.push(vertice.addVectors(entity.geometry.vertices[0], entity.position))
 
-      vertice = new THREE.Vector3(0, 0, 0);
-      vertice.parent = entity;
-      vertices.push(vertice.addVectors(entity.geometry.vertices[entity.geometry.vertices.length - 1], entity.position));
-
+      vertice = new THREE.Vector3(0, 0, 0)
+      vertice.parent = entity
+      vertices.push(vertice.addVectors(entity.geometry.vertices[entity.geometry.vertices.length - 1], entity.position))
     } else {
-      //line
-      let src = entity.geometry.vertices[0];
+      // line
+      let src = entity.geometry.vertices[0]
 
-      let vertice = new THREE.Vector3(src.x, src.y, 0);
-      vertice.parent = entity;
-      vertices.push(vertice);
+      let vertice = new THREE.Vector3(src.x, src.y, 0)
+      vertice.parent = entity
+      vertices.push(vertice)
 
-      src = entity.geometry.vertices[1];
-      vertice = new THREE.Vector3(src.x, src.y, 0);
-      vertice.parent = entity;
-      vertices.push(vertice);
+      src = entity.geometry.vertices[1]
+      vertice = new THREE.Vector3(src.x, src.y, 0)
+      vertice.parent = entity
+      vertices.push(vertice)
     }
-  });
-  return vertices;
+  })
+  return vertices
 }
 
 let distanceToLine = (vertex, line) => {
@@ -998,13 +968,13 @@ function distanceToLineSegment (lx1, ly1, lx2, ly2, px, py) {
 
 let distanceToEntity = (vertex, entity) => {
   if (entity.geometry instanceof THREE.CircleGeometry) {
-    //get distance to arc
-    return distanceToArc(vertex, entity);
+    // get distance to arc
+    return distanceToArc(vertex, entity)
   } else {
-    //get distance to line
-    let v0 = entity.geometry.vertices[0];
-    let v1 = entity.geometry.vertices[entity.geometry.vertices.length - 1];
-    return distanceToLineSegment(v0.x, v0.y, v1.x, v1.y, vertex.x, vertex.y);
+    // get distance to line
+    let v0 = entity.geometry.vertices[0]
+    let v1 = entity.geometry.vertices[entity.geometry.vertices.length - 1]
+    return distanceToLineSegment(v0.x, v0.y, v1.x, v1.y, vertex.x, vertex.y)
   }
 }
 
@@ -1237,14 +1207,14 @@ let isBoundingBoxesCollide = (boundingBox1, boundingBox2, threshold = 0.000001) 
     pointInBox({x: boundingBox2.x1, y: boundingBox2.y2}, boundingBox1, threshold) ||
     pointInBox({x: boundingBox2.x2, y: boundingBox2.y1}, boundingBox1, threshold) ||
     pointInBox({x: boundingBox2.x2, y: boundingBox2.y2}, boundingBox1, threshold)
-  );
+  )
 }
 
 let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001) => {
   if (!(entity1.geometry instanceof THREE.CircleGeometry) && !(entity2.geometry instanceof THREE.CircleGeometry)) {
-    //line to line
+    // line to line
 
-    let intersectionResult = linesIntersect(entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1], true);
+    let intersectionResult = linesIntersect(entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1], true)
 
     if (intersectionResult.isIntersects || intersectionResult.distance < threshold) {
       return {
@@ -1255,29 +1225,26 @@ let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001) => {
         ids: [entity1.id, entity2.id]
       }
     }
-
-
   } else if (entity1.geometry instanceof THREE.CircleGeometry && entity2.geometry instanceof THREE.CircleGeometry) {
-    //arc to arc
+    // arc to arc
 
     // console.count('ARC TO ARC check');
 
-    let intersectionResult = arcsIntersect(entity1, entity2);
+    let intersectionResult = arcsIntersect(entity1, entity2)
     if (intersectionResult) {
       // debugger;
 
-      let arc1v1 = new THREE.Vector3(0, 0, 0);
-      arc1v1.addVectors(intersectionResult.arc1.geometry.vertices[0], intersectionResult.arc1.position);
+      let arc1v1 = new THREE.Vector3(0, 0, 0)
+      arc1v1.addVectors(intersectionResult.arc1.geometry.vertices[0], intersectionResult.arc1.position)
 
-      let arc1v2 = new THREE.Vector3(0, 0, 0);
-      arc1v2.addVectors(intersectionResult.arc1.geometry.vertices[intersectionResult.arc1.geometry.vertices.length - 1], intersectionResult.arc1.position);
+      let arc1v2 = new THREE.Vector3(0, 0, 0)
+      arc1v2.addVectors(intersectionResult.arc1.geometry.vertices[intersectionResult.arc1.geometry.vertices.length - 1], intersectionResult.arc1.position)
 
-      let arc2v1 = new THREE.Vector3(0, 0, 0);
-      arc2v1.addVectors(intersectionResult.arc2.geometry.vertices[0], intersectionResult.arc2.position);
+      let arc2v1 = new THREE.Vector3(0, 0, 0)
+      arc2v1.addVectors(intersectionResult.arc2.geometry.vertices[0], intersectionResult.arc2.position)
 
-      let arc2v2 = new THREE.Vector3(0, 0, 0);
-      arc2v2.addVectors(intersectionResult.arc2.geometry.vertices[intersectionResult.arc2.geometry.vertices.length - 1], intersectionResult.arc2.position);
-
+      let arc2v2 = new THREE.Vector3(0, 0, 0)
+      arc2v2.addVectors(intersectionResult.arc2.geometry.vertices[intersectionResult.arc2.geometry.vertices.length - 1], intersectionResult.arc2.position)
 
       if (
         arc1v1.distanceTo(intersectionResult.intersectPoint) > threshold &&
@@ -1286,7 +1253,6 @@ let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001) => {
         arc2v2.distanceTo(intersectionResult.intersectPoint) > threshold
       ) {
         // console.warn('INTERSECTION!', intersectionResult);
-
 
         return {
           isIntersects: true,
@@ -1299,21 +1265,21 @@ let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001) => {
       }
     }
   } else {
-    //line to arc
+    // line to arc
 
-    let arc, line;
+    let arc, line
 
     if (entity1.geometry instanceof THREE.CircleGeometry) {
-      arc = entity1;
-      line = entity2;
+      arc = entity1
+      line = entity2
     } else {
-      arc = entity2;
-      line = entity1;
+      arc = entity2
+      line = entity1
     }
 
-    let intersectionResult = lineArcIntersect(line, arc, threshold);
+    let intersectionResult = lineArcIntersect(line, arc, threshold)
     if (intersectionResult) {
-      //possibly intersection. check for threshold
+      // possibly intersection. check for threshold
 
       // console.warn('INTERSECTION', arc, line);
 
@@ -1330,236 +1296,231 @@ let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001) => {
     // console.count('LINE TO ARC check');
   }
 
-  return false;
+  return false
 }
 
 let filterCollisionPoints = (collisionPoints, threshold = 0.000001) => {
-  let goodCp = [];
+  let goodCp = []
 
   collisionPoints.forEach(collisionPoint => {
     collisionPoint.entities.forEach(entity => {
       for (let isLast = 0; isLast <= 1; isLast++) {
-        //only first and last vertex need
-        let vertex = fixArcVertex(entity.geometry.vertices[(entity.geometry.vertices.length - 1) * isLast], entity);
+        // only first and last vertex need
+        let vertex = fixArcVertex(entity.geometry.vertices[(entity.geometry.vertices.length - 1) * isLast], entity)
 
         if (getDistance(vertex, collisionPoint.point) < threshold) {
-          continue;
+          continue
         }
 
-        let isGood = true;
+        let isGood = true
 
         // console.log({entity});
         // debugger;
 
-        let objOuterEntities = [];
+        let objOuterEntities = []
         collisionPoint.entities.forEach(entityToCheck => {
           if (entityToCheck === entity) {
-            return;
+            return
           }
 
           if (entityToCheck.parent && entityToCheck.parent.userData && entityToCheck.parent.userData.edgeModel) {
             entityToCheck.parent.userData.edgeModel.regions[0].path.forEach(vertex => {
               if (!objOuterEntities.includes(vertex.parent)) {
-                objOuterEntities.push(vertex.parent);
+                objOuterEntities.push(vertex.parent)
               }
-            });
+            })
           } else {
-            console.error('bad container');
+            console.error('bad container')
           }
-        });
+        })
 
         objOuterEntities.forEach(entityToCheck => {
           if (distanceToEntity(vertex, entityToCheck) < threshold) {
-            isGood = false;
+            isGood = false
           }
-        });
+        })
 
         if (isGood) {
           if (!goodCp.includes(collisionPoint)) {
-            goodCp.push(collisionPoint);
+            goodCp.push(collisionPoint)
           }
         }
       }
-    });
-  });
-  return goodCp;
+    })
+  })
+  return goodCp
 }
 
 let filterOverlappingCollisionPoints = (collisionPoints, threshold = 0.000001) => {
-  let uniqueCollisionPoints = [];
+  let uniqueCollisionPoints = []
 
   collisionPoints.forEach(collisionPoint => {
     try {
       uniqueCollisionPoints.forEach(uniqueCollisionPoint => {
         if (getDistance(collisionPoint.point, uniqueCollisionPoint.point) < threshold) {
-          throw new Error("point is overlapping")
+          throw new Error('point is overlapping')
         }
-      });
-      //if no-throw, then cp is unique
-      uniqueCollisionPoints.push(collisionPoint);
+      })
+      // if no-throw, then cp is unique
+      uniqueCollisionPoints.push(collisionPoint)
     } catch (e) {
-      //point is overlapping
+      // point is overlapping
     }
-  });
+  })
 
-  return uniqueCollisionPoints;
+  return uniqueCollisionPoints
 }
 
 let fixArcVertex = (vertex, entity) => {
   if (entity.geometry instanceof THREE.CircleGeometry) {
-    //arc
-    let v = new THREE.Vector3(0, 0, 0);
-    v.addVectors(vertex, entity.position);
-    vertex = v;
+    // arc
+    let v = new THREE.Vector3(0, 0, 0)
+    v.addVectors(vertex, entity.position)
+    vertex = v
   }
-  return vertex;
+  return vertex
 }
 
 let filterCollisionPointsWithSharedEntities = (collisionPoints, threshold = 0.000001) => {
-  let chunks = [];
+  let chunks = []
 
   collisionPoints.forEach(collisionPoint => {
     if (collisionPoint.inChunk) {
-      return;
+      return
     }
 
-    let chunk = [collisionPoint];
-    collisionPoint.inChunk = true;
+    let chunk = [collisionPoint]
+    collisionPoint.inChunk = true
 
-    //find collisionPoints with shared entities
+    // find collisionPoints with shared entities
     collisionPoints.forEach(checkCp => {
       if (checkCp.inChunk) {
-        return;
+        return
       }
 
-      //one of the entities shared (check if array intersects)
+      // one of the entities shared (check if array intersects)
       if (collisionPoint.entities.filter(n => checkCp.entities.includes(n)).length) {
-        chunk.push(checkCp);
-        checkCp.inChunk = true;
+        chunk.push(checkCp)
+        checkCp.inChunk = true
       }
-    });
-    chunks.push(chunk);
-  });
+    })
+    chunks.push(chunk)
+  })
   collisionPoints.forEach(collisionPoint => {
-    delete collisionPoint.inChunk;
-  });
+    delete collisionPoint.inChunk
+  })
 
-  let betterCollisionPoints = [];
+  let betterCollisionPoints = []
   chunks.forEach(chunk => {
     if (!chunk.length) {
-      return;
+      return
     }
 
     if (chunk.length === 1) {
-      betterCollisionPoints.push(chunk.pop());
-      return;
+      betterCollisionPoints.push(chunk.pop())
+      return
     }
 
     // chunk
 
-    //find shared entity
-    let sharedEntity = chunk[0].entities.find(en => chunk[1].entities.includes(en));
+    // find shared entity
+    let sharedEntity = chunk[0].entities.find(en => chunk[1].entities.includes(en))
 
-    //find which vertex of sharedEntity further from another object
-    let anotherObject = getParentObject(chunk[0].entities.find(en => en !== sharedEntity));
+    // find which vertex of sharedEntity further from another object
+    let anotherObject = getParentObject(chunk[0].entities.find(en => en !== sharedEntity))
 
-
-    let objOuterEntities = [];
+    let objOuterEntities = []
     anotherObject.userData.edgeModel.regions[0].path.forEach(vertex => {
       if (!objOuterEntities.includes(vertex.parent)) {
-        objOuterEntities.push(vertex.parent);
+        objOuterEntities.push(vertex.parent)
       }
-    });
+    })
 
-    let distances = [];
+    let distances = []
     for (let isLast = 0; isLast <= 1; isLast++) {
-      //only first and last vertex need
-      let vertex = fixArcVertex(sharedEntity.geometry.vertices[(sharedEntity.geometry.vertices.length - 1) * isLast], sharedEntity);
+      // only first and last vertex need
+      let vertex = fixArcVertex(sharedEntity.geometry.vertices[(sharedEntity.geometry.vertices.length - 1) * isLast], sharedEntity)
 
       distances.push({
         vertex,
         minDistance: 99999999999
-      });
+      })
 
       objOuterEntities.forEach(entityToCheck => {
-        let distance = distanceToEntity(vertex, entityToCheck);
+        let distance = distanceToEntity(vertex, entityToCheck)
         if (distance < distances[isLast].minDistance) {
           distances[isLast].minDistance = distance
         }
-      });
+      })
     }
 
-    //sort: further vertex first
+    // sort: further vertex first
     distances.sort((a, b) => {
-      return a.minDistance < b.minDistance;
-    });
-
+      return a.minDistance < b.minDistance
+    })
 
     // console.error({distances})
 
     distances.forEach(distance => {
       if (distance.minDistance > threshold) {
-        let furtherVertex = distance.vertex;
+        let furtherVertex = distance.vertex
 
-        //get nearest collisionPoint to further vertex (of shared entity)
-        let distancesToCollisionPoints = [];
+        // get nearest collisionPoint to further vertex (of shared entity)
+        let distancesToCollisionPoints = []
         chunk.forEach(collisionPoint => {
           distancesToCollisionPoints.push({
             collisionPoint,
             distance: getDistance(collisionPoint.point, furtherVertex)
-          });
-        });
+          })
+        })
 
-        //nearest first
+        // nearest first
         distancesToCollisionPoints.sort((a, b) => {
-          return a.distance > b.distance;
-        });
+          return a.distance > b.distance
+        })
 
         // console.error('distancesToCollisionPoints', distancesToCollisionPoints);
-        betterCollisionPoints.push(distancesToCollisionPoints[0].collisionPoint);
+        betterCollisionPoints.push(distancesToCollisionPoints[0].collisionPoint)
       }
     })
+  })
 
-
-
-  });
-
-  return betterCollisionPoints;
+  return betterCollisionPoints
 }
 
 let getParentObject = entity => {
-  if (entity.type === "Group") {
-    return entity;
+  if (entity.type === 'Group') {
+    return entity
   }
 
   if (entity.parent) {
-    return getParentObject(entity.parent);
+    return getParentObject(entity.parent)
   }
 
-  return undefined;
+  return undefined
 }
 
 let generateCollisionBranches = (collisionPoints, threshold) => {
-  let branches = [],
-    collisionMembers = [];
+  let branches = []
+  let collisionMembers = []
 
   collisionPoints.forEach(collisionPoint => {
     collisionPoint.entities.forEach(entity => {
       if (!collisionMembers.includes(entity)) {
-        collisionMembers.push(entity);
+        collisionMembers.push(entity)
       }
     })
-  });
+  })
 
   collisionPoints.forEach(collisionPoint => {
     branches.push({
       startPoint: collisionPoint,
       branches: getCollisionPointBranches(collisionPoint, collisionMembers, collisionPoints, threshold)
-    });
+    })
     // collisionPoint.processed = true;
-  });
+  })
 
-  return branches;
+  return branches
 }
 
 let getCollisionPointBranches = (collisionPoint, collisionMembers = [], collisionPoints = [], threshold, startEntity, currentObject, deep = 0, parentBranch = null) => {
@@ -1570,68 +1531,65 @@ let getCollisionPointBranches = (collisionPoint, collisionMembers = [], collisio
   }
 
   if (deep > 20) {
-    return [];
+    return []
   }
 
-  let currentStartEntity = collisionPoint.entities[0];
-  let startObject = getParentObject(currentStartEntity);
+  let currentStartEntity = collisionPoint.entities[0]
+  let startObject = getParentObject(currentStartEntity)
   if (currentObject === startObject) {
-    currentStartEntity = collisionPoint.entities[1];
-    startObject = getParentObject(currentStartEntity);
+    currentStartEntity = collisionPoint.entities[1]
+    startObject = getParentObject(currentStartEntity)
   }
 
   if (!startEntity) {
-    startEntity = currentStartEntity;
+    startEntity = currentStartEntity
   }
 
-  let branches = [];
+  let branches = []
 
-  //get nearest vertice in outer region (outer region always with index 0)
-  let path = startObject.userData.edgeModel.regions[0].path;
+  // get nearest vertice in outer region (outer region always with index 0)
+  let path = startObject.userData.edgeModel.regions[0].path
 
   for (let direction = 0; direction <= 1; direction++) {
     // debugger;
 
+    let iterator = vertexIterator(path, collisionPoint, direction)
 
-
-    let iterator = vertexIterator(path, collisionPoint, direction);
-
-    let branchPath = [];
-    let vertex = iterator.next();
+    let branchPath = []
+    let vertex = iterator.next()
     while (!vertex.done) {
       // console.log('VERTEX ITERATOR', vertex);
 
-      branchPath.push(vertex.value);
-
+      branchPath.push(vertex.value)
 
       if (collisionMembers.includes(vertex.value.parent)) {
         let nextCollisionPoint = ((collisionPoints, vertex) => {
           let nextCollisionPoints = collisionPoints.filter(cp => {
             return cp.entities.includes(vertex.parent)
-          });
+          })
           if (nextCollisionPoints.length === 1) {
-            return nextCollisionPoints.pop();
+            return nextCollisionPoints.pop()
           }
 
           let result = {
             collisionPoint: undefined,
             minDistance: undefined
-          };
+          }
 
           nextCollisionPoints.forEach(collisionPoint => {
-            let minDistance = collisionPoint.point.distanceTo(vertex);
+            let minDistance = collisionPoint.point.distanceTo(vertex)
             if (result.minDistance === undefined || minDistance < result.minDistance) {
               result = {
                 minDistance,
                 collisionPoint
               }
             }
-          });
+          })
 
-          return result.collisionPoint;
-        })(collisionPoints, vertex.value);
+          return result.collisionPoint
+        })(collisionPoints, vertex.value)
 
-        //if collision point is between 2 latest points in chain, then remove latest, and put collisionPoint coordinates instead
+        // if collision point is between 2 latest points in chain, then remove latest, and put collisionPoint coordinates instead
         if (nextCollisionPoint.entities.includes(startEntity)) {
           // console.log('LOOPED', nextCollisionPoint, startEntity);
 
@@ -1642,95 +1600,88 @@ let getCollisionPointBranches = (collisionPoint, collisionMembers = [], collisio
             path: branchPath,
             branches: [],
             parent: parentBranch
-          });
-          break;
+          })
+          break
         } else {
-          let tmpParentBranch = parentBranch;
+          let tmpParentBranch = parentBranch
 
           try {
             while (tmpParentBranch) {
               if (tmpParentBranch.collisionPoint === nextCollisionPoint) {
                 throw new Error('Collision point already in chain')
               }
-              tmpParentBranch = tmpParentBranch.parent;
+              tmpParentBranch = tmpParentBranch.parent
             }
-
 
             let branch = {
               collisionPoint: nextCollisionPoint,
               path: branchPath,
               // branches: 'getCollisionPointBranches(nextCollisionPoint, startEntity, deep + 1)',
               parent: parentBranch
-            };
-            branch.branches = getCollisionPointBranches(nextCollisionPoint, collisionMembers, collisionPoints, threshold, startEntity, startObject, deep + 1, branch);
+            }
+            branch.branches = getCollisionPointBranches(nextCollisionPoint, collisionMembers, collisionPoints, threshold, startEntity, startObject, deep + 1, branch)
 
-            branches.push(branch);
+            branches.push(branch)
           } catch (e) {
-            //point already in chain... skip
+            // point already in chain... skip
           }
-
         }
 
-        nextCollisionPoint.processed = true;
+        nextCollisionPoint.processed = true
 
         // nextCollisionPoints.forEach(nextCollisionPoint => {
         //     nextCollisionPoint.processed = true;
         // });
 
-        break;
+        break
       }
-      vertex = iterator.next();
+      vertex = iterator.next()
     }
   }
 
-  return branches;
+  return branches
 }
 
-let vertexIterator = function* iterator(path, collisionPoint, reverse = false, threshold = 0.000001)  {
+let vertexIterator = function * iterator (path, collisionPoint, reverse = false, threshold = 0.000001) {
   yield {
     // ...collisionPoint.point, // babel still not recognizes spread operator((
     x: collisionPoint.point.x,
     y: collisionPoint.point.y,
     z: collisionPoint.point.z,
     parent: null
-  };
-
+  }
 
   let startVertex = path.find(vertex => {
-    return collisionPoint.entities.includes(vertex.parent);
-  });
-  let previousEntity = startVertex.parent;
+    return collisionPoint.entities.includes(vertex.parent)
+  })
+  let previousEntity = startVertex.parent
 
-  let startIdx = path.indexOf(startVertex);
+  let startIdx = path.indexOf(startVertex)
   if (startIdx >= 0) {
-
     // debugger;
 
     for (let i = 1; i < path.length; i++) {
-      let vertex = path[getIdx(startIdx, i, reverse)];
-      let nextEntity = vertex.parent;
+      let vertex = path[getIdx(startIdx, i, reverse)]
+      let nextEntity = vertex.parent
       // debugger;
-      //get shared vertex
+      // get shared vertex
 
       if (nextEntity === previousEntity) {
-        yield vertex;
+        yield vertex
       } else {
-        let sharedVertex = getSharedVertex(previousEntity, nextEntity);
+        let sharedVertex = getSharedVertex(previousEntity, nextEntity)
         if (sharedVertex) {
           yield sharedVertex
         }
       }
 
-
-
-      previousEntity = nextEntity;
+      previousEntity = nextEntity
     }
   }
 
-
-  function getSharedVertex(entityPrev, entityNext) {
-    let [entityPrev1, entityPrev2] = getVertices([entityPrev]),
-      [entityNext1, entityNext2] = getVertices([entityNext]);
+  function getSharedVertex (entityPrev, entityNext) {
+    let [entityPrev1, entityPrev2] = getVertices([entityPrev])
+    let [entityNext1, entityNext2] = getVertices([entityNext])
 
     if (getDistance(entityNext1, entityPrev1) < threshold || getDistance(entityNext1, entityPrev2) < threshold) {
       return {
@@ -1748,70 +1699,69 @@ let vertexIterator = function* iterator(path, collisionPoint, reverse = false, t
       }
     }
 
-    return false;
+    return false
   }
 
-  function getIdx(startIdx, i, reverse) {
-    let idx;
+  function getIdx (startIdx, i, reverse) {
+    let idx
     if (reverse) {
-      idx = startIdx - i;
+      idx = startIdx - i
       if (idx < 0) {
-        idx = path.length + idx;
+        idx = path.length + idx
       }
     } else {
-      idx = (startIdx + i) % path.length;
+      idx = (startIdx + i) % path.length
     }
-    return idx;
+    return idx
   }
 }
 
-let queueIterator = function* iterator(queue = [])  {
-  let endQueue = [];
+let queueIterator = function * iterator (queue = []) {
+  let endQueue = []
 
   for (let item of queue) {
-    let addToEndQueue = yield item;
+    let addToEndQueue = yield item
     if (addToEndQueue) {
-      endQueue.push(addToEndQueue);
+      endQueue.push(addToEndQueue)
     }
   }
 
   for (let item of endQueue) {
-    yield item;
+    yield item
   }
 }
 
 let generateAllPaths = branches => {
-  function generatePaths(branch, branchId, startPoint, path = [], collisionPoints = []) {
+  function generatePaths (branch, branchId, startPoint, path = [], collisionPoints = []) {
     if (!startPoint) {
-      startPoint = branch.startPoint;
+      startPoint = branch.startPoint
     }
 
     if (branch.collisionPoint && !collisionPoints.includes(branch.collisionPoint)) {
-      collisionPoints.push(branch.collisionPoint);
+      collisionPoints.push(branch.collisionPoint)
     }
 
     branch.branches.forEach(childBranch => {
-      let nextPath = path.concat(childBranch.path);
+      let nextPath = path.concat(childBranch.path)
 
       if (childBranch.collisionPoint === startPoint) {
         paths.push({
           path: nextPath,
           branchId,
           collisionPoints: collisionPoints.concat([startPoint])
-        });
+        })
       } else {
-        generatePaths(childBranch, branchId, startPoint, nextPath, collisionPoints.concat([]));
+        generatePaths(childBranch, branchId, startPoint, nextPath, collisionPoints.concat([]))
       }
     })
-
   }
 
-  let paths = [];
+  let paths = []
   branches.forEach((branch, branchId) => {
     generatePaths(branch, branchId)
-  });
+  })
 
-  return paths;
+  return paths
 }
 
 let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavityArea = 1) => {
@@ -1820,54 +1770,52 @@ let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavity
     valid: false,
     needToCheckAgain: false,
     error: ''
-  };
+  }
 
-  let objects = [];
+  let objects = []
 
   // CameraUtils.previewPathInConsole(cavityToCheck.path);
 
   cavityToCheck.collisionPoints.forEach(collisionPoint => {
     collisionPoint.entities.forEach(entity => {
-      let object = getParentObject(entity);
+      let object = getParentObject(entity)
       if (!objects.includes(object)) {
-        objects.push(object);
+        objects.push(object)
       }
     })
-  });
+  })
 
   try {
-    ////////// if collision points has been already used, skip this path.
+    /// /////// if collision points has been already used, skip this path.
     if (cavityToCheck.collisionPoints.some(collisionPoint => usedCollisionPoints.includes(collisionPoint))) {
-      throw new Error('collision point already used in another cavity');
+      throw new Error('collision point already used in another cavity')
     }
 
     objects.forEach(object => {
       object.userData.edgeModel.regions.forEach((region, idx) => {
         if (idx) {
-          //inner regions
+          // inner regions
           region.path.forEach(vertex => {
             if (insidePolygon(cavityToCheck.path, vertex)) {
               throw new Error('inner region intersects with "cavity". bad cavity')
             }
-          });
+          })
         }
-      });
+      })
 
       // check if cavity intersects/contains object
-      //check if object's insidePoint lies on cavity
+      // check if object's insidePoint lies on cavity
       if (insidePolygon(cavityToCheck.path, object.userData.edgeModel.svgData.insidePoint)) {
         throw new Error(`object's insidePoint intersects with "cavity". probably, cavity covered region`)
       }
+    })
 
-    });
-
-
-    //this operation is slower, so it putted after check if inner region intersected to cavity
+    // this operation is slower, so it putted after check if inner region intersected to cavity
     if (selfIntersects(cavityToCheck.path)) {
       throw new Error('cavity has bad path (self intersects)')
     }
 
-    //check if cavity not too small
+    // check if cavity not too small
     if (!isEnoughVertices(cavityToCheck, threshold)) {
       throw new Error('bad cavity, a lot of same vertices. probably rounding error')
     }
@@ -1876,67 +1824,67 @@ let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavity
       // CameraUtils.previewPathInConsole(cavityToCheck.path);
       // console.warn('cavityToCheck (low area)', cavityToCheck, pathArea(cavityToCheck.path));
 
-      result.needToCheckAgain = true;
+      result.needToCheckAgain = true
       throw new Error('area to small, move this cavity to end of queue')
     }
 
-    result.valid = true;
+    result.valid = true
 
     // cavities.push(cavityToCheck);
     // usedCollisionPoints.push(...cavityToCheck.collisionPoints);
   } catch (e) {
     // e.getMessa
-    result.error = e.message;
-    //inner region intersects with 'cavity'. bad cavity
+    result.error = e.message
+    // inner region intersects with 'cavity'. bad cavity
   }
 
-  return result;
+  return result
 }
 
 let selfIntersects = (region, threshold = 0.000001) => {
   for (let segmentId = 0; segmentId < region.length; segmentId++) {
-    let segmentA = region[segmentId],
-      segmentB = region[(segmentId + 1) % region.length];
+    let segmentA = region[segmentId]
+    let segmentB = region[(segmentId + 1) % region.length]
 
     if (getDistance(segmentA, segmentB) < threshold) {
-      continue;
+      continue
     }
 
     for (let checkSegmentId = segmentId + 1; checkSegmentId < region.length; checkSegmentId++) {
-      let checkSegmentA = region[checkSegmentId],
-        checkSegmentB = region[(checkSegmentId + 1) % region.length];
+      let checkSegmentA = region[checkSegmentId]
+      let checkSegmentB = region[(checkSegmentId + 1) % region.length]
 
       if (getDistance(checkSegmentA, checkSegmentB) < threshold) {
-        continue;
+        continue
       }
 
       if (getDistance(segmentB, checkSegmentA) < threshold || getDistance(segmentA, checkSegmentB) < threshold) {
-        //one point of segment is close to another segment
-        continue;
+        // one point of segment is close to another segment
+        continue
       }
 
-      let intersectionResult = linesIntersect(segmentA, segmentB, checkSegmentA, checkSegmentB, true);
+      let intersectionResult = linesIntersect(segmentA, segmentB, checkSegmentA, checkSegmentB, true)
 
       if (intersectionResult.isIntersects) {
-        return true;
+        return true
       }
     }
   }
 
-  return false;
+  return false
 }
 
 let isEnoughVertices = (cavity, threshold) => {
-  let path = [];
+  let path = []
   cavity.path.forEach((v, idx) => {
-    let prevVertex = path.length ? path[path.length - 1] : cavity.path[cavity.path.length - 1];
-    let distance = getDistance(v, prevVertex);
+    let prevVertex = path.length ? path[path.length - 1] : cavity.path[cavity.path.length - 1]
+    let distance = getDistance(v, prevVertex)
     if (distance < threshold) {
       // if current and next vertices close to each other, than skip one of them
-      return false;
+      return false
     }
-    path.push(v);
-  });
+    path.push(v)
+  })
 
   // if (path.length >= 3) {
   //     console.log('CAVITY', cavity, cavity.path, path)
@@ -1945,23 +1893,22 @@ let isEnoughVertices = (cavity, threshold) => {
   // CameraUtils.previewPathInConsole(path);
   // console.warn('PATH AREA', pathArea(path))
 
-
   return path.length >= 3
 }
 
 let pathArea = path => {
-  let sumX = 0,
-    sumY = 0,
-    multipleIdx = 0;
+  let sumX = 0
+  let sumY = 0
+  let multipleIdx = 0
   for (let i = 0; i < path.length; i++) {
-    multipleIdx = i + 1;
+    multipleIdx = i + 1
     if (multipleIdx >= path.length) {
-      multipleIdx = 0;
+      multipleIdx = 0
     }
-    sumX += path[i].x * path[multipleIdx].y;
-    sumY += path[multipleIdx].x * path[i].y;
+    sumX += path[i].x * path[multipleIdx].y
+    sumY += path[multipleIdx].x * path[i].y
   }
-  return Math.abs((sumY - sumX) / 2);
+  return Math.abs((sumY - sumX) / 2)
 }
 
 export default {
@@ -1981,6 +1928,6 @@ export default {
   generateCollisionBranches,
   generateAllPaths,
   queueIterator,
-  checkCavity,
+  checkCavity
 
 }

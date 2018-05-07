@@ -1,5 +1,5 @@
 let msg = (msg) => {
-  alert(msg)
+  window.alert(msg)
 }
 
 export default {

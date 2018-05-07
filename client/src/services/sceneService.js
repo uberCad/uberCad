@@ -403,7 +403,7 @@ function * entityIterator (container, iterateContainers = false) {
 }
 
 let setPointOfInterest = (editor, object) => {
-  let STEPS_COUNT = 25
+  let stepsCount = 25
   let {camera} = editor
 
   console.log(editor)
@@ -419,7 +419,7 @@ let setPointOfInterest = (editor, object) => {
     object.geometry.computeBoundingSphere()
     pointOfInterests = object.geometry.boundingSphere.center
   }
-  let step = (new THREE.Vector3(0, 0, 0)).subVectors(pointOfInterests, camera.position).divideScalar(STEPS_COUNT)
+  let step = (new THREE.Vector3(0, 0, 0)).subVectors(pointOfInterests, camera.position).divideScalar(stepsCount)
 
   let radius = object.geometry.boundingSphere.radius
   let canvasDimension
@@ -428,14 +428,14 @@ let setPointOfInterest = (editor, object) => {
   } else {
     canvasDimension = camera.right
   }
-  let factor = Math.pow(radius / canvasDimension * 2, 1 / STEPS_COUNT)
+  let factor = Math.pow(radius / canvasDimension * 2, 1 / stepsCount)
 
-  let steps_left = STEPS_COUNT
+  let stepsLeft = stepsCount
 
   function animateCameraMove () {
-    steps_left--
-    if (steps_left > 0) {
-      requestAnimationFrame(animateCameraMove)
+    stepsLeft--
+    if (stepsLeft > 0) {
+      window.requestAnimationFrame(animateCameraMove)
     }
 
     step.z = 0
@@ -485,7 +485,6 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
       if (objectsContainer.name === 'Objects') {
         objectsContainer.children.forEach(object => {
           if (object.name === name) {
-
             let error = new Error(`Object with name "${name}" already exists`)
             error.userData = {
               error: 'duplicate name',
@@ -502,9 +501,9 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
           }
         })
 
-        //create object (entities container)
-        //move entities from layers to object
-        //render
+        // create object (entities container)
+        // move entities from layers to object
+        // render
 
         // object = new THREE.Object3D();
         object = new THREE.Group()
@@ -567,7 +566,7 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
         if (e.userData.data && e.userData.data.error) {
           switch (e.userData.data.error) {
             case 'interruption':
-              //show problem line
+              // show problem line
               console.error('show problem line', e)
 
               this.highlightEntities(entities, true)
@@ -582,7 +581,7 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
               break
 
             case 'intersection':
-              //show problem line
+              // show problem line
               console.error('show intersected lines', e)
 
               this.highlightEntities(entities, true)
@@ -598,7 +597,7 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
               break
 
             case 'unused entities':
-              //show unused entity
+              // show unused entity
               console.error('show unused entity', e)
               ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg)
 
@@ -639,13 +638,12 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
 
   render(editor)
   return object
-
 }
 
 let lastObjectName = ''
 let groupEntities = (editor, entities, objectName) => {
   if (!objectName) {
-    objectName = prompt('Set object name', lastObjectName)
+    objectName = window.prompt('Set object name', lastObjectName)
   }
 
   if (objectName) {
@@ -702,10 +700,10 @@ let combineEdgeModels = editor => {
     x: viewBox.x,
     y: viewBox.y,
     x2: +viewBox.x + +viewBox.width,
-    y2: +viewBox.y + +viewBox.height,
+    y2: +viewBox.y + +viewBox.height
   }
 
-  //width, height, x, y
+  // width, height, x, y
   objects.forEach(object => {
     let objViewBox = object.userData.edgeModel.svgData.viewBox
 
@@ -774,7 +772,6 @@ let combineEdgeModels = editor => {
     .filter(path => path.collisionPoints.length > 1)
     .sort((pathA, pathB) => pathA.collisionPoints.length - pathB.collisionPoints.length)
 
-
   // function shuffleArray(array) {
   //     for (let i = array.length - 1; i > 0; i--) {
   //         let j = Math.floor(Math.random() * (i + 1));
@@ -817,9 +814,9 @@ let combineEdgeModels = editor => {
       <constr id="Dummy" scale="1"></constr>
     </desc>
     <g id="group_d">${
-    objects.map(object => {
-      // console.log('SVG BUILDER', object);
-      return `<path d="${object.userData.edgeModel.svgData.pathD} " style="fill:rgb(200,240,200);stroke:black;stroke-width:0.00001">
+  objects.map(object => {
+    // console.log('SVG BUILDER', object);
+    return `<path d="${object.userData.edgeModel.svgData.pathD} " style="fill:rgb(200,240,200);stroke:black;stroke-width:0.00001">
                          <matprop type="const" id="O-1036" lambda="160" eps="0.9" density="2800"></matprop>
                          <area value="0.002" />
                        </path>
@@ -830,9 +827,8 @@ let combineEdgeModels = editor => {
                              <area value="0.01" />
                            </path>`
         }).join('')
-        
-    }).join('')
-    }
+  }).join('')
+}
   <g id="temperature">
 <bcprop id="External" x="-0.3606" y="-0.1793" temp="273.15" rs="0.04" rel_img="SvgjsImage1089" rel_id="0" rel="min"></bcprop>
 <bcprop id="External" x="-0.1796" y="-0.1793" temp="273.15" rs="0.04" rel_img="SvgjsImage1090" rel_id="1" rel="max"></bcprop>
@@ -841,42 +837,41 @@ let combineEdgeModels = editor => {
   </g>
   <g id="collisions">
     ${
-    collisionPoints.map(collisionPoint => {
-      let dot = ''
-      for (let i = 0; i <= collisionPoint.id; i++) {
-        // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
-      }
-      return `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(collisionPoint.point.y / 1000).toFixed(4)}" r="${collisionPoint.processed ? '0.0005' : '0.0005'}" style="fill:rgb(${collisionPoint.processed ? '255,200,200' : '200,200,255'}); stroke:black;stroke-width:0.00001" />` + dot
-    }).join('')
+  collisionPoints.map(collisionPoint => {
+    let dot = ''
+    for (let i = 0; i <= collisionPoint.id; i++) {
+      // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
     }
+    return `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(collisionPoint.point.y / 1000).toFixed(4)}" r="${collisionPoint.processed ? '0.0005' : '0.0005'}" style="fill:rgb(${collisionPoint.processed ? '255,200,200' : '200,200,255'}); stroke:black;stroke-width:0.00001" />` + dot
+  }).join('')
+}
   </g>
   <g id="cavities">
     ${
-    cavities.map(pathData => {
-      let path = pathData.path
-      // console.warn('PATH render', path, cavities.length);
-      // let circles = ''
+  cavities.map(pathData => {
+    let path = pathData.path
+    // console.warn('PATH render', path, cavities.length);
+    // let circles = ''
 
-      let vertexList = []
+    let vertexList = []
 
-      let last = path[path.length - 1]
-      let lastVertex = `${(last.x / 1000).toFixed(4)},${(last.y / 1000).toFixed(4)}`
-      let pathD = `M${lastVertex} L`
+    let last = path[path.length - 1]
+    let lastVertex = `${(last.x / 1000).toFixed(4)},${(last.y / 1000).toFixed(4)}`
+    let pathD = `M${lastVertex} L`
 
-      path.forEach(v => {
-        let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`
-        if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-          pathD += `${vertex} `
-          lastVertex = vertex
-          vertexList.push(vertex)
-        }
+    path.forEach(v => {
+      let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`
+      if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+        pathD += `${vertex} `
+        lastVertex = vertex
+        vertexList.push(vertex)
+      }
 
-        // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
-      })
-      return `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" />`
-
-    }).join('')
-    }
+      // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
+    })
+    return `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" />`
+  }).join('')
+}
   </g>
   </g>
   </svg>`
@@ -921,7 +916,6 @@ let combineEdgeModels = editor => {
     svg,
     viewBox
   }
-
 }
 
 export default {

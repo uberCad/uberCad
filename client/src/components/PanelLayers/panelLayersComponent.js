@@ -36,12 +36,12 @@ export default class PanelLayersComponent extends Component {
           {layers
             ? layers.children.filter(layer => layer.children.length).map((layer, idx) => (
               <div className='item'
-                   key={idx}
+                key={idx}
               >
                 <input type='checkbox' data-id={layer.id}
-                       title='Visibility'
-                       checked={layer.visible}
-                       onChange={this.onChangeVisible}
+                  title='Visibility'
+                  checked={layer.visible}
+                  onChange={this.onChangeVisible}
                 />
                 {layer.name}
                 <span>{layer.children.length}</span>
@@ -53,15 +53,15 @@ export default class PanelLayersComponent extends Component {
           }
         </div>
         <div className='toolbar'>
-          {/*{activeEntities.length > 1 && (*/}
-            {/*<button onClick={this.groupEntities}*/}
-                    {/*className="group"*/}
-                    {/*title="Group to object"*/}
-            {/*/>*/}
-          {/*)}*/}
+          {/* {activeEntities.length > 1 && ( */}
+          {/* <button onClick={this.groupEntities} */}
+          {/* className="group" */}
+          {/* title="Group to object" */}
+          {/* /> */}
+          {/* )} */}
           <button onClick={this.showAll}
-                  className="show-all"
-                  title="Show all"
+            className='show-all'
+            title='Show all'
           />
         </div>
       </div>
@@ -72,7 +72,7 @@ export default class PanelLayersComponent extends Component {
     editor: PropTypes.shape({
       scene: PropTypes.object,
       camera: PropTypes.object,
-      renderer: PropTypes.object,
+      renderer: PropTypes.object
     })
   }
 }
