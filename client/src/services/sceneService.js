@@ -215,11 +215,6 @@ let recursiveSelect = (object, editor) => {
 
   entities = GeometryUtils.skipZeroLines(entities, editor.options.threshold)
 
-  let area = GeometryUtils.calcArea(entities)
-  let lineLength = GeometryUtils.calcLength(entities)
-  let size = GeometryUtils.calcSize(entities)
-  console.log('object area: ' + area.toFixed(4) + '\nlength: ' + lineLength.toFixed(4) + '\nSize:\n\tWidth: ' + size.x.toFixed(4) + '\n\tHeight: ' + size.y.toFixed(4))
-
   return entities
 }
 
@@ -400,7 +395,10 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
 
         try {
           object.userData['edgeModel'] = GeometryUtils.buildEdgeModel({children: entities}, threshold)
-          ConsoleUtils.previewObjectInConsole(object)
+
+          // let size = GeometryUtils.calcSize(entities)
+          // console.log(`object area: ${GeometryUtils.calcArea(entities).toFixed(4)}\nLength: ${GeometryUtils.calcLength(entities).toFixed(4)}\nSize:\n\tWidth: ${size.x.toFixed(4)}\n\tHeight: ${size.y.toFixed(4)}`)
+          // ConsoleUtils.previewObjectInConsole(object)
         } catch (e) {
           console.warn('BUILD EDGE MODEL IN threeDXF')
           console.warn(e)
@@ -570,7 +568,7 @@ let getLayers = scene => {
 let combineEdgeModels = editor => {
   let {scene, options: {threshold}} = editor
   let objects = getObjects(scene, true)
-  // console.log('combineEdgeModels', scene, threshold, objects)
+  console.log('combineEdgeModels', scene, threshold, objects)
 
   if (!objects.length) {
     let error = new Error('No objects for edge-model')
@@ -599,22 +597,27 @@ let combineEdgeModels = editor => {
     box.y2 = Math.max(box.y2, +objViewBox.y + +objViewBox.height)
   })
 
+  //viewBox for SVG
   viewBox = {
     x: box.x,
     y: box.y,
     width: Math.abs(+box.x2 - +box.x),
     height: Math.abs(+box.y2 - +box.y)
   }
-
   let mul = 25 / Math.max(viewBox.width, viewBox.height)
 
   let collisionPoints = GeometryUtils.getCollisionPoints(objects, threshold)
+
+
 
   collisionPoints = GeometryUtils.filterOverlappingCollisionPoints(collisionPoints)
 
   collisionPoints = GeometryUtils.filterCollisionPoints(collisionPoints)
 
-  collisionPoints = GeometryUtils.filterCollisionPointsWithSharedEntities(collisionPoints)
+  // collisionPoints = GeometryUtils.filterCollisionPointsWithSharedEntities(collisionPoints)
+
+  console.error('collisionPoints', collisionPoints)
+
 
   let branches = GeometryUtils.generateCollisionBranches(collisionPoints, threshold)
 

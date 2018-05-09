@@ -478,12 +478,11 @@ let getCollisionPoints = (objects, threshold = 0.000001) => {
 
     // filter, to process collided objects once
     objects.filter((obj) => {
-      return !obj.userData.checkedIntersection &&
-        isBoundingBoxesCollide(
-          object.userData.edgeModel.regions[0].boundingBox,
-          obj.userData.edgeModel.regions[0].boundingBox,
-          threshold
-        )
+      return !obj.userData.checkedIntersection && isBoundingBoxesCollide(
+        object.userData.edgeModel.regions[0].boundingBox,
+        obj.userData.edgeModel.regions[0].boundingBox,
+        threshold
+      )
     }).forEach(obj => {
       // console.log('obj', obj);
       // check for intersections between object
@@ -500,11 +499,31 @@ let getCollisionPoints = (objects, threshold = 0.000001) => {
 
       // check for intersections
 
-      console.time('CHECK OBJECTS INTERSECTION')
+
 
       objectOuterEntities.forEach(entityObject => {
         objOuterEntities.forEach(entityObj => {
+
+
+
           let info = entitiesIntersectInfo(entityObject, entityObj, threshold)
+
+          let entitiesToCheck = [
+            // 265,
+            266,
+            // 267,
+            // 217,
+            218
+          ];
+
+          if (entitiesToCheck.includes(entityObject.id) && entitiesToCheck.includes(entityObj.id)) {
+            // console.log('check for intersections', entitiesIntersectInfo(entityObject, entityObj, threshold, true), entityObject.id, entityObj.id, threshold )
+            // info = entitiesIntersectInfo(entityObject, entityObj, threshold, true)
+          }
+
+
+
+
 
           if (info) {
             info.id = collisionPoints.length
@@ -516,6 +535,10 @@ let getCollisionPoints = (objects, threshold = 0.000001) => {
       // console.timeEnd('CHECK OBJECTS INTERSECTION');
     })
   })
+
+
+
+
 
   objects.forEach(object => {
     delete object.userData.checkedIntersection
@@ -1066,7 +1089,10 @@ function getAnotherVertex (entity, vertex) {
   return anotherVertex
 }
 
-let linesIntersect = (a, b, c, d, detailedResult = false) => {
+let linesIntersect = (a, b, c, d, detailedResult = false, debug = false) => {
+
+
+
   // https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
   // https://ideone.com/PnPJgb
   // https://github.com/pgkelley4/line-segments-intersect/blob/master/js/line-segments-intersect.js
@@ -1080,9 +1106,9 @@ let linesIntersect = (a, b, c, d, detailedResult = false) => {
   let CmPxs = CmP.x * s.y - CmP.y * s.x
   let rxs = r.x * s.y - r.y * s.x
 
-  // if (debug) {
-  //     debugger;
-  // }
+  if (debug) {
+    console.warn('linesIntersect', 'debug')
+  }
 
   if (CmPxr === 0 && CmPxs === 0) {
     // Lines are collinear, and so intersect if they have any overlap
@@ -1133,7 +1159,35 @@ let linesIntersect = (a, b, c, d, detailedResult = false) => {
 
   if (rxs === 0) {
     // Lines are parallel.
-    return false
+    // return false
+
+    if (!detailedResult) {
+      return false
+    }
+
+    //detailed result
+
+    let distances = [];
+    distances.push({point: a, distance: distanceToLine(a, {geometry: {vertices: [c, d]}})})
+    distances.push({point: b, distance: distanceToLine(b, {geometry: {vertices: [c, d]}})})
+    distances.push({point: c, distance: distanceToLine(c, {geometry: {vertices: [a, b]}})})
+    distances.push({point: d, distance: distanceToLine(d, {geometry: {vertices: [a, b]}})})
+
+    let minDistance = distances.sort((a, b) => a.distance > b.distance).find(() => true);
+
+    // console.error({
+    //   isIntersects: false,
+    //   point: minDistance.point,
+    //   distance: minDistance.distance,
+    //   collinear: true
+    // })
+
+    return {
+      isIntersects: false,
+      point: minDistance.point,
+      distance: minDistance.distance,
+      collinear: true
+    }
   }
 
   let rxsr = 1 / rxs
@@ -1219,11 +1273,18 @@ let isBoundingBoxesCollide = (boundingBox1, boundingBox2, threshold = 0.000001) 
   )
 }
 
-let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001) => {
+let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001, debug = false) => {
   if (!(entity1.geometry instanceof THREE.CircleGeometry) && !(entity2.geometry instanceof THREE.CircleGeometry)) {
     // line to line
 
-    let intersectionResult = linesIntersect(entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1], true)
+
+
+    let intersectionResult = linesIntersect(entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1], true, debug)
+
+    if (debug) {
+      console.log('entitiesIntersectInfo','line to line', intersectionResult)
+      console.log('linesIntersect problem???',entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1])
+    }
 
     if (intersectionResult.isIntersects || intersectionResult.distance < threshold) {
       return {

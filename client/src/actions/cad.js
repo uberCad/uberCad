@@ -24,33 +24,32 @@ export const drawDxf = (data, container) => {
    * init
    */
 
-  let editor = {scene, camera, renderer, cadCanvas, options: {threshold: 0.0001, selectMode: SELECT_MODE_NEW, singleLayerSelect: true}}
+  let editor = {scene, camera, renderer, cadCanvas, options: {threshold: 0.01, selectMode: SELECT_MODE_NEW, singleLayerSelect: true}}
 
   // 463, 316
 
   //
 
   let objectsDraft = [
-    [191],
-    [239],
+    // [191],
+    //[239],
 
-    // [316, 471, -1041],
-    // [370, 429],
-    //
-    // [650, 659],
-    // [544],
-    // [698],
-    // [1092, 1097, 1102],
-    // [1047, 1057, 1054],
+    //[316, 471, -1041],
+    //[370, 429],
 
-    // [284],
-    // [494],
-    // [741],
-    // [1025],
-    // [773, 825],
-    // [878, 960],
+    //[650, 659],
+    //[544],
+    //[698],
+    //[1092, 1097, 1102],
+    //[1047, 1057, 1054],
 
-    // [97, 92, 87],
+    //[284],
+    //[494],
+    //[741],
+    //[1025],
+    //[773, 825],
+    //[878, 960],
+    //[97, 92, 87],
     // [1040, -32, -33, -34],
     // [163, 173, 149],
     // [1041],
