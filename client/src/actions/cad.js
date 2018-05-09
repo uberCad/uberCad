@@ -32,7 +32,7 @@ export const drawDxf = (data, container) => {
 
   let objectsDraft = [
     // [191],
-    //[239],
+    // [239],
 
     //[316, 471, -1041],
     //[370, 429],
@@ -87,7 +87,9 @@ export const drawDxf = (data, container) => {
     frames.push(sceneService.groupEntities(editor, entities, `Frame${frameId + 1}`))
   })
 
-  sceneService.combineEdgeModels(editor)
+  if (frames.length) {
+    sceneService.combineEdgeModels(editor)
+  }
 
   return dispatch => dispatch({
     type: CAD_DRAW_DXF,
