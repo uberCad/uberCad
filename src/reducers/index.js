@@ -8,6 +8,7 @@ import toolbar from './toolbar'
 import options from './options'
 import selection from './selection'
 import sidebar from './sidebar'
+import userLogin from './userLogin'
 
 export default {
   counter,
@@ -19,5 +20,6 @@ export default {
   toolbar,
   options,
   selection,
-  sidebar
+  sidebar,
+  userLogin
 }

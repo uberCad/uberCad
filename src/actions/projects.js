@@ -1,4 +1,5 @@
 import { spinnerShow, spinnerHide } from './spinner'
+import Api from '../services/apiService'
 
 export const PROJECTS_INVALIDATE_FILTER = 'PROJECTS_INVALIDATE_FILTER'
 export const PROJECTS_FETCH_BEGIN = 'PROJECTS_FETCH_BEGIN'
@@ -39,25 +40,18 @@ export const receiveProjectsError = (filter, error) => ({
 const fetchProjects = filter => dispatch => {
   spinnerShow()(dispatch)
   dispatch(requestProjects(filter))
-  return fetch(`/api/projects/${filter}`)
-    .then(handleErrors)
-    .then(res => res.json())
-    .then(json => {
+
+  return Api.get(`/projects/${filter}`)
+    .then(res => {
       spinnerHide()(dispatch)
-      return dispatch(receiveProjects(filter, json.projects))
+      if (!res[0].error) {
+        return dispatch(receiveProjects(filter, res))
+      } else return null
     })
     .catch(error => {
       dispatch(receiveProjectsError(filter, error))
       spinnerHide()(dispatch)
     })
-}
-
-// Handle HTTP errors since fetch won't.
-function handleErrors (response) {
-  if (!response.ok) {
-    throw Error(response.statusText)
-  }
-  return response
 }
 
 export const fetchProjectsIfNeeded = (filter) => {

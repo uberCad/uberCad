@@ -7,6 +7,8 @@ import Spinner from './components/Spinner/spinnerComponentContainer'
 import Projects from './components/Projects/projectsComponentContainer'
 import Project from './components/Project/projectComponentContainer'
 import Cad from './components/Cad/cadComponentContainer'
+import UserLogin from './components/UserLogin/userLoginComponentContainer'
+import SignUp from './components/SignUp/signUpComponentContainer'
 import './App.css'
 
 class App extends Component {
@@ -19,7 +21,9 @@ class App extends Component {
             <Route path='/' exact component={Projects} />
             <Route path='/project/:id' component={Project} />
             <Route path='/cad/:id' component={Cad} />
-            {/* <Route path='/demo' component={Demo} /> */}
+            <Route path='/login/:sid?/:userName?' component={UserLogin} />
+            <Route path='/sign-up' component={SignUp} />
+
             <Route path='*' render={() => {
               return (
                 <Redirect to='/' />

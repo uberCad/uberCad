@@ -3,30 +3,42 @@ import axios from 'axios'
 
 export default class UserService {
   static isAuthenticated () {
-    return !!window.localStorage.userToken
+    return !!window.localStorage.sid
+  }
+  static updateSid (sid) {
+    axios.defaults.headers.common['X-Session-Id'] = sid
+    window.localStorage.setItem('sid', sid)
   }
 
-  static login (login, password) {
-    let headers = {}
-    headers['Authorization'] = 'Basic ' + window.btoa(login + ':' + password)
+  static login (username, password) {
+    return api.post(`/login`, {
+      data: {username, password}
+    }).then(res => {
+      this.updateSid(res.sid)
+      return res
+    })
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          return `User name or password is incorrect`
+        } else {
+          return error.message
+        }
+      })
+  }
 
+  static logout () {
     return new Promise(function (resolve, reject) {
-      api.post('users/login', { headers: headers })
+      api.post('/logout')
         .then((res) => {
-          axios.defaults.headers.common['x-code'] = res.user.token
-          window.localStorage.userToken = JSON.stringify(res.user.token)
-          window.localStorage.user = JSON.stringify(res.user)
-          resolve(res.user)
+          window.localStorage.clear()
+          axios.defaults.headers.common['X-Session-Id'] = ''
+          resolve(res)
         })
         .catch((error) => {
           reject(error)
         })
     })
-  }
 
-  static logout () {
-    window.localStorage.clear()
-    axios.defaults.headers.common['x-code'] = null
   }
 
   static changePassword (currentPassword, newPassword) {
@@ -52,24 +64,23 @@ export default class UserService {
   }
 
   static createUser (user) {
-    return new Promise((resolve, reject) => {
-      user.roles = ['ROLE_USER']
-      api.post('/super/users', {
-        data: user
-      })
-        .then((res) => {
-          api.put(`/users/${res.user.id}/tags/${user.tags}`)
-            .then((res) => {
-              resolve()
-            })
-            .catch((error) => {
-              reject(error)
-            })
-        })
-        .catch((error) => {
-          reject(error)
-        })
+    return api.post('/signup', {
+      data: user
     })
+      .then((res) => {
+        console.log('register res = ', res)
+        window.localStorage.setItem('sid', res.sid)
+        axios.defaults.headers.common['X-Session-Id'] = res.sid
+        return res
+      })
+      .catch((error) => {
+        console.log({...error})
+        if (error.response && error.response.data && error.response.data.errorMessage) {
+          return error.response.data.errorMessage
+        } else {
+          return error.message
+        }
+      })
   }
 
   static getUsersList () {
@@ -109,7 +120,7 @@ export default class UserService {
 
   static editUser (user) {
     return new Promise((resolve, reject) => {
-      let data = { first_name: user.first_name, email: user.email }
+      let data = {first_name: user.first_name, email: user.email}
       if (user.password) {
         data.password = user.password
       }
@@ -119,7 +130,7 @@ export default class UserService {
       if (user.last_name) {
         data.last_name = user.last_name
       }
-      api.put(`/users/${user.id}`, { data: data })
+      api.put(`/users/${user.id}`, {data: data})
         .then((res) => {
           if (typeof user.tags === 'object') {
             let tags = ''

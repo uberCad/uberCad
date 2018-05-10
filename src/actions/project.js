@@ -1,4 +1,5 @@
 import { spinnerShow, spinnerHide } from './spinner'
+import Api from '../services/apiService'
 
 export const PROJECT_FETCH_BEGIN = 'PROJECT_FETCH_BEGIN'
 export const PROJECT_FETCH_SUCCESS = 'PROJECT_FETCH_SUCCESS'
@@ -31,23 +32,13 @@ export const receiveProjectError = (id, error) => ({
 export const fetchProject = (id, preloadedProject) => dispatch => {
   dispatch(spinnerShow())
   dispatch(requestProject(id, preloadedProject))
-  return fetch(`/api/project/${id}`)
-    .then(handleErrors)
-    .then(res => res.json())
-    .then(json => {
+  return Api.get(`/project/${id}`)
+    .then(res => {
       dispatch(spinnerHide())
-      return dispatch(receiveProject(id, json.project))
+      return dispatch(receiveProject(id, res))
     })
     .catch(error => {
       dispatch(receiveProjectError(id, error))
       dispatch(spinnerHide())
     })
-}
-
-// Handle HTTP errors since fetch won't.
-function handleErrors (response) {
-  if (!response.ok) {
-    throw Error(response.statusText)
-  }
-  return response
 }

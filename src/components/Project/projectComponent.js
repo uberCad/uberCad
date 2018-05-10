@@ -26,8 +26,7 @@ export default class ProjectComponent extends Component {
         {JSON.stringify(project)}
         <p>Loading {loading ? 'true' : 'false'}</p>
         <p>Error {error ? 'true' : 'false'}</p>
-
-        {!loading && project && <Link to={`/cad/${project.id}`}>Open cad</Link>}
+        {!loading && project && <Link to={`/cad/${project._key}`}>Open cad</Link>}
       </div>
     )
   }

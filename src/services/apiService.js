@@ -3,8 +3,8 @@ import { API_HOST } from '../config'
 import UserService from './UserService'
 
 axios.defaults.baseURL = API_HOST
-if (window && window.localStorage.userToken) {
-  axios.defaults.headers.common['x-code'] = JSON.parse(window.localStorage.userToken)
+if (window && window.localStorage.sid) {
+  axios.defaults.headers.common['X-Session-Id'] = window.localStorage.sid
 }
 
 export default class ApiService {
