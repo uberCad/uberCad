@@ -27,7 +27,7 @@ export default class ProjectsListComponent extends Component {
                 <i className="fa fa-cubes fa-eye"/>
               </Col>
               <Col xs={3} className="table-data title">
-                <Link to={`/project/${project._key}`}>project: {project.title}</Link>
+                <Link to={`/project/${project._key}`}>{project.title}</Link>
                 <p>34 minutes ago hardcoded</p>
               </Col>
               <Col xs={2} className="table-data">

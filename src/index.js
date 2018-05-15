@@ -6,7 +6,6 @@ import {Router} from 'react-router-dom'
 import {Provider} from 'react-redux'
 import {PersistGate} from 'redux-persist/lib/integration/react'
 import history from './config/history'
-
 import configureStore from './configureStore'
 let { store, persistor } = configureStore()
 

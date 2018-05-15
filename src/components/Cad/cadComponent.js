@@ -19,11 +19,12 @@ export default class CadComponent extends Component {
   }
 
   componentDidMount () {
-    // const {id} = this.props.match.params
+    const {id} = this.props.match.params
     // const {preloadedProject} = this.props
 
     this.props.spinnerShow()
-    Api.get('file.dxf')
+    // Api.get('file.dxf')
+    Api.get(`project-file/${id}`)
       .then(data => {
         this.props.drawDxf(Dxf.parse(data), this.container)
         this.props.spinnerHide()

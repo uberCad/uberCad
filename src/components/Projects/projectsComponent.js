@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import ProjectsFilter from '../ProjectsFilter/projectsFilterComponentContainer'
 import ProjectsList from '../ProjectsList/projectsListComponentContainer'
+import AddProject from '../AddProject/addProjectComponentContainer'
 import './Projects.css'
 
 export default class ProjectsComponent extends Component {
@@ -36,6 +37,7 @@ export default class ProjectsComponent extends Component {
         <ProjectsFilter value={projectsFilter}
           onChange={this.handleChange}
           options={['all', 'shared', 'archive', '[some bad filter...]']} />
+        <AddProject />
         <p>
 
           {lastUpdated &&

@@ -111,8 +111,6 @@ export default class UserLoginComponent extends Component {
   handleChange = (event) => {
     const name = event.target.name
     const value = event.target.value
-    this.setState({
-      [name]: value
-    })
+    this.setState({[name]: value})
   }
 }

@@ -35,7 +35,7 @@ export const fetchProject = (id, preloadedProject) => dispatch => {
   return Api.get(`/project/${id}`)
     .then(res => {
       dispatch(spinnerHide())
-      return dispatch(receiveProject(id, res))
+      return dispatch(receiveProject(id, res[0]))
     })
     .catch(error => {
       dispatch(receiveProjectError(id, error))
