@@ -597,7 +597,7 @@ let combineEdgeModels = editor => {
     box.y2 = Math.max(box.y2, +objViewBox.y + +objViewBox.height)
   })
 
-  //viewBox for SVG
+  // viewBox for SVG
   viewBox = {
     x: box.x,
     y: box.y,
@@ -691,7 +691,8 @@ let combineEdgeModels = editor => {
 
   // debugger;
 
-  console.warn('PATHS', paths, branches, {cavities})
+  cavities.forEach(cavity => ConsoleUtils.previewPathInConsole(cavity.path))
+  console.warn('PATHS', paths, {branches}, {cavities})
 
   let svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${(viewBox.width * mul).toFixed(4)}cm" height="${(viewBox.height * mul).toFixed(4)}cm" viewBox="${viewBox.x.toFixed(4)} ${viewBox.y.toFixed(4)} ${viewBox.width.toFixed(4)} ${viewBox.height.toFixed(4)}">

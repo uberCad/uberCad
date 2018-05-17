@@ -51,10 +51,11 @@ export const drawDxf = (data = null, container, snapshot = null) => {
     //[773, 825],
     //[878, 960],
     //[97, 92, 87],
-    // [1040, -32, -33, -34],
-    // [163, 173, 149],
-    // [1041],
+    // // [1040, -32, -33, -34],
+    // // [163, 173, 149],
+    // // [1041],
 
+    // [650, 659], [698], [494], [1025], [773, 825], [878, 960], [97, 92, 87]
   ]
   let idsToFind = []
   objectsDraft.forEach(entityContainer => idsToFind.push(...entityContainer.map(id => Math.abs(id))))
