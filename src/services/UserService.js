@@ -1,5 +1,7 @@
 import api from './apiService'
 import axios from 'axios'
+import history from '../config/history'
+
 
 export default class UserService {
   static isAuthenticated () {
@@ -33,6 +35,7 @@ export default class UserService {
           window.localStorage.clear()
           axios.defaults.headers.common['X-Session-Id'] = ''
           resolve(res)
+          history.push('/login')
         })
         .catch((error) => {
           reject(error)

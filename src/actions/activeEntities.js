@@ -60,7 +60,7 @@ export const showAll = editor => {
 
 export const groupEntities = editor => {
   return dispatch => {
-    sceneService.groupEntities(editor)
+    sceneService.groupEntities(editor, editor.activeEntities)
 
     // dispatch({
     //   type: CAD_DO_SELECTION,

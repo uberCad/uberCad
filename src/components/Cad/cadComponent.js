@@ -48,8 +48,11 @@ export default class CadComponent extends Component {
 
   componentWillUnmount () {
     // this.stop()
-    this.container.removeChild(this.props.editor.renderer.domElement)
-    window.removeEventListener('resize', this.resizeWindow)
+    // if unauthorized user
+    if (this.props.editor.renderer) {
+      this.container.removeChild(this.props.editor.renderer.domElement)
+      window.removeEventListener('resize', this.resizeWindow)
+    }
   }
 
   render () {

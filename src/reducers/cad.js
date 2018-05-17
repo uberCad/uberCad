@@ -8,6 +8,10 @@ import {
   CAD_SHOW_ALL
 } from '../actions/cad'
 
+import {
+  SNAPSHOT_LOAD_SCENE
+} from '../actions/panelSnapshots'
+
 let initialState = {
   scene: null,
   camera: null,
@@ -27,6 +31,11 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+    case SNAPSHOT_LOAD_SCENE:
+      return {
+        ...state,
+        scene: action.payload.scene
+      }
     case CAD_DRAW_DXF:
       return {
         ...state,
