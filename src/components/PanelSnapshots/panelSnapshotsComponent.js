@@ -39,7 +39,7 @@ export default class PanelSnapshotsComponent extends Component {
   loadSnapshot = (event) => {
     event.stopPropagation()
     let {currentTarget: {dataset: {key}}} = event
-    this.props.loadSnapshot(key)
+    this.props.loadSnapshot(key, this.props.cadCanvas)
   }
 
   deleteSnapshot = (event) => {

@@ -1,12 +1,12 @@
 import { connect } from 'react-redux'
 import PanelSnapshotsComponent from './panelSnapshotsComponent'
-import { addSnapshot, deleteSnapshot, loadSnapshot} from '../../actions/panelSnapshots'
+import { addSnapshot, deleteSnapshot, loadSnapshot } from '../../actions/panelSnapshots'
 
 const mapStateToProps = (state, ownProps) => {
-  console.log('state= ', state)
   return {
     project: state.project.project,
     scene: state.cad.scene,
+    cadCanvas: state.cad.cadCanvas,
     ...ownProps
   }
 }
@@ -19,8 +19,8 @@ const mapDispatchToProps = (dispatch) => {
     deleteSnapshot: function (snapshotKey) {
       deleteSnapshot(snapshotKey)(dispatch)
     },
-    loadSnapshot: function (snapshotKey) {
-      loadSnapshot(snapshotKey)(dispatch)
+    loadSnapshot: function (snapshotKey, cadCanvas) {
+      loadSnapshot(snapshotKey, cadCanvas)(dispatch)
     }
   }
 }

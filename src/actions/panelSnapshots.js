@@ -1,5 +1,6 @@
 import snapshotService from '../services/snapshotService'
 import * as THREE from '../extend/THREE'
+import sceneService from '../services/sceneService'
 
 export const SNAPSHOT_ADD = 'SNAPSHOT_ADD'
 export const SNAPSHOT_LOAD_SCENE = 'SNAPSHOT_LOAD'
@@ -19,28 +20,14 @@ export const addSnapshot = (snapshot, projectKey) => {
   }
 }
 
-export const loadSnapshot = snapshotKey => {
-
+export const loadSnapshot = (snapshotKey, cadCanvas) => {
   return (dispatch) => {
     snapshotService.getSnapshotScene(snapshotKey)
-      .then(res => {
-
+      .then(sceneData => {
         let loader = new THREE.ObjectLoader()
-        const scene = loader.parse(JSON.parse(res))
-
-        scene.children.forEach(object => {
-          object.traverse(function (child) {
-            if (child.geometry instanceof THREE.CircleGeometry) {
-              //remove zero vertex from arc with coordinates (0,0,0) (points to center)
-              let zeroVertex = child.geometry.vertices[0]
-              if (!zeroVertex.x && !zeroVertex.y && !zeroVertex.z) {
-                child.geometry.vertices.shift()
-              }
-            }
-          })
-        })
-
-        console.log('scene', scene)
+        const scene = loader.parse(JSON.parse(sceneData))
+        sceneService.fixSceneAfterImport(scene)
+        cadCanvas.setScene(scene)
         dispatch({
           type: SNAPSHOT_LOAD_SCENE,
           payload: {

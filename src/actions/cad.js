@@ -13,8 +13,8 @@ export const CAD_TOGGLE_VISIBLE_LAYER = 'CAD_TOGGLE_VISIBLE_LAYER'
 export const CAD_SHOW_ALL = 'CAD_SHOW_ALL'
 export const CAD_COMBINE_EDGE_MODELS = 'CAD_COMBINE_EDGE_MODELS'
 
-export const drawDxf = (data, container) => {
-  let cadCanvas = new dxfService.Viewer(data, container)
+export const drawDxf = (data = null, container, snapshot = null) => {
+  let cadCanvas = new dxfService.Viewer(data, container, snapshot)
   let scene = cadCanvas.getScene()
   let camera = cadCanvas.getCamera()
   let renderer = cadCanvas.getRenderer()

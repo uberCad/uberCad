@@ -19,14 +19,16 @@ export default class CadComponent extends Component {
   }
 
   componentDidMount () {
-    const {id} = this.props.match.params
-    // const {preloadedProject} = this.props
-
+    const {projectId, snapshotId} = this.props.match.params
     this.props.spinnerShow()
-    // Api.get('file.dxf')
-    Api.get(`project-file/${id}`)
+
+    Api.get(snapshotId ? `snapshot/${snapshotId}` : `project-file/${projectId}`)
       .then(data => {
-        this.props.drawDxf(Dxf.parse(data), this.container)
+        if (snapshotId) {
+          this.props.drawDxf(null, this.container, data)
+        } else {
+          this.props.drawDxf(Dxf.parse(data), this.container)
+        }
         this.props.spinnerHide()
       })
       .catch(error => {

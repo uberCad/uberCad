@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { Row, Col } from 'react-bootstrap'
 
 export default class ProjectComponent extends Component {
   componentDidMount () {
@@ -21,12 +22,57 @@ export default class ProjectComponent extends Component {
     const {project, loading, error} = this.props
 
     return (
-      <div>
+      <div className='project-page'>
         <h1>Project:</h1>
-        {JSON.stringify(project)}
-        <p>Loading {loading ? 'true' : 'false'}</p>
-        <p>Error {error ? 'true' : 'false'}</p>
-        {!loading && project && <Link to={`/cad/${project._key}`}>Open cad</Link>}
+
+        <Row className='table-head'>
+          <Col xs={0} sm={1} className='table-head-name'/>
+          <Col xs={3} sm={3} className='hidden-sm-down table-head-name'>title</Col>
+          <Col xs={3} sm={2} className='hidden-sm-down table-head-name'>created by</Col>
+          <Col xs={2} sm={2} className='hidden-sm-down table-head-name'>rating<br/><span>price/efficiency</span></Col>
+          <Col xs={2} sm={2} className='hidden-sm-down table-head-name'>details</Col>
+          <Col xs={2} sm={2} className='hidden-sm-down table-head-name'>status</Col>
+        </Row>
+
+        {
+          project.snapshots.map((snapshot, i) =>
+            <Row key={i} className='table-row'>
+              <Col xs={1} className='table-data icon'>
+                <i className='fa fa-cubes fa-eye'/>
+              </Col>
+              <Col xs={3} className='table-data title'>
+                <Link to={`/cad/${project._key}/${snapshot._key}`}>{snapshot.title}</Link>
+                <p>34 minutes ago hardcoded</p>
+              </Col>
+              <Col xs={2} className='table-data'>
+                project - createdBy
+                <p>Project manager hardcoded</p>
+              </Col>
+
+              <Col xs={2} className='table-data'>rating...</Col>
+              <Col xs={2} className='table-data'>description...</Col>
+              <Col xs={1} className='table-data'>in progress</Col>
+            </Row>
+          )
+        }
+
+        <Row className='table-row'>
+          <Col xs={1} className='table-data icon'>
+            <i className='fa fa-cubes fa-eye'/>
+          </Col>
+          <Col xs={3} className='table-data title'>
+            <Link to={`/cad/${project._key}`}>{project.title}</Link>
+            <p>34 minutes ago hardcoded</p>
+          </Col>
+          <Col xs={2} className='table-data'>
+            project - createdBy
+            <p>Project manager hardcoded</p>
+          </Col>
+
+          <Col xs={2} className='table-data'>rating...</Col>
+          <Col xs={2} className='table-data'>description...</Col>
+          <Col xs={1} className='table-data'>in progress</Col>
+        </Row>
       </div>
     )
   }
