@@ -67,8 +67,8 @@ const mapDispatchToProps = (dispatch) => {
     //   parseDxf(dxf)(dispatch)
     // }
 
-    drawDxf: (data, container) => {
-      drawDxf(data, container)(dispatch)
+    drawDxf: (data = null, container, snapshot = null) => {
+      drawDxf(data, container, snapshot)(dispatch)
     },
 
     onClick: (event, editor) => {

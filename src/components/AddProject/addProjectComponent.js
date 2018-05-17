@@ -53,43 +53,43 @@ export default class AddProjectComponent extends Component {
         <Button bsStyle="primary" onClick={this.handleShow}>Add new Project</Button>
 
         <Modal show={this.state.show} onHide={this.handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Create new project</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <FormGroup
-                controlId="formControlsText"
-                validationState={this.getValidationState()}
-              >
-                <ControlLabel>Project title</ControlLabel>
-                <FormControl
-                  type="text"
-                  name="title"
-                  value={this.state.text}
-                  placeholder="Enter text"
-                  onChange={this.handleChange}
-                />
-                <FormControl.Feedback/>
-              </FormGroup>
+        <Modal.Header closeButton>
+          <Modal.Title>Create new project</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <FormGroup
+              controlId="formControlsText"
+              validationState={this.getValidationState()}
+            >
+              <ControlLabel>Project title</ControlLabel>
+              <FormControl
+                type="text"
+                name="title"
+                value={this.state.text}
+                placeholder="Enter text"
+                onChange={this.handleChange}
+              />
+              <FormControl.Feedback/>
+            </FormGroup>
 
-              <FormGroup controlId="formControlsFile">
-                <ControlLabel>File</ControlLabel>
-                <FormControl
-                  type="file"
-                  name="file"
-                  placeholder="Chose file ..."
-                  onChange={this.handleChange}
-                />
-                <FormControl.Feedback/>
-              </FormGroup>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={this.handleClose}>Close</Button>
-            <Button onClick={this.addProject}>Save</Button>
-          </Modal.Footer>
-        </Modal>
+            <FormGroup controlId="formControlsFile">
+              <ControlLabel>File</ControlLabel>
+              <FormControl
+                type="file"
+                name="file"
+                placeholder="Chose file ..."
+                onChange={this.handleChange}
+              />
+              <FormControl.Feedback/>
+            </FormGroup>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={this.handleClose}>Close</Button>
+          <Button onClick={this.addProject}>Save</Button>
+        </Modal.Footer>
+      </Modal>
       </div>
     )
   }

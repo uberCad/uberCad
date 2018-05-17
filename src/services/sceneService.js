@@ -805,6 +805,21 @@ let combineEdgeModels = editor => {
   }
 }
 
+let fixSceneAfterImport = scene => {
+  scene.children.forEach(object => {
+    object.traverse(function (child) {
+      if (child.geometry instanceof THREE.CircleGeometry) {
+        // remove zero vertex from arc with coordinates (0,0,0) (points to center)
+        let zeroVertex = child.geometry.vertices[0]
+        if (!zeroVertex.x && !zeroVertex.y && !zeroVertex.z) {
+          child.geometry.vertices.shift()
+        }
+      }
+    })
+  })
+  return scene
+}
+
 export default {
   onClick,
   doSelection,
@@ -819,7 +834,8 @@ export default {
   createObject,
   getObjects,
   getLayers,
-  combineEdgeModels
+  combineEdgeModels,
+  fixSceneAfterImport
 }
 
 function getOffset (elem) {

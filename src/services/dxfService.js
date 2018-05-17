@@ -1,5 +1,6 @@
 import DxfParser from 'dxf-parser'
 import * as THREE from '../extend/THREE'
+import sceneService from './sceneService'
 
 export default class DxfService {
   static parse (dxf) {
@@ -7,87 +8,95 @@ export default class DxfService {
     return parser.parseSync(dxf)
   }
 
-  static Viewer (data, container) {
-    createLineTypeShaders(data)
+  static Viewer (data = null, container, snapshot = null) {
+    let scene
+    if (data) {
+      createLineTypeShaders(data)
+      scene = new THREE.Scene()
 
-    let scene = new THREE.Scene()
+      let layers = {}
+      Object.keys(data.tables.layer.layers).forEach(layerName => {
+        layers[layerName] = new THREE.Object3D()
 
-    let layers = {}
-    Object.keys(data.tables.layer.layers).forEach(layerName => {
-      layers[layerName] = new THREE.Object3D()
+        layers[layerName].name = layerName
+        layers[layerName].userData['container'] = true
+      })
 
-      layers[layerName].name = layerName
-      layers[layerName].userData['container'] = true
-    })
+      // Create scene from dxf object (data)
+      let i
+      let entity
+      let obj
+      for (i = 0; i < data.entities.length; i++) {
+        entity = data.entities[i]
 
-    // Create scene from dxf object (data)
-    let i
-    let entity
-    let obj
+        if (entity.type === 'DIMENSION') {
+          if (entity.block) {
+            let block = data.blocks[entity.block]
+            if (!block) {
+              console.error('Missing referenced block "' + entity.block + '"')
+              continue
+            }
+            for (let j = 0; j < block.entities.length; j++) {
+              obj = drawEntity(block.entities[j], data)
+            }
+          } else {
+            console.log('WARNING: No block for DIMENSION entity')
+          }
+        } else {
+          obj = drawEntity(entity, data)
+        }
+
+        if (obj) {
+          if (Array.isArray(obj)) {
+            while (obj.length) {
+              let object = obj.pop()
+              layers[entity.layer].add(object)
+            }
+          } else {
+            layers[entity.layer].add(obj)
+          }
+          // scene.add(obj);
+        }
+        obj = null
+      }
+
+      let layersEntity = new THREE.Object3D()
+      layersEntity.name = 'Layers'
+      layersEntity.userData['container'] = true
+      scene.add(layersEntity)
+
+      let objectsEntity = new THREE.Object3D()
+      objectsEntity.name = 'Objects'
+      objectsEntity.userData['container'] = true
+      scene.add(objectsEntity)
+
+      let helpLayer = new THREE.Object3D()
+      helpLayer.name = 'HelpLayer'
+      helpLayer.userData['container'] = true
+      scene.add(helpLayer)
+
+      Object.keys(data.tables.layer.layers).forEach(layerName => {
+        layersEntity.add(layers[layerName])
+      })
+    }
+
+    if (snapshot) {
+      let loader = new THREE.ObjectLoader()
+      scene = loader.parse(JSON.parse(snapshot.scene))
+      sceneService.fixSceneAfterImport(scene)
+    }
+
     let dims = {
       min: {x: false, y: false, z: false},
       max: {x: false, y: false, z: false}
     }
-    for (i = 0; i < data.entities.length; i++) {
-      entity = data.entities[i]
-
-      if (entity.type === 'DIMENSION') {
-        if (entity.block) {
-          let block = data.blocks[entity.block]
-          if (!block) {
-            console.error('Missing referenced block "' + entity.block + '"')
-            continue
-          }
-          for (let j = 0; j < block.entities.length; j++) {
-            obj = drawEntity(block.entities[j], data)
-          }
-        } else {
-          console.log('WARNING: No block for DIMENSION entity')
-        }
-      } else {
-        obj = drawEntity(entity, data)
-      }
-
-      if (obj) {
-        let bbox = new THREE.Box3().setFromObject(obj)
-        if (bbox.min.x && ((dims.min.x === false) || (dims.min.x > bbox.min.x))) dims.min.x = bbox.min.x
-        if (bbox.min.y && ((dims.min.y === false) || (dims.min.y > bbox.min.y))) dims.min.y = bbox.min.y
-        if (bbox.min.z && ((dims.min.z === false) || (dims.min.z > bbox.min.z))) dims.min.z = bbox.min.z
-        if (bbox.max.x && ((dims.max.x === false) || (dims.max.x < bbox.max.x))) dims.max.x = bbox.max.x
-        if (bbox.max.y && ((dims.max.y === false) || (dims.max.y < bbox.max.y))) dims.max.y = bbox.max.y
-        if (bbox.max.z && ((dims.max.z === false) || (dims.max.z < bbox.max.z))) dims.max.z = bbox.max.z
-
-        if (Array.isArray(obj)) {
-          while (obj.length) {
-            let object = obj.pop()
-            layers[entity.layer].add(object)
-          }
-        } else {
-          layers[entity.layer].add(obj)
-        }
-        // scene.add(obj);
-      }
-      obj = null
-    }
-
-    let layersEntity = new THREE.Object3D()
-    layersEntity.name = 'Layers'
-    layersEntity.userData['container'] = true
-    scene.add(layersEntity)
-
-    let objectsEntity = new THREE.Object3D()
-    objectsEntity.name = 'Objects'
-    objectsEntity.userData['container'] = true
-    scene.add(objectsEntity)
-
-    let helpLayer = new THREE.Object3D()
-    helpLayer.name = 'HelpLayer'
-    helpLayer.userData['container'] = true
-    scene.add(helpLayer)
-
-    Object.keys(data.tables.layer.layers).forEach(layerName => {
-      layersEntity.add(layers[layerName])
-    })
+    let bbox = new THREE.Box3().setFromObject(scene)
+    if (bbox.min.x && ((dims.min.x === false) || (dims.min.x > bbox.min.x))) dims.min.x = bbox.min.x
+    if (bbox.min.y && ((dims.min.y === false) || (dims.min.y > bbox.min.y))) dims.min.y = bbox.min.y
+    if (bbox.min.z && ((dims.min.z === false) || (dims.min.z > bbox.min.z))) dims.min.z = bbox.min.z
+    if (bbox.max.x && ((dims.max.x === false) || (dims.max.x < bbox.max.x))) dims.max.x = bbox.max.x
+    if (bbox.max.y && ((dims.max.y === false) || (dims.max.y < bbox.max.y))) dims.max.y = bbox.max.y
+    if (bbox.max.z && ((dims.max.z === false) || (dims.max.z < bbox.max.z))) dims.max.z = bbox.max.z
 
     let width = container.clientWidth
     let height = container.clientHeight
@@ -624,6 +633,10 @@ export default class DxfService {
     }
 
     this.getScene = () => scene
+    this.setScene = newScene => {
+      scene = newScene
+      this.render()
+    }
     this.getCamera = () => camera
     this.getRenderer = () => renderer
   }

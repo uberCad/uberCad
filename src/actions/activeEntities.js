@@ -1,4 +1,4 @@
-import { CAD_TOGGLE_VISIBLE, CAD_DO_SELECTION, CAD_SHOW_ALL } from './cad'
+import { CAD_TOGGLE_VISIBLE, CAD_DO_SELECTION, CAD_SHOW_ALL, CAD_GROUP_ENTITIES } from './cad'
 import sceneService from '../services/sceneService'
 
 export const toggleVisible = (entity, visible, editor) => {
@@ -60,13 +60,14 @@ export const showAll = editor => {
 
 export const groupEntities = editor => {
   return dispatch => {
-    sceneService.groupEntities(editor, editor.activeEntities)
-
-    // dispatch({
-    //   type: CAD_DO_SELECTION,
-    //   payload: {
-    //     activeEntities: editor.activeEntities
-    //   }
-    // })
+    let object = sceneService.groupEntities(editor, editor.activeEntities)
+    if (object) {
+      dispatch({
+        type: CAD_GROUP_ENTITIES,
+        payload: {
+          object
+        }
+      })
+    }
   }
 }

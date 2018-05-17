@@ -4,6 +4,7 @@ import './Sidebar.css'
 import ActiveEntities from '../ActiveEntities/activeEntitiesComponentContainer'
 import PanelLayers from '../PanelLayers/panelLayersComponentContainer'
 import PanelObjects from '../PanelObjects/panelObjectsComponentContainer'
+import PanelSnapshots from '../PanelSnapshots/panelSnapshotsComponentContainer'
 
 export default class SidebarComponent extends Component {
   toggleSidebar = () => {
@@ -50,9 +51,9 @@ export default class SidebarComponent extends Component {
                     case 'PanelActiveEntities':
                       component = <ActiveEntities />
                       break
-                      // case 'PanelSnapshots':
-                      // component = <PanelSnapshots/>
-                      // break
+                    case 'PanelSnapshots':
+                      component = <PanelSnapshots />
+                      break
                     case 'PanelLayers':
                       component = <PanelLayers />
                       break

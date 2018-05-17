@@ -5,8 +5,13 @@ import {
   CAD_DO_SELECTION,
   CAD_TOGGLE_VISIBLE,
   CAD_TOGGLE_VISIBLE_LAYER,
-  CAD_SHOW_ALL
+  CAD_SHOW_ALL,
+  CAD_GROUP_ENTITIES
 } from '../actions/cad'
+
+import {
+  SNAPSHOT_LOAD_SCENE
+} from '../actions/panelSnapshots'
 
 let initialState = {
   scene: null,
@@ -27,6 +32,11 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+    case SNAPSHOT_LOAD_SCENE:
+      return {
+        ...state,
+        scene: action.payload.scene
+      }
     case CAD_DRAW_DXF:
       return {
         ...state,
@@ -45,6 +55,10 @@ const cad = (state = initialState, action) => {
       return update(state, {
         scene: {children: {$set: [...state.scene.children]}},
         activeEntities: {$set: [...state.activeEntities]}
+      })
+    case CAD_GROUP_ENTITIES:
+      return update(state, {
+        scene: {children: {$set: [...state.scene.children]}}
       })
     default:
       return state

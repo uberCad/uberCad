@@ -1,6 +1,6 @@
 @import "../../variables.scss";
 
-#activeEntities {
+#snapshots {
   height: 100%;
 
   .content {
@@ -53,10 +53,10 @@
         outline: none;
       }
 
-      &.group {
-        background: url("group.svg") no-repeat center transparent;
-        background-size: $sidebar-toolbar-size - 8px;
-      }
+      //&.group {
+      //  background: url("group.svg") no-repeat center transparent;
+      //  background-size: $sidebar-toolbar-size - 8px;
+      //}
 
       &.show-all {
         background: url("show-all.svg") no-repeat center transparent;
