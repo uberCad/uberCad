@@ -21,6 +21,10 @@ export default class OptionsComponent extends Component {
     this.props.setThreshold(value)
   }
 
+  cancelEdit = () => {
+    this.props.isEdit(!this.props.editMode.isEdit)
+  }
+
   render () {
     const {
       tool,
@@ -93,6 +97,7 @@ export default class OptionsComponent extends Component {
 
         {editMode.isEdit && (
           <ul className='list-group'>
+            <button onClick={this.cancelEdit}>Cancel edit mode</button>
             {/* <li> */}
             {/* <label>Edit object name: {editor.editMode.name}</label> */}
             {/* </li> */}
