@@ -42,7 +42,7 @@ const fetchProjects = filter => dispatch => {
   dispatch(requestProjects(filter))
 
   // return Api.get(`/projects/${filter}`)
-  return Api.get(`/projects-list`)
+  return Api.get(`/api/projects-list`)
     .then(res => {
       spinnerHide()(dispatch)
       if (!res[0].error) {

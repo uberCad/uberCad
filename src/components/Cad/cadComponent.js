@@ -22,7 +22,7 @@ export default class CadComponent extends Component {
     const {projectId, snapshotId} = this.props.match.params
     this.props.spinnerShow()
 
-    Api.get(snapshotId ? `snapshot/${snapshotId}` : `project-file/${projectId}`)
+    Api.get(snapshotId ? `/api/snapshot/${snapshotId}` : `/api/project-file/${projectId}`)
       .then(data => {
         if (snapshotId) {
           this.props.drawDxf(null, this.container, data)

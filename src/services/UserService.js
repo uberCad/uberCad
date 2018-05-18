@@ -13,7 +13,7 @@ export default class UserService {
   }
 
   static login (username, password) {
-    return api.post(`/login`, {
+    return api.post(`/auth/login`, {
       data: {username, password}
     }).then(res => {
       this.updateSid(res.sid)
@@ -30,7 +30,7 @@ export default class UserService {
 
   static logout () {
     return new Promise(function (resolve, reject) {
-      api.post('/logout')
+      api.post('/auth/logout')
         .then((res) => {
           window.localStorage.clear()
           axios.defaults.headers.common['X-Session-Id'] = ''
@@ -41,7 +41,6 @@ export default class UserService {
           reject(error)
         })
     })
-
   }
 
   static changePassword (currentPassword, newPassword) {
@@ -67,7 +66,7 @@ export default class UserService {
   }
 
   static createUser (user) {
-    return api.post('/signup', {
+    return api.post('/auth/signup', {
       data: user
     })
       .then((res) => {
