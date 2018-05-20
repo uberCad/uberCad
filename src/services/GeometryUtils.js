@@ -1865,7 +1865,7 @@ let generateAllPaths = branches => {
   return paths
 }
 
-let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavityArea = 0.1) => {
+let checkCavity = (cavityToCheck, usedCollisionPoints = [], threshold, minCavityArea = 0.02) => {
   let result = {
     cavity: cavityToCheck,
     valid: false,
