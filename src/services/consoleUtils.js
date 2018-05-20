@@ -1,4 +1,4 @@
-let previewInConsole = url => {
+let previewInConsole = (url, ...text) => {
   // Create a new `Image` instance
   let image = new window.Image()
 
@@ -18,13 +18,13 @@ let previewInConsole = url => {
       // Set image URL
       'background: url(' + url + ');'
     ].join(' ')
-    console.log('%c', style)
+    console.log('%c', style, ...text)
   }
   // Actually loads the image
   image.src = url
 }
 
-let previewObjectInConsole = object => {
+let previewObjectInConsole = (object, ...textData) => {
   let svg = `<?xml version="1.0" encoding="UTF-8"?>
                             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${object.userData.edgeModel.svgData.viewBox.width}m" height="${object.userData.edgeModel.svgData.viewBox.height}m" viewBox="${object.userData.edgeModel.svgData.viewBox.x} ${object.userData.edgeModel.svgData.viewBox.y} ${object.userData.edgeModel.svgData.viewBox.width} ${object.userData.edgeModel.svgData.viewBox.height}">
                             <desc>
@@ -47,10 +47,10 @@ let previewObjectInConsole = object => {
                             </g>
                             </svg>`
 
-  previewInConsole('data:image/svg+xml;base64,' + window.btoa(svg))
+  previewInConsole('data:image/svg+xml;base64,' + window.btoa(svg), ...textData)
 }
 
-let previewPathInConsole = (path, vertex) => {
+let previewPathInConsole = (path, vertex, ...textData) => {
   let minX = Math.min(...path.map(v => v.x))
   let minY = Math.min(...path.map(v => v.y))
   let width = Math.max(...path.map(v => v.x)) - minX
@@ -107,7 +107,7 @@ let previewPathInConsole = (path, vertex) => {
     ${ vertexData}
                             </g>
                             </svg>`
-  previewInConsole('data:image/svg+xml;base64,' + window.btoa(svg))
+  previewInConsole('data:image/svg+xml;base64,' + window.btoa(svg), ...textData)
 }
 
 export default {

@@ -560,13 +560,18 @@ let insidePolygon = (polygon = [], vertex) => {
     // with the line segment from 'polygon[i]' to 'polygon[next]'
     let intersectResult = linesIntersect(polygon[i], polygon[next], vertex, extreme)
     if (intersectResult.isIntersects) {
+      intersectResult.points.forEach(point => {
+        if (point.distance === 0) {
+          count++
+        }
+      })
+
       // If the point 'p' is colinear with line segment 'i-next',
       // then check if it lies on segment. If it lies, return true,
       // otherwise false
       if (intersectResult.type === 'collinear') {
         return true
       }
-      count++
     }
   }
 
@@ -1849,7 +1854,8 @@ let generateAllPaths = branches => {
         paths.push({
           path: nextPath,
           branchId,
-          collisionPoints: collisionPoints.concat([startPoint])
+          collisionPoints: collisionPoints.concat([startPoint]),
+          pathId: paths.length
         })
       } else {
         generatePaths(childBranch, branchId, startPoint, nextPath, collisionPoints.concat([]))
@@ -2193,5 +2199,6 @@ export default {
   calcArea,
   calcSize,
   vertexInArea,
-  entityIntersectArea
+  entityIntersectArea,
+  insidePolygon
 }

@@ -25,11 +25,15 @@ export const drawDxf = (data = null, container, snapshot = null) => {
    * init
    */
 
-  let editor = {scene, camera, renderer, cadCanvas, options: {threshold: 0.01, selectMode: SELECT_MODE_NEW, singleLayerSelect: true}}
+  let editor = {
+    scene,
+    camera,
+    renderer,
+    cadCanvas,
+    options: {threshold: 0.01, selectMode: SELECT_MODE_NEW, singleLayerSelect: true}
+  }
 
   // 463, 316
-
-  //
 
   let objectsDraft = [
     // [191],
