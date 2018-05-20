@@ -490,20 +490,7 @@ let getCollisionPoints = (objects, threshold = 0.000001) => {
 
       objectOuterEntities.forEach(entityObject => {
         objOuterEntities.forEach(entityObj => {
-          let info
-
-          let entitiesToCheck = [
-            261, 197
-          ]
-
-          if (entitiesToCheck.includes(entityObject.id) && entitiesToCheck.includes(entityObj.id)) {
-            // console.log('check for intersections', entitiesIntersectInfo(entityObject, entityObj, threshold, true), entityObject.id, entityObj.id, threshold )
-            info = entitiesIntersectInfo(entityObject, entityObj, threshold, true)
-            console.error('entitiesIntersectInfo RESULT', info)
-          } else {
-            info = entitiesIntersectInfo(entityObject, entityObj, threshold)
-          }
-
+          let info = entitiesIntersectInfo(entityObject, entityObj, threshold)
           if (info) {
             if (info.points) {
               // new result type
@@ -560,12 +547,11 @@ let insidePolygon = (polygon = [], vertex) => {
     // with the line segment from 'polygon[i]' to 'polygon[next]'
     let intersectResult = linesIntersect(polygon[i], polygon[next], vertex, extreme)
     if (intersectResult.isIntersects) {
-      intersectResult.points.forEach(point => {
+      for (let point of intersectResult.points) {
         if (point.distance === 0) {
           count++
         }
-      })
-
+      }
       // If the point 'p' is colinear with line segment 'i-next',
       // then check if it lies on segment. If it lies, return true,
       // otherwise false

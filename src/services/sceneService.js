@@ -568,7 +568,7 @@ let getLayers = scene => {
 let combineEdgeModels = editor => {
   let {scene, options: {threshold}} = editor
   let objects = getObjects(scene, true)
-  console.log('combineEdgeModels', scene, threshold, objects)
+  // console.log('combineEdgeModels', scene, threshold, objects)
 
   if (!objects.length) {
     let error = new Error('No objects for edge-model')
@@ -614,7 +614,7 @@ let combineEdgeModels = editor => {
 
   // collisionPoints = GeometryUtils.filterCollisionPointsWithSharedEntities(collisionPoints)
 
-  console.error('collisionPoints', collisionPoints)
+  // console.error('collisionPoints', collisionPoints)
 
   let branches = GeometryUtils.generateCollisionBranches(collisionPoints, threshold)
 
@@ -691,7 +691,7 @@ let combineEdgeModels = editor => {
 
   // debugger;
 
-  cavities.forEach(cavity => ConsoleUtils.previewPathInConsole(cavity.path))
+  cavities.forEach(cavity => ConsoleUtils.previewPathInConsole(cavity.path, null, cavity))
   console.warn('PATHS', paths, {branches}, {cavities})
 
   let svg = `<?xml version="1.0" encoding="UTF-8"?>
