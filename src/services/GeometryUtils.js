@@ -2163,6 +2163,53 @@ function entityIntersectArea (entity, area) {
   // alert('Unexpected geometry @ThreeDxf.entityIntersectArea()');
 }
 
+let angle = (p1, p2) => {
+  return Math.atan2(p2.y - p1.y, p2.x - p1.x)
+}
+
+let polar = (p1, phi, dist) => {
+  // This function (polar) returns the point at an angle (in radians) and distance from a given point
+  // http://www.afralisp.net/reference/autolisp-functions.php#P
+
+  let x = p1.x + dist * Math.cos(phi);
+  let y = p1.y + dist * Math.sin(phi);
+
+  return new THREE.Vector3(x, y, 0);
+}
+
+let bugleToArc = (p1, p2, bulge) => {
+  // http://www.afralisp.net/autolisp/tutorials/polyline-bulges-part-1.php
+  // https://github.com/vasnake/dwg2csv/blob/master/extra/autocad.bulge/convertbulge.py
+
+  let chord = getDistance(p1, p2);
+  let angleLength = Math.atan(bulge) * 4;
+  // height of the arc
+  let sagitta = chord / 2 * Math.abs(bulge);
+  let radius = (Math.pow(chord / 2, 2) + Math.pow(sagitta, 2)) / (2 * sagitta);
+
+  // let radius = 0;
+  // if (angleLength !== 0) {
+  //     radius = (chord/2.0) / Math.sin(Math.abs(angleLength/2.0))
+  // }
+
+  let theta = 4.0 * Math.atan(Math.abs(bulge));
+  let gamma = (Math.PI - theta) / 2.0;
+  let phi = angle(p1, p2) + gamma * Math.sign(bulge);
+  let center = polar(p1, phi, radius);
+  let startAngle = Math.acos(((p1.x - center.x) / radius).toFixed(10));
+  if (Math.sign(p1.y - center.y) < 0) {
+    startAngle = (2.0 * Math.PI) - startAngle;
+  }
+
+  return {
+    angleLength: angleLength,
+    center: center,
+    endAngle: startAngle + angleLength,
+    radius: radius,
+    startAngle: startAngle,
+  };
+}
+
 export default {
   distanceToLine,
   distanceToArc,
@@ -2186,5 +2233,6 @@ export default {
   calcSize,
   vertexInArea,
   entityIntersectArea,
-  insidePolygon
+  insidePolygon,
+  bugleToArc
 }

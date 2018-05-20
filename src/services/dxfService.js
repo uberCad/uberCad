@@ -1,6 +1,7 @@
 import DxfParser from 'dxf-parser'
 import * as THREE from '../extend/THREE'
 import sceneService from './sceneService'
+import GeometryUtils from './GeometryUtils'
 
 export default class DxfService {
   static parse (dxf) {
@@ -204,7 +205,10 @@ export default class DxfService {
       let mesh
       if (entity.type === 'CIRCLE' || entity.type === 'ARC') {
         mesh = drawCircle(entity, data)
-      } else if (entity.type === 'LWPOLYLINE' || entity.type === 'LINE' || entity.type === 'POLYLINE') {
+      } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
+        mesh = drawPolyLine(entity, data)
+        // mesh = drawLine(entity, data)
+      } else if (entity.type === 'LINE') {
         mesh = drawLine(entity, data)
       } else if (entity.type === 'TEXT') {
         mesh = drawText(entity, data)
@@ -354,6 +358,47 @@ export default class DxfService {
       let material = new THREE.LineBasicMaterial({linewidth: 1, color: color})
       // splineObject
       return new THREE.Line(geometry, material)
+    }
+
+    function drawPolyLine(entity, data) {
+      let vertices = entity.vertices;
+      let entities = [];
+
+      for(let i = 0; i < vertices.length; i++) {
+        let startPoint = vertices[i];
+        let endPoint = i + 1 < vertices.length ? vertices[i + 1] : vertices[0];
+
+        if(startPoint.bulge) {
+          //circle geometry
+
+          let p1 = new THREE.Vector3(startPoint.x, startPoint.y, 0),
+            p2 = new THREE.Vector3(endPoint.x, endPoint.y, 0);
+
+          let arc = GeometryUtils.bugleToArc(p1, p2, startPoint.bulge);
+
+          let subEntity = Object.assign({}, entity);
+          subEntity = Object.assign(subEntity, arc);
+          entities.push(drawCircle(Object.assign(subEntity, {
+            shape: false,
+            type: "ARC"
+          }), data));
+
+        } else {
+          //unfortunately babel not correctly works with spread operator
+          // entities.push(drawLine({...entity, vertices: [startPoint, endPoint]}, data));
+
+          let subEntity = Object.assign({}, entity);
+          entities.push(drawLine(Object.assign(subEntity, {
+            vertices: [
+              new THREE.Vector3(startPoint.x, startPoint.y, 0),
+              new THREE.Vector3(endPoint.x, endPoint.y, 0)
+            ],
+            shape: false
+          }), data));
+        }
+      }
+
+      return entities;
     }
 
     function drawLine (entity, data) {
@@ -531,6 +576,67 @@ export default class DxfService {
       }
 
       return group
+
+      // function drawBlock(entity, data, returnArray = false) {
+      //   let block = data.blocks[entity.name];
+      //
+      //   // console.log('drawBlock', entity, data, block);
+      //   let group = new THREE.Object3D()
+      //
+      //   if(entity.xScale) group.scale.x = entity.xScale;
+      //   if(entity.yScale) group.scale.y = entity.yScale;
+      //
+      //   for(let i = 0; i < block.entities.length; i++) {
+      //     let childEntity = drawEntity(block.entities[i], data, group);
+      //     if(childEntity) group.add(childEntity);
+      //   }
+      //
+      //   if(entity.rotation) {
+      //     group.rotation.z = entity.rotation * Math.PI / 180;
+      //
+      //     if (returnArray) {
+      //       //TODO implement entities rotation here
+      //
+      //       // group.children.forEach(children => {
+      //       //     if (children.geometry instanceof THREE.CircleGeometry) {
+      //       //         console.log('ch pos', children.position);
+      //       //     }
+      //       // })
+      //     }
+      //   }
+      //
+      //   if(entity.position) {
+      //     // console.log('POSITION', entity.position)
+      //     group.position.x = entity.position.x;
+      //     group.position.y = entity.position.y;
+      //     group.position.z = entity.position.z;
+      //
+      //     if (returnArray) {
+      //       group.children.forEach(children => {
+      //         if (children.geometry instanceof THREE.CircleGeometry) {
+      //           children.position.x += group.position.x;
+      //           children.position.y += group.position.y;
+      //           children.position.z += group.position.z;
+      //         } else {
+      //           children.geometry.vertices.forEach(v => {
+      //             v.x += group.position.x;
+      //             v.y += group.position.y;
+      //             v.z += group.position.z;
+      //           })
+      //         }
+      //
+      //
+      //       })
+      //     }
+      //
+      //   }
+      //
+      //   if (returnArray) {
+      //     return group.children;
+      //   }
+      //
+      //   return group;
+      // }
     }
 
     function getColor (entity, data) {
