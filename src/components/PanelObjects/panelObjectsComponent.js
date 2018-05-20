@@ -20,9 +20,19 @@ export default class PanelObjectsComponent extends Component {
     this.props.showAll(this.props.editor)
   }
 
-  shouldComponentUpdate (nextProps) {
-    return (this.props.editor.scene !== nextProps.editor.scene) ||
-      (nextProps.editor.scene && nextProps.editor.scene.children !== this.props.editor.scene.children)
+  // shouldComponentUpdate (nextProps) {
+  //   return (this.props.editor.scene !== nextProps.editor.scene) ||
+  //     (nextProps.editor.scene && nextProps.editor.scene.children !== this.props.editor.scene.children)
+  // }
+
+  edit = (event) => {
+    event.stopPropagation()
+    let {currentTarget: {dataset: {id}}} = event
+    const {scene} = this.props.editor
+    if (scene) {
+      let object = scene.getObjectById(parseInt(id, 10))
+      this.props.isEdit(!this.props.editor.isEdit, object)
+    }
   }
 
   render () {
@@ -48,6 +58,7 @@ export default class PanelObjectsComponent extends Component {
                   onChange={this.onChangeVisible}
                 />
                 {object.name}
+                {!this.props.editor.isEdit && <span onClick={this.edit} data-id={object.id}>edit</span>}
                 <span>{object.children.length}</span>
               </div>
             ))
@@ -76,7 +87,8 @@ export default class PanelObjectsComponent extends Component {
     editor: PropTypes.shape({
       scene: PropTypes.object,
       camera: PropTypes.object,
-      renderer: PropTypes.object
+      renderer: PropTypes.object,
+      isEdit: PropTypes.bool
     })
   }
 }

@@ -9,14 +9,14 @@ export default class snapshotService {
         scene
       }
     }
-    return api.post(`/add-snapshot/${projectKey}`, options)
+    return api.post(`/api/add-snapshot/${projectKey}`, options)
       .then(res => {
         return res
       })
   }
 
   static getSnapshots (projectKey) {
-    return api.get(`/get-snapshots/${projectKey}`)
+    return api.get(`/api/get-snapshots/${projectKey}`)
       .then(res => {
         console.log(res)
         return res
@@ -24,7 +24,7 @@ export default class snapshotService {
   }
 
   static getSnapshotScene (snapshotKey) {
-    return api.get(`/snapshot/${snapshotKey}`)
+    return api.get(`/api/snapshot/${snapshotKey}`)
       .then(res => {
         console.log(res)
         return res.scene
@@ -32,7 +32,7 @@ export default class snapshotService {
   }
 
   static delSnapshot (snapshotKey) {
-    return api.get(`/del-snapshot/${snapshotKey}`)
+    return api.get(`/api/del-snapshot/${snapshotKey}`)
       .then(res => {
         return res
       })

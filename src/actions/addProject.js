@@ -10,7 +10,7 @@ export const addProject = (project) => {
         'content-type': 'multipart/form-data'
       }
     }
-    Api.post('/add-project', {data: project}, config)
+    Api.post('/api/add-project', {data: project}, config)
       .then((res) => {
         // selectFilter('all')(dispatch)
         // fetchProjectsIfNeeded('all', true)(dispatch)

@@ -13,6 +13,8 @@ import {
   SNAPSHOT_LOAD_SCENE
 } from '../actions/panelSnapshots'
 
+import { OPTIONS_IS_EDIT } from '../actions/options'
+
 let initialState = {
   scene: null,
   camera: null,
@@ -20,7 +22,9 @@ let initialState = {
   cadCanvas: null,
   activeEntities: [],
   editMode: {
-    isEdit: false
+    isEdit: false,
+    beforeEdit: {},
+    editObject: {}
   },
 
   loading: false,
@@ -32,6 +36,14 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+    case OPTIONS_IS_EDIT:
+      return update(state, {
+        editMode: {
+          isEdit: {$set: action.payload.isEdit},
+          beforeEdit: {$set: action.payload.beforeEdit},
+          editObject: {$set: action.payload.editObject}
+        }
+      })
     case SNAPSHOT_LOAD_SCENE:
       return {
         ...state,
