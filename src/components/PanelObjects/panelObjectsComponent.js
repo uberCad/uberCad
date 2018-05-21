@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './PanelObjects.css'
 import sceneService from '../../services/sceneService'
+import MaterialComponent from '../Material/materrialComponentContainer'
 
 export default class PanelObjectsComponent extends Component {
   onChangeVisible = ({currentTarget: {checked, dataset: {id}}}) => {
@@ -58,8 +59,9 @@ export default class PanelObjectsComponent extends Component {
                   onChange={this.onChangeVisible}
                 />
                 {object.name}
-                {!this.props.editor.isEdit && <span onClick={this.edit} data-id={object.id}>edit</span>}
                 <span>{object.children.length}</span>
+                {!this.props.editor.isEdit && <span onClick={this.edit} data-id={object.id}>edit</span>}
+                <MaterialComponent objectId={object.id} />
               </div>
             ))
             : (

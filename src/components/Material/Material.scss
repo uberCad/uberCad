@@ -1,0 +1,52 @@
+@import "../../variables.scss";
+
+.material {
+  float: right;
+
+  span:hover{
+    cursor: pointer;
+  }
+}
+
+ul.materials-list {
+  margin: 0;
+  padding: 10px 0;
+  list-style: none;
+
+  li {
+    padding: 5px 0 0 70px;
+    height: 60px;
+    transition: All 0.3s;
+    position: relative;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    h4 {
+      text-align: left;
+      margin: 0 0 5px 0;
+      padding: 0;
+    }
+
+    span {
+      color: gray;
+      font-style: italic;
+      margin-right: 5px;
+
+      &.color {
+        border-radius: 5px;
+        width: 50px;
+        height: 50px;
+        //border: 1px solid red;
+        display: block;
+        position: absolute;
+        left: 10px;
+        top: 5px;
+        box-shadow: lightgray 3px 3px 6px;
+      }
+    }
+  }
+}
+

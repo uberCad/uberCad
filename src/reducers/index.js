@@ -9,6 +9,7 @@ import options from './options'
 import selection from './selection'
 import sidebar from './sidebar'
 import userLogin from './userLogin'
+import materials from './materials'
 
 export default {
   counter,
@@ -21,5 +22,6 @@ export default {
   options,
   selection,
   sidebar,
-  userLogin
+  userLogin,
+  materials
 }
