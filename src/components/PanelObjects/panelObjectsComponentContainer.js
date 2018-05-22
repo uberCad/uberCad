@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import PanelObjectsComponent from './panelObjectsComponent'
-import { toggleVisible, combineEdgeModels } from '../../actions/panelObjects'
+import { toggleVisible, combineEdgeModels, toggleObject } from '../../actions/panelObjects'
 import { showAll } from '../../actions/activeEntities'
 import { isEdit } from '../../actions/options'
 
@@ -15,6 +15,7 @@ const mapStateToProps = (state, ownProps) => {
       options: state.options,
       isEdit: state.cad.editMode.isEdit
     },
+    activeObject: state.sidebar.activeObject,
     ...ownProps
   }
 }
@@ -32,6 +33,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     isEdit: function (option, object) {
       isEdit(option, object)(dispatch)
+    },
+    toggleObject: function (object) {
+      toggleObject(object)(dispatch)
     }
   }
 }

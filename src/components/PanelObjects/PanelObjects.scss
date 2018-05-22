@@ -23,6 +23,9 @@
         padding: 0 5px;
       }
     }
+    .active {
+      background-color: rgba(0,0,0,0.1);
+    }
   }
 
   .toolbar {
@@ -49,6 +52,11 @@
 
       &.show-all {
         background: url("../ActiveEntities/show-all.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
+
+      &.add-material {
+        background: url("painter-palette.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
     }

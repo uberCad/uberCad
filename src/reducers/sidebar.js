@@ -3,9 +3,11 @@ import update from 'immutability-helper'
 import {
   SIDEBAR_TOGGLE, TOGGLE_TAB
 } from '../actions/sidebar'
+import { PANEL_OBJECTS_TOGGLE } from '../actions/panelObjects'
 
 let initialState = {
   active: true,
+  activeObject: null,
   panels: [
     [
       {
@@ -44,6 +46,11 @@ let initialState = {
 
 const options = (state = initialState, action) => {
   switch (action.type) {
+    case PANEL_OBJECTS_TOGGLE:
+      return {
+        ...state,
+        activeObject: action.payload.activeObject
+      }
     case SIDEBAR_TOGGLE:
       return {
         ...state,

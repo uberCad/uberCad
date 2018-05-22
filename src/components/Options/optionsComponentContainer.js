@@ -8,8 +8,6 @@ import {
 } from '../../actions/options'
 
 const mapStateToProps = (state, ownProps) => {
-  console.log('optionsComponent state.cad.editMode = ', state.cad.editMode)
-
   return {
     tool: state.toolbar.tool,
     editMode: state.cad.editMode,

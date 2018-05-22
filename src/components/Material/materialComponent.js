@@ -33,10 +33,8 @@ export default class MaterialComponent extends Component {
   choose = (event) => {
     event.stopPropagation()
     let {currentTarget: {dataset: {dbKey}}} = event
-    const scene = this.props.scene
-    let object = scene.getObjectById(parseInt(this.props.objectId, 10))
     const material = this.props.materials.find(item => item._key === dbKey)
-    this.props.setMaterial(material, object)
+    this.props.setMaterial(material, this.props.activeObject)
     this.handleClose()
   }
 
@@ -59,7 +57,7 @@ export default class MaterialComponent extends Component {
     return (
       <div className="material">
 
-        <span onClick={this.handleShow}>Set material</span>
+        <button onClick={this.handleShow} title='Set material' className='add-material' />
 
         <Modal show={this.state.show} onHide={this.handleClose}>
           <Modal.Header closeButton>
@@ -109,6 +107,6 @@ export default class MaterialComponent extends Component {
   static propTypes = {
     scene: PropTypes.object,
     materials: PropTypes.array,
-    objectId: PropTypes.number
+    activeObject: PropTypes.object
   }
 }

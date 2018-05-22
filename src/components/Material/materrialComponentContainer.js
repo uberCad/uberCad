@@ -4,6 +4,7 @@ import { loadMaterials, setMaterial } from '../../actions/materials'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    activeObject: state.sidebar.activeObject,
     materials: state.materials,
     scene: state.cad.scene,
     ...ownProps
