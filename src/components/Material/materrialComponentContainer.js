@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import MaterialComponent from './materialComponent'
-import { loadMaterials } from '../../actions/materials'
+import { loadMaterials, setMaterial } from '../../actions/materials'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -14,6 +14,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     loadMaterials: function () {
       loadMaterials()(dispatch)
+    },
+    setMaterial: function (material, object) {
+      setMaterial(material, object)(dispatch)
     }
   }
 }

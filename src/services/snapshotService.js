@@ -26,7 +26,6 @@ export default class snapshotService {
   static getSnapshotScene (snapshotKey) {
     return api.get(`/api/snapshot/${snapshotKey}`)
       .then(res => {
-        console.log(res)
         return res.scene
       })
   }

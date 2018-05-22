@@ -9,14 +9,8 @@ export default class MaterialComponent extends Component {
     super(props)
     this.state = {
       show: false,
-      displayedMaterials: []
+      searchQuery: ''
     }
-  }
-
-  componentDidMount () {
-    this.setState({
-      displayedMaterials: this.props.materials.slice(0, 10)
-    })
   }
 
   handleClose = () => {
@@ -31,31 +25,26 @@ export default class MaterialComponent extends Component {
   }
 
   handleSearch = (event) => {
-    const searchQuery = event.target.value.toLowerCase()
-    const displayedMaterials = this.props.materials.filter((el) => {
-      const searchName = el.name.toLowerCase()
-      return searchName.indexOf(searchQuery) !== -1
-    })
     this.setState({
-      displayedMaterials: displayedMaterials
+      searchQuery: event.target.value.toLowerCase()
     })
   }
 
   choose = (event) => {
     event.stopPropagation()
-    let {currentTarget: {dataset: {idx}}} = event
+    let {currentTarget: {dataset: {dbKey}}} = event
     const scene = this.props.scene
     let object = scene.getObjectById(parseInt(this.props.objectId, 10))
-    object.userData.material = this.state.displayedMaterials[idx]
+    const material = this.props.materials.find(item => item._key === dbKey)
+    this.props.setMaterial(material, object)
     this.handleClose()
   }
 
   render () {
-
-    const MaterialComponent = ({idx, name, density, lambda, epsilon, color}) => {
+    const MaterialComponent = ({dbKey, name, density, lambda, epsilon, color}) => {
       let bgcolor = {backgroundColor: color.toString()}
       return (
-        <li className="list-group-flush" data-idx={idx} onClick={this.choose}>
+        <li className="list-group-flush" data-db-key={dbKey} onClick={this.choose}>
           <h4>{name}</h4>
           <span>Density: {density}</span>
           <span>Lambda: {lambda}</span>
@@ -64,7 +53,8 @@ export default class MaterialComponent extends Component {
         </li>
       )
     }
-    const materials = this.state.displayedMaterials
+
+    const {materials} = this.props
 
     return (
       <div className="material">
@@ -83,21 +73,26 @@ export default class MaterialComponent extends Component {
                   name="title"
                   placeholder="Life search ..."
                   onChange={this.handleSearch}
+                  autoFocus
                 />
                 <FormControl.Feedback/>
               </FormGroup>
             </Form>
 
-            <ListGroup componentClass="ul" className="materials-list">
+            <ListGroup componentClass='ul' className='materials-list'>
               {materials &&
-              materials.map((material, idx) =>
+              materials.filter(material => {
+                const searchName = `${material.name} ${material.density} ${material.epsilon} ${material.lambda}`.toLowerCase()
+
+                return searchName.includes(this.state.searchQuery)
+              }).slice(0, this.state.searchQuery ? 30 : 10).map((material) =>
                 <MaterialComponent key={material._key}
                                    name={material.name}
                                    density={material.density}
                                    lambda={material.lambda}
                                    epsilon={material.epsilon}
                                    color={material.color}
-                                   idx={idx}
+                                   dbKey={material._key}
                 />
               )}
             </ListGroup>
