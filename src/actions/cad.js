@@ -33,39 +33,52 @@ export const drawDxf = (data = null, container, snapshot = null) => {
     options: {threshold: 0.01, selectMode: SELECT_MODE_NEW, singleLayerSelect: true}
   }
 
-  // 463, 316
+  try {
+    testExample(editor)
+  } catch (e) {
+    console.error(e)
+  }
 
+  return dispatch => dispatch({
+    type: CAD_DRAW_DXF,
+    payload: {
+      scene,
+      camera,
+      renderer,
+      cadCanvas
+    }
+  })
+}
+
+function testExample (editor) {
   let objectsDraft = [
-    // [191],
-    // [239],
-
-    //[316, 471, -1041],
-    //[370, 429],
-
-    //[650, 659],
-    //[544],
-    //[698],
-    //[1092, 1097, 1102],
-    //[1047, 1057, 1054],
-
-    //[284],
-    //[494],
-    //[741],
-    //[1025],
-    //[773, 825],
-    //[878, 960],
-    //[97, 92, 87],
-    // // [1040, -32, -33, -34],
-    // // [163, 173, 149],
-    // // [1041],
-
-    // [650, 659], [698], [494], [1025], [773, 825], [878, 960], [97, 92, 87]
+    // // [191],
+    // // [239],
+    // [370, 429],
+    // // [650, 659],
+    // // [544],
+    // // [698],
+    // // [1154, 1134, 1139],
+    // [284],
+    // // [494],
+    // // [741],
+    // // [1025],
+    // // [773, 825],
+    // // [878, 960],
+    //
+    // // [97, 92, 87],
+    // // [1117, 1098, 1086],
+    // [316, 463, -1043, -1042, -1041, -1083, -1081, -1080, -1079, -1078, -1077, -1076, -1075, -1074, -1073, -1072, -1071, -1070, -1069, -1068, -1067, -1066, -1065, -1064, -1062, -1061, -1060, -1059, -1058, -1057, -1056, -1055, -1054, -1053, -1052, -1051, -1050, -1049, -1048, -1047, -1046, -1045, -1044, -1082, -1063],
+    // [1080],
+    // [138, 173, 163],
+    // [49, 46, 80, -1037, -1038, -1039, -1040],
+    // [1038]
   ]
   let idsToFind = []
   objectsDraft.forEach(entityContainer => idsToFind.push(...entityContainer.map(id => Math.abs(id))))
   let result = {}
 
-  let iterator = sceneService.entityIterator(scene)
+  let iterator = sceneService.entityIterator(editor.scene)
   let entity = iterator.next()
   while (!entity.done) {
     if (idsToFind.indexOf(entity.value.id) >= 0) {
@@ -96,16 +109,6 @@ export const drawDxf = (data = null, container, snapshot = null) => {
   if (frames.length) {
     sceneService.combineEdgeModels(editor)
   }
-
-  return dispatch => dispatch({
-    type: CAD_DRAW_DXF,
-    payload: {
-      scene,
-      camera,
-      renderer,
-      cadCanvas
-    }
-  })
 }
 
 export const cadClick = (event, editor) => {

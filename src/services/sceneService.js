@@ -373,12 +373,6 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
               name: name
             }
             throw error
-
-            // throw {
-            //   error: 'duplicate name',
-            //   msg: `Object with name "${name}" already exists`,
-            //   name: name
-            // }
           }
         })
 
@@ -678,6 +672,8 @@ let combineEdgeModels = editor => {
     let cavityToCheck = queue.value
 
     let result = GeometryUtils.checkCavity(cavityToCheck, usedCollisionPoints, threshold)
+
+    ConsoleUtils.previewPathInConsole(cavityToCheck.path, null, result)
     if (result.needToCheckAgain) {
       queue = iterator.next(cavityToCheck)
     } else {
