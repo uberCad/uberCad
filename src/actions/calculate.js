@@ -17,7 +17,13 @@ export const calculate = (scene) => {
     info.push(data)
   })
 
-  Api.post('/api/calculate', {data: info})
+  Api.post('/api/calculate',
+    {
+      data: info,
+      headers: {
+        authgapi: 'Bearer ya29.GlvFBd28AfEhvqoTasP1cvHR2mjdi7TQ9VzIH-rqfGmmUXo_D3P09K5rAt0JhwPq_ZeBJVJrX3cnALs4U_AKqm_NM-pEEpnq6slef6ltsOYj4bIXbgGKgCUyIS1B'
+      }
+    })
     .then(res => {
       console.log('calculate res = ', res)
     })
