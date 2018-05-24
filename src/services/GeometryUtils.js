@@ -1,4 +1,5 @@
 import * as THREE from '../extend/THREE'
+import kMeans from '../../node_modules/kmeans-js/kMeans'
 
 let buildEdgeModel = (object, threshold = 0.000001) => {
   let vertices = getVertices(object.children)
@@ -2171,6 +2172,118 @@ function entityIntersectArea (entity, area) {
   // alert('Unexpected geometry @ThreeDxf.entityIntersectArea()');
 }
 
+function getRegionClusters (path) {
+  let data = path.map(dot => {
+    return [dot.x, dot.y]
+  })
+
+  let km = new kMeans({
+    K: 3
+  })
+
+  km.maxIterations = 300
+
+  km.cluster(data)
+  while (km.step()) {
+    km.findClosestCentroids()
+    km.moveCentroids()
+    if (km.hasConverged() || km.currentIteration > 300) {
+      break
+    }
+  }
+  // console.log('Finished in:', km.currentIteration, ' iterations');
+  // console.log(km.centroids, km.clusters);
+  return km
+}
+
+function getObjectInfo (object) {
+  let res = getRegionClusters(object.userData.edgeModel.regions[0].path)
+
+  let heaviestClusters = res.centroids
+    .map((centroid, idx) => {
+      return {
+        centroid,
+        weight: res.clusters[idx].length
+      }
+    })
+    .sort((a, b) => a.weight < b.weight)
+    .splice(0, 2)
+    .map(heaviestCluster => {
+      return {
+        x: heaviestCluster.centroid[0],
+        y: heaviestCluster.centroid[1]
+      }
+    })
+
+  // CameraUtils.previewPathInConsole(object.userData.edgeModel.regions[0].path, heaviestClusters)
+
+  //width is where two legs oriented. if polyamide rotated - get orientation by heaviest clusters (possibly legs)
+  let inversedWidth = Math.abs(heaviestClusters[0].y - heaviestClusters[1].y) > Math.abs(heaviestClusters[0].x - heaviestClusters[1].x)
+
+  object.userData.edgeModel.regions.forEach(region => {
+    let vertices = region.path
+
+    let minX, minY, maxX, maxY
+
+    let sumX = 0,
+      sumY = 0,
+      multipleIdx = 0
+    for (let i = 0; i < vertices.length; i++) {
+      if (minX === undefined && minY === undefined && maxX === undefined && maxY === undefined) {
+        minX = maxX = vertices[i].x
+        minY = maxY = vertices[i].y
+      }
+      if (vertices[i].x < minX) {
+        minX = vertices[i].x
+      }
+      if (vertices[i].y < minY) {
+        minY = vertices[i].y
+      }
+      if (vertices[i].x > maxX) {
+        maxX = vertices[i].x
+      }
+      if (vertices[i].y > maxY) {
+        maxY = vertices[i].y
+      }
+
+      multipleIdx = i + 1
+      if (multipleIdx >= vertices.length) {
+        multipleIdx = 0
+      }
+      sumX += vertices[i].x * vertices[multipleIdx].y
+      sumY += vertices[multipleIdx].x * vertices[i].y
+    }
+
+    if (inversedWidth) {
+      region.width = Math.abs(maxY - minY)
+      region.height = Math.abs(maxX - minX)
+    } else {
+      region.width = Math.abs(maxX - minX)
+      region.height = Math.abs(maxY - minY)
+    }
+
+    region.area = Math.abs((sumY - sumX) / 2)
+  })
+
+  let innerArea = 0
+  object.userData.edgeModel.regions.forEach((region, idx) => {
+    if (idx) {
+      innerArea += region.area
+    }
+  })
+
+  if (object.userData.edgeModel.regions.length) {
+    object.userData.edgeModel.regions[0].area -= innerArea
+  }
+
+  return object.userData.edgeModel.regions.map(region => {
+    return {
+      region,
+      area: region.area
+    }
+  })
+}
+
 export default {
   distanceToLine,
   distanceToArc,
@@ -2193,5 +2306,6 @@ export default {
   calcArea,
   calcSize,
   vertexInArea,
-  entityIntersectArea
+  entityIntersectArea,
+  getObjectInfo
 }

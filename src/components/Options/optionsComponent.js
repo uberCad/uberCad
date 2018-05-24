@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './Options.css'
 import { TOOL_POINT, TOOL_SELECT } from '../Toolbar/toolbarComponent'
+
 export const SELECT_MODE_NEW = 'SELECT_MODE_NEW'
 export const SELECT_MODE_ADD = 'SELECT_MODE_ADD'
 export const SELECT_MODE_SUB = 'SELECT_MODE_SUB'
@@ -25,6 +26,10 @@ export default class OptionsComponent extends Component {
     this.props.isEdit(!this.props.editMode.isEdit)
   }
 
+  calculate = () => {
+    this.props.calculate(this.props.scene)
+  }
+
   render () {
     const {
       tool,
@@ -42,31 +47,31 @@ export default class OptionsComponent extends Component {
               <label>Mode:</label>
               <label>
                 <input type='radio' className='mode-new'
-                  title='New selection'
-                  value={SELECT_MODE_NEW}
-                  checked={selectMode === SELECT_MODE_NEW}
-                  onChange={this.onChangeMode} />
+                       title='New selection'
+                       value={SELECT_MODE_NEW}
+                       checked={selectMode === SELECT_MODE_NEW}
+                       onChange={this.onChangeMode}/>
               </label>
               <label>
                 <input type='radio' className='mode-add'
-                  title='Add to selection (... + Shift)'
-                  value={SELECT_MODE_ADD}
-                  checked={selectMode === SELECT_MODE_ADD}
-                  onChange={this.onChangeMode} />
+                       title='Add to selection (... + Shift)'
+                       value={SELECT_MODE_ADD}
+                       checked={selectMode === SELECT_MODE_ADD}
+                       onChange={this.onChangeMode}/>
               </label>
               <label>
                 <input type='radio' className='mode-sub'
-                  title='Subtract from selection (... + Alt)'
-                  value={SELECT_MODE_SUB}
-                  checked={selectMode === SELECT_MODE_SUB}
-                  onChange={this.onChangeMode} />
+                       title='Subtract from selection (... + Alt)'
+                       value={SELECT_MODE_SUB}
+                       checked={selectMode === SELECT_MODE_SUB}
+                       onChange={this.onChangeMode}/>
               </label>
               <label>
                 <input type='radio' className='mode-intersect'
-                  title='Intersect with selection (... + Alt + Shift)'
-                  value={SELECT_MODE_INTERSECT}
-                  checked={selectMode === SELECT_MODE_INTERSECT}
-                  onChange={this.onChangeMode} />
+                       title='Intersect with selection (... + Alt + Shift)'
+                       value={SELECT_MODE_INTERSECT}
+                       checked={selectMode === SELECT_MODE_INTERSECT}
+                       onChange={this.onChangeMode}/>
 
               </label>
             </li>
@@ -78,9 +83,9 @@ export default class OptionsComponent extends Component {
             <li>
 
               <input type='checkbox' id='editor-options-singleLayerSelect'
-                title='Select lines on same layer'
-                defaultChecked={singleLayerSelect}
-                onChange={this.onChangeSingleLayer} />
+                     title='Select lines on same layer'
+                     defaultChecked={singleLayerSelect}
+                     onChange={this.onChangeSingleLayer}/>
               <label htmlFor='editor-options-singleLayerSelect'>
                 Same layer
               </label>
@@ -89,7 +94,7 @@ export default class OptionsComponent extends Component {
               <label>
                 Threshold
                 <input type='text' min='0.000001' max='0.1' value={threshold}
-                  onChange={this.onChangeThreshold} />
+                       onChange={this.onChangeThreshold}/>
               </label>
             </li>
           </ul>
@@ -178,7 +183,7 @@ export default class OptionsComponent extends Component {
             {/* </li> */}
           </ul>
         )}
-
+        <button onClick={this.calculate}>calculate</button>
       </div>
 
     )
