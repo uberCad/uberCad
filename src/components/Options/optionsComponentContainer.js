@@ -6,11 +6,11 @@ import {
   setSingleLayerSelect,
   setThreshold
 } from '../../actions/options'
+import { calculate } from '../../actions/calculate'
 
 const mapStateToProps = (state, ownProps) => {
-  console.log('optionsComponent state.cad.editMode = ', state.cad.editMode)
-
   return {
+    scene: state.cad.scene,
     tool: state.toolbar.tool,
     editMode: state.cad.editMode,
     selectMode: state.options.selectMode,
@@ -35,6 +35,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     isEdit: function (option) {
       isEdit(option)(dispatch)
+    },
+    calculate: (scene) => {
+      calculate(scene)(dispatch)
     }
   }
 }
