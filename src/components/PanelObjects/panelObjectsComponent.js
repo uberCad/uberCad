@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import './PanelObjects.css'
 import sceneService from '../../services/sceneService'
 import MaterialComponent from '../Material/materrialComponentContainer'
+import Calculate from '../CalculatePrice/calculatePriceComponentContainer'
 
 export default class PanelObjectsComponent extends Component {
   shouldComponentUpdate (nextProps) {
@@ -91,6 +92,7 @@ export default class PanelObjectsComponent extends Component {
                   title='Show all'
           />
           {this.props.activeObject && <MaterialComponent />}
+          {objects && objects.children.length > 0 && <Calculate />}
         </div>
       </div>
     )

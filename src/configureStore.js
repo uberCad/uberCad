@@ -7,7 +7,7 @@ import reducers from './reducers'
 const rootPersistConfig = {
   key: 'root',
   storage: storage,
-  blacklist: ['cad', 'options', 'selection']
+  blacklist: ['cad', 'options', 'selection', 'price']
 }
 
 const cadPersistConfig = {

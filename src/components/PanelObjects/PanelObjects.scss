@@ -59,6 +59,10 @@
         background: url("painter-palette.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
+      &.btn-calc {
+        background: url("calculator.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
     }
   }
 }

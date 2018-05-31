@@ -26,10 +26,6 @@ export default class OptionsComponent extends Component {
     this.props.isEdit(!this.props.editMode.isEdit)
   }
 
-  calculate = () => {
-    this.props.calculate(this.props.scene)
-  }
-
   render () {
     const {
       tool,
@@ -183,7 +179,6 @@ export default class OptionsComponent extends Component {
             {/* </li> */}
           </ul>
         )}
-        <button onClick={this.calculate}>calculate</button>
       </div>
 
     )

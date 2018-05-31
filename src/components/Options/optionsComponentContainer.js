@@ -6,7 +6,6 @@ import {
   setSingleLayerSelect,
   setThreshold
 } from '../../actions/options'
-import { calculate } from '../../actions/calculate'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -35,9 +34,6 @@ const mapDispatchToProps = (dispatch) => {
     },
     isEdit: function (option) {
       isEdit(option)(dispatch)
-    },
-    calculate: (scene) => {
-      calculate(scene)(dispatch)
     }
   }
 }
