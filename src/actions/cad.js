@@ -197,7 +197,7 @@ export const cadDoubleClick = (event, editor) => {
               activeEntities = sceneService.recursiveSelect(clickResult.activeEntities[0], editor)
             }
 
-            sceneService.doSelection(activeEntities, editor)
+            activeEntities = sceneService.doSelection(activeEntities, editor)
             dispatch({
               type: CAD_DO_SELECTION,
               payload: {
