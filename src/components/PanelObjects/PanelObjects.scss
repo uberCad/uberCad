@@ -56,7 +56,8 @@
       }
 
       &.add-material {
-        background: url("painter-palette.svg") no-repeat center transparent;
+        //background: url("painter-palette.svg") no-repeat center transparent;
+        background: url("set-material.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
     }

@@ -9,23 +9,49 @@ export const calculate = (scene) => {
   objects.forEach(object => {
     const geometry = GeometryUtils.getObjectInfo(object)
     let data = {
-      area: geometry[0].region.area,
-      height: geometry[0].region.height,
-      width: geometry[0].region.width
+      size: {
+        area: geometry[0].region.area,
+        height: geometry[0].region.height,
+        width: geometry[0].region.width,
+        type: geometry.length > 1 ? 2 : 1
+      },
+      geometry,
+      material: object.userData.material,
+      object
     }
-    data.type = geometry.length > 1 ? 2 : 1
     info.push(data)
   })
 
   Api.post('/api/calculate',
     {
-      data: info,
+      data: info.map(data => data.size),
       headers: {
-        authgapi: 'Bearer ya29.GlvFBd28AfEhvqoTasP1cvHR2mjdi7TQ9VzIH-rqfGmmUXo_D3P09K5rAt0JhwPq_ZeBJVJrX3cnALs4U_AKqm_NM-pEEpnq6slef6ltsOYj4bIXbgGKgCUyIS1B'
+        authgapi: 'Bearer ya29.GlzGBfQDXqABrGtL_1eREp_fvWmJ8FwBdEtqpaS0rXciW6pezWOhiFZhnuNaiIg49_tvdH0pAzfCnOif6vgMlVN69CiZJZ2IocLu_JuobZG5-bVZRWjd-aurrwR2Gg'
       }
     })
-    .then(res => {
-      console.log('calculate res = ', res)
+    .then(prices => {
+      let totalWeight = 0
+      let totalPrice = 0
+      info.forEach((data, idx) => {
+        data.price = parseFloat(prices[idx].replace(',', '.'))
+        data.size.weight = data.material.density * (data.size.area / 1000000)
+        console.log(`
+Object: ${data.object.name}
+Material: ${data.material.name}
+  Area: ${data.size.area.toFixed(4)} mm² 
+  Width: ${data.size.width.toFixed(4)} mm
+  Height: ${data.size.height.toFixed(4)} mm
+  Weight ${data.size.weight.toFixed(4)} kg/m
+Price: ${data.price} €`)
+
+        totalWeight += data.size.weight
+        totalPrice += data.price
+      })
+
+      console.log(`
+System weight ${totalWeight.toFixed(4)} kg/m
+System price ${totalPrice} €/m
+      `)
     })
   return (dispatch) => {
     dispatch({
