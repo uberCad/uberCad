@@ -27,10 +27,9 @@ export default class PanelSnapshotsComponent extends Component {
   }
 
   addSnapshot = () => {
-    const scene = this.props.scene
     const snapshot = {
       title: this.state.title,
-      scene
+      scene: this.props.scene
     }
     this.props.addSnapshot(snapshot, this.props.project._key)
     this.handleClose()
@@ -74,6 +73,7 @@ export default class PanelSnapshotsComponent extends Component {
                 <FormControl
                   type="text"
                   name="title"
+                  autoFocus
                   placeholder="Enter title"
                   onChange={this.handleChange}/>
               </FormGroup>

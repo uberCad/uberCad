@@ -1,5 +1,6 @@
 import * as THREE from '../extend/THREE'
 import kMeans from '../../node_modules/kmeans-js/kMeans'
+import sceneService from './sceneService'
 
 let buildEdgeModel = (object, threshold = 0.000001) => {
   let vertices = getVertices(object.children)
@@ -142,6 +143,18 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
     entityToCheck.userData.noIntersections = true
   })
 
+  function Path () {}
+
+  Path.prototype = []
+  Path.prototype.toJSON = function () {
+    return this.map(v => ({
+      x: v.x,
+      y: v.y,
+      z: v.z,
+      parentUuid: v.parent.uuid
+    }))
+  }
+
   let prevEntitiesCount = -1
   do {
     regions.forEach(region => {
@@ -174,7 +187,17 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
     }
 
     if (entities.length) {
-      let path = buildChain(vertices, startVertex, threshold)
+      // do this crap to add toJSON to this object, which also have array prototype
+      // also there is Object.defineProperty to hide length from Object.keys (by default there is no such property in vanilla array)
+
+      let path = new Path()
+      Object.defineProperty(path, 'length', {
+        enumerable: false,
+        writable: true
+      })
+      path.push(...buildChain(vertices, startVertex, threshold))
+      // let path = new Path(buildChain(vertices, startVertex, threshold))
+
       regions.push({
         path,
         boundingBox: buildBoundingBox(path)
@@ -219,6 +242,7 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
   let pathD = ''
   let subRegionsPathD = []
   let vertexList = []
+  let insidePoint = getInsidePoint(regions, threshold)
   regions.forEach((region, idx) => {
     let last = region.path[region.path.length - 1]
     let lastVertex = `${(last.x / 1000).toFixed(4)},${(last.y / 1000).toFixed(4)}`
@@ -252,7 +276,7 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
       viewBox,
       pathD,
       subRegionsPathD,
-      insidePoint: getInsidePoint(regions, threshold)
+      insidePoint
     }
   }
 }
@@ -2285,34 +2309,34 @@ let polar = (p1, phi, dist) => {
   // This function (polar) returns the point at an angle (in radians) and distance from a given point
   // http://www.afralisp.net/reference/autolisp-functions.php#P
 
-  let x = p1.x + dist * Math.cos(phi);
-  let y = p1.y + dist * Math.sin(phi);
+  let x = p1.x + dist * Math.cos(phi)
+  let y = p1.y + dist * Math.sin(phi)
 
-  return new THREE.Vector3(x, y, 0);
+  return new THREE.Vector3(x, y, 0)
 }
 
 let bugleToArc = (p1, p2, bulge) => {
   // http://www.afralisp.net/autolisp/tutorials/polyline-bulges-part-1.php
   // https://github.com/vasnake/dwg2csv/blob/master/extra/autocad.bulge/convertbulge.py
 
-  let chord = getDistance(p1, p2);
-  let angleLength = Math.atan(bulge) * 4;
+  let chord = getDistance(p1, p2)
+  let angleLength = Math.atan(bulge) * 4
   // height of the arc
-  let sagitta = chord / 2 * Math.abs(bulge);
-  let radius = (Math.pow(chord / 2, 2) + Math.pow(sagitta, 2)) / (2 * sagitta);
+  let sagitta = chord / 2 * Math.abs(bulge)
+  let radius = (Math.pow(chord / 2, 2) + Math.pow(sagitta, 2)) / (2 * sagitta)
 
   // let radius = 0;
   // if (angleLength !== 0) {
   //     radius = (chord/2.0) / Math.sin(Math.abs(angleLength/2.0))
   // }
 
-  let theta = 4.0 * Math.atan(Math.abs(bulge));
-  let gamma = (Math.PI - theta) / 2.0;
-  let phi = angle(p1, p2) + gamma * Math.sign(bulge);
-  let center = polar(p1, phi, radius);
-  let startAngle = Math.acos(((p1.x - center.x) / radius).toFixed(10));
+  let theta = 4.0 * Math.atan(Math.abs(bulge))
+  let gamma = (Math.PI - theta) / 2.0
+  let phi = angle(p1, p2) + gamma * Math.sign(bulge)
+  let center = polar(p1, phi, radius)
+  let startAngle = Math.acos(((p1.x - center.x) / radius).toFixed(10))
   if (Math.sign(p1.y - center.y) < 0) {
-    startAngle = (2.0 * Math.PI) - startAngle;
+    startAngle = (2.0 * Math.PI) - startAngle
   }
 
   return {
@@ -2321,7 +2345,24 @@ let bugleToArc = (p1, p2, bulge) => {
     endAngle: startAngle + angleLength,
     radius: radius,
     startAngle: startAngle,
-  };
+  }
+}
+
+let fixObjectsPaths = scene => {
+  sceneService.getObjects(scene, true).forEach(object => {
+    if (object && object.userData && object.userData.edgeModel && object.userData.edgeModel.regions) {
+      object.userData.edgeModel.regions.forEach(region => {
+        if (region.path) {
+          region.path.forEach(v => {
+            if (v.parentUuid) {
+              v.parent = scene.getObjectByProperty('uuid', v.parentUuid)
+              delete v.parentUuid
+            }
+          })
+        }
+      })
+    }
+  })
 }
 
 export default {
@@ -2349,5 +2390,6 @@ export default {
   entityIntersectArea,
   insidePolygon,
   bugleToArc,
-  getObjectInfo
+  getObjectInfo,
+  fixObjectsPaths
 }

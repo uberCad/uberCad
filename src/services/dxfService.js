@@ -85,6 +85,7 @@ export default class DxfService {
       let loader = new THREE.ObjectLoader()
       scene = loader.parse(JSON.parse(snapshot.scene))
       sceneService.fixSceneAfterImport(scene)
+      GeometryUtils.fixObjectsPaths(scene)
     }
 
     let dims = {

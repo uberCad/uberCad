@@ -1,6 +1,7 @@
 import snapshotService from '../services/snapshotService'
 import * as THREE from '../extend/THREE'
 import sceneService from '../services/sceneService'
+import GeometryUtils from '../services/GeometryUtils'
 
 export const SNAPSHOT_ADD = 'SNAPSHOT_ADD'
 export const SNAPSHOT_LOAD_SCENE = 'SNAPSHOT_LOAD'
@@ -27,6 +28,7 @@ export const loadSnapshot = (snapshotKey, cadCanvas) => {
         let loader = new THREE.ObjectLoader()
         const scene = loader.parse(JSON.parse(sceneData))
         sceneService.fixSceneAfterImport(scene)
+        GeometryUtils.fixObjectsPaths(scene)
         cadCanvas.setScene(scene)
         dispatch({
           type: SNAPSHOT_LOAD_SCENE,
