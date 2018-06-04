@@ -13,7 +13,7 @@ import {
   SNAPSHOT_LOAD_SCENE
 } from '../actions/panelSnapshots'
 
-import { OPTIONS_IS_EDIT } from '../actions/options'
+import { EDIT_IS_EDIT } from '../actions/edit'
 
 let initialState = {
   scene: null,
@@ -36,13 +36,14 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
-    case OPTIONS_IS_EDIT:
+    case EDIT_IS_EDIT:
       return update(state, {
         editMode: {
           isEdit: {$set: action.payload.isEdit},
           beforeEdit: {$set: action.payload.beforeEdit},
           editObject: {$set: action.payload.editObject}
-        }
+        },
+        scene: {$set: action.payload.scene}
       })
     case SNAPSHOT_LOAD_SCENE:
       return {

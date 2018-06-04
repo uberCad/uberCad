@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import PanelObjectsComponent from './panelObjectsComponent'
 import { toggleVisible, combineEdgeModels, toggleObject } from '../../actions/panelObjects'
 import { showAll } from '../../actions/activeEntities'
-import { isEdit } from '../../actions/options'
+import { isEdit } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -31,8 +31,8 @@ const mapDispatchToProps = (dispatch) => {
     showAll: function (editor) {
       showAll(editor)(dispatch)
     },
-    isEdit: function (option, object) {
-      isEdit(option, object)(dispatch)
+    isEdit: function (option, editor, object) {
+      isEdit(option, editor, object)(dispatch)
     },
     toggleObject: function (object) {
       toggleObject(object)(dispatch)

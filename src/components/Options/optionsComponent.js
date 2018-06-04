@@ -23,7 +23,7 @@ export default class OptionsComponent extends Component {
   }
 
   cancelEdit = () => {
-    this.props.isEdit(!this.props.editMode.isEdit)
+    this.props.isEdit(!this.props.editMode.isEdit, this.props.editor)
   }
 
   render () {
@@ -189,6 +189,7 @@ export default class OptionsComponent extends Component {
     editMode: PropTypes.shape({
       isEdit: PropTypes.bool.isRequired
     }),
+    editor: PropTypes.object.isRequired,
 
     selectMode: PropTypes.string.isRequired,
     singleLayerSelect: PropTypes.bool.isRequired,

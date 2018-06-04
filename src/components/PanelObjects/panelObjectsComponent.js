@@ -35,7 +35,7 @@ export default class PanelObjectsComponent extends Component {
     const {scene} = this.props.editor
     if (scene) {
       let object = scene.getObjectById(parseInt(id, 10))
-      this.props.isEdit(!this.props.editor.isEdit, object)
+      this.props.isEdit(!this.props.editor.isEdit, this.props.editor, object)
     }
   }
 
@@ -72,7 +72,6 @@ export default class PanelObjectsComponent extends Component {
                 />
                 {object.name}
                 <span>{object.children.length}</span>
-                {!this.props.editor.isEdit && <span onClick={this.edit} data-id={object.id}>edit</span>}
               </div>
             ))
             : (
@@ -92,6 +91,9 @@ export default class PanelObjectsComponent extends Component {
                   title='Show all'
           />
           {this.props.activeObject && <MaterialComponent />}
+          {this.props.activeObject &&
+          (!this.props.editor.isEdit && <button onClick={this.edit} data-id={this.props.activeObject.id} className='btn-edit' />)
+          }
           {objects && objects.children.length > 0 && <Calculate />}
         </div>
       </div>
