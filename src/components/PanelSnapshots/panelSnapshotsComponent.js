@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './PanelSnapshots.css'
 import { Button, Modal, Form, FormGroup, ControlLabel, FormControl } from 'react-bootstrap'
-import { addSnapshot } from '../../actions/panelSnapshots'
 import { FormattedMessage } from 'react-intl'
 
 export default class PanelSnapshotsComponent extends Component {

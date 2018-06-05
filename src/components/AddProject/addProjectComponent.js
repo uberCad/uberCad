@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 
 import { Button, Modal, FormControl, Form, FormGroup, ControlLabel } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import { addProject } from '../../actions/addProject'
 import { FormattedMessage } from 'react-intl'
 
 export default class AddProjectComponent extends Component {

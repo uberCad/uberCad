@@ -1,5 +1,3 @@
-import CalculatePriceComponent from './components/CalculatePrice/calculatePriceComponent'
-
 export default {
   'en': {
     btn: {

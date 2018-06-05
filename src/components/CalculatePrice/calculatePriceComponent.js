@@ -17,6 +17,7 @@ export default class CalculatePriceComponent extends Component {
     let systemWeight = 0
     objects.map((object) => {
       if (object.userData.info) return (systemWeight += object.userData.info.weight)
+      else return systemWeight
     })
 
     const ObjectComponent = ({object}) => {
