@@ -1,5 +1,11 @@
 import { connect } from 'react-redux'
 import ProjectsListComponent from './projectsListComponent'
 
-export default connect()(ProjectsListComponent)
-// export default connect(mapStateToProps, mapDispatchToProps)(ProjectsFilterComponent)
+const mapStateToProps = (state, ownProps) => {
+  return {
+    lang: state.locale.lang,
+    ...ownProps
+  }
+}
+
+export default connect(mapStateToProps)(ProjectsListComponent)

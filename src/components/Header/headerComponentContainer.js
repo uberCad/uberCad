@@ -6,6 +6,7 @@ import { setLocale } from '../../actions/locale'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    lang: state.locale.lang,
     userName: state.userLogin.userName,
     ...ownProps
   }

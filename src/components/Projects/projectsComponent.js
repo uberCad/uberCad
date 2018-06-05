@@ -8,14 +8,7 @@ import './Projects.css'
 export default class ProjectsComponent extends Component {
   componentDidMount () {
     const { projectsFilter } = this.props
-    this.props.fetchProjectsIfNeeded(projectsFilter)
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.projectsFilter !== this.props.projectsFilter) {
-      const { projectsFilter } = nextProps
-      this.props.fetchProjectsIfNeeded(projectsFilter)
-    }
+    this.props.fetchProjects(projectsFilter)
   }
 
   handleChange = nextFilter => {
@@ -25,15 +18,16 @@ export default class ProjectsComponent extends Component {
   handleRefreshClick = e => {
     e.preventDefault()
     const { projectsFilter } = this.props
-    this.props.fetchProjectsIfNeeded(projectsFilter, true)
+    this.props.fetchProjects(projectsFilter, true)
   }
 
   render () {
-    const {projectsFilter, items, loading, error, lastUpdated} = this.props
+    const {projectsFilter, items, loading, error, lastUpdated, lang} = this.props
 
     const isEmpty = 0 && items.length === 0
     return (
       <div className='Projects'>
+        <h1>{lang}</h1>
         <ProjectsFilter value={projectsFilter}
           onChange={this.handleChange}
           options={['all', 'shared', 'archive', '[some bad filter...]']} />

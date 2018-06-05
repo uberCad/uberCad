@@ -66,8 +66,8 @@ export default class HeaderComponent extends Component {
               <FormattedMessage id='header.signUp' defaultMessage='Sign Up' />
             </NavItem>}
 
-            <NavItem role='button' onClick={() => this.props.setLocale('en')}>en</NavItem>
-            <NavItem role='button' onClick={() => this.props.setLocale('ru')}>ru</NavItem>
+            <NavItem role='button' onClick={() => this.props.setLocale('en')}>EN</NavItem>
+            <NavItem role='button' onClick={() => this.props.setLocale('ru')}>RU</NavItem>
           </Nav>
         </Navbar.Collapse>
       </Navbar>

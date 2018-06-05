@@ -24,7 +24,7 @@ export default class ProjectComponent extends Component {
     const {project} = this.props
     return (
       <div className='project-page'>
-        <h3>Project: {project.title}</h3>
+        {project && <h3>Project: {project.title}</h3>}
         {project && (
           <div>
             <Row className='table-head'>
