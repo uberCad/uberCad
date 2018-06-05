@@ -6,6 +6,7 @@ import { isEdit } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    lang: state.locale.lang,
     editor: {
       scene: state.cad.scene,
       camera: state.cad.camera,

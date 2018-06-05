@@ -5,6 +5,7 @@ import { toggleVisible } from '../../actions/panelLayers'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    lang: state.locale.lang,
     editor: {
       scene: state.cad.scene,
       camera: state.cad.camera,

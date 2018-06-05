@@ -4,6 +4,7 @@ import { calculate, calculateHide } from '../../actions/calculate'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    lang: state.locale.lang,
     show: state.price.show,
     polyamides: state.price.polyamideObjects,
     scene: state.cad.scene,

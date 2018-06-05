@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { FormattedMessage } from 'react-intl'
 import PropTypes from 'prop-types'
 import './ActiveEntities.css'
 
@@ -44,45 +45,59 @@ export default class ActiveEntitiesComponent extends Component {
           {activeEntities.length
             ? activeEntities.map((entity, idx) => (
               <div className='item'
-                key={idx}
-                data-idx={idx}
-                onClick={this.selectEntity}
+                   key={idx}
+                   data-idx={idx}
+                   onClick={this.selectEntity}
               >
                 id: {entity.id} parent: {entity.parent.name}
 
                 <button className='un-select' data-idx={idx}
-                  onClick={this.unSelect}
+                        onClick={this.unSelect}
                 />
-                <input type='checkbox' data-idx={idx}
-                  title='Visibility'
-                  checked={entity.visible}
-                  onChange={this.onChangeVisible}
-                  onClick={this.stopPropagation}
-                />
+
+                <FormattedMessage id='activeEntities.checkboxVisibility' defaultMessage='Visibility'>
+                  {title =>
+                    <input type='checkbox' data-idx={idx}
+                           title={title}
+                           checked={entity.visible}
+                           onChange={this.onChangeVisible}
+                           onClick={this.stopPropagation}
+                    />
+                  }
+                </FormattedMessage>
               </div>
             ))
             : (
-              <span>No active entities</span>
+              <FormattedMessage id='activeEntities.noEntities' defaultMessage='No active entities' />
             )
           }
         </div>
         <div className='toolbar'>
           {activeEntities.length > 1 && (
-            <button onClick={this.groupEntities}
-              className='group'
-              title='Group to object'
-            />
+            <FormattedMessage id='activeEntities.group' defaultMessage='Group'>
+              {title =>
+                <button onClick={this.groupEntities}
+                        className='group'
+                        title={title}
+                />
+              }
+            </FormattedMessage>
           )}
-          <button onClick={this.showAll}
-            className='show-all'
-            title='Show all'
-          />
+          <FormattedMessage id='activeEntities.show' defaultMessage='Show'>
+            {title =>
+              <button onClick={this.showAll}
+                      className='show-all'
+                      title={title}
+              />
+            }
+          </FormattedMessage>
         </div>
       </div>
     )
   }
 
   static propTypes = {
+    lang: PropTypes.string.isRequired,
     editor: PropTypes.shape({
       activeEntities: PropTypes.array.isRequired,
       scene: PropTypes.object,

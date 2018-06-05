@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './Options.css'
 import { TOOL_POINT, TOOL_SELECT } from '../Toolbar/toolbarComponent'
+import { FormattedMessage } from 'react-intl'
 
 export const SELECT_MODE_NEW = 'SELECT_MODE_NEW'
 export const SELECT_MODE_ADD = 'SELECT_MODE_ADD'
@@ -40,35 +41,53 @@ export default class OptionsComponent extends Component {
         {(tool === TOOL_POINT || tool === TOOL_SELECT) && (
           <ul className='list-group'>
             <li>
-              <label>Mode:</label>
+              <FormattedMessage id='options.modeLabel' defaultMessage='Mode'>
+                {value => <label>{value}:</label>}
+              </FormattedMessage>
               <label>
-                <input type='radio' className='mode-new'
-                       title='New selection'
-                       value={SELECT_MODE_NEW}
-                       checked={selectMode === SELECT_MODE_NEW}
-                       onChange={this.onChangeMode}/>
+                <FormattedMessage id='options.inputTitleSelection' defaultMessage='New selection'>
+                  {value =>
+                    <input type='radio' className='mode-new'
+                           title={value}
+                           value={SELECT_MODE_NEW}
+                           checked={selectMode === SELECT_MODE_NEW}
+                           onChange={this.onChangeMode}/>
+                  }
+                </FormattedMessage>
               </label>
               <label>
-                <input type='radio' className='mode-add'
-                       title='Add to selection (... + Shift)'
-                       value={SELECT_MODE_ADD}
-                       checked={selectMode === SELECT_MODE_ADD}
-                       onChange={this.onChangeMode}/>
+                <FormattedMessage id='options.inputTitleAddSelection' defaultMessage='Add to selection (... + Shift)'>
+                  {value =>
+                    <input type='radio' className='mode-add'
+                           title={value}
+                           value={SELECT_MODE_ADD}
+                           checked={selectMode === SELECT_MODE_ADD}
+                           onChange={this.onChangeMode}/>
+                  }
+                </FormattedMessage>
               </label>
               <label>
-                <input type='radio' className='mode-sub'
-                       title='Subtract from selection (... + Alt)'
-                       value={SELECT_MODE_SUB}
-                       checked={selectMode === SELECT_MODE_SUB}
-                       onChange={this.onChangeMode}/>
+                <FormattedMessage id='options.inputTitleSubtract' defaultMessage='Subtract from selection (... + Alt)'>
+                  {value =>
+                    <input type='radio' className='mode-sub'
+                           title={value}
+                           value={SELECT_MODE_SUB}
+                           checked={selectMode === SELECT_MODE_SUB}
+                           onChange={this.onChangeMode}/>
+                  }
+                </FormattedMessage>
               </label>
               <label>
-                <input type='radio' className='mode-intersect'
-                       title='Intersect with selection (... + Alt + Shift)'
-                       value={SELECT_MODE_INTERSECT}
-                       checked={selectMode === SELECT_MODE_INTERSECT}
-                       onChange={this.onChangeMode}/>
-
+                <FormattedMessage id='options.inputTitleIntersect'
+                                  defaultMessage='Intersect with selection (... + Alt + Shift)'>
+                  {value =>
+                    <input type='radio' className='mode-intersect'
+                           title={value}
+                           value={SELECT_MODE_INTERSECT}
+                           checked={selectMode === SELECT_MODE_INTERSECT}
+                           onChange={this.onChangeMode}/>
+                  }
+                </FormattedMessage>
               </label>
             </li>
           </ul>
@@ -77,21 +96,31 @@ export default class OptionsComponent extends Component {
         {tool === TOOL_POINT && (
           <ul className='list-group'>
             <li>
+              <FormattedMessage id='options.inputTitleSameLayer' defaultMessage='Select lines on same layer'>
+                {value =>
+                  <input type='checkbox' id='editor-options-singleLayerSelect'
+                         title={value}
+                         defaultChecked={singleLayerSelect}
+                         onChange={this.onChangeSingleLayer}/>
+                }
+              </FormattedMessage>
+              <FormattedMessage id='options.labelSameLayer' defaultMessage='Same layer'>
+                {value =>
+                  <label htmlFor='editor-options-singleLayerSelect'>{value}</label>
+                }
+              </FormattedMessage>
 
-              <input type='checkbox' id='editor-options-singleLayerSelect'
-                     title='Select lines on same layer'
-                     defaultChecked={singleLayerSelect}
-                     onChange={this.onChangeSingleLayer}/>
-              <label htmlFor='editor-options-singleLayerSelect'>
-                Same layer
-              </label>
             </li>
             <li>
-              <label>
-                Threshold
-                <input type='text' min='0.000001' max='0.1' value={threshold}
-                       onChange={this.onChangeThreshold}/>
-              </label>
+              <FormattedMessage id='options.threshold' defaultMessage='Threshold'>
+                {value =>
+                  <label>
+                    {value}
+                    <input type='text' min='0.000001' max='0.1' value={threshold}
+                           onChange={this.onChangeThreshold}/>
+                  </label>
+                }
+              </FormattedMessage>
             </li>
           </ul>
         )}
@@ -185,6 +214,7 @@ export default class OptionsComponent extends Component {
   }
 
   static propTypes = {
+    lang: PropTypes.string.isRequired,
     tool: PropTypes.string.isRequired,
     editMode: PropTypes.shape({
       isEdit: PropTypes.bool.isRequired

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Button, Modal, FormControl, Form, FormGroup, ListGroup } from 'react-bootstrap'
 import './Material.css'
+import { FormattedMessage } from 'react-intl'
 
 export default class MaterialComponent extends Component {
 
@@ -57,22 +58,34 @@ export default class MaterialComponent extends Component {
     return (
       <div className="material">
 
-        <button onClick={this.handleShow} title='Set material' className='add-material' />
+        <FormattedMessage id='material.btnMaterialTitle' defaultMessage='Set material'>
+          {title =>
+            <button onClick={this.handleShow} title={title} className='add-material' />
+          }
+        </FormattedMessage>
 
         <Modal show={this.state.show} onHide={this.handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Choose material</Modal.Title>
+            <FormattedMessage id='material.modal.title' defaultMessage='Choose material'>
+              {value =>
+                <Modal.Title>{value}</Modal.Title>
+              }
+            </FormattedMessage>
           </Modal.Header>
           <Modal.Body>
             <Form>
               <FormGroup controlId="formControlsText">
-                <FormControl
-                  type="text"
-                  name="title"
-                  placeholder="Life search ..."
-                  onChange={this.handleSearch}
-                  autoFocus
-                />
+                <FormattedMessage id='material.modal.searchPlaceholder' defaultMessage='Life search ...'>
+                  {placeholder =>
+                    <FormControl
+                      type="text"
+                      name="title"
+                      placeholder={placeholder}
+                      onChange={this.handleSearch}
+                      autoFocus
+                    />
+                  }
+                </FormattedMessage>
                 <FormControl.Feedback/>
               </FormGroup>
             </Form>
@@ -97,7 +110,11 @@ export default class MaterialComponent extends Component {
 
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={this.handleClose}>Cancel</Button>
+            <FormattedMessage id='btn.cancel' defaultMessage='Cancel'>
+              {value =>
+                <Button onClick={this.handleClose}>{value}</Button>
+              }
+            </FormattedMessage>
           </Modal.Footer>
         </Modal>
       </div>
@@ -105,6 +122,7 @@ export default class MaterialComponent extends Component {
   }
 
   static propTypes = {
+    lang: PropTypes.string.isRequired,
     scene: PropTypes.object,
     materials: PropTypes.array,
     activeObject: PropTypes.object

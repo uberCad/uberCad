@@ -4,6 +4,7 @@ import { loadMaterials, setMaterial } from '../../actions/materials'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    lang: state.locale.lang,
     activeObject: state.sidebar.activeObject,
     materials: state.materials,
     scene: state.cad.scene,
