@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './PanelSnapshots.css'
 import { Button, Modal, Form, FormGroup, ControlLabel, FormControl } from 'react-bootstrap'
+import { addSnapshot } from '../../actions/panelSnapshots'
+import { FormattedMessage } from 'react-intl'
 
 export default class PanelSnapshotsComponent extends Component {
 
@@ -54,44 +56,62 @@ export default class PanelSnapshotsComponent extends Component {
     return (
       <div id='snapshots'>
         <div className='content'>
-          {snapshots ? snapshots.map(snapshot => (
-              <div className='item' key={snapshot._key} data-key={snapshot._key} onClick={this.loadSnapshot}>{snapshot.title}
-                <button className='un-select' data-key={snapshot._key} onClick={this.deleteSnapshot} />
+          {snapshots.length ? snapshots.map(snapshot => (
+              <div className='item' key={snapshot._key} data-key={snapshot._key}
+                   onClick={this.loadSnapshot}>{snapshot.title}
+                <button className='un-select' data-key={snapshot._key} onClick={this.deleteSnapshot}/>
               </div>)) :
-            <div>No snapshot </div>}
+            (<FormattedMessage id='panelSnapshots.noSnapshot' defaultMessage='No snapshot'/>)
+          }
         </div>
-
-        <Button onClick={this.handleShow}>add snapshot</Button>
-
+        <div className='toolbar'>
+          <FormattedMessage id='panelSnapshots.btnTitleAdd' defaultMessage='Add snapshot'>
+            {value =>
+              <button onClick={this.handleShow} className='add' title={value}/>
+            }
+          </FormattedMessage>
+        </div>
         <Modal show={this.state.show} onHide={this.handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Add new snapshot</Modal.Title>
+            <FormattedMessage id='panelSnapshots.modal.title' defaultMessage='Add new snapshot'>
+              {value => <Modal.Title>{value}</Modal.Title>}
+            </FormattedMessage>
           </Modal.Header>
           <Modal.Body>
             <Form>
               <FormGroup controlId="formControlsText">
-                <ControlLabel>Snapshot title</ControlLabel>
-                <FormControl
-                  type="text"
-                  name="title"
-                  placeholder="Enter title"
-                  onChange={this.handleChange}/>
+                <FormattedMessage id='panelSnapshots.modal.inputLabel' defaultMessage='Snapshot title'>
+                  {value => <ControlLabel>{value}</ControlLabel>}
+                </FormattedMessage>
+                <FormattedMessage id='panelSnapshots.modal.inputPlaceholder' defaultMessage='Enter title'>
+                  {value =>
+                    <FormControl
+                      type="text"
+                      name="title"
+                      placeholder={value}
+                      onChange={this.handleChange}/>
+                  }
+                </FormattedMessage>
               </FormGroup>
             </Form>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={this.addSnapshot}>Save</Button>
+            <FormattedMessage id='btn.save' defaultMessage='Save'>
+              {value => <Button onClick={this.addSnapshot}>{value}</Button>}
+            </FormattedMessage>
           </Modal.Footer>
         </Modal>
       </div>
     )
   }
 
-  // static propTypes = {
-  //   editor: PropTypes.shape({
-  //     scene: PropTypes.object,
-  //     camera: PropTypes.object,
-  //     renderer: PropTypes.object
-  //   })
-  // }
+  static propTypes = {
+    lang: PropTypes.string.isRequired,
+    project: PropTypes.object.isRequired,
+    scene: PropTypes.object,
+    cadCanvas: PropTypes.object,
+    addSnapshot: PropTypes.func.isRequired,
+    deleteSnapshot: PropTypes.func.isRequired,
+    loadSnapshot: PropTypes.func.isRequired
+  }
 }

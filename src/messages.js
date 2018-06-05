@@ -4,7 +4,8 @@ export default {
   'en': {
     btn: {
       cancel: 'Cancel',
-      order: 'Order'
+      order: 'Order',
+      save: 'Save'
     },
     header: {
       projects: 'Projects',
@@ -92,12 +93,45 @@ export default {
       noObjects: 'No objects',
       showAll: 'Show all',
       combineEdgeModels: 'Combine edge models'
+    },
+    panelSnapshots: {
+      noSnapshot: 'No snapshot',
+      btnTitleAdd: 'Add snapshot',
+      modal: {
+        title: 'Add new snapshot',
+        inputLabel: 'Snapshot title',
+        inputPlaceholder: 'Enter snapshot title'
+      }
+    },
+    signUp: {
+      title: 'Registration new user',
+      labelUserName: 'Username',
+      userNamePlaceholder: 'Enter your username',
+      labelPassword: 'Password',
+      passwordPlaceholder: 'Enter your password',
+      btnSignUp: 'Sign Up ...'
+    },
+    toolbar: {
+      point: 'Point (v)',
+      select: 'Select (m)',
+      undo: 'Undo',
+      redo: 'Redo'
+    },
+    userLogin: {
+      title: 'Log In',
+      description: 'Register Username & Password',
+      labelUserName: 'Username',
+      userNamePlaceholder: 'Enter your username',
+      labelPassword: 'Password',
+      passwordPlaceholder: 'Enter your password',
+      btnSignIn: 'Sign in ...'
     }
   },
   'ru': {
     btn: {
       cancel: 'Отмена',
-      order: 'Заказать'
+      order: 'Заказать',
+      save: 'Сохранить'
     },
     header: {
       projects: 'Проекты',
@@ -185,6 +219,38 @@ export default {
       noObjects: 'Нет обьектов',
       showAll: 'Показать все',
       combineEdgeModels: 'Объединить краевые модели'
+    },
+    panelSnapshots: {
+      noSnapshot: 'Нет сохранений',
+      btnTitleAdd: 'Сохранить',
+      modal: {
+        title: 'Добавить новое сохранение',
+        inputLabel: 'Заглавие',
+        inputPlaceholder: 'Введите заглавие'
+      }
+    },
+    signUp: {
+      title: 'Регистрация нового пользователя',
+      labelUserName: 'Имя пользователя',
+      userNamePlaceholder: 'Введите ваше имя',
+      labelPassword: 'Пароль',
+      passwordPlaceholder: 'Введите ваш пароль',
+      btnSignUp: 'Зарегистрироваться ...'
+    },
+    toolbar: {
+      point: 'Указатель (v)',
+      select: 'Выбрать несколько елементов (m)',
+      undo: 'Назад',
+      redo: 'Впред'
+    },
+    userLogin: {
+      title: 'Вход',
+      description: 'Зарегистрированное имя пользователя и пароль',
+      labelUserName: 'Имя пользователя',
+      userNamePlaceholder: 'Введите ваше имя',
+      labelPassword: 'Пароль',
+      passwordPlaceholder: 'Введите ваш пароль',
+      btnSignIn: 'Войти ...'
     }
   }
 }

@@ -5,6 +5,7 @@ import { register, logout, setUserName } from '../../actions/userLogin'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    lang: state.locale.lang,
     ...ownProps
   }
 }

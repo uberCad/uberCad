@@ -4,6 +4,7 @@ import { addSnapshot, deleteSnapshot, loadSnapshot } from '../../actions/panelSn
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    lang: state.locale.lang,
     project: state.project.project,
     scene: state.cad.scene,
     cadCanvas: state.cad.cadCanvas,
