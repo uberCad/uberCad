@@ -6,7 +6,8 @@ import {
   CAD_TOGGLE_VISIBLE,
   CAD_TOGGLE_VISIBLE_LAYER,
   CAD_SHOW_ALL,
-  CAD_GROUP_ENTITIES
+  CAD_GROUP_ENTITIES,
+  CAD_EDITMODE_SET_ACTIVE_LINE
 } from '../actions/cad'
 
 import {
@@ -24,7 +25,8 @@ let initialState = {
   editMode: {
     isEdit: false,
     beforeEdit: {},
-    editObject: {}
+    editObject: {},
+    activeLine: {}
   },
 
   loading: false,
@@ -36,6 +38,12 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+    case CAD_EDITMODE_SET_ACTIVE_LINE:
+      return update(state, {
+        editMode: {
+          activeLine: {$set: action.payload.activeLine}
+        }
+      })
     case EDIT_IS_EDIT:
       return update(state, {
         editMode: {

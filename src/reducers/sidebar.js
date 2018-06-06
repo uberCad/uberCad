@@ -5,6 +5,7 @@ import {
 } from '../actions/sidebar'
 import { PANEL_OBJECTS_TOGGLE } from '../actions/panelObjects'
 import { LOCALE_SET } from '../actions/locale'
+import { EDIT_IS_EDIT } from '../actions/edit'
 
 let initialState = {
   active: true,
@@ -56,6 +57,11 @@ let initialState = {
 
 const options = (state = initialState, action) => {
   switch (action.type) {
+    case EDIT_IS_EDIT:
+      state.panels[1][0].active = !state.panels[1][0].active
+      state.panels[1][1].active = !state.panels[1][1].active
+      return {...state}
+
     case PANEL_OBJECTS_TOGGLE:
       return {
         ...state,
