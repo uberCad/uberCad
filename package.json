@@ -7,8 +7,11 @@
   "dependencies": {
     "antd": "^3.1.4",
     "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
     "bootstrap": "^3.3.7",
     "dxf-parser": "^0.5.1",
+    "express": "^4.16.3",
+    "express-fileupload": "^0.4.0",
     "immutability-helper": "^2.6.5",
     "jest": "^22.4.3",
     "kmeans-js": "^0.1.2",

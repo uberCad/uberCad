@@ -1330,8 +1330,17 @@ let isBoundingBoxesCollide = (boundingBox1, boundingBox2, threshold = 0.000001) 
 let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001, debug = false) => {
   if (!(entity1.geometry instanceof THREE.CircleGeometry) && !(entity2.geometry instanceof THREE.CircleGeometry)) {
     // line to line
+    let intersectionResult
+    try {
 
-    let intersectionResult = linesIntersect(entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1], threshold, debug)
+
+      intersectionResult = linesIntersect(entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1], threshold, debug)
+    } catch (e) {
+
+      console.error("AAAAAAAAAAAAAAAAAAAA", e, entity1, entity2)
+
+    }
+
     if (intersectionResult.isIntersects) {
       return {
         type: intersectionResult.type,

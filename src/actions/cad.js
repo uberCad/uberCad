@@ -107,8 +107,21 @@ function testExample (editor) {
   })
 
   if (frames.length) {
-    sceneService.combineEdgeModels(editor)
+    // let {svg} = sceneService.combineEdgeModels(editor)
+    let svg = sceneService.someSvg
+    try {
+      sceneService.sendToFlixo(svg)
+    } catch (e) {
+      console.error(e)
+    }
   }
+
+  // let svg = sceneService.someSvg
+  // try {
+  //   sceneService.sendToFlixo(svg)
+  // } catch (e) {
+  //   console.error(e)
+  // }
 }
 
 export const cadClick = (event, editor) => {
