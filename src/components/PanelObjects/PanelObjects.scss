@@ -60,6 +60,14 @@
         background: url("set-material.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
+      &.btn-calc {
+        background: url("calculator.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
+      &.btn-edit {
+        background: url("edit.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
     }
   }
 }

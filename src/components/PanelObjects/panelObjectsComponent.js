@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import './PanelObjects.css'
 import sceneService from '../../services/sceneService'
 import MaterialComponent from '../Material/materrialComponentContainer'
+import Calculate from '../CalculatePrice/calculatePriceComponentContainer'
+import { FormattedMessage } from 'react-intl'
 
 export default class PanelObjectsComponent extends Component {
   shouldComponentUpdate (nextProps) {
@@ -34,7 +36,7 @@ export default class PanelObjectsComponent extends Component {
     const {scene} = this.props.editor
     if (scene) {
       let object = scene.getObjectById(parseInt(id, 10))
-      this.props.isEdit(!this.props.editor.isEdit, object)
+      this.props.isEdit(!this.props.editor.isEdit, this.props.editor, object)
     }
   }
 
@@ -64,39 +66,56 @@ export default class PanelObjectsComponent extends Component {
                    data-id={object.id}
                    onClick={this.toggleObject}
               >
-                <input type='checkbox' data-id={object.id}
-                       title='Visibility'
-                       checked={object.visible}
-                       onChange={this.onChangeVisible}
-                />
+                <FormattedMessage id='panelObject.checkboxVisibility' defaultMessage='Visibility'>
+                  {value =>
+                    <input type='checkbox' data-id={object.id}
+                           title={value}
+                           checked={object.visible}
+                           onChange={this.onChangeVisible}
+                    />
+                  }
+                </FormattedMessage>
+
                 {object.name}
                 <span>{object.children.length}</span>
-                {!this.props.editor.isEdit && <span onClick={this.edit} data-id={object.id}>edit</span>}
               </div>
             ))
             : (
-              <span>No objects</span>
+              <FormattedMessage id='panelObject.noObjects' defaultMessage='No objects' />
             )
           }
         </div>
         <div className='toolbar'>
           {objects && objects.children.length > 1 && (
-            <button onClick={this.combineEdgeModels}
-                    className='combine'
-                    title='Combine edge models'
-            />
+            <FormattedMessage id='panelObject.combineEdgeModels' defaultMessage='Combine edge models'>
+              {value =>
+                <button onClick={this.combineEdgeModels}
+                        className='combine'
+                        title={value}
+                />
+              }
+            </FormattedMessage>
           )}
-          <button onClick={this.showAll}
-                  className='show-all'
-                  title='Show all'
-          />
+          <FormattedMessage id='panelObject.showAll' defaultMessage='Show all'>
+            {value =>
+              <button onClick={this.showAll}
+                      className='show-all'
+                      title={value}
+              />
+            }
+          </FormattedMessage>
           {this.props.activeObject && <MaterialComponent />}
+          {this.props.activeObject &&
+          (!this.props.editor.isEdit && <button onClick={this.edit} data-id={this.props.activeObject.id} className='btn-edit' />)
+          }
+          {objects && objects.children.length > 0 && <Calculate />}
         </div>
       </div>
     )
   }
 
   static propTypes = {
+    lang: PropTypes.string.isRequired,
     editor: PropTypes.shape({
       scene: PropTypes.object,
       camera: PropTypes.object,

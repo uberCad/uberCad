@@ -10,6 +10,8 @@ import selection from './selection'
 import sidebar from './sidebar'
 import userLogin from './userLogin'
 import materials from './materials'
+import price from './price'
+import locale from './locale'
 
 export default {
   counter,
@@ -23,5 +25,7 @@ export default {
   selection,
   sidebar,
   userLogin,
-  materials
+  materials,
+  price,
+  locale
 }

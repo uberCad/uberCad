@@ -14,6 +14,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 
   return {
+    lang: state.locale.lang,
     projectsFilter,
     items,
     loading,
@@ -24,8 +25,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchProjectsIfNeeded: function (filter, force = false) {
-      fetchProjectsIfNeeded(filter, force)(dispatch)
+    fetchProjects: function (filter) {
+      fetchProjectsIfNeeded(filter)(dispatch)
     }
   }
 }

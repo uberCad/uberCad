@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import UserService from '../../services/UserService'
-
-
-
 import { Row, Col, Button, Form, FormGroup, ControlLabel, Alert } from 'react-bootstrap'
+import PropTypes from 'prop-types'
+import { FormattedMessage } from 'react-intl'
 
 export default class UserLoginComponent extends Component {
 
@@ -41,46 +40,61 @@ export default class UserLoginComponent extends Component {
   }
 
   render () {
-
     return (
       <Row className='container'>
         <Form>
           <Row>
             <Col smOffset={4} sm={6}>
-              <h3>Log In</h3>
-              Via <a href='https://github.com/login/oauth/authorize?scope=user:email&client_id=3b1d468a19661c8789c4'>
-                <span className='fa fa-github'> </span>GitHub</a>
+              <FormattedMessage id='userLogin.title' defaultMessage='Log In'>
+                {value => <h3>{value}</h3>}
+              </FormattedMessage>
 
-                <h5>
-                  Via register Username & Password
-                </h5>
+              <a href='https://github.com/login/oauth/authorize?scope=user:email&client_id=3b1d468a19661c8789c4'>
+                <span className='fa fa-github'/> GitHub</a>
+                <hr />
+              <FormattedMessage id='userLogin.description' defaultMessage='Register Username & Password'>
+                {value => <h5>{value}</h5>}
+              </FormattedMessage>
               <FormGroup
                 controlId='formBasicText'
                 validationState={this.getValidationState()}
               >
                 <div className='input-group-login'>
-                  <ControlLabel className='label'>Username</ControlLabel>
-                  <input
-                    id={'name'}
-                    name='name'
-                    className='input form-control'
-                    type='text'
-                    value={this.state.name}
-                    placeholder='Enter your username'
-                    onChange={this.handleChange}
-                  />
+                  <FormattedMessage id='userLogin.labelUserName' defaultMessage='Username'>
+                    {value => <ControlLabel className='label'>{value}</ControlLabel>}
+                  </FormattedMessage>
+                  <FormattedMessage id='userLogin.userNamePlaceholder' defaultMessage='Enter your username'>
+                    {value =>
+                      <input
+                        id={'name'}
+                        name='name'
+                        className='input form-control'
+                        type='text'
+                        value={this.state.name}
+                        placeholder={value}
+                        onChange={this.handleChange}
+                      />
+                    }
+                  </FormattedMessage>
+
                 </div>
                 <div className='input-group-login'>
-                  <ControlLabel className='label'>Password</ControlLabel>
-                  <input
-                    id='password'
-                    name='password'
-                    className='input form-control'
-                    type='password'
-                    value={this.state.password}
-                    placeholder='Enter your password'
-                    onChange={this.handleChange}
-                  />
+                  <FormattedMessage id='userLogin.labelPassword' defaultMessage='Password'>
+                    {value => <ControlLabel className='label'>{value}</ControlLabel>}
+                  </FormattedMessage>
+                  <FormattedMessage id='userLogin.passwordPlaceholder' defaultMessage='Enter your password'>
+                    {value =>
+                      <input
+                        id='password'
+                        name='password'
+                        className='input form-control'
+                        type='password'
+                        value={this.state.password}
+                        placeholder={value}
+                        onChange={this.handleChange}
+                      />
+                    }
+                  </FormattedMessage>
                 </div>
 
                 {this.state.errorMessage &&
@@ -89,12 +103,12 @@ export default class UserLoginComponent extends Component {
                 </Alert>}
 
               </FormGroup>
-              <Button className='' onClick={this.authorize}>Sign in ...</Button>
-
+              <FormattedMessage id='userLogin.btnSignIn' defaultMessage='Sign in ...'>
+                {value => <Button onClick={this.authorize}>{value}</Button>}
+              </FormattedMessage>
             </Col>
           </Row>
         </Form>
-
       </Row>
     )
   }
@@ -112,5 +126,12 @@ export default class UserLoginComponent extends Component {
     const name = event.target.name
     const value = event.target.value
     this.setState({[name]: value})
+  }
+
+  static propTypes = {
+    lang: PropTypes.string.isRequired,
+    setUserName: PropTypes.func.isRequired,
+    authorize: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired
   }
 }

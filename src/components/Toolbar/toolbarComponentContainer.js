@@ -4,6 +4,7 @@ import { chooseTool } from '../../actions/toolbar'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    lang: state.locale.lang,
     tool: state.toolbar.tool,
     ...ownProps
   }

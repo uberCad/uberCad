@@ -4,6 +4,7 @@ import { addProject } from '../../actions/addProject'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    lang: state.locale.lang,
     ...ownProps
   }
 }

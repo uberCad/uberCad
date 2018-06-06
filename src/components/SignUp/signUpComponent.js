@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { Row, Col, Button, Form, FormGroup, ControlLabel, Alert } from 'react-bootstrap'
+import PropTypes from 'prop-types'
+import { FormattedMessage } from 'react-intl'
 
 export default class SignUpComponent extends Component {
 
@@ -32,47 +34,63 @@ export default class SignUpComponent extends Component {
         <Form>
           <Row>
             <Col smOffset={4} sm={6}>
-              <h3>Sign Up</h3>
+              <FormattedMessage id='signUp.title' defaultMessage='Sign Up'>
+                {value => <h3>{value}</h3>}
+              </FormattedMessage>
               <FormGroup
                 controlId='formBasicText'
                 validationState={this.getValidationState()}
               >
                 <div className='input-group-login'>
-                  <ControlLabel className='label'>Username</ControlLabel>
-                  <input
-                    id={'name'}
-                    name='name'
-                    className='input form-control'
-                    type='text'
-                    value={this.state.name}
-                    placeholder='Enter your username'
-                    onChange={this.handleChange}
-                  />
+                  <FormattedMessage id='signUp.labelUserName' defaultMessage='Username'>
+                    {value => <ControlLabel className='label'>{value}</ControlLabel>}
+                  </FormattedMessage>
+                  <FormattedMessage id='signUp.userNamePlaceholder' defaultMessage='Enter your username'>
+                    {value =>
+                      <input
+                        id={'name'}
+                        name='name'
+                        className='input form-control'
+                        type='text'
+                        value={this.state.name}
+                        placeholder={value}
+                        onChange={this.handleChange}
+                      />
+                    }
+                  </FormattedMessage>
+
                 </div>
                 <div className='input-group-login'>
-                  <ControlLabel className='label'>Password</ControlLabel>
-                  <input
-                    id='password'
-                    name='password'
-                    className='input form-control'
-                    type='password'
-                    value={this.state.password}
-                    placeholder='Enter your password'
-                    onChange={this.handleChange}
-                  />
+                  <FormattedMessage id='signUp.labelPassword' defaultMessage='Password'>
+                    {value => <ControlLabel className='label'>{value}</ControlLabel>}
+                  </FormattedMessage>
+                  <FormattedMessage id='signUp.passwordPlaceholder' defaultMessage='Enter your password'>
+                    {value =>
+                      <input
+                        id='password'
+                        name='password'
+                        className='input form-control'
+                        type='password'
+                        value={this.state.password}
+                        placeholder={value}
+                        onChange={this.handleChange}
+                      />
+                    }
+                  </FormattedMessage>
                 </div>
 
                 {this.state.errorMessage &&
-                  <Alert bsStyle="danger">
-                    <strong>Error!</strong> {this.state.errorMessage}
-                  </Alert>}
+                <Alert bsStyle="danger">
+                  <strong>Error!</strong> {this.state.errorMessage}
+                </Alert>}
 
               </FormGroup>
-              <Button className='' onClick={this.register}>Sign Up ...</Button>
+              <FormattedMessage id='signUp.btnSignUp' defaultMessage='Sign Up ...'>
+                {value => <Button className='' onClick={this.register}>{value}</Button>}
+              </FormattedMessage>
             </Col>
           </Row>
         </Form>
-
       </Row>
     )
   }
@@ -92,5 +110,12 @@ export default class SignUpComponent extends Component {
     this.setState({
       [name]: value
     })
+  }
+
+  static propTypes = {
+    lang: PropTypes.string.isRequired,
+    register: PropTypes.func.isRequired,
+    setUserName: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired
   }
 }

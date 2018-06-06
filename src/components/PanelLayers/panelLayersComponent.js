@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './PanelLayers.css'
 import sceneService from '../../services/sceneService'
+import { FormattedMessage } from 'react-intl'
 
 export default class PanelLayersComponent extends Component {
   onChangeVisible = ({currentTarget: {checked, dataset: {id}}}) => {
@@ -36,19 +37,23 @@ export default class PanelLayersComponent extends Component {
           {layers
             ? layers.children.filter(layer => layer.children.length).map((layer, idx) => (
               <div className='item'
-                key={idx}
+                   key={idx}
               >
-                <input type='checkbox' data-id={layer.id}
-                  title='Visibility'
-                  checked={layer.visible}
-                  onChange={this.onChangeVisible}
-                />
+                <FormattedMessage id='panelLayer.checkboxVisibility' defaultMessage='Visibility'>
+                  {value =>
+                    <input type='checkbox' data-id={layer.id}
+                           title={value}
+                           checked={layer.visible}
+                           onChange={this.onChangeVisible}
+                    />
+                  }
+                </FormattedMessage>
                 {layer.name}
                 <span>{layer.children.length}</span>
               </div>
             ))
             : (
-              <span>No layers</span>
+              <FormattedMessage id='panelLayer.noLayers' defaultMessage='No layers'/>
             )
           }
         </div>
@@ -59,16 +64,22 @@ export default class PanelLayersComponent extends Component {
           {/* title="Group to object" */}
           {/* /> */}
           {/* )} */}
-          <button onClick={this.showAll}
-            className='show-all'
-            title='Show all'
-          />
+          <FormattedMessage id='panelLayer.showAll' defaultMessage='Show all'>
+            {value =>
+              <button onClick={this.showAll}
+                      className='show-all'
+                      title={value}
+              />
+            }
+          </FormattedMessage>
+
         </div>
       </div>
     )
   }
 
   static propTypes = {
+    lang: PropTypes.string.isRequired,
     editor: PropTypes.shape({
       scene: PropTypes.object,
       camera: PropTypes.object,

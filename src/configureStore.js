@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, combineReducers } from 'redux'
+import { createStore, applyMiddleware, combineReducers, compose } from 'redux'
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import thunk from 'redux-thunk'
@@ -7,7 +7,7 @@ import reducers from './reducers'
 const rootPersistConfig = {
   key: 'root',
   storage: storage,
-  blacklist: ['cad', 'options', 'selection']
+  blacklist: ['cad', 'options', 'selection', 'price']
 }
 
 const cadPersistConfig = {
@@ -24,7 +24,9 @@ const persistedReducer = persistReducer(rootPersistConfig, combineReducers({
 }))
 
 export default () => {
-  let store = createStore(persistedReducer, applyMiddleware(thunk))
+  const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+  let store = createStore(persistedReducer, composeEnhancers(
+    applyMiddleware(thunk)))
   let persistor = persistStore(store)
   return { store, persistor }
 }

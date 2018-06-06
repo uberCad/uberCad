@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import ProjectsListComponent from './projectsListComponent'
+import App from './App'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -8,4 +8,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps)(ProjectsListComponent)
+export default connect(mapStateToProps)(App)

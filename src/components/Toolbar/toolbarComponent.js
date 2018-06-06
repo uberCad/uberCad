@@ -7,6 +7,8 @@ import toolPoint from './point.svg'
 import toolSelect from './select.svg'
 import toolUndo from './undo.svg'
 import toolRedo from './redo.svg'
+import PropTypes from 'prop-types'
+import { FormattedMessage } from 'react-intl'
 
 export const TOOL_POINT = 'TOOL_POINT'
 export const TOOL_SELECT = 'TOOL_SELECT'
@@ -23,36 +25,53 @@ export default class ToolbarComponent extends Component {
 
     return (
       <div id='toolbar'>
-        <button className={`btn ${tool === TOOL_POINT ? 'btn-success' : ''}`}
-          data-tool={TOOL_POINT}
-          onClick={this.onClick}
-          title='Point (v)'
-        >
-          <img src={toolPoint} alt='Point' />
-        </button>
+        <FormattedMessage id='toolbar.point' defaultMessage='Point (v)'>
+          {value =>
+            <button className={`btn ${tool === TOOL_POINT ? 'btn-success' : ''}`}
+                    data-tool={TOOL_POINT}
+                    onClick={this.onClick}
+                    title={value}
+            >
+              <img src={toolPoint} alt='Point'/>
+            </button>
+          }
+        </FormattedMessage>
 
-        <button className={`btn ${tool === TOOL_SELECT ? 'btn-success' : ''}`}
-          data-tool={TOOL_SELECT}
-          onClick={this.onClick}
-          title='Select (m)'
-        >
-          <img src={toolSelect} alt='Select' />
-        </button>
+        <FormattedMessage id='toolbar.select' defaultMessage='Select (m)'>
+          {value =>
+            <button className={`btn ${tool === TOOL_SELECT ? 'btn-success' : ''}`}
+                    data-tool={TOOL_SELECT}
+                    onClick={this.onClick}
+                    title={value}
+            >
+              <img src={toolSelect} alt='Select'/>
+            </button>
+          }
+        </FormattedMessage>
 
-        <button className={`btn ${tool === TOOL_UNDO ? 'btn-success' : ''}`}
-          data-tool={TOOL_UNDO}
-          onClick={this.onClick}
-          title='Undo'
-        >
-          <img src={toolUndo} alt='Undo' />
-        </button>
-        <button className={`btn ${tool === TOOL_REDO ? 'btn-success' : ''}`}
-          data-tool={TOOL_REDO}
-          onClick={this.onClick}
-          title='Redo'
-        >
-          <img src={toolRedo} alt='Redo' />
-        </button>
+        <FormattedMessage id='toolbar.undo' defaultMessage='Undo'>
+          {value =>
+            <button className={`btn ${tool === TOOL_UNDO ? 'btn-success' : ''}`}
+                    data-tool={TOOL_UNDO}
+                    onClick={this.onClick}
+                    title={value}
+            >
+              <img src={toolUndo} alt='Undo'/>
+            </button>
+          }
+        </FormattedMessage>
+
+        <FormattedMessage id='toolbar.redo' defaultMessage='Redo'>
+          {value =>
+            <button className={`btn ${tool === TOOL_REDO ? 'btn-success' : ''}`}
+                    data-tool={TOOL_REDO}
+                    onClick={this.onClick}
+                    title={value}
+            >
+              <img src={toolRedo} alt='Redo'/>
+            </button>
+          }
+        </FormattedMessage>
 
         {/* <button className="btn" id="back" type="submit" disabled="true" ng-click="back()" title="Back"><i */}
         {/* class="fa fa-rotate-left"></i></button> */}
@@ -86,6 +105,7 @@ export default class ToolbarComponent extends Component {
   }
 
   static propTypes = {
+    lang: PropTypes.string.isRequired
     // tool: PropTypes.object.isRequired,
   }
 }

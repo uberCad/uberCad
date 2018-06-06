@@ -1,10 +1,14 @@
-.data-projects {
+.project-page {
   margin: 30px;
   padding: 0;
   font-family: 'Verdana';
   font-size: 16px;
   color: #999999;
   box-shadow: 0 0 50px rgb(241, 241, 241);
+
+  h3{
+    padding: 10px;
+  }
 
   .table-row {
     border-bottom: 1px dashed #e6eaec;
