@@ -1,0 +1,11 @@
+@import "../../variables.scss";
+
+.pointInfo {
+  display: none;
+  position: absolute;
+  background: rgba(204, 204, 204, 0.5);
+  border: 1px solid #b5b5b5;
+  opacity: 0.5;
+  padding: 3px;
+  z-index: 1;
+}

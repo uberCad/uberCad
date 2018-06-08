@@ -14,7 +14,18 @@ import {
   SNAPSHOT_LOAD_SCENE
 } from '../actions/panelSnapshots'
 
-import { EDIT_IS_EDIT } from '../actions/edit'
+import {
+  EDIT_IS_EDIT,
+  EDIT_SELECT_POINT,
+  EDIT_CANCEL,
+  EDIT_SAVE_POINT
+} from '../actions/edit'
+
+import {
+  POINT_INFO_ACTIVE,
+  POINT_INFO_MOVE,
+  POINT_INFO_DISABLE
+} from '../actions/pointInfo'
 
 let initialState = {
   scene: null,
@@ -26,7 +37,14 @@ let initialState = {
     isEdit: false,
     beforeEdit: {},
     editObject: {},
-    activeLine: {}
+    activeLine: {},
+    selectPointIndex: null
+  },
+  pointInfo: {
+    style: {
+      display: 'none'
+    },
+    message: ''
   },
 
   loading: false,
@@ -38,6 +56,41 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+
+    case POINT_INFO_ACTIVE:
+      return update(state, {
+        pointInfo: {style: {$set: action.payload.style}}
+      })
+    case POINT_INFO_MOVE:
+      return update(state, {
+        pointInfo: {
+          style: {$set: action.payload.style},
+          message: {$set: action.payload.message}
+        }
+      })
+    case POINT_INFO_DISABLE:
+      return update(state, {
+        pointInfo: {
+          style: {$set: action.payload.style},
+          message: {$set: action.payload.message}
+        }
+      })
+
+    case EDIT_SAVE_POINT:
+      return update(state, {
+        editMode: {selectPointIndex: {$set: action.payload.index}}
+      })
+    case EDIT_CANCEL:
+      return update(state, {
+        editMode: {$set: action.payload.editMode}
+      })
+    case EDIT_SELECT_POINT:
+      return update(state, {
+        editMode: {
+          selectPointIndex: {$set: action.payload.selectPointIndex}
+        }
+      })
+
     case CAD_EDITMODE_SET_ACTIVE_LINE:
       return update(state, {
         editMode: {

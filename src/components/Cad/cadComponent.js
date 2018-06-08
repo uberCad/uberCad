@@ -7,6 +7,7 @@ import Toolbar from '../Toolbar/toolbarComponentContainer'
 import Options from '../Options/optionsComponentContainer'
 import Sidebar from '../Sidebar/sidebarComponentContainer'
 import Selection from '../Selection/selectionComponentContainer'
+import PointInfoComponent from '../PointInfo/pointInfoComponentContainer'
 // import * as THREE  from '../../extend/THREE'
 
 import './Cad.css'
@@ -74,6 +75,7 @@ export default class CadComponent extends Component {
         <Toolbar />
         <Options />
         <Sidebar />
+        <PointInfoComponent />
       </div>
     )
   }

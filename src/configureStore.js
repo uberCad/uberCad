@@ -13,7 +13,7 @@ const rootPersistConfig = {
 const cadPersistConfig = {
   key: 'cad',
   storage: storage,
-  blacklist: ['scene', 'camera', 'renderer', 'cadCanvas', 'activeEntities']
+  blacklist: ['scene', 'camera', 'renderer', 'cadCanvas', 'activeEntities', 'pointInfo']
 }
 
 // https://github.com/reactjs/redux/issues/749

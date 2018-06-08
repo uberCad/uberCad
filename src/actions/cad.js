@@ -3,7 +3,7 @@ import dxfService from './../services/dxfService'
 import sceneService from './../services/sceneService'
 import { TOOL_POINT } from '../components/Toolbar/toolbarComponent'
 import { SELECT_MODE_NEW } from '../components/Options/optionsComponent'
-import { addHelpPoints, getScale } from '../services/editObject'
+import { addHelpPoints, getScale, setLine } from '../services/editObject'
 
 export const CAD_PARSE_DXF = 'CAD_PARSE_DXF'
 export const CAD_DRAW_DXF = 'CAD_DRAW_DXF'
@@ -160,19 +160,23 @@ export const cadClick = (event, editor) => {
           })
         } else {
           if (selectResult.length && selectResult[0].parent.name === editor.editMode.editObject.name) {
-            let activeEntities = sceneService.doSelection(selectResult, editor)
-            const rPoint = getScale(camera)
-            addHelpPoints(activeEntities[0], scene, rPoint)
-            renderer.render(scene, camera)
-            dispatch({
-              type: CAD_EDITMODE_SET_ACTIVE_LINE,
-              payload: {
-                activeLine: activeEntities[0]
+            if (selectResult[0].id !== editor.editMode.activeLine.id) {
+              if (editor.editMode.activeLine.id) {
+                setLine(editor.editMode.activeLine, scene)
               }
-            })
+              let activeEntities = sceneService.doSelection(selectResult, editor)
+              const rPoint = getScale(camera)
+              activeEntities[0].name = 'ActiveLine'
+              addHelpPoints(activeEntities[0], scene, rPoint)
+              renderer.render(scene, camera)
+              dispatch({
+                type: CAD_EDITMODE_SET_ACTIVE_LINE,
+                payload: {
+                  activeLine: activeEntities[0]
+                }
+              })
+            }
           }
-          //
-          console.log('cad selectResult = ', selectResult)
         }
         // else {
         //   if (clickResult.activeEntities.length > 0 &&

@@ -18,6 +18,7 @@ import {
   TOOL_SELECT
 } from '../Toolbar/toolbarComponent'
 import sceneService from '../../services/sceneService'
+import { movePoint, savePoint, selectPoint } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -85,6 +86,9 @@ const mapDispatchToProps = (dispatch) => {
         if (editor.tool === TOOL_POINT) {
           if (editor.editMode.isEdit) {
             // do edit here
+            if (editor.editMode.activeLine.id) {
+              selectPoint(editor.editMode.activeLine, event, editor)(dispatch)
+            }
           }
         }
 
@@ -101,6 +105,20 @@ const mapDispatchToProps = (dispatch) => {
         if (editor.selection.active) {
           selectionUpdate(event, editor)(dispatch)
         }
+      }
+
+      if (event.button === 0
+        && editor.tool === TOOL_POINT
+        && editor.editMode.isEdit
+        && editor.editMode.activeLine.id
+        && (editor.editMode.selectPointIndex || editor.editMode.selectPointIndex === 0)
+      ) {
+        // do edit here
+        movePoint(
+          editor.editMode.activeLine,
+          editor.editMode.selectPointIndex,
+          event,
+          editor)(dispatch)
       }
     },
 
@@ -121,6 +139,12 @@ const mapDispatchToProps = (dispatch) => {
           })
         }
         // console.warn('selectResult', selectResult)
+      }
+
+      // do edit here
+      if (event.button === 0 && editor.tool === TOOL_POINT && editor.editMode.isEdit && editor.editMode.activeLine.id) {
+        // do edit here
+        savePoint(editor.editMode.selectPointIndex)(dispatch)
       }
     }
 
