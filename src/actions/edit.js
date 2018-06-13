@@ -66,6 +66,14 @@ export const selectPoint = (line, event, editor) => {
     y: clickResult.point.y
   }
   const selectPointIndex = startPointIndex(line, mousePoint)
+  if (line.geometry.type === 'CircleGeometry') {
+    if (!line.userData.helpGeometry) {
+      line.userData.helpGeometry = {}
+    }
+    line.userData.helpGeometry.helpLength = line.geometry.parameters.thetaLength
+    line.userData.helpGeometry.helpStart = line.geometry.parameters.thetaStart
+  }
+
   return dispatch => {
     activePoint()(dispatch)
     dispatch({
