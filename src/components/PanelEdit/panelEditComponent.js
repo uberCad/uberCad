@@ -4,6 +4,10 @@ import './PanelEdit.css'
 
 export default class PanelEditComponent extends Component {
 
+  newLine = (event) =>{
+    this.props.newLine(event)
+  }
+
   render () {
     const {activeLine} = this.props.editMode
     return (
@@ -16,6 +20,11 @@ export default class PanelEditComponent extends Component {
           <div>thetaLength: {activeLine.geometry.parameters.thetaLength}</div>
           <div>thetaStart: {activeLine.geometry.parameters.thetaStart}</div>
         </div>)}
+        <button onClick={this.newLine}>new line</button>
+        <br />
+        <button onClick={this.props.cancelNewLine}>cancel line</button>
+        <br />
+        <button>new arc</button>
       </div>
     )
   }

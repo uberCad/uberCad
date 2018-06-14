@@ -159,7 +159,10 @@ export const cadClick = (event, editor) => {
             }
           })
         } else {
-          if (selectResult.length && selectResult[0].parent.name === editor.editMode.editObject.name) {
+          if (selectResult.length
+            && selectResult[0].parent.name === editor.editMode.editObject.name
+            && !editor.editMode.isNewLine
+          ) {
             if (selectResult[0].id !== editor.editMode.activeLine.id) {
               if (editor.editMode.activeLine.id) {
                 setLine(editor.editMode.activeLine, scene)

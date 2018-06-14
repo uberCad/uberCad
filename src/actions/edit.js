@@ -9,6 +9,9 @@ export const EDIT_CANCEL = 'EDIT_CANCEL'
 export const EDIT_SELECT_POINT = 'EDIT_SELECT_POINT'
 export const EDIT_MOVE_POINT = 'EDIT_MOVE_POINT'
 export const EDIT_SAVE_POINT = 'EDIT_SAVE_POINT'
+export const EDIT_NEW_LINE = 'EDIT_NEW_LINE'
+export const EDIT_CANCEL_NEW_LINE = 'EDIT_CANCEL_NEW_LINE'
+export const EDIT_NEW_ARC = 'EDIT_NEW_ARC'
 
 export const isEdit = (option, editor, object = {}) => {
   if (option) {
@@ -116,4 +119,29 @@ export const savePoint = () => {
       payload: {index: null}
     })
   }
+}
+
+export const newLine = (event) => {
+  const pInfo = {
+    x: event.pageX,
+    y: event.pageY
+  }
+
+  return dispatch => {
+    movePointInfo(pInfo, 'Select first point')(dispatch)
+
+    dispatch({
+      type: EDIT_NEW_LINE,
+      payload:
+        {isNewLine: true}
+
+    })
+  }
+}
+
+export const cancelNewLine = () => {
+  return dispatch => dispatch({
+    type: EDIT_CANCEL_NEW_LINE,
+    payload: {isNewLine: false}
+  })
 }
