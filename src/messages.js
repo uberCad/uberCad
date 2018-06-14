@@ -3,7 +3,8 @@ export default {
     btn: {
       cancel: 'Cancel',
       order: 'Order',
-      save: 'Save'
+      save: 'Save',
+      delete: 'Delete'
     },
     header: {
       projects: 'Projects',
@@ -31,7 +32,9 @@ export default {
       price: 'price',
       efficiency: 'efficiency',
       details: 'details',
-      status: 'status'
+      status: 'status',
+      btnDel: 'Delete project',
+      delMsg: 'Do you really want to delete the project and all the snapshots?'
     },
     activeEntities: {
       checkboxVisibility: 'Visibility',
@@ -129,7 +132,8 @@ export default {
     btn: {
       cancel: 'Отмена',
       order: 'Заказать',
-      save: 'Сохранить'
+      save: 'Сохранить',
+      delete: 'Удалить'
     },
     header: {
       projects: 'Проекты',
@@ -157,7 +161,9 @@ export default {
       price: 'цена',
       efficiency: 'эффективность',
       details: 'детали',
-      status: 'статус'
+      status: 'статус',
+      btnDel: 'Удалить проект',
+      delMsg: 'Вы действительно хотите удалить проект и все снимки?'
     },
     activeEntities: {
       checkboxVisibility: 'Отображение линии',
