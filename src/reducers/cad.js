@@ -20,7 +20,9 @@ import {
   EDIT_CANCEL,
   EDIT_SAVE_POINT,
   EDIT_NEW_LINE,
-  EDIT_CANCEL_NEW_LINE
+  EDIT_CANCEL_NEW_LINE,
+  EDIT_LINE_FIRST_POINT,
+  EDIT_NEW_LINE_SAVE
 } from '../actions/edit'
 
 import {
@@ -41,7 +43,8 @@ let initialState = {
     editObject: {},
     activeLine: {},
     selectPointIndex: null,
-    isNewLine: false
+    isNewLine: false,
+    newLineFirst: null
   },
   pointInfo: {
     style: {
@@ -59,10 +62,23 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
-
+    case EDIT_NEW_LINE_SAVE:
+      return update(state, {
+        editMode: {
+          isNewLine: {$set: action.payload.isNewLine},
+          newLineFirst: {$set: action.payload.firstPoint}
+        }
+      })
+    case EDIT_LINE_FIRST_POINT:
+      return update(state, {
+        editMode: {newLineFirst: {$set: action.payload.firstPoint}}
+      })
     case EDIT_CANCEL_NEW_LINE:
       return update(state, {
-        editMode: {isNewLine: {$set: action.payload.isNewLine}}
+        editMode: {
+          isNewLine: {$set: action.payload.isNewLine},
+          newLineFirst: {$set: action.payload.newLineFirst}
+        }
       })
     case EDIT_NEW_LINE:
       return update(state, {

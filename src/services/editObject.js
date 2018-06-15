@@ -177,10 +177,12 @@ let changeGeometry = (line, index, point, scene) => {
     // change circle point
     let point1 = scene.getObjectByName('point1')
     let point2 = scene.getObjectByName('point2')
-    point1.position.x = line.geometry.vertices[0].x
-    point1.position.y = line.geometry.vertices[0].y
-    point2.position.x = line.geometry.vertices[1].x
-    point2.position.y = line.geometry.vertices[1].y
+    if (point1 && point2) {
+      point1.position.x = line.geometry.vertices[0].x
+      point1.position.y = line.geometry.vertices[0].y
+      point2.position.x = line.geometry.vertices[1].x
+      point2.position.y = line.geometry.vertices[1].y
+    }
   } else {
     if (line.geometry.type === 'CircleGeometry') {
       let changedGeometry = {
@@ -466,6 +468,21 @@ let crossingPoint = (pointMouse, activeEntities, entrainment = 0.05) => {
   }
 }
 
+let createLine = (point0, point1) => {
+  if (point0.x && point0.y && point1.x && point1.y) {
+    let geometryLine = new THREE.Geometry()
+    geometryLine.vertices.push(new THREE.Vector3(point0.x, point0.y, 0))
+    geometryLine.vertices.push(new THREE.Vector3(point1.x, point1.y, 0))
+    //create a blue LineBasicMaterial
+    let materialLine = new THREE.LineBasicMaterial({color: 0x00ff00})
+    let line = new THREE.Line(geometryLine, materialLine)
+    line.name = 'newLine'
+    return line
+  } else {
+    console.error('New Line Error. Missing all points to create line \n point0 = ', point0, 'point1 = ', point1)
+  }
+}
+
 export {
   setColor,
   setOriginalColor,
@@ -474,5 +491,6 @@ export {
   setLine,
   startPointIndex,
   changeGeometry,
-  crossingPoint
+  crossingPoint,
+  createLine
 }

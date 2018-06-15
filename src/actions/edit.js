@@ -1,5 +1,12 @@
 import * as THREE from '../extend/THREE'
-import { setColor, setOriginalColor, startPointIndex, changeGeometry, crossingPoint } from '../services/editObject'
+import {
+  setColor,
+  setOriginalColor,
+  startPointIndex,
+  changeGeometry,
+  crossingPoint,
+  createLine
+} from '../services/editObject'
 import sceneService from '../services/sceneService'
 import GeometryUtils from '../services/GeometryUtils'
 import { activePoint, disablePoint, movePointInfo } from './pointInfo'
@@ -9,8 +16,12 @@ export const EDIT_CANCEL = 'EDIT_CANCEL'
 export const EDIT_SELECT_POINT = 'EDIT_SELECT_POINT'
 export const EDIT_MOVE_POINT = 'EDIT_MOVE_POINT'
 export const EDIT_SAVE_POINT = 'EDIT_SAVE_POINT'
+
 export const EDIT_NEW_LINE = 'EDIT_NEW_LINE'
 export const EDIT_CANCEL_NEW_LINE = 'EDIT_CANCEL_NEW_LINE'
+export const EDIT_LINE_FIRST_POINT = 'EDIT_LINE_FIRST_POINT'
+export const EDIT_NEW_LINE_SAVE = 'EDIT_NEW_LINE_SAVE'
+
 export const EDIT_NEW_ARC = 'EDIT_NEW_ARC'
 
 export const isEdit = (option, editor, object = {}) => {
@@ -89,10 +100,6 @@ export const selectPoint = (line, event, editor) => {
 export const movePoint = (line, index, event, editor) => {
   let {scene, camera, renderer} = editor
   let clickResult = sceneService.onClick(event, scene, camera)
-  const pInfo = {
-    x: event.pageX,
-    y: event.pageY
-  }
   let point = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -103,7 +110,7 @@ export const movePoint = (line, index, event, editor) => {
   renderer.render(scene, camera)
 
   return dispatch => {
-    crossing ? movePointInfo(pInfo, 'Crossing point')(dispatch) : disablePoint()(dispatch)
+    crossing ? movePointInfo(event, 'Crossing point')(dispatch) : disablePoint()(dispatch)
     dispatch({
       type: EDIT_MOVE_POINT,
       payload: {}
@@ -121,15 +128,9 @@ export const savePoint = () => {
   }
 }
 
-export const newLine = (event) => {
-  const pInfo = {
-    x: event.pageX,
-    y: event.pageY
-  }
-
+//* Create new line
+export const newLine = () => {
   return dispatch => {
-    movePointInfo(pInfo, 'Select first point')(dispatch)
-
     dispatch({
       type: EDIT_NEW_LINE,
       payload:
@@ -139,9 +140,89 @@ export const newLine = (event) => {
   }
 }
 
-export const cancelNewLine = () => {
-  return dispatch => dispatch({
-    type: EDIT_CANCEL_NEW_LINE,
-    payload: {isNewLine: false}
-  })
+export const cancelNewLine = (editor) => {
+  let {scene, camera, renderer} = editor
+  const line = scene.getObjectByName('newLine')
+  if (line) {
+    line.parent.remove(line)
+    renderer.render(scene, camera)
+  }
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_CANCEL_NEW_LINE,
+      payload: {
+        isNewLine: false,
+        newLineFirst: null
+      }
+    })
+  }
+}
+
+export const firstPoint = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const firstPoint = crossing ? crossing : mousePoint
+
+  return dispatch => {
+    dispatch({
+      type: EDIT_LINE_FIRST_POINT,
+      payload: {firstPoint}
+    })
+  }
+}
+
+export const startNewLine = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing first')(dispatch) : movePointInfo(event, 'Select first')(dispatch)
+  }
+}
+
+export const drawLine = (event, editor) => {
+  let {scene, camera, renderer, editMode} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const secondPoint = crossing ? crossing : mousePoint
+
+  let changeLine = scene.getObjectByName('newLine')
+  if (changeLine) {
+    changeGeometry(changeLine, 1, secondPoint, scene)
+  } else {
+    const line = createLine(editMode.newLineFirst, secondPoint)
+    editMode.editObject.add(line)
+  }
+  renderer.render(scene, camera)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing second')(dispatch) : movePointInfo(event, 'Select second')(dispatch)
+  }
+}
+
+export const saveNewLine = (editor) => {
+  editor.scene.getObjectByName('newLine').name = ''
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_NEW_LINE_SAVE,
+      payload: {
+        isNewLine: false,
+        newLineFirst: null
+      }
+    })
+  }
 }

@@ -1,11 +1,16 @@
 import React, { Component } from 'react'
 // import PropTypes from 'prop-types'
 import './PanelEdit.css'
+import PropTypes from 'prop-types'
 
 export default class PanelEditComponent extends Component {
 
-  newLine = (event) =>{
-    this.props.newLine(event)
+  newLine = () => {
+    this.props.newLine()
+  }
+
+  cancelNewLine = () => {
+    this.props.cancelNewLine(this.props.editor)
   }
 
   render () {
@@ -22,14 +27,15 @@ export default class PanelEditComponent extends Component {
         </div>)}
         <button onClick={this.newLine}>new line</button>
         <br />
-        <button onClick={this.props.cancelNewLine}>cancel line</button>
+        <button onClick={this.cancelNewLine}>cancel line</button>
         <br />
         <button>new arc</button>
       </div>
     )
   }
 
-  // static propTypes = {
-  //
-  // }
+  static propTypes = {
+    editMode: PropTypes.object,
+    editor: PropTypes.object
+  }
 }

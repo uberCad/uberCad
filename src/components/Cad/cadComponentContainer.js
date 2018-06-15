@@ -18,7 +18,7 @@ import {
   TOOL_SELECT
 } from '../Toolbar/toolbarComponent'
 import sceneService from '../../services/sceneService'
-import { movePoint, savePoint, selectPoint } from '../../actions/edit'
+import { drawLine, firstPoint, movePoint, saveNewLine, savePoint, selectPoint, startNewLine } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -91,6 +91,10 @@ const mapDispatchToProps = (dispatch) => {
             }
           }
         }
+        //new line
+        if (editor.editMode.isNewLine) {
+          !editor.editMode.newLineFirst ? firstPoint(event, editor)(dispatch) : saveNewLine(editor)(dispatch)
+        }
 
         if (editor.tool === TOOL_SELECT) {
           selectionBegin(event, editor)(dispatch)
@@ -119,6 +123,11 @@ const mapDispatchToProps = (dispatch) => {
           editor.editMode.selectPointIndex,
           event,
           editor)(dispatch)
+      }
+
+      //new Line
+      if (editor.editMode.isNewLine) {
+        !editor.editMode.newLineFirst ? startNewLine(event, editor)(dispatch) : drawLine(event, editor)(dispatch)
       }
     },
 

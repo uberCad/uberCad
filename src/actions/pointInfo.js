@@ -13,7 +13,11 @@ export const activePoint = () => {
   })
 }
 
-export const movePointInfo = (point, msg) => {
+export const movePointInfo = (event, msg) => {
+  const point = {
+    x: event.pageX,
+    y: event.pageY
+  }
   return dispatch => dispatch({
     type: POINT_INFO_MOVE,
     payload: {
