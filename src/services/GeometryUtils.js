@@ -1,6 +1,7 @@
 import * as THREE from '../extend/THREE'
 import kMeans from '../../node_modules/kmeans-js/kMeans'
 import sceneService from './sceneService'
+import Path from '../classes/Path'
 
 let buildEdgeModel = (object, threshold = 0.000001) => {
   let vertices = getVertices(object.children)
@@ -143,18 +144,6 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
     entityToCheck.userData.noIntersections = true
   })
 
-  function Path () {}
-
-  Path.prototype = []
-  Path.prototype.toJSON = function () {
-    return this.map(v => ({
-      x: v.x,
-      y: v.y,
-      z: v.z,
-      parentUuid: v.parent.uuid
-    }))
-  }
-
   let prevEntitiesCount = -1
   do {
     regions.forEach(region => {
@@ -198,8 +187,11 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
       path.push(...buildChain(vertices, startVertex, threshold))
       // let path = new Path(buildChain(vertices, startVertex, threshold))
 
+      let area = pathArea(path)
       regions.push({
         path,
+        area,
+        areaAbsolute: area,
         boundingBox: buildBoundingBox(path)
       })
     }
@@ -219,6 +211,14 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
 
     // set outer region first
     regions.unshift(...regions.splice(regions.indexOf(outerRegion), 1))
+
+    let innerArea = 0
+    regions.forEach((region, idx) => {
+      if (idx) {
+        innerArea += region.areaAbsolute
+      }
+    })
+    regions[0].area -= innerArea
 
     regions.forEach(region => {
       if (isClockwise(region.path)) {
@@ -1330,17 +1330,7 @@ let isBoundingBoxesCollide = (boundingBox1, boundingBox2, threshold = 0.000001) 
 let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001, debug = false) => {
   if (!(entity1.geometry instanceof THREE.CircleGeometry) && !(entity2.geometry instanceof THREE.CircleGeometry)) {
     // line to line
-    let intersectionResult
-    try {
-
-
-      intersectionResult = linesIntersect(entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1], threshold, debug)
-    } catch (e) {
-
-      console.error("AAAAAAAAAAAAAAAAAAAA", e, entity1, entity2)
-
-    }
-
+    let intersectionResult = linesIntersect(entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1], threshold, debug)
     if (intersectionResult.isIntersects) {
       return {
         type: intersectionResult.type,
@@ -2362,6 +2352,10 @@ let fixObjectsPaths = scene => {
     if (object && object.userData && object.userData.edgeModel && object.userData.edgeModel.regions) {
       object.userData.edgeModel.regions.forEach(region => {
         if (region.path) {
+          let path = new Path()
+          Object.defineProperty(path, 'length', {enumerable: false, writable: true})
+          path.push(...region.path)
+          region.path = path
           region.path.forEach(v => {
             if (v.parentUuid) {
               v.parent = scene.getObjectByProperty('uuid', v.parentUuid)
@@ -2372,6 +2366,111 @@ let fixObjectsPaths = scene => {
       })
     }
   })
+}
+
+let getThermalPoints = scene => {
+  let leftTop, leftBottom, rightTop, rightBottom
+
+  // hot2: new THREE.Vector3(0,0,0),
+  // cold1: new THREE.Vector3(0,0,0),
+  // cold2: new THREE.Vector3(0,0,0)
+
+  let objects = sceneService.getObjects(scene, true)
+
+  objects.forEach(object => {
+    if (object && object.userData && object.userData.edgeModel && object.userData.edgeModel.regions) {
+      let region = object.userData.edgeModel.regions[0]
+      let {boundingBox} = region
+
+      if (!leftTop || !leftBottom || !rightTop || !rightBottom) {
+        leftTop = {
+          boundingBox,
+          region
+        }
+        leftBottom = {
+          boundingBox,
+          region
+        }
+        rightTop = {
+          boundingBox,
+          region
+        }
+        rightBottom = {
+          boundingBox,
+          region
+        }
+      }
+      if (boundingBox.x1 <= leftTop.boundingBox.x1 && boundingBox.y1 <= leftTop.boundingBox.y1) {
+        leftTop.boundingBox = boundingBox
+        leftTop.region = region
+      }
+      if (boundingBox.x1 <= leftBottom.boundingBox.x1 && boundingBox.y2 >= leftBottom.boundingBox.y2) {
+        leftBottom.boundingBox = boundingBox
+        leftBottom.region = region
+      }
+      if (boundingBox.x2 >= rightTop.boundingBox.x2 && boundingBox.y1 <= rightTop.boundingBox.y1) {
+        rightTop.boundingBox = boundingBox
+        rightTop.region = region
+      }
+      if (boundingBox.x2 >= rightBottom.boundingBox.x2 && boundingBox.y2 >= rightBottom.boundingBox.y2) {
+        rightBottom.boundingBox = boundingBox
+        rightBottom.region = region
+      }
+    }
+  })
+
+  if (leftTop && leftBottom && rightTop && rightBottom) {
+    leftTop.region.path.forEach(vertex => {
+      if (!leftTop.vertex) {
+        leftTop.vertex = vertex
+      }
+
+      if (vertex.x <= leftTop.vertex.x && vertex.y <= leftTop.vertex.y) {
+        leftTop.vertex = vertex
+      }
+    })
+
+    leftBottom.region.path.forEach(vertex => {
+      if (!leftBottom.vertex) {
+        leftBottom.vertex = vertex
+      }
+
+      if (vertex.x <= leftBottom.vertex.x && vertex.y >= leftBottom.vertex.y) {
+        leftBottom.vertex = vertex
+      }
+    })
+
+    rightTop.region.path.forEach(vertex => {
+      if (!rightTop.vertex) {
+        rightTop.vertex = vertex
+      }
+
+      if (vertex.x >= rightTop.vertex.x && vertex.y <= rightTop.vertex.y) {
+        rightTop.vertex = vertex
+      }
+    })
+
+    rightBottom.region.path.forEach(vertex => {
+      if (!rightBottom.vertex) {
+        rightBottom.vertex = vertex
+      }
+
+      if (vertex.x >= rightBottom.vertex.x && vertex.y >= rightBottom.vertex.y) {
+        rightBottom.vertex = vertex
+      }
+    })
+
+    return {
+      cold1: leftTop.vertex,
+      cold2: rightTop.vertex,
+      hot1: leftBottom.vertex,
+      hot2: rightBottom.vertex
+    }
+  }
+
+  // , leftBottom, rightTop, rightBottom
+
+  return false
 }
 
 export default {
@@ -2394,11 +2493,13 @@ export default {
   checkCavity,
   calcLength,
   calcArea,
+  pathArea,
   calcSize,
   vertexInArea,
   entityIntersectArea,
   insidePolygon,
   bugleToArc,
   getObjectInfo,
-  fixObjectsPaths
+  fixObjectsPaths,
+  getThermalPoints
 }

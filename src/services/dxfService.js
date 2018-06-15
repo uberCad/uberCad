@@ -221,12 +221,12 @@ export default class DxfService {
         mesh = drawBlock(entity, data)
       } else if (entity.type === 'SPLINE') {
         mesh = drawSpline(entity, data)
-      } else if (entity.type === 'MTEXT') {
-        mesh = drawMtext(entity, data)
+      // } else if (entity.type === 'MTEXT') {
+        // mesh = drawMtext(entity, data)
       } else if (entity.type === 'ELLIPSE') {
         mesh = drawEllipse(entity, data)
       } else {
-        console.log('Unsupported Entity Type: ' + entity.type)
+        console.error('Unsupported Entity Type: ' + entity.type, entity)
       }
       return mesh
     }

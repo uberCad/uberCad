@@ -1,10 +1,11 @@
 import Api from '../services/apiService'
 import GeometryUtils from '../services/GeometryUtils'
+import sceneService from '../services/sceneService'
 
 export const CALCULATE = 'CALCULATE'
 
 export const calculate = (scene) => {
-  const objects = scene.children[1].children
+  const objects = sceneService.getObjects(scene, true)
   const info = []
   objects.forEach(object => {
     const geometry = GeometryUtils.getObjectInfo(object)
