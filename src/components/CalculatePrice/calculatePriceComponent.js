@@ -6,7 +6,6 @@ import './CalculatePrice.css'
 import { FormattedMessage } from 'react-intl'
 
 export default class CalculatePriceComponent extends Component {
-
   calculate = () => {
     this.props.calculate(this.props.scene)
   }
@@ -22,7 +21,7 @@ export default class CalculatePriceComponent extends Component {
 
     const ObjectComponent = ({object}) => {
       return (
-        <li className="list-group-flush">
+        <li className='list-group-flush'>
           <FormattedMessage id='calculatePrice.modal.object' defaultMessage='Object'>
             {value =>
               <h4>{value}: {object.name}</h4>
@@ -68,7 +67,7 @@ export default class CalculatePriceComponent extends Component {
       <div>
         <FormattedMessage id='calculatePrice.btnCalculateTitle' defaultMessage='Calculate price'>
           {title =>
-            <button onClick={this.calculate} title={title} className='btn-calc'/>
+            <button onClick={this.calculate} title={title} className='btn-calc' />
           }
         </FormattedMessage>
 
@@ -85,20 +84,20 @@ export default class CalculatePriceComponent extends Component {
             <ListGroup componentClass='ul' className='polyamide-list'>
               {polyamides.length &&
               polyamides.map((object, i) => {
-                  return (
-                    <ObjectComponent object={object} key={i}/>
-                  )
-                }
+                return (
+                  <ObjectComponent object={object} key={i} />
+                )
+              }
               )}
 
               {objects.length &&
               (objects.filter(object => (polyamides.indexOf(object) < 0)).map((object, i) => {
-                  return (
-                    <ObjectComponent object={object} key={i}/>
-                  )
-                }
+                return (
+                  <ObjectComponent object={object} key={i} />
+                )
+              }
               ))}
-              <hr/>
+              <hr />
               {polyamides.length &&
               <div>
                 <FormattedMessage id='calculatePrice.modal.systemWeight' defaultMessage='System weight'>
@@ -113,7 +112,7 @@ export default class CalculatePriceComponent extends Component {
           <Modal.Footer>
             <FormattedMessage id='btn.order' defaultMessage='Order'>
               {value =>
-                <Button bsStyle="info">{value}</Button>
+                <Button bsStyle='info'>{value}</Button>
               }
             </FormattedMessage>
             <FormattedMessage id='btn.cancel' defaultMessage='Cancel'>

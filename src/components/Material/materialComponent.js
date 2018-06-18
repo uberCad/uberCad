@@ -5,7 +5,6 @@ import './Material.css'
 import { FormattedMessage } from 'react-intl'
 
 export default class MaterialComponent extends Component {
-
   constructor (props) {
     super(props)
     this.state = {
@@ -43,12 +42,12 @@ export default class MaterialComponent extends Component {
     const MaterialComponent = ({dbKey, name, density, lambda, epsilon, color}) => {
       let bgcolor = {backgroundColor: color.toString()}
       return (
-        <li className="list-group-flush" data-db-key={dbKey} onClick={this.choose}>
+        <li className='list-group-flush' data-db-key={dbKey} onClick={this.choose}>
           <h4>{name}</h4>
           <span>Density: {density}</span>
           <span>Lambda: {lambda}</span>
           <span>Epsilon: {epsilon}</span>
-          <span className="color" style={bgcolor}></span>
+          <span className='color' style={bgcolor} />
         </li>
       )
     }
@@ -56,7 +55,7 @@ export default class MaterialComponent extends Component {
     const {materials} = this.props
 
     return (
-      <div className="material">
+      <div className='material'>
 
         <FormattedMessage id='material.btnMaterialTitle' defaultMessage='Set material'>
           {title =>
@@ -74,19 +73,19 @@ export default class MaterialComponent extends Component {
           </Modal.Header>
           <Modal.Body>
             <Form>
-              <FormGroup controlId="formControlsText">
+              <FormGroup controlId='formControlsText'>
                 <FormattedMessage id='material.modal.searchPlaceholder' defaultMessage='Life search ...'>
                   {placeholder =>
                     <FormControl
-                      type="text"
-                      name="title"
+                      type='text'
+                      name='title'
                       placeholder={placeholder}
                       onChange={this.handleSearch}
                       autoFocus
                     />
                   }
                 </FormattedMessage>
-                <FormControl.Feedback/>
+                <FormControl.Feedback />
               </FormGroup>
             </Form>
 
@@ -98,12 +97,12 @@ export default class MaterialComponent extends Component {
                 return searchName.includes(this.state.searchQuery)
               }).slice(0, this.state.searchQuery ? 30 : 10).map((material) =>
                 <MaterialComponent key={material._key}
-                                   name={material.name}
-                                   density={material.density}
-                                   lambda={material.lambda}
-                                   epsilon={material.epsilon}
-                                   color={material.color}
-                                   dbKey={material._key}
+                  name={material.name}
+                  density={material.density}
+                  lambda={material.lambda}
+                  epsilon={material.epsilon}
+                  color={material.color}
+                  dbKey={material._key}
                 />
               )}
             </ListGroup>

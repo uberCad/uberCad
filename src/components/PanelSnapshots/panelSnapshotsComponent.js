@@ -5,7 +5,6 @@ import { Button, Modal, Form, FormGroup, ControlLabel, FormControl } from 'react
 import { FormattedMessage } from 'react-intl'
 
 export default class PanelSnapshotsComponent extends Component {
-
   constructor (props) {
     super(props)
     this.state = {
@@ -55,17 +54,17 @@ export default class PanelSnapshotsComponent extends Component {
       <div id='snapshots'>
         <div className='content'>
           {snapshots.length ? snapshots.map(snapshot => (
-              <div className='item' key={snapshot._key} data-key={snapshot._key}
-                   onClick={this.loadSnapshot}>{snapshot.title}
-                <button className='un-select' data-key={snapshot._key} onClick={this.deleteSnapshot}/>
-              </div>)) :
-            (<FormattedMessage id='panelSnapshots.noSnapshot' defaultMessage='No snapshot'/>)
+            <div className='item' key={snapshot._key} data-key={snapshot._key}
+              onClick={this.loadSnapshot}>{snapshot.title}
+              <button className='un-select' data-key={snapshot._key} onClick={this.deleteSnapshot} />
+            </div>))
+            : (<FormattedMessage id='panelSnapshots.noSnapshot' defaultMessage='No snapshot' />)
           }
         </div>
         <div className='toolbar'>
           <FormattedMessage id='panelSnapshots.btnTitleAdd' defaultMessage='Add snapshot'>
             {value =>
-              <button onClick={this.handleShow} className='add' title={value}/>
+              <button onClick={this.handleShow} className='add' title={value} />
             }
           </FormattedMessage>
         </div>
@@ -77,18 +76,18 @@ export default class PanelSnapshotsComponent extends Component {
           </Modal.Header>
           <Modal.Body>
             <Form>
-              <FormGroup controlId="formControlsText">
+              <FormGroup controlId='formControlsText'>
                 <FormattedMessage id='panelSnapshots.modal.inputLabel' defaultMessage='Snapshot title'>
                   {value => <ControlLabel>{value}</ControlLabel>}
                 </FormattedMessage>
                 <FormattedMessage id='panelSnapshots.modal.inputPlaceholder' defaultMessage='Enter title'>
                   {value =>
                     <FormControl
-                      type="text"
-                      name="title"
+                      type='text'
+                      name='title'
                       autoFocus
                       placeholder={value}
-                      onChange={this.handleChange}/>
+                      onChange={this.handleChange} />
                   }
                 </FormattedMessage>
               </FormGroup>

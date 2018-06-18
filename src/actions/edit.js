@@ -5,9 +5,9 @@ export const EDIT_IS_EDIT = 'EDIT_IS_EDIT'
 
 export const isEdit = (option, editor, object = {}) => {
   if (option) {
-    let bgColor = new THREE.Color(0xaaaaaa);
-    let objColor = new THREE.Color(0x00ff00);
-    setColor(editor.scene, bgColor, object.name, objColor);
+    let bgColor = new THREE.Color(0xaaaaaa)
+    let objColor = new THREE.Color(0x00ff00)
+    setColor(editor.scene, bgColor, object.name, objColor)
   } else {
     setOriginalColor(editor.scene)
   }

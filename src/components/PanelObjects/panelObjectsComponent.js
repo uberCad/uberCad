@@ -62,16 +62,16 @@ export default class PanelObjectsComponent extends Component {
           {objects
             ? objects.children.map((object, idx) => (
               <div className={`item ${this.props.activeObject === object ? 'active' : ''}`}
-                   key={idx}
-                   data-id={object.id}
-                   onClick={this.toggleObject}
+                key={idx}
+                data-id={object.id}
+                onClick={this.toggleObject}
               >
                 <FormattedMessage id='panelObject.checkboxVisibility' defaultMessage='Visibility'>
                   {value =>
                     <input type='checkbox' data-id={object.id}
-                           title={value}
-                           checked={object.visible}
-                           onChange={this.onChangeVisible}
+                      title={value}
+                      checked={object.visible}
+                      onChange={this.onChangeVisible}
                     />
                   }
                 </FormattedMessage>
@@ -90,8 +90,8 @@ export default class PanelObjectsComponent extends Component {
             <FormattedMessage id='panelObject.combineEdgeModels' defaultMessage='Combine edge models'>
               {value =>
                 <button onClick={this.combineEdgeModels}
-                        className='combine'
-                        title={value}
+                  className='combine'
+                  title={value}
                 />
               }
             </FormattedMessage>
@@ -99,8 +99,8 @@ export default class PanelObjectsComponent extends Component {
           <FormattedMessage id='panelObject.showAll' defaultMessage='Show all'>
             {value =>
               <button onClick={this.showAll}
-                      className='show-all'
-                      title={value}
+                className='show-all'
+                title={value}
               />
             }
           </FormattedMessage>

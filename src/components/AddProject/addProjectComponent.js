@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import { FormattedMessage } from 'react-intl'
 
 export default class AddProjectComponent extends Component {
-
   constructor (props) {
     super(props)
     this.state = {
@@ -53,7 +52,7 @@ export default class AddProjectComponent extends Component {
       <div>
         <FormattedMessage id='addProject.newProgect' defaultMessage='Add new project'>
           {value =>
-            <Button bsStyle="primary" onClick={this.handleShow}>{value}</Button>
+            <Button bsStyle='primary' className='pull-right' onClick={this.handleShow}>{value}</Button>
           }
         </FormattedMessage>
 
@@ -69,7 +68,7 @@ export default class AddProjectComponent extends Component {
           <Modal.Body>
             <Form>
               <FormGroup
-                controlId="formControlsText"
+                controlId='formControlsText'
                 validationState={this.getValidationState()}
               >
                 <FormattedMessage id='addProject.modal.inputLabel' defaultMessage='Project title'>
@@ -80,18 +79,18 @@ export default class AddProjectComponent extends Component {
                 <FormattedMessage id='addProject.modal.inputPlaceholder' defaultMessage='Enter text'>
                   {placeholder =>
                     <FormControl
-                      type="text"
-                      name="title"
+                      type='text'
+                      name='title'
                       value={this.state.text}
                       placeholder={placeholder}
                       onChange={this.handleChange}
                     />
                   }
                 </FormattedMessage>
-                <FormControl.Feedback/>
+                <FormControl.Feedback />
               </FormGroup>
 
-              <FormGroup controlId="formControlsFile">
+              <FormGroup controlId='formControlsFile'>
                 <FormattedMessage id='addProject.modal.fileLabel' defaultMessage='File'>
                   {value =>
                     <ControlLabel>{value}</ControlLabel>
@@ -100,14 +99,14 @@ export default class AddProjectComponent extends Component {
                 <FormattedMessage id='addProject.modal.filePlaceholder' defaultMessage='Chose file ...'>
                   {placeholder =>
                     <FormControl
-                      type="file"
-                      name="file"
+                      type='file'
+                      name='file'
                       placeholder={placeholder}
                       onChange={this.handleChange}
                     />
                   }
                 </FormattedMessage>
-                <FormControl.Feedback/>
+                <FormControl.Feedback />
               </FormGroup>
             </Form>
           </Modal.Body>

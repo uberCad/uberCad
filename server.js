@@ -1,12 +1,12 @@
 'use strict'
 
-let express = require('express'),
-  app = express(),
-  bodyParser = require('body-parser'),
-  http = require('http').Server(app),
-  port = process.env.PORT || 5000,
-  // config = require('./server/config'),
-  fileUpload = require('express-fileupload')
+let express = require('express')
+let app = express()
+let bodyParser = require('body-parser')
+let http = require('http').Server(app)
+let port = process.env.PORT || 5000
+// let config = require('./server/config')
+let fileUpload = require('express-fileupload')
 
 app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
@@ -24,7 +24,6 @@ app.use(fileUpload())
 let router = express.Router()
 
 router.post('/flixo', function (req, res) {
-
   // console.log('req', req.body);
 
   // res.json({ message: JSON.stringify(req.body.id) });
@@ -38,17 +37,17 @@ router.post('/flixo', function (req, res) {
       body: req.body,
       headers: {
         'Cookie': 'website_lang=en_US; _ga=GA1.2.1463665294.1528200908; _gid=GA1.2.1457081784.1528200908; _ym_uid=1528200908275609853; _ym_visorc_33983905=w; _ym_isad=2; session_id=0f40fbea1b687077bb9b966fa5a4f64616a90da5',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      json: true,
+      json: true
     }, function (error, response, body) {
-      //Print the Response
+      // Print the Response
       console.log(body)
-      res.json({message: body})
+      res.json({message: body, error})
     })
 })
 
-app.use('/api', router);
+app.use('/api', router)
 
 http.listen(port, function () {
   console.log(`Server running at localhost:${port}`)

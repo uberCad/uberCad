@@ -48,10 +48,10 @@ export default class OptionsComponent extends Component {
                 <FormattedMessage id='options.inputTitleSelection' defaultMessage='New selection'>
                   {value =>
                     <input type='radio' className='mode-new'
-                           title={value}
-                           value={SELECT_MODE_NEW}
-                           checked={selectMode === SELECT_MODE_NEW}
-                           onChange={this.onChangeMode}/>
+                      title={value}
+                      value={SELECT_MODE_NEW}
+                      checked={selectMode === SELECT_MODE_NEW}
+                      onChange={this.onChangeMode} />
                   }
                 </FormattedMessage>
               </label>
@@ -59,10 +59,10 @@ export default class OptionsComponent extends Component {
                 <FormattedMessage id='options.inputTitleAddSelection' defaultMessage='Add to selection (... + Shift)'>
                   {value =>
                     <input type='radio' className='mode-add'
-                           title={value}
-                           value={SELECT_MODE_ADD}
-                           checked={selectMode === SELECT_MODE_ADD}
-                           onChange={this.onChangeMode}/>
+                      title={value}
+                      value={SELECT_MODE_ADD}
+                      checked={selectMode === SELECT_MODE_ADD}
+                      onChange={this.onChangeMode} />
                   }
                 </FormattedMessage>
               </label>
@@ -70,22 +70,22 @@ export default class OptionsComponent extends Component {
                 <FormattedMessage id='options.inputTitleSubtract' defaultMessage='Subtract from selection (... + Alt)'>
                   {value =>
                     <input type='radio' className='mode-sub'
-                           title={value}
-                           value={SELECT_MODE_SUB}
-                           checked={selectMode === SELECT_MODE_SUB}
-                           onChange={this.onChangeMode}/>
+                      title={value}
+                      value={SELECT_MODE_SUB}
+                      checked={selectMode === SELECT_MODE_SUB}
+                      onChange={this.onChangeMode} />
                   }
                 </FormattedMessage>
               </label>
               <label>
                 <FormattedMessage id='options.inputTitleIntersect'
-                                  defaultMessage='Intersect with selection (... + Alt + Shift)'>
+                  defaultMessage='Intersect with selection (... + Alt + Shift)'>
                   {value =>
                     <input type='radio' className='mode-intersect'
-                           title={value}
-                           value={SELECT_MODE_INTERSECT}
-                           checked={selectMode === SELECT_MODE_INTERSECT}
-                           onChange={this.onChangeMode}/>
+                      title={value}
+                      value={SELECT_MODE_INTERSECT}
+                      checked={selectMode === SELECT_MODE_INTERSECT}
+                      onChange={this.onChangeMode} />
                   }
                 </FormattedMessage>
               </label>
@@ -99,9 +99,9 @@ export default class OptionsComponent extends Component {
               <FormattedMessage id='options.inputTitleSameLayer' defaultMessage='Select lines on same layer'>
                 {value =>
                   <input type='checkbox' id='editor-options-singleLayerSelect'
-                         title={value}
-                         defaultChecked={singleLayerSelect}
-                         onChange={this.onChangeSingleLayer}/>
+                    title={value}
+                    defaultChecked={singleLayerSelect}
+                    onChange={this.onChangeSingleLayer} />
                 }
               </FormattedMessage>
               <FormattedMessage id='options.labelSameLayer' defaultMessage='Same layer'>
@@ -117,7 +117,7 @@ export default class OptionsComponent extends Component {
                   <label>
                     {value}
                     <input type='text' min='0.000001' max='0.1' value={threshold}
-                           onChange={this.onChangeThreshold}/>
+                      onChange={this.onChangeThreshold} />
                   </label>
                 }
               </FormattedMessage>

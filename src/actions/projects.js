@@ -6,13 +6,6 @@ export const PROJECTS_FETCH_BEGIN = 'PROJECTS_FETCH_BEGIN'
 export const PROJECTS_FETCH_SUCCESS = 'PROJECTS_FETCH_SUCCESS'
 export const PROJECTS_FETCH_FAILURE = 'PROJECTS_FETCH_FAILURE'
 
-export const invalidateFilter = filter => {
-  return dispatch => dispatch({
-    type: PROJECTS_INVALIDATE_FILTER,
-    payload: {filter}
-  })
-}
-
 export const requestProjects = filter => ({
   type: PROJECTS_FETCH_BEGIN,
   payload: {filter}
@@ -37,12 +30,12 @@ export const receiveProjectsError = (filter, error) => ({
   }
 })
 
-const fetchProjects = filter => dispatch => {
+export const fetchProjects = filter => dispatch => {
   spinnerShow()(dispatch)
   dispatch(requestProjects(filter))
 
-  // return Api.get(`/projects/${filter}`)
   return Api.get(`/api/projects-list`)
+  // return Api.get(`/api/projects-list/${filter}`)
     .then(res => {
       spinnerHide()(dispatch)
       if (!res[0].error) {
@@ -53,10 +46,4 @@ const fetchProjects = filter => dispatch => {
       dispatch(receiveProjectsError(filter, error))
       spinnerHide()(dispatch)
     })
-}
-
-export const fetchProjectsIfNeeded = (filter) => {
-  return dispatch => {
-    return dispatch(fetchProjects(filter))
-  }
 }
