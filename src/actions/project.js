@@ -1,5 +1,6 @@
 import { spinnerShow, spinnerHide } from './spinner'
 import Api from '../services/apiService'
+import history from '../config/history'
 
 export const PROJECT_FETCH_BEGIN = 'PROJECT_FETCH_BEGIN'
 export const PROJECT_FETCH_SUCCESS = 'PROJECT_FETCH_SUCCESS'
@@ -39,6 +40,16 @@ export const fetchProject = (id, preloadedProject) => dispatch => {
     })
     .catch(error => {
       dispatch(receiveProjectError(id, error))
+      dispatch(spinnerHide())
+    })
+}
+
+export const delProject = (key) => dispatch => {
+  dispatch(spinnerShow())
+  return Api.delete(`/api/project/${key}`)
+    .then((res) => {
+      console.log(res)
+      history.push(`/projects`)
       dispatch(spinnerHide())
     })
 }
