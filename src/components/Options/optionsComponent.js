@@ -24,7 +24,7 @@ export default class OptionsComponent extends Component {
   }
 
   cancelEdit = () => {
-    this.props.isEdit(!this.props.editMode.isEdit, this.props.editor)
+    this.props.cancelEdit(this.props.editor, this.props.editMode.editObject, this.props.editMode.beforeEdit)
   }
 
   render () {

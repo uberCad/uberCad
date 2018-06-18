@@ -2,10 +2,26 @@ import React, { Component } from 'react'
 import { FormattedMessage } from 'react-intl'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Row, Col } from 'react-bootstrap'
+import { Row, Col, Button, Modal } from 'react-bootstrap'
 import './Project.css'
 
 export default class ProjectComponent extends Component {
+
+  constructor (props) {
+    super(props)
+    this.state = {
+      show: false
+    }
+  }
+
+  handleClose = () => {
+    this.setState({show: false})
+  }
+
+  handleShow = () => {
+    this.setState({show: true})
+  }
+
   componentDidMount () {
     const {id} = this.props.match.params
     const {preloadedProject} = this.props
@@ -20,11 +36,49 @@ export default class ProjectComponent extends Component {
     }
   }
 
+  delProject = () => {
+    this.handleClose()
+    this.props.delProject(this.props.project._key)
+  }
+
   render () {
     const {project} = this.props
     return (
       <div className='project-page'>
-        {project && <h3>Project: {project.title}</h3>}
+        {project &&
+        <div className='head-project'>
+          <h3>Project: {project.title}</h3>
+          <FormattedMessage id='project.btnDel' defaultMessage='Delete project'>
+            {value =>
+              <button title={value} className='del-project' onClick={this.handleShow} />
+            }
+          </FormattedMessage>
+        </div>
+        }
+
+        <Modal show={this.state.show} onHide={this.handleClose}>
+          <Modal.Header >
+            <FormattedMessage id='project.delMsg' defaultMessage='Delete project'>
+              {value =>
+                <Modal.Title>{value}</Modal.Title>
+              }
+            </FormattedMessage>
+
+          </Modal.Header>
+          <Modal.Footer>
+            <FormattedMessage id='btn.delete' defaultMessage='Delete'>
+              {value =>
+                <Button onClick={this.delProject}>{value}</Button>
+              }
+            </FormattedMessage>
+            <FormattedMessage id='btn.cancel' defaultMessage='Cancel'>
+              {value =>
+                <Button onClick={this.handleClose}>{value}</Button>
+              }
+            </FormattedMessage>
+          </Modal.Footer>
+        </Modal>
+
         {project && (
           <div>
             <Row className='table-head'>

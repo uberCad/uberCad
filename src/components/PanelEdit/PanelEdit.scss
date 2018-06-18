@@ -1,0 +1,44 @@
+@import "../../variables.scss";
+#panel-edit {
+  height: 100%;
+
+  .content {
+    height: calc(100% - #{$sidebar-toolbar-size});
+    max-height: calc(100% - #{$sidebar-toolbar-size});
+    overflow: auto;
+  }
+
+  .toolbar {
+    button {
+      float: left;
+      opacity: 0.7;
+      transition: All 0.3s;
+      display: inline-block;
+      width: $sidebar-toolbar-size;
+      height: $sidebar-toolbar-size;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &:active, &:focus {
+        outline: none;
+      }
+
+      &.new-line {
+        background: url("line.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
+      &.new-curve {
+        background: url("curve.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
+
+      &.active{
+        display: inline-block;
+        background-color: rgba(0,0,0,0.1);;
+      }
+    }
+  }
+}
+

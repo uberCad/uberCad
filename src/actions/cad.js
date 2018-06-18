@@ -3,6 +3,7 @@ import dxfService from './../services/dxfService'
 import sceneService from './../services/sceneService'
 import { TOOL_POINT } from '../components/Toolbar/toolbarComponent'
 import { SELECT_MODE_NEW } from '../components/Options/optionsComponent'
+import { addHelpPoints, getScale, setLine } from '../services/editObject'
 
 export const CAD_PARSE_DXF = 'CAD_PARSE_DXF'
 export const CAD_DRAW_DXF = 'CAD_DRAW_DXF'
@@ -13,6 +14,7 @@ export const CAD_TOGGLE_VISIBLE_LAYER = 'CAD_TOGGLE_VISIBLE_LAYER'
 export const CAD_SHOW_ALL = 'CAD_SHOW_ALL'
 export const CAD_GROUP_ENTITIES = 'CAD_GROUP_ENTITIES'
 export const CAD_COMBINE_EDGE_MODELS = 'CAD_COMBINE_EDGE_MODELS'
+export const CAD_EDITMODE_SET_ACTIVE_LINE = 'CAD_EDITMODE_SET_ACTIVE_LINE'
 
 export const drawDxf = (data = null, container, snapshot = null) => {
   let cadCanvas = new dxfService.Viewer(data, container, snapshot)
@@ -126,7 +128,7 @@ function testExample (editor) {
 
 export const cadClick = (event, editor) => {
   return dispatch => {
-    let {scene, camera, tool} = editor
+    let {scene, camera, tool, renderer} = editor
 
     switch (tool) {
       case TOOL_POINT: {
@@ -156,6 +158,28 @@ export const cadClick = (event, editor) => {
               activeEntities
             }
           })
+        } else {
+          if (selectResult.length
+            && selectResult[0].parent.name === editor.editMode.editObject.name
+            && !editor.editMode.isNewLine
+          ) {
+            if (selectResult[0].id !== editor.editMode.activeLine.id) {
+              if (editor.editMode.activeLine.id) {
+                setLine(editor.editMode.activeLine, scene)
+              }
+              let activeEntities = sceneService.doSelection(selectResult, editor)
+              const rPoint = getScale(camera)
+              activeEntities[0].name = 'ActiveLine'
+              addHelpPoints(activeEntities[0], scene, rPoint)
+              renderer.render(scene, camera)
+              dispatch({
+                type: CAD_EDITMODE_SET_ACTIVE_LINE,
+                payload: {
+                  activeLine: activeEntities[0]
+                }
+              })
+            }
+          }
         }
         // else {
         //   if (clickResult.activeEntities.length > 0 &&

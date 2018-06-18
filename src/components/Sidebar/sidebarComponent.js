@@ -5,6 +5,7 @@ import ActiveEntities from '../ActiveEntities/activeEntitiesComponentContainer'
 import PanelLayers from '../PanelLayers/panelLayersComponentContainer'
 import PanelObjects from '../PanelObjects/panelObjectsComponentContainer'
 import PanelSnapshots from '../PanelSnapshots/panelSnapshotsComponentContainer'
+import PanelEdit from '../PanelEdit/panelEditComponentContainer'
 
 export default class SidebarComponent extends Component {
   toggleSidebar = () => {
@@ -59,6 +60,9 @@ export default class SidebarComponent extends Component {
                       break
                     case 'PanelObjects':
                       component = <PanelObjects />
+                      break
+                    case 'PanelEdit':
+                      component = <PanelEdit />
                       break
                     default:
                       component = `[COMPONENT "${tab.component}" NOT FOUND]`
