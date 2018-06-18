@@ -5,9 +5,27 @@
   font-size: 16px;
   color: #999999;
   box-shadow: 0 0 50px rgb(241, 241, 241);
+  .head-project{
+    height: 60px;
+    line-height: 60px;
+    padding: 0 25px;
+    h3{
+      float: left;
+    }
+    .del-project{
+      display: block;
+      height:20px;
+      width:20px;
+      float: right;
+      margin-top: 20px;
+      background: url("garbage.svg") no-repeat center transparent;
+      background-size: 20px;
+      cursor:pointer;
 
-  h3{
-    padding: 10px;
+      &:active, &:focus {
+        outline: none;
+      }
+    }
   }
 
   .table-row {

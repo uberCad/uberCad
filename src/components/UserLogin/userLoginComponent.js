@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import { FormattedMessage } from 'react-intl'
 
 export default class UserLoginComponent extends Component {
-
   constructor (props) {
     super(props)
     this.state = {
@@ -50,8 +49,8 @@ export default class UserLoginComponent extends Component {
               </FormattedMessage>
 
               <a href='https://github.com/login/oauth/authorize?scope=user:email&client_id=3b1d468a19661c8789c4'>
-                <span className='fa fa-github'/> GitHub</a>
-                <hr />
+                <span className='fa fa-github' /> GitHub</a>
+              <hr />
               <FormattedMessage id='userLogin.description' defaultMessage='Register Username & Password'>
                 {value => <h5>{value}</h5>}
               </FormattedMessage>
@@ -98,7 +97,7 @@ export default class UserLoginComponent extends Component {
                 </div>
 
                 {this.state.errorMessage &&
-                <Alert bsStyle="danger">
+                <Alert bsStyle='danger'>
                   <strong>Error!</strong> {this.state.errorMessage}
                 </Alert>}
 

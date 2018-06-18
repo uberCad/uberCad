@@ -45,23 +45,23 @@ export default class ActiveEntitiesComponent extends Component {
           {activeEntities.length
             ? activeEntities.map((entity, idx) => (
               <div className='item'
-                   key={idx}
-                   data-idx={idx}
-                   onClick={this.selectEntity}
+                key={idx}
+                data-idx={idx}
+                onClick={this.selectEntity}
               >
                 id: {entity.id} parent: {entity.parent.name}
 
                 <button className='un-select' data-idx={idx}
-                        onClick={this.unSelect}
+                  onClick={this.unSelect}
                 />
 
                 <FormattedMessage id='activeEntities.checkboxVisibility' defaultMessage='Visibility'>
                   {title =>
                     <input type='checkbox' data-idx={idx}
-                           title={title}
-                           checked={entity.visible}
-                           onChange={this.onChangeVisible}
-                           onClick={this.stopPropagation}
+                      title={title}
+                      checked={entity.visible}
+                      onChange={this.onChangeVisible}
+                      onClick={this.stopPropagation}
                     />
                   }
                 </FormattedMessage>
@@ -77,8 +77,8 @@ export default class ActiveEntitiesComponent extends Component {
             <FormattedMessage id='activeEntities.group' defaultMessage='Group'>
               {title =>
                 <button onClick={this.groupEntities}
-                        className='group'
-                        title={title}
+                  className='group'
+                  title={title}
                 />
               }
             </FormattedMessage>
@@ -86,8 +86,8 @@ export default class ActiveEntitiesComponent extends Component {
           <FormattedMessage id='activeEntities.show' defaultMessage='Show'>
             {title =>
               <button onClick={this.showAll}
-                      className='show-all'
-                      title={title}
+                className='show-all'
+                title={title}
               />
             }
           </FormattedMessage>

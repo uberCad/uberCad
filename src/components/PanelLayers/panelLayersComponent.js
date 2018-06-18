@@ -37,14 +37,14 @@ export default class PanelLayersComponent extends Component {
           {layers
             ? layers.children.filter(layer => layer.children.length).map((layer, idx) => (
               <div className='item'
-                   key={idx}
+                key={idx}
               >
                 <FormattedMessage id='panelLayer.checkboxVisibility' defaultMessage='Visibility'>
                   {value =>
                     <input type='checkbox' data-id={layer.id}
-                           title={value}
-                           checked={layer.visible}
-                           onChange={this.onChangeVisible}
+                      title={value}
+                      checked={layer.visible}
+                      onChange={this.onChangeVisible}
                     />
                   }
                 </FormattedMessage>
@@ -53,7 +53,7 @@ export default class PanelLayersComponent extends Component {
               </div>
             ))
             : (
-              <FormattedMessage id='panelLayer.noLayers' defaultMessage='No layers'/>
+              <FormattedMessage id='panelLayer.noLayers' defaultMessage='No layers' />
             )
           }
         </div>
@@ -67,8 +67,8 @@ export default class PanelLayersComponent extends Component {
           <FormattedMessage id='panelLayer.showAll' defaultMessage='Show all'>
             {value =>
               <button onClick={this.showAll}
-                      className='show-all'
-                      title={value}
+                className='show-all'
+                title={value}
               />
             }
           </FormattedMessage>

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import { FormattedMessage } from 'react-intl'
 
 export default class SignUpComponent extends Component {
-
   constructor (props) {
     super(props)
     this.state = {
@@ -16,10 +15,10 @@ export default class SignUpComponent extends Component {
 
   register = () => {
     this.props.register({
-        username: this.state.name,
-        password: this.state.password
-      },
-      this.props.history
+      username: this.state.name,
+      password: this.state.password
+    },
+    this.props.history
     )
       .then(res => {
         if (res) {
@@ -80,7 +79,7 @@ export default class SignUpComponent extends Component {
                 </div>
 
                 {this.state.errorMessage &&
-                <Alert bsStyle="danger">
+                <Alert bsStyle='danger'>
                   <strong>Error!</strong> {this.state.errorMessage}
                 </Alert>}
 

@@ -1332,13 +1332,9 @@ let entitiesIntersectInfo = (entity1, entity2, threshold = 0.000001, debug = fal
     // line to line
     let intersectionResult
     try {
-
-
       intersectionResult = linesIntersect(entity1.geometry.vertices[0], entity1.geometry.vertices[1], entity2.geometry.vertices[0], entity2.geometry.vertices[1], threshold, debug)
     } catch (e) {
-
-      console.error("AAAAAAAAAAAAAAAAAAAA", e, entity1, entity2)
-
+      console.error('AAAAAAAAAAAAAAAAAAAA', e, entity1, entity2)
     }
 
     if (intersectionResult.isIntersects) {
@@ -2243,17 +2239,16 @@ function getObjectInfo (object) {
 
   // CameraUtils.previewPathInConsole(object.userData.edgeModel.regions[0].path, heaviestClusters)
 
-  //width is where two legs oriented. if polyamide rotated - get orientation by heaviest clusters (possibly legs)
+  // width is where two legs oriented. if polyamide rotated - get orientation by heaviest clusters (possibly legs)
   let inversedWidth = Math.abs(heaviestClusters[0].y - heaviestClusters[1].y) > Math.abs(heaviestClusters[0].x - heaviestClusters[1].x)
 
   object.userData.edgeModel.regions.forEach(region => {
     let vertices = region.path
 
     let minX, minY, maxX, maxY
-
-    let sumX = 0,
-      sumY = 0,
-      multipleIdx = 0
+    let sumX = 0
+    let sumY = 0
+    let multipleIdx = 0
     for (let i = 0; i < vertices.length; i++) {
       if (minX === undefined && minY === undefined && maxX === undefined && maxY === undefined) {
         minX = maxX = vertices[i].x
@@ -2353,7 +2348,7 @@ let bugleToArc = (p1, p2, bulge) => {
     center: center,
     endAngle: startAngle + angleLength,
     radius: radius,
-    startAngle: startAngle,
+    startAngle: startAngle
   }
 }
 

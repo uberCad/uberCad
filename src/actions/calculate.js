@@ -26,26 +26,26 @@ export const calculate = (scene) => {
       infoPrice.push(data)
       polyamideObjects.push(object)
     } else {
-      //nothing
+      // nothing
     }
   })
   return (dispatch) => {
     dispatch(spinnerShow())
     Api.post('/api/calculate', {data: infoPrice})
       .then(res => {
-          res.forEach((price, i) => {
-            polyamideObjects[i].userData.price = price
-          })
-          dispatch(spinnerHide())
-          dispatch({
-            type: CALCULATE,
-            payload: {
-              prices: res,
-              polyamideObjects,
-              info: infoPrice
-            }
-          })
-        }
+        res.forEach((price, i) => {
+          polyamideObjects[i].userData.price = price
+        })
+        dispatch(spinnerHide())
+        dispatch({
+          type: CALCULATE,
+          payload: {
+            prices: res,
+            polyamideObjects,
+            info: infoPrice
+          }
+        })
+      }
       )
   }
 }

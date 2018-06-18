@@ -1,60 +1,48 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import ProjectsFilter from '../ProjectsFilter/projectsFilterComponentContainer'
 import ProjectsList from '../ProjectsList/projectsListComponentContainer'
 import AddProject from '../AddProject/addProjectComponentContainer'
 import './Projects.css'
+import { Row, Col } from 'react-bootstrap'
 
 export default class ProjectsComponent extends Component {
   componentDidMount () {
-    const { projectsFilter } = this.props
+    const {projectsFilter} = this.props
     this.props.fetchProjects(projectsFilter)
   }
 
-  handleChange = nextFilter => {
-    this.props.selectFilter(nextFilter)
-  }
-
-  handleRefreshClick = e => {
-    e.preventDefault()
-    const { projectsFilter } = this.props
-    this.props.fetchProjects(projectsFilter, true)
+  handleChange = ({currentTarget: {dataset: {option}}}) => {
+    this.props.selectFilter(option)
   }
 
   render () {
-    const {projectsFilter, items, loading, error, lastUpdated, lang} = this.props
+    const {projectsFilter, items, loading} = this.props
 
     const isEmpty = 0 && items.length === 0
     return (
       <div className='Projects'>
-        <h1>{lang}</h1>
-        <ProjectsFilter value={projectsFilter}
-          onChange={this.handleChange}
-          options={['all', 'shared', 'archive', '[some bad filter...]']} />
-        <AddProject />
-        <p>
-
-          {lastUpdated &&
-          <span>
-              Last updated at {new Date(lastUpdated).toLocaleTimeString()}.
-            {' '}
-          </span>
+        <ul className='ProjectsFilter'>
+          {
+            ['all', 'shared', 'archive', '[some bad filter...]'].map(option =>
+              <li className={projectsFilter === option ? 'active' : ''} key={option} data-option={option} onClick={this.handleChange}>
+                {option}
+              </li>
+            )
           }
-          {!loading &&
-          <button onClick={this.handleRefreshClick}>
-            Refresh
-          </button>
-          }
-        </p>
+        </ul>
 
-        <h3>Projects list</h3>
-        <h4>loading: {loading ? 'true' : 'false'}</h4>
-        <h4>error: {error ? 'true' : 'false'}</h4>
+        <Row className='component-head'>
+          <Col xs={12} sm={6}>
+            <h3>Projects list</h3>
+          </Col>
+          <Col xs={12} sm={6}>
+            <AddProject />
+          </Col>
+        </Row>
 
         {isEmpty
           ? (loading ? <h2>Loading...</h2> : <h2>Empty.</h2>)
           : <div style={{opacity: loading ? 0.5 : 1}}>
-            {/* {JSON.stringify(items)} */}
             <ProjectsList projects={items} />
           </div>
         }
