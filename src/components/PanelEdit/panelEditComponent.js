@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
-// import PropTypes from 'prop-types'
 import './PanelEdit.css'
 import PropTypes from 'prop-types'
+
+// eslint-disable-next-line
+import Worker from 'worker-loader!../../workers/worker.js'
 
 export default class PanelEditComponent extends Component {
 
@@ -11,6 +13,19 @@ export default class PanelEditComponent extends Component {
 
   cancelNewLine = () => {
     this.props.cancelNewLine(this.props.editor)
+  }
+
+  worker = () => {
+    if (window.Worker) {
+      console.log('worker works in this window...')
+      const worker = new Worker()
+      worker.postMessage({a: 4000})
+      worker.onmessage = function (event) {}
+      worker.addEventListener("message", function (event) {
+        console.log('message from worker, event.data= ', event.data)
+      })
+      // worker.terminate()
+    }
   }
 
   render () {
@@ -35,6 +50,7 @@ export default class PanelEditComponent extends Component {
           { !isNewCurve ? <button className='new-curve ' title='New curve' />
             : <button className='new-curve active' title='Cencel new curve' />
           }
+          <button onClick={this.worker}>test worker</button>
         </div>
       </div>
     )

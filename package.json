@@ -57,7 +57,8 @@
     "reselect": "^3.0.1",
     "snazzy": "^7.1.1",
     "standard": "^11.0.1",
-    "tape": "^4.8.0"
+    "tape": "^4.8.0",
+    "worker-loader": "^2.0.0"
   },
   "scripts": {
     "build": "npm run build:css && react-scripts build",
