@@ -44,7 +44,8 @@ let initialState = {
     activeLine: {},
     selectPointIndex: null,
     isNewLine: false,
-    newLineFirst: null
+    newLineFirst: null,
+    isNewCurve: false
   },
   pointInfo: {
     style: {
