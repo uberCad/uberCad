@@ -89,7 +89,7 @@ let getScale = (camera) => {
   return scale
 }
 
-let setLine = (line, scene) => {
+let unselectLine = (line, scene) => {
   line.name = ''
   scene.getObjectByName('HelpLayer').children = []
   line.material.color.set(0x00ff00)
@@ -488,7 +488,7 @@ export {
   setOriginalColor,
   addHelpPoints,
   getScale,
-  setLine,
+  unselectLine,
   startPointIndex,
   changeGeometry,
   crossingPoint,
