@@ -3,7 +3,7 @@ import dxfService from './../services/dxfService'
 import sceneService from './../services/sceneService'
 import { TOOL_POINT } from '../components/Toolbar/toolbarComponent'
 import { SELECT_MODE_NEW } from '../components/Options/optionsComponent'
-import { addHelpPoints, getScale, setLine } from '../services/editObject'
+import { addHelpPoints, getScale, unselectLine } from '../services/editObject'
 
 export const CAD_PARSE_DXF = 'CAD_PARSE_DXF'
 export const CAD_DRAW_DXF = 'CAD_DRAW_DXF'
@@ -15,6 +15,7 @@ export const CAD_SHOW_ALL = 'CAD_SHOW_ALL'
 export const CAD_GROUP_ENTITIES = 'CAD_GROUP_ENTITIES'
 export const CAD_COMBINE_EDGE_MODELS = 'CAD_COMBINE_EDGE_MODELS'
 export const CAD_EDITMODE_SET_ACTIVE_LINE = 'CAD_EDITMODE_SET_ACTIVE_LINE'
+export const CAD_EDITMODE_UNSELECT_ACTIVE_LINE = 'CAD_EDITMODE_UNSELECT_ACTIVE_LINE'
 
 export const drawDxf = (data = null, container, snapshot = null) => {
   let cadCanvas = new dxfService.Viewer(data, container, snapshot)
@@ -165,7 +166,7 @@ export const cadClick = (event, editor) => {
           ) {
             if (selectResult[0].id !== editor.editMode.activeLine.id) {
               if (editor.editMode.activeLine.id) {
-                setLine(editor.editMode.activeLine, scene)
+                unselectLine(editor.editMode.activeLine, scene)
               }
               let activeEntities = sceneService.doSelection(selectResult, editor)
               const rPoint = getScale(camera)
@@ -176,6 +177,18 @@ export const cadClick = (event, editor) => {
                 type: CAD_EDITMODE_SET_ACTIVE_LINE,
                 payload: {
                   activeLine: activeEntities[0]
+                }
+              })
+            }
+          } else {
+            //unselect activeLine line
+            if (editor.editMode.activeLine.id) {
+              unselectLine(editor.editMode.activeLine, scene)
+              renderer.render(scene, camera)
+              dispatch({
+                type: CAD_EDITMODE_UNSELECT_ACTIVE_LINE,
+                payload: {
+                  activeLine: {}
                 }
               })
             }
