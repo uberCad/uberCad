@@ -2,7 +2,6 @@ import api from './apiService'
 import axios from 'axios'
 import history from '../config/history'
 
-
 export default class UserService {
   static isAuthenticated () {
     return !!window.localStorage.sid

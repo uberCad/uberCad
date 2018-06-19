@@ -28,11 +28,11 @@ export default class ToolbarComponent extends Component {
         <FormattedMessage id='toolbar.point' defaultMessage='Point (v)'>
           {value =>
             <button className={`btn ${tool === TOOL_POINT ? 'btn-success' : ''}`}
-                    data-tool={TOOL_POINT}
-                    onClick={this.onClick}
-                    title={value}
+              data-tool={TOOL_POINT}
+              onClick={this.onClick}
+              title={value}
             >
-              <img src={toolPoint} alt='Point'/>
+              <img src={toolPoint} alt='Point' />
             </button>
           }
         </FormattedMessage>
@@ -40,11 +40,11 @@ export default class ToolbarComponent extends Component {
         <FormattedMessage id='toolbar.select' defaultMessage='Select (m)'>
           {value =>
             <button className={`btn ${tool === TOOL_SELECT ? 'btn-success' : ''}`}
-                    data-tool={TOOL_SELECT}
-                    onClick={this.onClick}
-                    title={value}
+              data-tool={TOOL_SELECT}
+              onClick={this.onClick}
+              title={value}
             >
-              <img src={toolSelect} alt='Select'/>
+              <img src={toolSelect} alt='Select' />
             </button>
           }
         </FormattedMessage>
@@ -52,11 +52,11 @@ export default class ToolbarComponent extends Component {
         <FormattedMessage id='toolbar.undo' defaultMessage='Undo'>
           {value =>
             <button className={`btn ${tool === TOOL_UNDO ? 'btn-success' : ''}`}
-                    data-tool={TOOL_UNDO}
-                    onClick={this.onClick}
-                    title={value}
+              data-tool={TOOL_UNDO}
+              onClick={this.onClick}
+              title={value}
             >
-              <img src={toolUndo} alt='Undo'/>
+              <img src={toolUndo} alt='Undo' />
             </button>
           }
         </FormattedMessage>
@@ -64,11 +64,11 @@ export default class ToolbarComponent extends Component {
         <FormattedMessage id='toolbar.redo' defaultMessage='Redo'>
           {value =>
             <button className={`btn ${tool === TOOL_REDO ? 'btn-success' : ''}`}
-                    data-tool={TOOL_REDO}
-                    onClick={this.onClick}
-                    title={value}
+              data-tool={TOOL_REDO}
+              onClick={this.onClick}
+              title={value}
             >
-              <img src={toolRedo} alt='Redo'/>
+              <img src={toolRedo} alt='Redo' />
             </button>
           }
         </FormattedMessage>

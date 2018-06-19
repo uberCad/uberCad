@@ -361,45 +361,43 @@ export default class DxfService {
       return new THREE.Line(geometry, material)
     }
 
-    function drawPolyLine(entity, data) {
-      let vertices = entity.vertices;
-      let entities = [];
+    function drawPolyLine (entity, data) {
+      let vertices = entity.vertices
+      let entities = []
 
-      for(let i = 0; i < vertices.length; i++) {
-        let startPoint = vertices[i];
-        let endPoint = i + 1 < vertices.length ? vertices[i + 1] : vertices[0];
+      for (let i = 0; i < vertices.length; i++) {
+        let startPoint = vertices[i]
+        let endPoint = i + 1 < vertices.length ? vertices[i + 1] : vertices[0]
 
-        if(startPoint.bulge) {
-          //circle geometry
+        if (startPoint.bulge) {
+          // circle geometry
 
-          let p1 = new THREE.Vector3(startPoint.x, startPoint.y, 0),
-            p2 = new THREE.Vector3(endPoint.x, endPoint.y, 0);
+          let p1 = new THREE.Vector3(startPoint.x, startPoint.y, 0)
+          let p2 = new THREE.Vector3(endPoint.x, endPoint.y, 0)
+          let arc = GeometryUtils.bugleToArc(p1, p2, startPoint.bulge)
 
-          let arc = GeometryUtils.bugleToArc(p1, p2, startPoint.bulge);
-
-          let subEntity = Object.assign({}, entity);
-          subEntity = Object.assign(subEntity, arc);
+          let subEntity = Object.assign({}, entity)
+          subEntity = Object.assign(subEntity, arc)
           entities.push(drawCircle(Object.assign(subEntity, {
             shape: false,
-            type: "ARC"
-          }), data));
-
+            type: 'ARC'
+          }), data))
         } else {
-          //unfortunately babel not correctly works with spread operator
+          // unfortunately babel not correctly works with spread operator
           // entities.push(drawLine({...entity, vertices: [startPoint, endPoint]}, data));
 
-          let subEntity = Object.assign({}, entity);
+          let subEntity = Object.assign({}, entity)
           entities.push(drawLine(Object.assign(subEntity, {
             vertices: [
               new THREE.Vector3(startPoint.x, startPoint.y, 0),
               new THREE.Vector3(endPoint.x, endPoint.y, 0)
             ],
             shape: false
-          }), data));
+          }), data))
         }
       }
 
-      return entities;
+      return entities
     }
 
     function drawLine (entity, data) {

@@ -45,7 +45,7 @@ let previewObjectInConsole = (object, ...textData) => {
                                                         <area value="0.01" />
                                                     </path>`
   }).join('')
-    }
+}
                             </g>
                             </svg>`
 
@@ -114,15 +114,15 @@ let previewPathInConsole = (path, vertex, ...textData) => {
 
 let getSvg = (object) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"
-         viewBox={`${object.userData.edgeModel.svgData.viewBox.x}
+    <svg xmlns='http://www.w3.org/2000/svg'
+      viewBox={`${object.userData.edgeModel.svgData.viewBox.x}
          ${object.userData.edgeModel.svgData.viewBox.y}
          ${object.userData.edgeModel.svgData.viewBox.width}
          ${object.userData.edgeModel.svgData.viewBox.height}
-         `}
+        `}
     >
-      <path fill="#9F9F9F"
-            d={object.userData.edgeModel.svgData.pathD}/>
+      <path fill='#9F9F9F'
+        d={object.userData.edgeModel.svgData.pathD} />
     </svg>
   )
 }

@@ -2,7 +2,6 @@ import {
   DEFAULT_THRESHOLD
 } from '../components/Options/optionsComponent'
 
-
 export const OPTIONS_SELECT_MODE = 'OPTIONS_SELECT_MODE'
 export const OPTIONS_SINGLE_LAYER_SELECT = 'OPTIONS_SINGLE_LAYER_SELECT'
 export const OPTIONS_SET_THRESHOLD = 'OPTIONS_SET_THRESHOLD'
@@ -37,4 +36,3 @@ export const setThreshold = value => {
     }
   })
 }
-

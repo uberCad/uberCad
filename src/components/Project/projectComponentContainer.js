@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import ProjectComponent from './projectComponent'
-import { fetchProject } from '../../actions/project'
+import { delProject, fetchProject } from '../../actions/project'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -19,6 +19,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     fetchProject: function (id, preloadedProject) {
       fetchProject(id, preloadedProject)(dispatch)
+    },
+    delProject: function (key) {
+      delProject(key)(dispatch)
     }
   }
 }

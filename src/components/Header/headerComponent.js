@@ -21,10 +21,10 @@ export default class HeaderComponent extends Component {
           <Navbar.Brand>
             <Link to='/' className='logo'>
               {appName}
-              <img src={logo} alt='logo' width={24}/>
+              <img src={logo} alt='logo' width={24} />
             </Link>
           </Navbar.Brand>
-          <Navbar.Toggle/>
+          <Navbar.Toggle />
         </Navbar.Header>
         <Navbar.Collapse>
           <Nav className='nav-group'>
@@ -43,7 +43,7 @@ export default class HeaderComponent extends Component {
             <NavDropdown
               title={
                 <div className='pull-left'>
-                  <img className='user-pic img-circle' src={userPic} alt='user pic'/>
+                  <img className='user-pic img-circle' src={userPic} alt='user pic' />
                   {this.props.userName}
                 </div>
               }
@@ -54,7 +54,7 @@ export default class HeaderComponent extends Component {
               <MenuItem>
                 <FormattedMessage id='header.editProfile' defaultMessage='Edit profile' />
               </MenuItem>
-              <MenuItem divider/>
+              <MenuItem divider />
               <MenuItem onClick={this.logout}>
                 <FormattedMessage id='header.logout' defaultMessage='Logout' />
               </MenuItem>
