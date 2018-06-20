@@ -3,7 +3,12 @@ import sceneService from '../services/sceneService'
 
 export const PANEL_OBJECTS_TOGGLE = 'PANEL_OBJECTS_TOGGLE'
 
-export const toggleObject = object => {
+export const toggleObject = (editor, object) => {
+  if (object) {
+    sceneService.setPointOfInterest(editor, object)
+  } else {
+    sceneService.setPointOfInterest(editor, editor.scene)
+  }
   return dispatch => {
     dispatch({
       type: PANEL_OBJECTS_TOGGLE,

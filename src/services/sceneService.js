@@ -285,12 +285,11 @@ function * entityIterator (container, iterateContainers = false) {
 }
 
 let setPointOfInterest = (editor, object) => {
+  if (object.type !== 'Line') {
+    object = new THREE.BoxHelper(object, 0xffff00)
+  }
   let stepsCount = 25
   let {camera} = editor
-
-  console.log(editor)
-  console.log(editor.cadCanvas)
-  console.log(editor.cadCanvas.getControls())
 
   let controls = editor.cadCanvas.getControls()
 
@@ -303,7 +302,7 @@ let setPointOfInterest = (editor, object) => {
   }
   let step = (new THREE.Vector3(0, 0, 0)).subVectors(pointOfInterests, camera.position).divideScalar(stepsCount)
 
-  let radius = object.geometry.boundingSphere.radius
+  let radius = object.type === 'LineSegments' ? object.geometry.boundingSphere.radius / 2 : object.geometry.boundingSphere.radius
   let canvasDimension
   if (camera.right > camera.top) {
     canvasDimension = camera.top

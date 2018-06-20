@@ -44,7 +44,7 @@ export default class PanelObjectsComponent extends Component {
     let {currentTarget: {dataset: {id}}} = event
     const {scene} = this.props.editor
     let object = scene.getObjectById(parseInt(id, 10))
-    this.props.toggleObject(object !== this.props.activeObject ? object : null)
+    this.props.toggleObject(this.props.editor, object !== this.props.activeObject ? object : null)
   }
 
   render () {
