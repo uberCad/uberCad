@@ -23,7 +23,8 @@ import {
   EDIT_NEW_LINE,
   EDIT_CANCEL_NEW_LINE,
   EDIT_LINE_FIRST_POINT,
-  EDIT_NEW_LINE_SAVE
+  EDIT_NEW_LINE_SAVE,
+  EDIT_SAVE
 } from '../actions/edit'
 
 import {
@@ -111,6 +112,10 @@ const cad = (state = initialState, action) => {
         editMode: {selectPointIndex: {$set: action.payload.index}}
       })
     case EDIT_CANCEL:
+      return update(state, {
+        editMode: {$set: action.payload.editMode}
+      })
+    case EDIT_SAVE:
       return update(state, {
         editMode: {$set: action.payload.editMode}
       })

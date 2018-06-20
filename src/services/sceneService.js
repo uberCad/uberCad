@@ -97,14 +97,14 @@ let highlightEntities = (editor, entities, restoreColor = false, color = 0x0000F
     if (restoreColor) {
       delete entity.userData.showInTop
       if (entity.userData.originalColor) {
-        entity.material.color = entity.userData.originalColor
+        entity.material.color.set(entity.userData.originalColor)
         delete entity.userData.originalColor
       }
     } else {
       if (!entity.userData.originalColor) {
-        entity.userData.originalColor = entity.material.color
+        entity.userData.originalColor = entity.material.color.clone()
       }
-      entity.material.color = new THREE.Color(color)
+      entity.material.color.set(new THREE.Color(color))
     }
     // entity.geometry.computeLineDistances();
     entity.material.needUpdate = true

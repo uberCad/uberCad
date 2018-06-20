@@ -103,4 +103,48 @@
       }
     }
   }
+
+  .edit-group {
+    height: $toolSize;
+    line-height: $toolSize;
+
+    label {
+      float: left;
+      font-weight: normal;
+      display: inline-block;
+      line-height: $toolSize;
+      vertical-align: top;
+      height: 100%;
+      font-size: 11px;
+    }
+
+    button {
+      float: left;
+      opacity: 0.7;
+      transition: All 0.3s;
+      display: inline-block;
+      height: 100%;
+      padding-left: $toolSize - 20px;
+      margin-left: 10px;
+      font-weight: normal;
+      font-size: 13px;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &:active, &:focus {
+        outline: none;
+      }
+
+      &.cancel {
+        background: url("cancel.svg") no-repeat left transparent;
+        background-size: $toolSize - 25px;
+      }
+      &.save {
+        background: url("save.svg") no-repeat left transparent;
+        background-size: $toolSize - 25px;
+      }
+    }
+  }
 }

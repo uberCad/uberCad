@@ -13,6 +13,7 @@ import { activePoint, disablePoint, movePointInfo } from './pointInfo'
 
 export const EDIT_IS_EDIT = 'EDIT_IS_EDIT'
 export const EDIT_CANCEL = 'EDIT_CANCEL'
+export const EDIT_SAVE = 'EDIT_SAVE'
 export const EDIT_SELECT_POINT = 'EDIT_SELECT_POINT'
 export const EDIT_MOVE_POINT = 'EDIT_MOVE_POINT'
 export const EDIT_SAVE_POINT = 'EDIT_SAVE_POINT'
@@ -60,6 +61,24 @@ export const cancelEdit = (editor, editObject, backUp) => {
   editor.renderer.render(editor.scene, editor.camera)
   return dispatch => dispatch({
     type: EDIT_CANCEL,
+    payload: {
+      editMode: {
+        isEdit: false,
+        beforeEdit: {},
+        editObject: {},
+        activeLine: {},
+        selectPointIndex: null
+      }
+    }
+  })
+}
+
+export const saveEdit = (editor) => {
+  editor.scene.getObjectByName('HelpLayer').children = []
+  setOriginalColor(editor.scene)
+  editor.renderer.render(editor.scene, editor.camera)
+  return dispatch => dispatch({
+    type: EDIT_SAVE,
     payload: {
       editMode: {
         isEdit: false,
@@ -205,6 +224,7 @@ export const drawLine = (event, editor) => {
     changeGeometry(changeLine, 1, secondPoint, scene)
   } else {
     const line = createLine(editMode.newLineFirst, secondPoint)
+    line.userData.originalColor = editMode.editObject.children[0].userData.originalColor
     editMode.editObject.add(line)
   }
   renderer.render(scene, camera)

@@ -23,15 +23,15 @@ let setColor = function (entity, bgColor, objName, objColor) {
 }
 
 let setOriginalColor = (entity) => {
-  let firstColor // set color first line for created new line, arc
   entity.children.forEach(function (entity) {
     if (entity.children.length > 0) {
       setOriginalColor(entity)
     } else {
-      if (entity.type === 'Line' &&
-        entity.children.length === 0) {
+      if (entity.type === 'Line' && entity.children.length === 0) {
+        // set color first line for created new line, arc
+        let firstColor
         if (entity.userData.originalColor) {
-          firstColor = firstColor || entity.userData.originalColor
+          firstColor = !firstColor ? entity.userData.originalColor : firstColor
           entity.material.color.set(entity.userData.originalColor)
         } else {
           entity.material.color.set(firstColor)
