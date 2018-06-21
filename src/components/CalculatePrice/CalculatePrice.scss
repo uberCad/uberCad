@@ -23,7 +23,7 @@ ul.polyamide-list {
       font-style: italic;
       margin-right: 5px;
 
-      &.profil{
+      &.profile {
         width: 200px;
         display: block;
         position: absolute;
@@ -31,6 +31,10 @@ ul.polyamide-list {
         top: 5px;
         box-shadow: 0 0 12px rgba(153, 153, 153, 0.4);
         padding: 10px;
+
+        svg {
+          max-height: 180px;
+        }
       }
     }
   }

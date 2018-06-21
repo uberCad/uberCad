@@ -58,7 +58,7 @@ export default class CalculatePriceComponent extends Component {
               <span><b>{value}: {object.userData.price}</b></span>
             }
           </FormattedMessage>}
-          <span className='profil col-sm-4 .col-md-4 .col-xs-4'>{consoleUtils.getSvg(object)}</span>
+          <span className='profile col-sm-4 .col-md-4 .col-xs-4'>{consoleUtils.getSvg(object)}</span>
         </li>
       )
     }
