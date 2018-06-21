@@ -24,7 +24,13 @@ import {
   EDIT_CANCEL_NEW_LINE,
   EDIT_LINE_FIRST_POINT,
   EDIT_NEW_LINE_SAVE,
-  EDIT_SAVE
+  EDIT_SAVE,
+  EDIT_NEW_CURVE,
+  EDIT_CANCEL_NEW_CURVE,
+  EDIT_CURVE_CENTER_POINT,
+  EDIT_CURVE_RADIUS,
+  EDIT_THETA_START,
+  EDIT_NEW_CURVE_SAVE
 } from '../actions/edit'
 
 import {
@@ -47,7 +53,12 @@ let initialState = {
     selectPointIndex: null,
     isNewLine: false,
     newLineFirst: null,
-    isNewCurve: false
+    isNewCurve: false,
+    newCurveCenter: null,
+    radius: null,
+    start: null,
+    thetaStart: null,
+    thetaLength: null
   },
   pointInfo: {
     style: {
@@ -65,6 +76,49 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+
+    case EDIT_NEW_CURVE:
+      return update(state, {
+        editMode: {isNewCurve: {$set: action.payload.isNewCurve}}
+      })
+    case EDIT_CANCEL_NEW_CURVE:
+      return update(state, {
+        editMode: {
+          isNewCurve: {$set: action.payload.isNewCurve},
+          newCurveCenter: {$set: action.payload.newCurveCenter},
+          radius: {$set: action.payload.radius},
+          start: {$set: action.payload.start},
+          thetaStart: {$set: action.payload.thetaStart},
+          thetaLength: {$set: action.payload.thetaLength}
+        }
+      })
+    case EDIT_CURVE_CENTER_POINT:
+      return update(state, {
+        editMode: {newCurveCenter: {$set: action.payload.firstPoint}}
+      })
+    case EDIT_CURVE_RADIUS:
+      return update(state, {
+        editMode: {
+          radius: {$set: action.payload.radius},
+          start: {$set: action.payload.start}
+        }
+      })
+    case EDIT_THETA_START:
+      return update(state, {
+        editMode: {thetaStart: {$set: action.payload.thetaStart}}
+      })
+    case EDIT_NEW_CURVE_SAVE:
+      return update(state, {
+        editMode: {
+          isNewCurve: {$set: action.payload.isNewCurve},
+          newCurveCenter: {$set: action.payload.newCurveCenter},
+          radius: {$set: action.payload.radius},
+          start: {$set: action.payload.start},
+          thetaStart: {$set: action.payload.thetaStart},
+          thetaLength: {$set: action.payload.thetaLength}
+        }
+      })
+
     case EDIT_NEW_LINE_SAVE:
       return update(state, {
         editMode: {

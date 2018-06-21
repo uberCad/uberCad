@@ -13,6 +13,14 @@ export default class PanelEditComponent extends Component {
     this.props.cancelNewLine(this.props.editor)
   }
 
+  newCurve = () => {
+    if (this.props.editMode.editObject.id) this.props.newCurve()
+  }
+
+  cancelNewCurve = () => {
+    this.props.cancelNewCurve(this.props.editor)
+  }
+
   render () {
     const {activeLine, isNewLine, isNewCurve} = this.props.editMode
     return (
@@ -32,8 +40,8 @@ export default class PanelEditComponent extends Component {
           { !isNewLine ? <button className='new-line' title='New line' onClick={this.newLine} />
             : <button className='new-line active' title='Cancel new line' onClick={this.cancelNewLine} />
           }
-          { !isNewCurve ? <button className='new-curve ' title='New curve' />
-            : <button className='new-curve active' title='Cencel new curve' />
+          { !isNewCurve ? <button onClick={this.newCurve} className='new-curve ' title='New curve' />
+            : <button onClick={this.cancelNewCurve} className='new-curve active' title='Cencel new curve' />
           }
         </div>
       </div>

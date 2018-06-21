@@ -5,7 +5,11 @@ import {
   startPointIndex,
   changeGeometry,
   crossingPoint,
-  createLine
+  createLine,
+  helpArc,
+  newArc,
+  circleIntersectionAngle,
+  editThetaLenght
 } from '../services/editObject'
 import sceneService from '../services/sceneService'
 import GeometryUtils from '../services/GeometryUtils'
@@ -23,7 +27,13 @@ export const EDIT_CANCEL_NEW_LINE = 'EDIT_CANCEL_NEW_LINE'
 export const EDIT_LINE_FIRST_POINT = 'EDIT_LINE_FIRST_POINT'
 export const EDIT_NEW_LINE_SAVE = 'EDIT_NEW_LINE_SAVE'
 
-export const EDIT_NEW_ARC = 'EDIT_NEW_ARC'
+export const EDIT_NEW_CURVE = 'EDIT_NEW_CURVE'
+export const EDIT_CANCEL_NEW_CURVE = 'EDIT_CANCEL_NEW_CURVE'
+export const EDIT_CURVE_CENTER_POINT = 'EDIT_CURVE_CENTER_POINT'
+export const EDIT_CURVE_RADIUS = 'EDIT_CURVE_RADIUS'
+export const EDIT_THETA_START = 'EDIT_THETA_START'
+export const EDIT_THETA_LENGTH = 'EDIT_THETA_LENGTH'
+export const EDIT_NEW_CURVE_SAVE = 'EDIT_NEW_CURVE_SAVE'
 
 export const isEdit = (option, editor, object = {}) => {
   if (option) {
@@ -242,6 +252,165 @@ export const saveNewLine = (editor) => {
       payload: {
         isNewLine: false,
         newLineFirst: null
+      }
+    })
+  }
+}
+
+//* Create new curve
+export const newCurve = () => {
+  return dispatch => {
+    dispatch({
+      type: EDIT_NEW_CURVE,
+      payload:
+        {isNewCurve: true}
+    })
+  }
+}
+
+export const cancelNewCurve = (editor) => {
+  let {scene, camera, renderer} = editor
+  scene.getObjectByName('HelpLayer').children = []
+  const line = scene.getObjectByName('newLine')
+  if (line) {
+    line.parent.remove(line)
+    renderer.render(scene, camera)
+  }
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_CANCEL_NEW_CURVE,
+      payload: {
+        isNewCurve: false,
+        newCurveCenter: null,
+        radius: null,
+        start: null,
+        thetaStart: null,
+        thetaLength: null
+      }
+    })
+  }
+}
+
+export const centerPoint = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const firstPoint = crossing ? crossing : mousePoint
+
+  return dispatch => {
+    dispatch({
+      type: EDIT_CURVE_CENTER_POINT,
+      payload: {firstPoint}
+    })
+  }
+}
+
+export const centerCurve = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing center')(dispatch) : movePointInfo(event, 'Click to add center')(dispatch)
+  }
+}
+
+export const radius = (event, editor) => {
+  let {scene, camera, renderer, editMode} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const start = !crossing ? mousePoint : crossing
+  let radius = Math.sqrt(
+    (editMode.newCurveCenter.x - start.x) *
+    (editMode.newCurveCenter.x - start.x) +
+    (editMode.newCurveCenter.y - start.y) *
+    (editMode.newCurveCenter.y - start.y)
+  )
+  let helpLine = helpArc(radius)
+  helpLine.position.x = editMode.newCurveCenter.x
+  helpLine.position.y = editMode.newCurveCenter.y
+  const oldHelpLine = scene.getObjectByName('helpLine')
+  if (oldHelpLine) oldHelpLine.parent.remove(oldHelpLine)
+  scene.getObjectByName('HelpLayer').add(helpLine)
+  renderer.render(scene, camera)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing thetaStart')(dispatch) : movePointInfo(event, 'Click to add thetaStart')(dispatch)
+    dispatch({
+      type: EDIT_CURVE_RADIUS,
+      payload: {radius, start}
+    })
+  }
+}
+
+export const thetaStart = (editor) => {
+  return dispatch => {
+    dispatch({
+      type: EDIT_THETA_START,
+      payload: {thetaStart: editor.editMode.start}
+    })
+  }
+}
+
+export const thetaLength = (event, editor) => {
+  let {scene, camera, renderer, editMode} = editor
+  const thetaStart = circleIntersectionAngle(editMode.thetaStart, editMode.newCurveCenter)
+  const oldLine = scene.getObjectByName('newLine') || newArc(editMode.radius, thetaStart, 0.1)
+
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const length = !crossing ? mousePoint : crossing
+  const t = editThetaLenght(length, oldLine)
+
+  let line = newArc(editMode.radius, t.thetaStart, t.thetaLength)
+  line.userData.helpGeometry = t
+  line.position.x = editMode.newCurveCenter.x
+  line.position.y = editMode.newCurveCenter.y
+
+  if (oldLine && oldLine.parent) oldLine.parent.remove(oldLine)
+  line.userData.originalColor = editMode.editObject.children[0].userData.originalColor
+  editMode.editObject.add(line)
+  renderer.render(scene, camera)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing thetaLength')(dispatch) : movePointInfo(event, 'Click to add thetaLength')(dispatch)
+    dispatch({
+      type: EDIT_THETA_LENGTH,
+      payload: {}
+    })
+  }
+}
+
+export const saveNewCurve = (editor) => {
+  let {scene, camera, renderer} = editor
+  scene.getObjectByName('newLine').name = ''
+  scene.getObjectByName('HelpLayer').children = []
+  renderer.render(scene, camera)
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_NEW_CURVE_SAVE,
+      payload: {
+        isNewCurve: false,
+        newCurveCenter: null,
+        radius: null,
+        start: null,
+        thetaStart: null,
+        thetaLength: null
       }
     })
   }

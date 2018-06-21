@@ -18,7 +18,19 @@ import {
   TOOL_SELECT
 } from '../Toolbar/toolbarComponent'
 import sceneService from '../../services/sceneService'
-import { drawLine, firstPoint, movePoint, saveNewLine, savePoint, selectPoint, startNewLine } from '../../actions/edit'
+import {
+  centerCurve,
+  centerPoint,
+  drawLine,
+  firstPoint,
+  movePoint, radius, saveNewCurve,
+  saveNewLine,
+  savePoint,
+  selectPoint,
+  startNewLine,
+  thetaLength,
+  thetaStart
+} from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -95,6 +107,16 @@ const mapDispatchToProps = (dispatch) => {
         if (editor.editMode.isNewLine) {
           !editor.editMode.newLineFirst ? firstPoint(event, editor)(dispatch) : saveNewLine(editor)(dispatch)
         }
+        //new curve
+        if (editor.editMode.isNewCurve) {
+          if (!editor.editMode.newCurveCenter) {
+            centerPoint(event, editor)(dispatch)
+          } else if (!editor.editMode.thetaStart) {
+            thetaStart(editor)(dispatch)
+          } else if (!editor.editMode.thetaLength) {
+            saveNewCurve(editor)(dispatch)
+          }
+        }
 
         if (editor.tool === TOOL_SELECT) {
           selectionBegin(event, editor)(dispatch)
@@ -128,6 +150,16 @@ const mapDispatchToProps = (dispatch) => {
       //new Line
       if (editor.editMode.isNewLine) {
         !editor.editMode.newLineFirst ? startNewLine(event, editor)(dispatch) : drawLine(event, editor)(dispatch)
+      }
+      //new Curve
+      if (editor.editMode.isNewCurve) {
+        if (!editor.editMode.newCurveCenter) {
+          centerCurve(event, editor)(dispatch)
+        } else if (!editor.editMode.thetaStart) {
+          radius(event, editor)(dispatch)
+        } else if (!editor.editMode.thetaLength) {
+          thetaLength(event, editor)(dispatch)
+        }
       }
     },
 
