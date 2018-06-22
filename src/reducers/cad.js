@@ -30,7 +30,8 @@ import {
   EDIT_CURVE_CENTER_POINT,
   EDIT_CURVE_RADIUS,
   EDIT_THETA_START,
-  EDIT_NEW_CURVE_SAVE
+  EDIT_NEW_CURVE_SAVE,
+  EDIT_DELETE_LINE
 } from '../actions/edit'
 
 import {
@@ -76,6 +77,11 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+
+    case EDIT_DELETE_LINE:
+      return update(state, {
+        editMode: {activeLine: {$set: action.payload.activeLine}}
+      })
 
     case EDIT_NEW_CURVE:
       return update(state, {

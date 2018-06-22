@@ -510,7 +510,6 @@ let helpArc = (radius) => {
 }
 
 let newArc = (radius, thetaStart, thetaLength) => {
-  console.log(radius, thetaStart, thetaLength)
   let geometryArc = new THREE.CircleGeometry(radius, 32, thetaStart, thetaLength)
   geometryArc.vertices.shift()
   let materialArc = new THREE.LineBasicMaterial({color: 0x00ff00})

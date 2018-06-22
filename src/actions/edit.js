@@ -35,6 +35,8 @@ export const EDIT_THETA_START = 'EDIT_THETA_START'
 export const EDIT_THETA_LENGTH = 'EDIT_THETA_LENGTH'
 export const EDIT_NEW_CURVE_SAVE = 'EDIT_NEW_CURVE_SAVE'
 
+export const EDIT_DELETE_LINE = 'EDIT_DELETE_LINE'
+
 export const isEdit = (option, editor, object = {}) => {
   if (option) {
     let bgColor = new THREE.Color(0xaaaaaa)
@@ -412,6 +414,20 @@ export const saveNewCurve = (editor) => {
         thetaStart: null,
         thetaLength: null
       }
+    })
+  }
+}
+
+export const deleteLine = (editor, line) => {
+  let {scene, camera, renderer} = editor
+  line.parent.remove(line)
+  scene.getObjectByName('HelpLayer').children = []
+  renderer.render(scene, camera)
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_DELETE_LINE,
+      payload: {activeLine: {}}
     })
   }
 }

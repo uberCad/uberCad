@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import PanelEditComponent from './panelEditComponent'
-import {newLine, cancelNewLine, newCurve, cancelNewCurve} from '../../actions/edit'
+import { newLine, cancelNewLine, newCurve, cancelNewCurve, deleteLine } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -27,6 +27,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     cancelNewCurve: function (editor) {
       cancelNewCurve(editor)(dispatch)
+    },
+    deleteLine: function (editor, line) {
+      deleteLine(editor, line)(dispatch)
     }
   }
 }

@@ -21,13 +21,20 @@ export default class PanelEditComponent extends Component {
     this.props.cancelNewCurve(this.props.editor)
   }
 
+  deleteLine = () => {
+    this.props.deleteLine(this.props.editor, this.props.editMode.activeLine)
+  }
+
   render () {
     const {activeLine, isNewLine, isNewCurve} = this.props.editMode
     return (
       <div id='panel-edit'>
         <div className='content'>
           <h5>Title: {this.props.editMode.editObject.name}</h5>
-          <h5> Active line: {activeLine.uuid}</h5>
+          { activeLine.uuid && <div className='line'>
+            Active line: {activeLine.uuid}
+            <button className='del-line' onClick={this.deleteLine} title='Delete line'/>
+          </div>}
           {activeLine.geometry && (activeLine.geometry.type === 'CircleGeometry' &&
             <div>
               <div>radius: {activeLine.geometry.parameters.radius}</div>
@@ -37,11 +44,11 @@ export default class PanelEditComponent extends Component {
         </div>
 
         <div className='toolbar'>
-          { !isNewLine ? <button className='new-line' title='New line' onClick={this.newLine} />
-            : <button className='new-line active' title='Cancel new line' onClick={this.cancelNewLine} />
+          {!isNewLine ? <button className='new-line' title='New line' onClick={this.newLine}/>
+            : <button className='new-line active' title='Cancel new line' onClick={this.cancelNewLine}/>
           }
-          { !isNewCurve ? <button onClick={this.newCurve} className='new-curve ' title='New curve' />
-            : <button onClick={this.cancelNewCurve} className='new-curve active' title='Cencel new curve' />
+          {!isNewCurve ? <button onClick={this.newCurve} className='new-curve ' title='New curve'/>
+            : <button onClick={this.cancelNewCurve} className='new-curve active' title='Cencel new curve'/>
           }
         </div>
       </div>
