@@ -35,8 +35,8 @@ const mapDispatchToProps = (dispatch) => {
     isEdit: function (option, editor, object) {
       isEdit(option, editor, object)(dispatch)
     },
-    toggleObject: function (object) {
-      toggleObject(object)(dispatch)
+    toggleObject: function (editor, object) {
+      toggleObject(editor, object)(dispatch)
     }
   }
 }

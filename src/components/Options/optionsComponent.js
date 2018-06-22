@@ -27,6 +27,10 @@ export default class OptionsComponent extends Component {
     this.props.cancelEdit(this.props.editor, this.props.editMode.editObject, this.props.editMode.beforeEdit)
   }
 
+  saveEdit = () => {
+    this.props.saveEdit(this.props.editor)
+  }
+
   render () {
     const {
       tool,
@@ -126,8 +130,10 @@ export default class OptionsComponent extends Component {
         )}
 
         {editMode.isEdit && (
-          <ul className='list-group'>
-            <button onClick={this.cancelEdit}>Cancel edit mode</button>
+          <ul className='edit-group'>
+            <label>Edit Object: </label>
+            <button className='save' onClick={this.saveEdit}>Save</button>
+            <button className='cancel' onClick={this.cancelEdit}>Cancel</button>
             {/* <li> */}
             {/* <label>Edit object name: {editor.editMode.name}</label> */}
             {/* </li> */}

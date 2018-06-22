@@ -6,7 +6,7 @@ import {
   setThreshold
 } from '../../actions/options'
 
-import { cancelEdit } from '../../actions/edit'
+import { cancelEdit, saveEdit } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -41,6 +41,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     cancelEdit: function (editor, editObject, backup) {
       cancelEdit(editor, editObject, backup)(dispatch)
+    },
+    saveEdit: function (editor) {
+      saveEdit(editor)(dispatch)
     }
   }
 }

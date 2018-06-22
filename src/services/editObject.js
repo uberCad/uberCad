@@ -23,15 +23,15 @@ let setColor = function (entity, bgColor, objName, objColor) {
 }
 
 let setOriginalColor = (entity) => {
-  let firstColor // set color first line for created new line, arc
   entity.children.forEach(function (entity) {
     if (entity.children.length > 0) {
       setOriginalColor(entity)
     } else {
-      if (entity.type === 'Line' &&
-        entity.children.length === 0) {
+      if (entity.type === 'Line' && entity.children.length === 0) {
+        // set color first line for created new line, arc
+        let firstColor
         if (entity.userData.originalColor) {
-          firstColor = firstColor || entity.userData.originalColor
+          firstColor = !firstColor ? entity.userData.originalColor : firstColor
           entity.material.color.set(entity.userData.originalColor)
         } else {
           entity.material.color.set(firstColor)
@@ -251,13 +251,12 @@ let radiusArc = (point, line) => Math.sqrt(
 let editThetaLenght = (mousePoint, line) => {
   let result = {}
 
-  let helpLength = line.userData.helpGeometry.helpLength
-  let helpStart = line.userData.helpGeometry.helpStart
-  let pastDeltaLength = line.userData.helpGeometry.pastDeltaLength || -0.1
-  let overpastAngle = line.userData.helpGeometry.overpastAngle || 0
-  let mouseAngles = line.userData.helpGeometry.mouseAngles || []
-  let thetaLength = line.userData.helpGeometry.thetaLength
-
+  let helpStart = line.userData.helpGeometry ? line.userData.helpGeometry.helpStart : line.geometry.parameters.thetaStart
+  let helpLength = line.userData.helpGeometry ? line.userData.helpGeometry.helpLength : line.geometry.parameters.thetaLength
+  let thetaLength = line.userData.helpGeometry ? line.userData.helpGeometry.thetaLength : line.geometry.parameters.thetaLength
+  let pastDeltaLength = line.userData.helpGeometry ? line.userData.helpGeometry.pastDeltaLength : -0.1
+  let overpastAngle = line.userData.helpGeometry ? line.userData.helpGeometry.overpastAngle : 0
+  let mouseAngles = line.userData.helpGeometry ? line.userData.helpGeometry.mouseAngles : [line.geometry.parameters.thetaStart]
   let isOnClock = (arr) => {
     return (arr[0] < arr[1])
   }
@@ -271,7 +270,6 @@ let editThetaLenght = (mousePoint, line) => {
   mouseAngles.unshift(angle)
   let onClock = isOnClock(mouseAngles)
   result.mouseAngles = mouseAngles
-
   let start1 = helpStart
   let deltaLength
 
@@ -308,11 +306,19 @@ let editThetaLenght = (mousePoint, line) => {
   result.thetaLength = thetaLength
 
   // length < 0
-  result = deltaLength < 0 ? ({...result, thetaStart: start1 + deltaLength, thetaLength: -deltaLength}) : ({...result, thetaStart: start1, thetaLength: deltaLength})
-
+  result = deltaLength < 0 ?
+    ({
+      ...result,
+      thetaStart: start1 + deltaLength,
+      thetaLength: -deltaLength
+    })
+    : ({
+      ...result,
+      thetaStart: start1,
+      thetaLength: deltaLength
+    })
   // start < 0
   result.thetaStart = result.thetaStart < 0 ? (result.thetaStart + 2 * Math.PI) : result.thetaStart
-
   return result
 }
 
@@ -366,7 +372,16 @@ let editThetaStart = (mousePoint, line) => {
   result.helpStart = helpStart
 
   // length < 0
-  result = deltaLength < 0 ? ({...result, thetaStart: q + deltaLength, thetaLength: -deltaLength}) : ({...result, thetaStart: q, thetaLength: deltaLength})
+  result = deltaLength < 0 ?
+    ({
+      ...result,
+      thetaStart: q + deltaLength,
+      thetaLength: -deltaLength
+    }) : ({
+      ...result,
+      thetaStart: q,
+      thetaLength: deltaLength
+    })
 
   // start < 0
   result.thetaStart = result.thetaStart < 0 ? result.thetaStart + 2 * Math.PI : result.thetaStart
@@ -483,6 +498,27 @@ let createLine = (point0, point1) => {
   }
 }
 
+let helpArc = (radius) => {
+  let geometryArc = new THREE.CircleGeometry(radius, 32, 0, 2 * Math.PI)
+  geometryArc.vertices.shift()
+  let materialArc = new THREE.LineBasicMaterial({color: 0xcccccc})
+  materialArc.opacity = 0.5
+  materialArc.transparent = true
+  let helpLine = new THREE.Line(geometryArc, materialArc)
+  helpLine.name = 'helpLine'
+  return helpLine
+}
+
+let newArc = (radius, thetaStart, thetaLength) => {
+  console.log(radius, thetaStart, thetaLength)
+  let geometryArc = new THREE.CircleGeometry(radius, 32, thetaStart, thetaLength)
+  geometryArc.vertices.shift()
+  let materialArc = new THREE.LineBasicMaterial({color: 0x00ff00})
+  let line = new THREE.Line(geometryArc, materialArc)
+  line.name = 'newLine'
+  return line
+}
+
 export {
   setColor,
   setOriginalColor,
@@ -492,5 +528,9 @@ export {
   startPointIndex,
   changeGeometry,
   crossingPoint,
-  createLine
+  createLine,
+  helpArc,
+  newArc,
+  circleIntersectionAngle,
+  editThetaLenght
 }
