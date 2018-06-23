@@ -31,7 +31,12 @@ import {
   EDIT_CURVE_RADIUS,
   EDIT_THETA_START,
   EDIT_NEW_CURVE_SAVE,
-  EDIT_DELETE_LINE
+  EDIT_DELETE_LINE,
+  EDIT_CLONE_OBJECT,
+  EDIT_CLONE_ACTIVE,
+  EDIT_CLONE_POINT,
+  EDIT_CLONE_SAVE,
+  EDIT_CLONE_CANCEL
 } from '../actions/edit'
 
 import {
@@ -59,7 +64,12 @@ let initialState = {
     radius: null,
     start: null,
     thetaStart: null,
-    thetaLength: null
+    thetaLength: null,
+    clone: {
+      active: false,
+      point: null,
+      cloneObject: null
+    }
   },
   pointInfo: {
     style: {
@@ -77,6 +87,27 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+
+    case EDIT_CLONE_CANCEL:
+      return update(state, {
+        editMode: {clone: {$set: action.payload.clone}}
+      })
+    case EDIT_CLONE_SAVE:
+      return update(state, {
+        editMode: {clone: {$set: action.payload.clone}}
+      })
+    case EDIT_CLONE_ACTIVE:
+      return update(state, {
+        editMode: {clone: {active: {$set: action.payload.active}}}
+      })
+    case EDIT_CLONE_POINT:
+      return update(state, {
+        editMode: {clone: {point: {$set: action.payload.point}}}
+      })
+    case EDIT_CLONE_OBJECT:
+      return update(state, {
+        editMode: {clone: {cloneObject: {$set: action.payload.cloneObject}}}
+      })
 
     case EDIT_DELETE_LINE:
       return update(state, {

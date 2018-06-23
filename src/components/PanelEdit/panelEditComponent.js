@@ -25,13 +25,21 @@ export default class PanelEditComponent extends Component {
     this.props.deleteLine(this.props.editor, this.props.editMode.activeLine)
   }
 
+  clone = () => {
+    this.props.cloneActive(true)
+  }
+  cancelClone = () => {
+    this.props.cancelClone(this.props.editor, this.props.editMode.clone.cloneObject)
+  }
+
   render () {
     const {activeLine, isNewLine, isNewCurve} = this.props.editMode
+    const clone = this.props.editMode.clone.active
     return (
       <div id='panel-edit'>
         <div className='content'>
           <h5>Title: {this.props.editMode.editObject.name}</h5>
-          { activeLine.uuid && <div className='line'>
+          {activeLine.uuid && <div className='line'>
             Active line: {activeLine.uuid}
             <button className='del-line' onClick={this.deleteLine} title='Delete line'/>
           </div>}
@@ -49,6 +57,9 @@ export default class PanelEditComponent extends Component {
           }
           {!isNewCurve ? <button onClick={this.newCurve} className='new-curve ' title='New curve'/>
             : <button onClick={this.cancelNewCurve} className='new-curve active' title='Cencel new curve'/>
+          }
+          {!clone ? <button onClick={this.clone} className='clone' title='Clone object' />
+            : <button onClick={this.cancelClone} className='clone active' title='Cancel clone object' />
           }
         </div>
       </div>

@@ -518,6 +518,55 @@ let newArc = (radius, thetaStart, thetaLength) => {
   return line
 }
 
+let clone = (obj, name) => {
+  let object = new THREE.Group()
+  obj.children.forEach(item => {
+    let cloneGeometry, line
+    const cloneMaterial = item.material.clone()
+    if (item.geometry.type === 'Geometry') {
+      cloneGeometry = item.geometry.clone()
+      line = new THREE.Line(cloneGeometry, cloneMaterial)
+    } else if (item.geometry.type === 'CircleGeometry') {
+      cloneGeometry = new THREE.CircleGeometry(
+        item.geometry.parameters.radius,
+        item.geometry.parameters.segments,
+        item.geometry.parameters.thetaStart,
+        item.geometry.parameters.thetaLength)
+      cloneGeometry.vertices.shift()
+      line = new THREE.Line(cloneGeometry, cloneMaterial)
+      line.position.set(item.position.x, item.position.y, item.position.z)
+    }
+    line.userData = item.userData
+    object.add(line)
+  })
+  object.name = !name ? obj.name + '_copy' : name
+  object.userData = obj.userData
+  return object
+}
+
+let fixPosition = (object) => {
+  object.children.forEach(line => {
+    if (line.geometry.type === 'Geometry') {
+      line.geometry.vertices.forEach(vertex => {
+        vertex.x = vertex.x + object.position.x
+        vertex.y = vertex.y + object.position.y
+        vertex.z = vertex.z + object.position.z
+      })
+      line.geometry.verticesNeedUpdate = true
+      line.computeLineDistances()
+      line.geometry.computeBoundingSphere()
+    } else if (line.geometry.type === 'CircleGeometry') {
+      line.position.set(
+        line.position.x + object.position.x,
+        line.position.y + object.position.y,
+        line.position.z + object.position.z
+      )
+    }
+  })
+  object.position.set(0, 0, 0)
+  return object
+}
+
 export {
   setColor,
   setOriginalColor,
@@ -531,5 +580,7 @@ export {
   helpArc,
   newArc,
   circleIntersectionAngle,
-  editThetaLenght
+  editThetaLenght,
+  clone,
+  fixPosition
 }

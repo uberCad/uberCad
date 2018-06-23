@@ -163,6 +163,8 @@ export const cadClick = (event, editor) => {
           if (selectResult.length
             && selectResult[0].parent.name === editor.editMode.editObject.name
             && !editor.editMode.isNewLine
+            && !editor.editMode.isNewCurve
+            && !editor.editMode.clone.active
           ) {
             if (selectResult[0].id !== editor.editMode.activeLine.id) {
               if (editor.editMode.activeLine.id) {
