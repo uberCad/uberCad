@@ -11,7 +11,8 @@ import {
   circleIntersectionAngle,
   editThetaLenght,
   clone,
-  fixPosition
+  fixPosition,
+  mirrorObject
 } from '../services/editObject'
 import sceneService from '../services/sceneService'
 import GeometryUtils from '../services/GeometryUtils'
@@ -44,6 +45,8 @@ export const EDIT_CLONE_POINT = 'EDIT_CLONE_POINT'
 export const EDIT_CLONE_OBJECT = 'EDIT_CLONE_OBJECT'
 export const EDIT_CLONE_SAVE = 'EDIT_CLONE_SAVE'
 export const EDIT_CLONE_CANCEL = 'EDIT_CLONE_CANCEL'
+
+export const EDIT_MIRROR = 'EDIT_MIRROR'
 
 export const isEdit = (option, editor, object = {}) => {
   if (option) {
@@ -560,6 +563,20 @@ export const cancelClone = (editor, cloneObject) => {
           point: null,
           cloneObject: null
         }
+      }
+    })
+  }
+}
+
+export const mirror = (object, editor, option) => {
+  let {scene, camera, renderer} = editor
+  const editObject = mirrorObject(object, option)
+  renderer.render(scene, camera)
+  return dispatch => {
+    dispatch({
+      type: EDIT_MIRROR,
+      payload: {
+        editObject
       }
     })
   }

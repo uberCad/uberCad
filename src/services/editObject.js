@@ -567,6 +567,41 @@ let fixPosition = (object) => {
   return object
 }
 
+let mirrorObject = (object, option) => {
+  let box = new THREE.BoxHelper(object, 0xffff00)
+  object.children.forEach(line => {
+    if (line.geometry.type === 'Geometry') {
+      line.geometry.vertices.forEach(vertex => {
+        if (option === 'OX') {
+          vertex.y = -vertex.y + 2 * box.geometry.boundingSphere.center.y
+        } else if (option === 'OY') {
+          vertex.x = -vertex.x + 2 * box.geometry.boundingSphere.center.x
+        }
+      })
+      line.geometry.verticesNeedUpdate = true
+      line.computeLineDistances()
+      line.geometry.computeBoundingSphere()
+    } else if (line.geometry instanceof THREE.CircleGeometry) {
+      if (option === 'OX') {
+        line.rotation.x = line.rotation.x === Math.PI ? 0 : Math.PI
+        line.position.set(
+          line.position.x,
+          -line.position.y + 2 * box.geometry.boundingSphere.center.y,
+          line.position.z
+        )
+      } else if (option === 'OY') {
+        line.rotation.y = line.rotation.y === Math.PI ? 0 : Math.PI
+        line.position.set(
+          -line.position.x + 2 * box.geometry.boundingSphere.center.x,
+          line.position.y,
+          line.position.z
+        )
+      }
+    }
+  })
+  return object
+}
+
 export {
   setColor,
   setOriginalColor,
@@ -582,5 +617,6 @@ export {
   circleIntersectionAngle,
   editThetaLenght,
   clone,
-  fixPosition
+  fixPosition,
+  mirrorObject
 }

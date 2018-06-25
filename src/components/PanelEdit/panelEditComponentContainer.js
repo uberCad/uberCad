@@ -7,7 +7,8 @@ import {
   cancelNewCurve,
   deleteLine,
   cloneActive,
-  cancelClone
+  cancelClone,
+  mirror
 } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
@@ -44,6 +45,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     cloneActive: function (option) {
       cloneActive(option)(dispatch)
+    },
+    mirror: function (object, editor, option) {
+      mirror(object, editor, option)(dispatch)
     }
   }
 }

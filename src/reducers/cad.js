@@ -36,7 +36,8 @@ import {
   EDIT_CLONE_ACTIVE,
   EDIT_CLONE_POINT,
   EDIT_CLONE_SAVE,
-  EDIT_CLONE_CANCEL
+  EDIT_CLONE_CANCEL,
+  EDIT_MIRROR
 } from '../actions/edit'
 
 import {
@@ -87,7 +88,10 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
-
+    case EDIT_MIRROR:
+      return update(state, {
+        editMode: {editObject: {$set: action.payload.editObject}}
+      })
     case EDIT_CLONE_CANCEL:
       return update(state, {
         editMode: {clone: {$set: action.payload.clone}}
