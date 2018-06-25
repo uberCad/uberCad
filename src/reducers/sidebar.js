@@ -50,6 +50,13 @@ let initialState = {
         title: 'Snapshots',
         component: 'PanelSnapshots',
         active: true
+      },
+      {
+        title_en: 'Info',
+        title_ru: 'Информация',
+        title: 'Info',
+        component: 'PanelInfo',
+        active: false
       }
     ]
   ]
