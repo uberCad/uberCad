@@ -8,10 +8,12 @@ import {
   CAD_SHOW_ALL,
   CAD_GROUP_ENTITIES,
   CAD_EDITMODE_SET_ACTIVE_LINE,
-  CAD_EDITMODE_UNSELECT_ACTIVE_LINE
+  CAD_EDITMODE_UNSELECT_ACTIVE_LINE,
+  CAD_IS_CHANGED
 } from '../actions/cad'
 
 import {
+  SNAPSHOT_ADD,
   SNAPSHOT_LOAD_SCENE
 } from '../actions/panelSnapshots'
 
@@ -71,7 +73,8 @@ let initialState = {
   didInvalidate: false,
   items: [],
   error: null,
-  lastUpdated: null
+  lastUpdated: null,
+  isChanged: false
 }
 
 const cad = (state = initialState, action) => {
@@ -200,12 +203,14 @@ const cad = (state = initialState, action) => {
           beforeEdit: {$set: action.payload.beforeEdit},
           editObject: {$set: action.payload.editObject}
         },
-        scene: {$set: action.payload.scene}
+        scene: {$set: action.payload.scene},
+        isChanged: {$set: action.payload.isChanged}
       })
     case SNAPSHOT_LOAD_SCENE:
       return {
         ...state,
-        scene: action.payload.scene
+        scene: action.payload.scene,
+        isChanged: action.payload.isChanged
       }
     case CAD_DRAW_DXF:
       return {
@@ -228,8 +233,20 @@ const cad = (state = initialState, action) => {
       })
     case CAD_GROUP_ENTITIES:
       return update(state, {
-        scene: {children: {$set: [...state.scene.children]}}
+        scene: {children: {$set: [...state.scene.children]}},
+        isChanged: {$set: action.payload.isChanged}
       })
+
+    case SNAPSHOT_ADD:
+      return {
+        ...state,
+        isChanged: action.payload.isChanged
+      }
+    case CAD_IS_CHANGED:
+      return {
+        ...state,
+        isChanged: action.payload.isChanged
+      }
     default:
       return state
   }

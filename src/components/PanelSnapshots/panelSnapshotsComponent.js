@@ -37,8 +37,14 @@ export default class PanelSnapshotsComponent extends Component {
 
   loadSnapshot = (event) => {
     event.stopPropagation()
-    let {currentTarget: {dataset: {key}}} = event
-    this.props.loadSnapshot(key, this.props.cadCanvas)
+    let confirm
+    if (this.props.isChanged) {
+      confirm = window.confirm('Document is not saved. You will lost the changes if you load snapshot.')
+    }
+    if (!this.props.isChanged || confirm) {
+      let {currentTarget: {dataset: {key}}} = event
+      this.props.loadSnapshot(key, this.props.cadCanvas)
+    }
   }
 
   deleteSnapshot = (event) => {
@@ -110,6 +116,7 @@ export default class PanelSnapshotsComponent extends Component {
     cadCanvas: PropTypes.object,
     addSnapshot: PropTypes.func.isRequired,
     deleteSnapshot: PropTypes.func.isRequired,
-    loadSnapshot: PropTypes.func.isRequired
+    loadSnapshot: PropTypes.func.isRequired,
+    isChanged: PropTypes.bool.isRequired
   }
 }

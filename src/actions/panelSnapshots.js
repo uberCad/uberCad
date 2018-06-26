@@ -17,7 +17,8 @@ export const addSnapshot = (snapshot, projectKey) => {
         dispatch({
           type: SNAPSHOT_ADD,
           payload: {
-            snapshot: res
+            snapshot: res,
+            isChanged: false
           }
         })
       })
@@ -38,7 +39,8 @@ export const loadSnapshot = (snapshotKey, cadCanvas) => {
         dispatch({
           type: SNAPSHOT_LOAD_SCENE,
           payload: {
-            scene: scene
+            scene,
+            isChanged: false
           }
         })
       })

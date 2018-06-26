@@ -16,6 +16,7 @@ export const CAD_GROUP_ENTITIES = 'CAD_GROUP_ENTITIES'
 export const CAD_COMBINE_EDGE_MODELS = 'CAD_COMBINE_EDGE_MODELS'
 export const CAD_EDITMODE_SET_ACTIVE_LINE = 'CAD_EDITMODE_SET_ACTIVE_LINE'
 export const CAD_EDITMODE_UNSELECT_ACTIVE_LINE = 'CAD_EDITMODE_UNSELECT_ACTIVE_LINE'
+export const CAD_IS_CHANGED = 'CAD_IS_CHANGED'
 
 export const drawDxf = (data = null, container, snapshot = null) => {
   let cadCanvas = new dxfService.Viewer(data, container, snapshot)
@@ -274,3 +275,13 @@ export const parseDxf = dxf => {
     }
   })
 }
+
+export const toggleChanged = isChanged => {
+  return dispatch => dispatch({
+    type: CAD_IS_CHANGED,
+    payload: {
+      isChanged: !isChanged
+    }
+  })
+}
+

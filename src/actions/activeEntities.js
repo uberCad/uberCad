@@ -65,7 +65,8 @@ export const groupEntities = editor => {
       dispatch({
         type: CAD_GROUP_ENTITIES,
         payload: {
-          object
+          object,
+          isChanged: true
         }
       })
     }

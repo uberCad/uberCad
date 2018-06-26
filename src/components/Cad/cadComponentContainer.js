@@ -4,7 +4,8 @@ import { fetchProject } from '../../actions/project'
 import {
   drawDxf,
   cadClick,
-  cadDoubleClick, CAD_DO_SELECTION
+  cadDoubleClick, CAD_DO_SELECTION,
+  toggleChanged
 } from '../../actions/cad'
 import {
   selectionBegin,
@@ -55,6 +56,7 @@ const mapStateToProps = (state, ownProps) => {
     loading: state.project.loading,
     error: state.project.error,
     project: state.project.project,
+    isChanged: state.cad.isChanged,
     ...ownProps
   }
 }
@@ -187,6 +189,10 @@ const mapDispatchToProps = (dispatch) => {
         // do edit here
         savePoint(editor.editMode.selectPointIndex)(dispatch)
       }
+    },
+
+    toggleChanged: (isChanged) => {
+      toggleChanged(isChanged)(dispatch)
     }
 
   }

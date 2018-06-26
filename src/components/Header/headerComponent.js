@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { FormattedMessage } from 'react-intl'
 import logo from './logo.svg'
 import userPic from './userPhoto.png'
-import { Link } from 'react-router-dom'
 import { appName } from './../../config'
 import './Header.css'
 import history from '../../config/history'
@@ -19,10 +18,10 @@ export default class HeaderComponent extends Component {
       <Navbar className='nav-head header' collapseOnSelect fluid>
         <Navbar.Header>
           <Navbar.Brand>
-            <Link to='/' className='logo'>
+            <a href='/' className='logo navbar-brand'>
               {appName}
               <img src={logo} alt='logo' width={24} />
-            </Link>
+            </a>
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
