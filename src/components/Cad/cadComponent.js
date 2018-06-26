@@ -11,6 +11,7 @@ import PointInfoComponent from '../PointInfo/pointInfoComponentContainer'
 // import * as THREE  from '../../extend/THREE'
 
 import './Cad.css'
+import { Prompt } from 'react-router-dom'
 
 export default class CadComponent extends Component {
   constructor (props) {
@@ -59,6 +60,13 @@ export default class CadComponent extends Component {
   }
 
   render () {
+
+    // window.onbeforeunload = function ()
+    // {
+    //   console.log('reload')
+    //   return ""
+    // }
+
     return (
       <div className={`threejs-app ${this.props.sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}
         onMouseUp={this.onMouseUp}
@@ -76,6 +84,7 @@ export default class CadComponent extends Component {
         <Options />
         <Sidebar />
         <PointInfoComponent />
+        <Prompt message='Are you sure you want to leave?' />
       </div>
     )
   }

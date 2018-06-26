@@ -19,6 +19,7 @@ import history from './config/history'
 class App extends Component {
   render () {
     const {lang} = this.props
+
     return (
       <IntlProvider locale={lang} messages={flattenMessages(messages[lang])}>
         <Router history={history}>
