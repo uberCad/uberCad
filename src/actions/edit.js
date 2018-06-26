@@ -9,7 +9,10 @@ import {
   helpArc,
   newArc,
   circleIntersectionAngle,
-  editThetaLenght
+  editThetaLenght,
+  clone,
+  fixPosition,
+  mirrorObject
 } from '../services/editObject'
 import sceneService from '../services/sceneService'
 import GeometryUtils from '../services/GeometryUtils'
@@ -34,6 +37,16 @@ export const EDIT_CURVE_RADIUS = 'EDIT_CURVE_RADIUS'
 export const EDIT_THETA_START = 'EDIT_THETA_START'
 export const EDIT_THETA_LENGTH = 'EDIT_THETA_LENGTH'
 export const EDIT_NEW_CURVE_SAVE = 'EDIT_NEW_CURVE_SAVE'
+
+export const EDIT_DELETE_LINE = 'EDIT_DELETE_LINE'
+
+export const EDIT_CLONE_ACTIVE = 'EDIT_CLONE_ACTIVE'
+export const EDIT_CLONE_POINT = 'EDIT_CLONE_POINT'
+export const EDIT_CLONE_OBJECT = 'EDIT_CLONE_OBJECT'
+export const EDIT_CLONE_SAVE = 'EDIT_CLONE_SAVE'
+export const EDIT_CLONE_CANCEL = 'EDIT_CLONE_CANCEL'
+
+export const EDIT_MIRROR = 'EDIT_MIRROR'
 
 export const isEdit = (option, editor, object = {}) => {
   if (option) {
@@ -77,7 +90,12 @@ export const cancelEdit = (editor, editObject, backUp) => {
         beforeEdit: {},
         editObject: {},
         activeLine: {},
-        selectPointIndex: null
+        selectPointIndex: null,
+        clone: {
+          active: false,
+          point: null,
+          cloneObject: null
+        }
       }
     }
   })
@@ -95,7 +113,12 @@ export const saveEdit = (editor) => {
         beforeEdit: {},
         editObject: {},
         activeLine: {},
-        selectPointIndex: null
+        selectPointIndex: null,
+        clone: {
+          active: false,
+          point: null,
+          cloneObject: null
+        }
       }
     }
   })
@@ -411,6 +434,149 @@ export const saveNewCurve = (editor) => {
         start: null,
         thetaStart: null,
         thetaLength: null
+      }
+    })
+  }
+}
+
+export const deleteLine = (editor, line) => {
+  let {scene, camera, renderer} = editor
+  line.parent.remove(line)
+  scene.getObjectByName('HelpLayer').children = []
+  renderer.render(scene, camera)
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_DELETE_LINE,
+      payload: {activeLine: {}}
+    })
+  }
+}
+
+export const cloneObject = (editor, object) => {
+  let {scene, camera, renderer} = editor
+  const cloneObject = clone(object)
+  let objects = scene.getObjectByName('Objects')
+  objects.add(cloneObject)
+  renderer.render(scene, camera)
+  return dispatch => {
+    dispatch({
+      type: EDIT_CLONE_OBJECT,
+      payload: {cloneObject}
+    })
+  }
+}
+
+export const setClone = (event, editor) => {
+  let {scene, camera, renderer} = editor
+  let cloneObject = editor.editMode.clone.cloneObject
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const p = !crossing ? mousePoint : crossing
+  cloneObject.position.set(
+    p.x - editor.editMode.clone.point.x,
+    p.y - editor.editMode.clone.point.y,
+    0
+  )
+  renderer.render(scene, camera)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing point')(dispatch) : movePointInfo(event, 'Click to select paste point')(dispatch)
+    dispatch({
+      type: EDIT_CLONE_OBJECT,
+      payload: {cloneObject}
+    })
+  }
+}
+
+export const selectClonePoint = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing point')(dispatch) : movePointInfo(event, 'Click to select clone point')(dispatch)
+  }
+}
+
+export const clonePoint = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  const point = {
+    x: clickResult.point.x,
+    y: clickResult.point.y,
+    z: 0
+  }
+  return dispatch => {
+    dispatch({
+      type: EDIT_CLONE_POINT,
+      payload: {point}
+    })
+  }
+}
+
+export const cloneActive = (active) => {
+  return dispatch => {
+    dispatch({
+      type: EDIT_CLONE_ACTIVE,
+      payload: {active}
+    })
+  }
+}
+
+export const saveClone = (object) => {
+  fixPosition(object)
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_CLONE_SAVE,
+      payload: {
+        clone: {
+          active: false,
+          point: null,
+          cloneObject: null
+        }
+      }
+    })
+  }
+}
+
+export const cancelClone = (editor, cloneObject) => {
+  if (cloneObject) {
+    let {scene, camera, renderer} = editor
+    cloneObject.parent.remove(cloneObject)
+    renderer.render(scene, camera)
+  }
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_CLONE_CANCEL,
+      payload: {
+        clone: {
+          active: false,
+          point: null,
+          cloneObject: null
+        }
+      }
+    })
+  }
+}
+
+export const mirror = (object, editor, option) => {
+  let {scene, camera, renderer} = editor
+  const editObject = mirrorObject(object, option)
+  renderer.render(scene, camera)
+  return dispatch => {
+    dispatch({
+      type: EDIT_MIRROR,
+      payload: {
+        editObject
       }
     })
   }

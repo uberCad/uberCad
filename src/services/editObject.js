@@ -510,13 +510,96 @@ let helpArc = (radius) => {
 }
 
 let newArc = (radius, thetaStart, thetaLength) => {
-  console.log(radius, thetaStart, thetaLength)
   let geometryArc = new THREE.CircleGeometry(radius, 32, thetaStart, thetaLength)
   geometryArc.vertices.shift()
   let materialArc = new THREE.LineBasicMaterial({color: 0x00ff00})
   let line = new THREE.Line(geometryArc, materialArc)
   line.name = 'newLine'
   return line
+}
+
+let clone = (obj, name) => {
+  let object = new THREE.Group()
+  obj.children.forEach(item => {
+    let cloneGeometry, line
+    const cloneMaterial = item.material.clone()
+    if (item.geometry.type === 'Geometry') {
+      cloneGeometry = item.geometry.clone()
+      line = new THREE.Line(cloneGeometry, cloneMaterial)
+    } else if (item.geometry.type === 'CircleGeometry') {
+      cloneGeometry = new THREE.CircleGeometry(
+        item.geometry.parameters.radius,
+        item.geometry.parameters.segments,
+        item.geometry.parameters.thetaStart,
+        item.geometry.parameters.thetaLength)
+      cloneGeometry.vertices.shift()
+      line = new THREE.Line(cloneGeometry, cloneMaterial)
+      line.position.set(item.position.x, item.position.y, item.position.z)
+    }
+    line.userData = item.userData
+    object.add(line)
+  })
+  object.name = !name ? obj.name + '_copy' : name
+  object.userData = obj.userData
+  return object
+}
+
+let fixPosition = (object) => {
+  object.children.forEach(line => {
+    if (line.geometry.type === 'Geometry') {
+      line.geometry.vertices.forEach(vertex => {
+        vertex.x = vertex.x + object.position.x
+        vertex.y = vertex.y + object.position.y
+        vertex.z = vertex.z + object.position.z
+      })
+      line.geometry.verticesNeedUpdate = true
+      line.computeLineDistances()
+      line.geometry.computeBoundingSphere()
+    } else if (line.geometry.type === 'CircleGeometry') {
+      line.position.set(
+        line.position.x + object.position.x,
+        line.position.y + object.position.y,
+        line.position.z + object.position.z
+      )
+    }
+  })
+  object.position.set(0, 0, 0)
+  return object
+}
+
+let mirrorObject = (object, option) => {
+  let box = new THREE.BoxHelper(object, 0xffff00)
+  object.children.forEach(line => {
+    if (line.geometry.type === 'Geometry') {
+      line.geometry.vertices.forEach(vertex => {
+        if (option === 'OX') {
+          vertex.y = -vertex.y + 2 * box.geometry.boundingSphere.center.y
+        } else if (option === 'OY') {
+          vertex.x = -vertex.x + 2 * box.geometry.boundingSphere.center.x
+        }
+      })
+      line.geometry.verticesNeedUpdate = true
+      line.computeLineDistances()
+      line.geometry.computeBoundingSphere()
+    } else if (line.geometry instanceof THREE.CircleGeometry) {
+      if (option === 'OX') {
+        line.rotation.x = line.rotation.x === Math.PI ? 0 : Math.PI
+        line.position.set(
+          line.position.x,
+          -line.position.y + 2 * box.geometry.boundingSphere.center.y,
+          line.position.z
+        )
+      } else if (option === 'OY') {
+        line.rotation.y = line.rotation.y === Math.PI ? 0 : Math.PI
+        line.position.set(
+          -line.position.x + 2 * box.geometry.boundingSphere.center.x,
+          line.position.y,
+          line.position.z
+        )
+      }
+    }
+  })
+  return object
 }
 
 export {
@@ -532,5 +615,8 @@ export {
   helpArc,
   newArc,
   circleIntersectionAngle,
-  editThetaLenght
+  editThetaLenght,
+  clone,
+  fixPosition,
+  mirrorObject
 }

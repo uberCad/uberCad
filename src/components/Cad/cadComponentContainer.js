@@ -20,13 +20,13 @@ import {
 import sceneService from '../../services/sceneService'
 import {
   centerCurve,
-  centerPoint,
+  centerPoint, cloneObject, clonePoint,
   drawLine,
   firstPoint,
-  movePoint, radius, saveNewCurve,
+  movePoint, radius, saveClone, saveNewCurve,
   saveNewLine,
-  savePoint,
-  selectPoint,
+  savePoint, selectClonePoint,
+  selectPoint, setClone,
   startNewLine,
   thetaLength,
   thetaStart
@@ -117,6 +117,15 @@ const mapDispatchToProps = (dispatch) => {
             saveNewCurve(editor)(dispatch)
           }
         }
+        //clone object
+        if (editor.editMode.clone.active) {
+          if (!editor.editMode.clone.point) {
+            clonePoint(event, editor)(dispatch)
+            cloneObject(editor, editor.editMode.editObject)(dispatch)
+          } else if (editor.editMode.clone.cloneObject) {
+            saveClone(editor.editMode.clone.cloneObject)(dispatch)
+          }
+        }
 
         if (editor.tool === TOOL_SELECT) {
           selectionBegin(event, editor)(dispatch)
@@ -159,6 +168,13 @@ const mapDispatchToProps = (dispatch) => {
           radius(event, editor)(dispatch)
         } else if (!editor.editMode.thetaLength) {
           thetaLength(event, editor)(dispatch)
+        }
+      }
+      //clone object
+      if (editor.editMode.clone.active) {
+        selectClonePoint(event, editor)(dispatch)
+        if (editor.editMode.clone.point && editor.editMode.clone.cloneObject ) {
+          setClone(event, editor)(dispatch)
         }
       }
     },

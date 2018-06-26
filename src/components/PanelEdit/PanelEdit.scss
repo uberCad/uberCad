@@ -1,4 +1,5 @@
 @import "../../variables.scss";
+
 #panel-edit {
   height: 100%;
 
@@ -6,6 +7,24 @@
     height: calc(100% - #{$sidebar-toolbar-size});
     max-height: calc(100% - #{$sidebar-toolbar-size});
     overflow: auto;
+
+    .line {
+      padding: 3px;
+      transition: All 0.2s;
+
+      .del-line {
+        float: right;
+        background: url("delete.svg") no-repeat center transparent;
+        background-size: 10px;
+        display: inline-block;
+        width: 12px;
+        height: 18px;
+
+        &:active, &:focus {
+          outline: none;
+        }
+      }
+    }
   }
 
   .toolbar {
@@ -33,10 +52,24 @@
         background: url("curve.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
+      &.clone {
+        background: url("copy.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
 
-      &.active{
+      &.mirror-h {
+        background: url("mirror-horizontally.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
+
+      &.mirror-v {
+        background: url("mirror-vertically.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
+
+      &.active {
         display: inline-block;
-        background-color: rgba(0,0,0,0.1);;
+        background-color: rgba(0, 0, 0, 0.1);;
       }
     }
   }
