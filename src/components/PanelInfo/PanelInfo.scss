@@ -1,0 +1,16 @@
+@import "../../variables.scss";
+#panel-info {
+  height: 100%;
+  padding: 0 5px;
+
+  .content {
+    height: calc(100% - #{$sidebar-toolbar-size});
+    max-height: calc(100% - #{$sidebar-toolbar-size});
+    overflow: auto;
+
+    .warning{
+      color: red;
+    }
+  }
+}
+
