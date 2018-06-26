@@ -535,6 +535,7 @@ let clone = (obj, name) => {
       cloneGeometry.vertices.shift()
       line = new THREE.Line(cloneGeometry, cloneMaterial)
       line.position.set(item.position.x, item.position.y, item.position.z)
+      line.rotation.set(item.rotation.x, item.rotation.y, item.rotation.z)
     }
     line.userData = item.userData
     object.add(line)
