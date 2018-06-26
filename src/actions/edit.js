@@ -65,7 +65,8 @@ export const isEdit = (option, editor, object = {}) => {
       isEdit: option,
       beforeEdit: beforeEdit,
       editObject: object,
-      scene: editor.scene
+      scene: editor.scene,
+      isChanged: true
     }
   })
 }

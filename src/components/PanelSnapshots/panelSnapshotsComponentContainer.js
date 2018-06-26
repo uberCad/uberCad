@@ -8,6 +8,7 @@ const mapStateToProps = (state, ownProps) => {
     project: state.project.project,
     scene: state.cad.scene,
     cadCanvas: state.cad.cadCanvas,
+    isChanged: state.cad.isChanged,
     ...ownProps
   }
 }

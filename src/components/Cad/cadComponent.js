@@ -38,6 +38,7 @@ export default class CadComponent extends Component {
       })
 
     window.addEventListener('resize', this.resizeWindow)
+    this.props.toggleChanged(this.props.isChanged)
   }
 
   resizeWindow = () => {
@@ -59,6 +60,22 @@ export default class CadComponent extends Component {
   }
 
   render () {
+
+    if (this.props.isChanged) {
+      window.onbeforeunload = function (evt) {
+        let message = "Document is not saved. You will lost the changes if you leave the page."
+        if (typeof evt === 'undefined') {
+          evt = window.event
+        }
+        if (evt) {
+          evt.returnValue = message
+        }
+        return message
+      }
+    } else {
+      window.onbeforeunload = null
+    }
+
     return (
       <div className={`threejs-app ${this.props.sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}
         onMouseUp={this.onMouseUp}
@@ -103,6 +120,7 @@ export default class CadComponent extends Component {
   static propTypes = {
     loading: PropTypes.bool.isRequired,
     error: PropTypes.object,
-    lastUpdated: PropTypes.number
+    lastUpdated: PropTypes.number,
+    isChanged: PropTypes.bool.isRequired
   }
 }
