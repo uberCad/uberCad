@@ -6,7 +6,8 @@ import {
 
 let initialState = {
   sid: '',
-  userName: ''
+  userName: '',
+  pictureUrl: ''
 }
 
 const userLogin = (state = initialState, action) => {
@@ -20,7 +21,8 @@ const userLogin = (state = initialState, action) => {
     case SET_USER_NAME:
       return {
         ...state,
-        userName: action.payload.userName
+        userName: action.payload.userName,
+        pictureUrl: action.payload.pictureUrl
       }
     case LOGOUT_ACTION:
       return {

@@ -42,7 +42,7 @@ export default class HeaderComponent extends Component {
             <NavDropdown
               title={
                 <div className='pull-left'>
-                  <img className='user-pic img-circle' src={userPic} alt='user pic' />
+                  <img className='user-pic img-circle' src={this.props.pictureUrl || userPic} alt='user pic' />
                   {this.props.userName}
                 </div>
               }
@@ -75,6 +75,9 @@ export default class HeaderComponent extends Component {
 
   static
   propTypes = {
-    setLocale: PropTypes.func.isRequired
+    setLocale: PropTypes.func.isRequired,
+    lang: PropTypes.string.isRequired,
+    userName: PropTypes.string.isRequired,
+    pictureUrl: PropTypes.string,
   }
 }

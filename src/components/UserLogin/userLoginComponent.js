@@ -48,8 +48,19 @@ export default class UserLoginComponent extends Component {
                 {value => <h3>{value}</h3>}
               </FormattedMessage>
 
-              <a href='https://github.com/login/oauth/authorize?scope=user:email&client_id=3b1d468a19661c8789c4'>
-                <span className='fa fa-github' /> GitHub</a>
+              <Col smOffset={1} sm={3}>
+                <a href='https://github.com/login/oauth/authorize?scope=user:email&client_id=3b1d468a19661c8789c4'>
+                  <span className='fa fa-github' /> GitHub</a>
+              </Col>
+              <Col smOffset={1} sm={3}>
+                <a href='https://accounts.google.com/o/oauth2/auth?response_type=code&access_type=offline&scope=email&client_id=892068659113-q1h36vlqqcfur0sromlbrn1ps050h2mg.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fuber-cad.ml%2F_db%2Fcad%2Fauth%2Fgauth2code'>
+                  <span className='fa fa-google' /> Google</a>
+              </Col>
+              <Col smOffset={1} sm={3}>
+                <a href='https://www.facebook.com/dialog/oauth?response_type=code&client_id=1802126316499818&redirect_uri=https%3A%2F%2Fuber-cad.ml%2F_db%2Fcad%2Fauth%2Ffauth2code'>
+                  <span className='fa fa-facebook-official' /> Facebook</a>
+              </Col>
+              <br />
               <hr />
               <FormattedMessage id='userLogin.description' defaultMessage='Register Username & Password'>
                 {value => <h5>{value}</h5>}
