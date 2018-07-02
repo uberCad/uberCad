@@ -82,9 +82,30 @@ export default class DxfService {
     }
 
     if (snapshot) {
+      scene = new THREE.Scene()
       let loader = new THREE.ObjectLoader()
-      scene = loader.parse(JSON.parse(snapshot.scene))
-      sceneService.fixSceneAfterImport(scene)
+
+      const layers = loader.parse(JSON.parse(snapshot.layers))
+      sceneService.fixSceneAfterImport(layers)
+      scene.add(layers)
+
+      let objectsEntity = new THREE.Object3D()
+      objectsEntity.name = 'Objects'
+      objectsEntity.userData['container'] = true
+      scene.add(objectsEntity)
+
+      let helpLayer = new THREE.Object3D()
+      helpLayer.name = 'HelpLayer'
+      helpLayer.userData['container'] = true
+      scene.add(helpLayer)
+
+      let objects = scene.getObjectByName('Objects')
+      snapshot.objects.forEach(item => {
+        const object = loader.parse(JSON.parse(item.parameters))
+        sceneService.fixSceneAfterImport(object)
+        objects.add(object)
+      })
+
       GeometryUtils.fixObjectsPaths(scene)
     }
 
