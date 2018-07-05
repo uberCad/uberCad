@@ -35,16 +35,18 @@ export const loadSnapshot = (snapshotKey, cadCanvas) => {
         const scene = cadCanvas.getScene()
 
         let layers = scene.getObjectByName('Layers')
-        scene.remove(layers)
-        const l = loader.parse(JSON.parse(snapshot.layers))
-        sceneService.fixSceneAfterImport(l)
-        scene.add(l)
+        layers.children = []
+        const savedLayers = loader.parse(JSON.parse(snapshot.layers))
+        sceneService.fixSceneAfterImport(savedLayers)
+
+        while (savedLayers.children.length) {
+          const object = savedLayers.children.pop()
+          layers.add(object)
+        }
+        scene.add(savedLayers)
 
         const objects = scene.getObjectByName('Objects')
-        objects.children.forEach(item => {
-          item.parent.remove(item)
-        })
-
+        objects.children = []
         snapshot.objects.forEach(item => {
           const object = loader.parse(JSON.parse(item.parameters))
           sceneService.fixSceneAfterImport(object)

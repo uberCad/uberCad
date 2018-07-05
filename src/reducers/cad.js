@@ -47,6 +47,7 @@ import {
   POINT_INFO_MOVE,
   POINT_INFO_DISABLE
 } from '../actions/pointInfo'
+import { SNAPSHOT_LOAD_OBJECT } from '../actions/panelObjects'
 
 let initialState = {
   scene: null,
@@ -86,7 +87,8 @@ let initialState = {
   items: [],
   error: null,
   lastUpdated: null,
-  isChanged: false
+  isChanged: false,
+  objectsIds: []
 }
 
 const cad = (state = initialState, action) => {
@@ -251,6 +253,13 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         scene: action.payload.scene,
+        isChanged: action.payload.isChanged
+      }
+    case SNAPSHOT_LOAD_OBJECT:
+      return {
+        ...state,
+        scene: action.payload.scene,
+        objectsIds: action.payload.objectsIds,
         isChanged: action.payload.isChanged
       }
     case CAD_DRAW_DXF:

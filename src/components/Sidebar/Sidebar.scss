@@ -41,8 +41,8 @@
     position: relative;
     margin: 0;
     border: none;
-    //max-height: 33%;
-    //overflow: hidden;
+    max-height: 33.33%;
+    overflow: hidden;
 
     &:last-child .tabs{
       border: none;
@@ -81,8 +81,8 @@
     }
 
     .panel-content {
-      max-height: 30vh;
-      height: 30vh;
+      max-height: calc(30vh - 25px);
+      height: calc(30vh - 25px);
       overflow: auto;
     }
 

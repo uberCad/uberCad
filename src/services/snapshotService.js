@@ -40,6 +40,13 @@ export default class snapshotService {
       })
   }
 
+  static getObjectSnapshot (key) {
+    return api.get(`/api/object-snapshot/${key}`)
+      .then(res => {
+        return res
+      })
+  }
+
   static delSnapshot (snapshotKey) {
     return api.get(`/api/del-snapshot/${snapshotKey}`)
       .then(res => {
