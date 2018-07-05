@@ -5,9 +5,9 @@ import GeometryUtils from '../../services/GeometryUtils'
 
 export default class PanelInfoComponent extends Component {
   getInfo = () => {
-    let object = this.props.editObject
+    let object = this.props.activeObject
     if (object.id) {
-      const geometry = GeometryUtils.getObjectInfo(this.props.editObject)
+      const geometry = GeometryUtils.getObjectInfo(object)
       let data = {
         area: geometry[0].region.area,
         height: geometry[0].region.height,
@@ -15,37 +15,40 @@ export default class PanelInfoComponent extends Component {
         type: geometry.length > 1 ? 2 : 1,
         weight: object.userData.material ? object.userData.material.density * geometry[0].region.area / 1000000 : null
       }
-      this.props.editObject.userData.info = data
+      this.props.activeObject.userData.info = data
       return data
     }
   }
 
   render () {
-    const editObject = this.props.editObject
-    const info = (editObject.userData && editObject.userData.info) ? editObject.userData.info : this.getInfo()
+    const object = this.props.activeObject
+    let info
+    if (object && object.name) {
+      info = (object.userData && object.userData.info) ? object.userData.info : this.getInfo()
+    }
     return (
       <div id='panel-info'>
-        {editObject.name ?
+        {(object && object.name)  ? (
           <div className='content'>
-            <h5>Title: {this.props.editObject.name}</h5>
+            <h5>Title: {object.name}</h5>
 
-            <div>Material: {editObject.userData.material ? editObject.userData.material.name
+            <div>Material: {object.userData.material ? object.userData.material.name
               : <span className='warning'>No set meterial for this object.</span>}</div>
 
-            {editObject.userData.info && (
+            {object.userData.info && (
               <div>
                 <div>Width: {info.width.toFixed(4)} mm</div>
                 <div>Height: {info.height.toFixed(4)} mm</div>
                 <div>Area: {info.area.toFixed(4)} mm2</div>
                 <div>
                   Weight: {info.weight ? info.weight.toFixed(4)
-                    : <span className='warning'>Set material first</span>} kg/m
+                    : <span className='warning'>Set material first and calculate Weight(Price)</span>} kg/m
                 </div>
                 <div>Type: {info.type}</div>
               </div>
             )}
 
-          </div>
+          </div>)
           : <div>No select object</div>
         }
       </div>
@@ -53,6 +56,6 @@ export default class PanelInfoComponent extends Component {
   }
 
   static propTypes = {
-    editObject: PropTypes.object
+    activeObject: PropTypes.object
   }
 }

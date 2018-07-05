@@ -2,8 +2,13 @@ import { connect } from 'react-redux'
 import PanelInfoComponent from './panelInfoComponent'
 
 const mapStateToProps = (state, ownProps) => {
+  let material
+  if (state.sidebar.activeObject && state.sidebar.activeObject.userData) {
+    material = state.sidebar.activeObject.userData.material
+  }
   return {
-    editObject: state.cad.editMode.editObject,
+    activeObject: state.sidebar.activeObject,
+    material,
     ...ownProps
   }
 }

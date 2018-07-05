@@ -6,6 +6,7 @@ import {
 import { PANEL_OBJECTS_TOGGLE } from '../actions/panelObjects'
 import { LOCALE_SET } from '../actions/locale'
 import { EDIT_IS_EDIT } from '../actions/edit'
+import { MATERIAL_SET } from '../actions/materials'
 
 let initialState = {
   active: true,
@@ -118,6 +119,11 @@ const options = (state = initialState, action) => {
         panels: {$set: [...state.panels]},
         active: {$set: active}
       })
+    case MATERIAL_SET:
+      return {
+        ...state,
+        activeObject: action.payload.object
+      }
     default:
       return state
   }
