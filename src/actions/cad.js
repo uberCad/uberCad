@@ -185,7 +185,7 @@ export const cadClick = (event, editor) => {
             }
           } else {
             //unselect activeLine line
-            if (editor.editMode.activeLine.id) {
+            if (editor.editMode.activeLine.id && editor.editMode.activeLine !== editor.editMode.editObject) {
               unselectLine(editor.editMode.activeLine, scene)
               renderer.render(scene, camera)
               dispatch({

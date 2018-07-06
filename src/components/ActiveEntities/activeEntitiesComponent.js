@@ -36,6 +36,14 @@ export default class ActiveEntitiesComponent extends Component {
     this.props.showAll(this.props.editor)
   }
 
+  editLine = (event) => {
+    event.stopPropagation()
+    let {currentTarget: {dataset: {id}}} = event
+    const {scene} = this.props.editor
+    let object = scene.getObjectById(parseInt(id, 10))
+    this.props.isEdit(!this.props.editor.isEdit, this.props.editor, object)
+    }
+
   render () {
     console.debug('render:', this)
     const {activeEntities} = this.props.editor
@@ -54,6 +62,8 @@ export default class ActiveEntitiesComponent extends Component {
                 <button className='un-select' data-idx={idx}
                   onClick={this.unSelect}
                 />
+
+                <button className='edit-line' onClick={this.editLine} title='Edit line' data-id={entity.id} />
 
                 <FormattedMessage id='activeEntities.checkboxVisibility' defaultMessage='Visibility'>
                   {title =>

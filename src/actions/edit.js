@@ -12,7 +12,9 @@ import {
   editThetaLenght,
   clone,
   fixPosition,
-  mirrorObject
+  mirrorObject,
+  getScale,
+  addHelpPoints
 } from '../services/editObject'
 import sceneService from '../services/sceneService'
 import GeometryUtils from '../services/GeometryUtils'
@@ -49,16 +51,24 @@ export const EDIT_CLONE_CANCEL = 'EDIT_CLONE_CANCEL'
 export const EDIT_MIRROR = 'EDIT_MIRROR'
 
 export const isEdit = (option, editor, object = {}) => {
+  let activeLine = {}
+  let {scene, camera, renderer} = editor
+  object.userData.parentName = object.parent.name
+  const beforeEdit = JSON.stringify(object)
   if (option) {
     let bgColor = new THREE.Color(0xaaaaaa)
     let objColor = new THREE.Color(0x00ff00)
-    setColor(editor.scene, bgColor, object.name, objColor)
+    setColor(scene, bgColor, object.id, objColor)
   } else {
-    setOriginalColor(editor.scene)
+    setOriginalColor(scene)
   }
-  object.userData.parentName = object.parent.name
-  const beforeEdit = JSON.stringify(object)
-  editor.renderer.render(editor.scene, editor.camera)
+  if (object instanceof THREE.Line) {
+    activeLine = object
+    const rPoint = getScale(camera)
+    object.name = 'ActiveLine'
+    addHelpPoints(object, scene, rPoint)
+  }
+  renderer.render(scene, camera)
   return dispatch => dispatch({
     type: EDIT_IS_EDIT,
     payload: {
@@ -66,7 +76,8 @@ export const isEdit = (option, editor, object = {}) => {
       beforeEdit: beforeEdit,
       editObject: object,
       scene: editor.scene,
-      isChanged: true
+      isChanged: true,
+      activeLine
     }
   })
 }

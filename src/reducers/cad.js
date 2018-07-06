@@ -242,7 +242,8 @@ const cad = (state = initialState, action) => {
         editMode: {
           isEdit: {$set: action.payload.isEdit},
           beforeEdit: {$set: action.payload.beforeEdit},
-          editObject: {$set: action.payload.editObject}
+          editObject: {$set: action.payload.editObject},
+          activeLine: {$set: action.payload.activeLine}
         },
         scene: {$set: action.payload.scene},
         isChanged: {$set: action.payload.isChanged}
