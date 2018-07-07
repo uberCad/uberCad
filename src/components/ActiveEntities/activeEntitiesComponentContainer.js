@@ -19,7 +19,8 @@ const mapStateToProps = (state, ownProps) => {
       cadCanvas: state.cad.cadCanvas,
       activeEntities: state.cad.activeEntities,
       options: state.options,
-      isEdit: state.cad.editMode.isEdit
+      isEdit: state.cad.editMode.isEdit,
+      activeLine: state.cad.activeLine
     },
     ...ownProps
   }

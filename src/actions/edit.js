@@ -56,6 +56,7 @@ export const isEdit = (option, editor, object = {}) => {
   object.userData.parentName = object.parent.name
   const beforeEdit = JSON.stringify(object)
   if (option) {
+    scene.getObjectByName('HelpLayer').children = []
     let bgColor = new THREE.Color(0xaaaaaa)
     let objColor = new THREE.Color(0x00ff00)
     setColor(scene, bgColor, object.id, objColor)

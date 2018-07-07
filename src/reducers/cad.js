@@ -9,7 +9,8 @@ import {
   CAD_GROUP_ENTITIES,
   CAD_EDITMODE_SET_ACTIVE_LINE,
   CAD_EDITMODE_UNSELECT_ACTIVE_LINE,
-  CAD_IS_CHANGED
+  CAD_IS_CHANGED,
+  CAD_SELECT_LINE
 } from '../actions/cad'
 
 import {
@@ -54,6 +55,7 @@ let initialState = {
   renderer: null,
   cadCanvas: null,
   activeEntities: [],
+  activeLine: null,
   editMode: {
     isEdit: false,
     beforeEdit: {},
@@ -91,6 +93,12 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+    case CAD_SELECT_LINE:
+      return {
+        ...state,
+        activeLine: action.payload.activeLine
+      }
+
     case EDIT_MIRROR:
       return update(state, {
         editMode: {editObject: {$set: action.payload.editObject}}
@@ -263,7 +271,10 @@ const cad = (state = initialState, action) => {
         cadCanvas: action.payload.cadCanvas
       }
     case CAD_DO_SELECTION:
-      return update(state, {activeEntities: {$set: [...action.payload.activeEntities]}})
+      return update(state, {
+        activeEntities: {$set: [...action.payload.activeEntities]},
+        activeLine: {$set: action.payload.activeLine}
+      })
     case CAD_TOGGLE_VISIBLE:
       return update(state, {activeEntities: {$set: [...state.activeEntities]}})
     case CAD_TOGGLE_VISIBLE_LAYER:

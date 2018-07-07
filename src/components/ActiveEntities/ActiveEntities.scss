@@ -21,20 +21,6 @@
         margin-right: 4px;
       }
 
-      .edit-line{
-        width: 14px;
-        height: 17px;
-        cursor: pointer;
-        background: url("edit.svg") no-repeat center transparent;
-        background-size: $sidebar-toolbar-size - 14px;
-        margin: 0 5px;
-        float: right;
-
-        &:active, &:focus {
-          outline: none;
-        }
-      }
-
       .un-select {
         float: right;
         background: url("delete.svg") no-repeat center transparent;
@@ -47,6 +33,9 @@
           outline: none;
         }
       }
+    }
+    .active {
+      background-color: rgba(0,0,0,0.1);
     }
   }
 
@@ -74,6 +63,10 @@
 
       &.show-all {
         background: url("show-all.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
+      &.edit-line {
+        background: url("edit.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
     }
