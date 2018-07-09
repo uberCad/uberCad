@@ -17,9 +17,18 @@ export default class PanelLayersComponent extends Component {
     this.props.showAll(this.props.editor)
   }
 
-  shouldComponentUpdate (nextProps) {
-    return (this.props.editor.scene !== nextProps.editor.scene) ||
-      (nextProps.editor.scene && nextProps.editor.scene.children !== this.props.editor.scene.children)
+  // shouldComponentUpdate (nextProps) {
+  //   return (this.props.editor.scene !== nextProps.editor.scene) ||
+  //     (nextProps.editor.scene && nextProps.editor.scene.children !== this.props.editor.scene.children) ||
+  //     (nextProps.activeLayer !== this.props.activeLayer)
+  // }
+
+  toggleLayer = event => {
+    let {currentTarget: {dataset: {id}}} = event
+    const {scene} = this.props.editor
+    let layer = scene.getObjectById(parseInt(id, 10))
+    console.log(layer)
+    this.props.toggleLayer(this.props.editor, layer !== this.props.activeLayer ? layer : null)
   }
 
   render () {
@@ -36,15 +45,17 @@ export default class PanelLayersComponent extends Component {
         <div className='content'>
           {layers
             ? layers.children.filter(layer => layer.children.length).map((layer, idx) => (
-              <div className='item'
-                key={idx}
+              <div className={`item ${this.props.activeLayer === layer ? 'active' : ''}`}
+                   key={idx}
+                   data-id={layer.id}
+                   onClick={this.toggleLayer}
               >
                 <FormattedMessage id='panelLayer.checkboxVisibility' defaultMessage='Visibility'>
                   {value =>
                     <input type='checkbox' data-id={layer.id}
-                      title={value}
-                      checked={layer.visible}
-                      onChange={this.onChangeVisible}
+                           title={value}
+                           checked={layer.visible}
+                           onChange={this.onChangeVisible}
                     />
                   }
                 </FormattedMessage>
@@ -53,7 +64,7 @@ export default class PanelLayersComponent extends Component {
               </div>
             ))
             : (
-              <FormattedMessage id='panelLayer.noLayers' defaultMessage='No layers' />
+              <FormattedMessage id='panelLayer.noLayers' defaultMessage='No layers'/>
             )
           }
         </div>
@@ -67,8 +78,8 @@ export default class PanelLayersComponent extends Component {
           <FormattedMessage id='panelLayer.showAll' defaultMessage='Show all'>
             {value =>
               <button onClick={this.showAll}
-                className='show-all'
-                title={value}
+                      className='show-all'
+                      title={value}
               />
             }
           </FormattedMessage>

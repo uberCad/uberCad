@@ -255,7 +255,7 @@ export const startNewLine = (event, editor) => {
   }
 }
 
-export const drawLine = (event, editor) => {
+export const drawLine = (event, editor, parent) => {
   let {scene, camera, renderer, editMode} = editor
   let clickResult = sceneService.onClick(event, scene, camera)
   let mousePoint = {
@@ -270,8 +270,8 @@ export const drawLine = (event, editor) => {
     changeGeometry(changeLine, 1, secondPoint, scene)
   } else {
     const line = createLine(editMode.newLineFirst, secondPoint)
-    line.userData.originalColor = editMode.editObject.children[0].userData.originalColor
-    editMode.editObject.add(line)
+    line.userData.originalColor = parent.children[0].userData.originalColor
+    parent.add(line)
   }
   renderer.render(scene, camera)
   return dispatch => {
@@ -280,7 +280,10 @@ export const drawLine = (event, editor) => {
 }
 
 export const saveNewLine = (editor) => {
-  editor.scene.getObjectByName('newLine').name = ''
+  const line = editor.scene.getObjectByName('newLine')
+  if (line) {
+    line.name = ''
+  }
   return dispatch => {
     disablePoint()(dispatch)
     dispatch({
@@ -310,8 +313,8 @@ export const cancelNewCurve = (editor) => {
   const line = scene.getObjectByName('newLine')
   if (line) {
     line.parent.remove(line)
-    renderer.render(scene, camera)
   }
+  renderer.render(scene, camera)
   return dispatch => {
     disablePoint()(dispatch)
     dispatch({
@@ -399,7 +402,7 @@ export const thetaStart = (editor) => {
   }
 }
 
-export const thetaLength = (event, editor) => {
+export const thetaLength = (event, editor, parent) => {
   let {scene, camera, renderer, editMode} = editor
   const thetaStart = circleIntersectionAngle(editMode.thetaStart, editMode.newCurveCenter)
   const oldLine = scene.getObjectByName('newLine') || newArc(editMode.radius, thetaStart, 0.1)
@@ -419,8 +422,9 @@ export const thetaLength = (event, editor) => {
   line.position.y = editMode.newCurveCenter.y
 
   if (oldLine && oldLine.parent) oldLine.parent.remove(oldLine)
-  line.userData.originalColor = editMode.editObject.children[0].userData.originalColor
-  editMode.editObject.add(line)
+  line.userData.originalColor = parent.children[0].userData.originalColor
+  parent.add(line)
+
   renderer.render(scene, camera)
   return dispatch => {
     crossing ? movePointInfo(event, 'Crossing thetaLength')(dispatch) : movePointInfo(event, 'Click to add thetaLength')(dispatch)
@@ -433,7 +437,10 @@ export const thetaLength = (event, editor) => {
 
 export const saveNewCurve = (editor) => {
   let {scene, camera, renderer} = editor
-  scene.getObjectByName('newLine').name = ''
+  let line = scene.getObjectByName('newLine')
+  if (line) {
+    line.name = ''
+  }
   scene.getObjectByName('HelpLayer').children = []
   renderer.render(scene, camera)
   return dispatch => {

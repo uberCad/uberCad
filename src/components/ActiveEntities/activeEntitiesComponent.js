@@ -38,7 +38,11 @@ export default class ActiveEntitiesComponent extends Component {
   }
 
   editLine = () => {
-    this.props.isEdit(true, this.props.editor, this.props.editor.activeLine)
+    if (this.props.editor.activeLine.parent.parent.name === 'Objects') {
+      this.props.isEdit(true, this.props.editor, this.props.editor.activeLine.parent)
+    } else {
+      this.props.isEdit(true, this.props.editor, this.props.editor.activeLine)
+    }
   }
 
   render () {

@@ -15,6 +15,8 @@ import {
 import { spinnerShow, spinnerHide } from '../../actions/spinner'
 
 import {
+  TOOL_NEW_CURVE,
+  TOOL_NEW_LINE,
   TOOL_POINT,
   TOOL_SELECT
 } from '../Toolbar/toolbarComponent'
@@ -32,6 +34,7 @@ import {
   thetaLength,
   thetaStart
 } from '../../actions/edit'
+import { PANEL_LAYERS_TOGGLE } from '../../actions/panelLayers'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -48,7 +51,8 @@ const mapStateToProps = (state, ownProps) => {
         threshold: state.options.threshold
       },
       editMode: state.cad.editMode,
-      selection: state.selection
+      selection: state.selection,
+      activeLayer: state.sidebar.activeLayer
     },
 
     sidebarExpanded: state.sidebar.active,
@@ -106,11 +110,11 @@ const mapDispatchToProps = (dispatch) => {
           }
         }
         //new line
-        if (editor.editMode.isNewLine) {
+        if (editor.tool === TOOL_NEW_LINE || editor.editMode.isNewLine) {
           !editor.editMode.newLineFirst ? firstPoint(event, editor)(dispatch) : saveNewLine(editor)(dispatch)
         }
         //new curve
-        if (editor.editMode.isNewCurve) {
+        if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
           if (!editor.editMode.newCurveCenter) {
             centerPoint(event, editor)(dispatch)
           } else if (!editor.editMode.thetaStart) {
@@ -159,17 +163,39 @@ const mapDispatchToProps = (dispatch) => {
       }
 
       //new Line
-      if (editor.editMode.isNewLine) {
-        !editor.editMode.newLineFirst ? startNewLine(event, editor)(dispatch) : drawLine(event, editor)(dispatch)
+      if (editor.tool === TOOL_NEW_LINE || editor.editMode.isNewLine) {
+        let parent = editor.tool === TOOL_NEW_LINE ? editor.activeLayer : editor.editMode.editObject
+        if (!parent || parent.metadata) {
+          parent = editor.scene.getObjectByName('Layers').children[0]
+          dispatch({
+            type: PANEL_LAYERS_TOGGLE,
+            payload: {
+              activeLayer: parent
+            }
+          })
+        }
+        !editor.editMode.newLineFirst ? startNewLine(event, editor)(dispatch) : drawLine(event, editor, parent)(dispatch)
       }
+
       //new Curve
-      if (editor.editMode.isNewCurve) {
+      if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
+        let parent = editor.tool === TOOL_NEW_CURVE ? editor.activeLayer : editor.editMode.editObject
+        if (!parent || parent.metadata) {
+          parent = editor.scene.getObjectByName('Layers').children[0]
+          dispatch({
+            type: PANEL_LAYERS_TOGGLE,
+            payload: {
+              activeLayer: parent
+            }
+          })
+        }
+
         if (!editor.editMode.newCurveCenter) {
           centerCurve(event, editor)(dispatch)
         } else if (!editor.editMode.thetaStart) {
           radius(event, editor)(dispatch)
         } else if (!editor.editMode.thetaLength) {
-          thetaLength(event, editor)(dispatch)
+          thetaLength(event, editor, parent)(dispatch)
         }
       }
       //clone object
