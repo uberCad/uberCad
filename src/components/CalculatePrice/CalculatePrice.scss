@@ -17,6 +17,18 @@ ul.polyamide-list {
       padding: 0;
     }
 
+    label {
+      display: inline-block;
+
+      input {
+        margin: 0 20px;
+      }
+    }
+
+    .laser {
+      margin: 0;
+    }
+
     span {
       display: block;
       color: gray;
@@ -35,6 +47,9 @@ ul.polyamide-list {
         svg {
           max-height: 180px;
         }
+      }
+      &.warning {
+        color: red;
       }
     }
   }

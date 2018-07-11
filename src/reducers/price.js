@@ -1,7 +1,7 @@
 // import update from 'immutability-helper'
 
 import {
-  CALCULATE, CALCULATE_HIDE
+  CALCULATE, CALCULATE_CHECK_OBJECT, CALCULATE_HIDE
 } from '../actions/calculate'
 
 let initialState = {
@@ -27,7 +27,11 @@ const price = (state = initialState, action) => {
         ...state,
         show: false
       }
-
+    case CALCULATE_CHECK_OBJECT:
+      return {
+        ...state,
+        forceRender: {}
+      }
     default:
       return state
   }
