@@ -40,7 +40,11 @@ import {
   EDIT_CLONE_POINT,
   EDIT_CLONE_SAVE,
   EDIT_CLONE_CANCEL,
-  EDIT_MIRROR
+  EDIT_MIRROR,
+  EDIT_MOVE_OBJECT_ACTIVE,
+  EDIT_MOVE_OBJECT_CANCEL,
+  EDIT_MOVE_OBJECT_POINT,
+  EDIT_MOVE_DISABLE_POINT
 } from '../actions/edit'
 
 import {
@@ -74,6 +78,11 @@ let initialState = {
       active: false,
       point: null,
       cloneObject: null
+    },
+    move: {
+      active: false,
+      point: null,
+      moveObject: null
     }
   },
   pointInfo: {
@@ -98,6 +107,28 @@ const cad = (state = initialState, action) => {
         ...state,
         activeLine: action.payload.activeLine
       }
+
+    case EDIT_MOVE_OBJECT_ACTIVE:
+      return update(state, {
+        editMode: {
+          move: {
+            active: {$set: action.payload.active},
+            moveObject: {$set: action.payload.moveObject}
+          }
+        }
+      })
+    case EDIT_MOVE_OBJECT_CANCEL:
+      return update(state, {
+        editMode: {move: {$set: action.payload.move}}
+      })
+    case EDIT_MOVE_OBJECT_POINT:
+      return update(state, {
+        editMode: {move: {point: {$set: action.payload.point}}}
+      })
+    case EDIT_MOVE_DISABLE_POINT:
+      return update(state, {
+        editMode: {move: {point: {$set: action.payload.point}}}
+      })
 
     case EDIT_MIRROR:
       return update(state, {

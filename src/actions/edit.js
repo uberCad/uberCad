@@ -50,6 +50,11 @@ export const EDIT_CLONE_CANCEL = 'EDIT_CLONE_CANCEL'
 
 export const EDIT_MIRROR = 'EDIT_MIRROR'
 
+export const EDIT_MOVE_OBJECT_ACTIVE = 'EDIT_MOVE_OBJECT_ACTIVE'
+export const EDIT_MOVE_OBJECT_CANCEL = 'EDIT_MOVE_OBJECT_CANCEL'
+export const EDIT_MOVE_OBJECT_POINT = 'EDIT_MOVE_OBJECT_POINT'
+export const EDIT_MOVE_DISABLE_POINT = 'EDIT_MOVE_DISABLE_POINT'
+
 export const isEdit = (option, editor, object = {}) => {
   let activeLine = {}
   let {scene, camera, renderer} = editor
@@ -95,46 +100,62 @@ export const cancelEdit = (editor, editObject, backUp) => {
   GeometryUtils.fixObjectsPaths(editor.scene)
   setOriginalColor(editor.scene)
   editor.renderer.render(editor.scene, editor.camera)
-  return dispatch => dispatch({
-    type: EDIT_CANCEL,
-    payload: {
-      editMode: {
-        isEdit: false,
-        beforeEdit: {},
-        editObject: {},
-        activeLine: {},
-        selectPointIndex: null,
-        clone: {
-          active: false,
-          point: null,
-          cloneObject: null
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_CANCEL,
+      payload: {
+        editMode: {
+          isEdit: false,
+          beforeEdit: {},
+          editObject: {},
+          activeLine: {},
+          selectPointIndex: null,
+          clone: {
+            active: false,
+            point: null,
+            cloneObject: null
+          },
+          move: {
+            active: false,
+            point: null,
+            moveObject: null
+          }
         }
       }
-    }
-  })
+    })
+  }
 }
 
 export const saveEdit = (editor) => {
   editor.scene.getObjectByName('HelpLayer').children = []
   setOriginalColor(editor.scene)
   editor.renderer.render(editor.scene, editor.camera)
-  return dispatch => dispatch({
-    type: EDIT_SAVE,
-    payload: {
-      editMode: {
-        isEdit: false,
-        beforeEdit: {},
-        editObject: {},
-        activeLine: {},
-        selectPointIndex: null,
-        clone: {
-          active: false,
-          point: null,
-          cloneObject: null
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_SAVE,
+      payload: {
+        editMode: {
+          isEdit: false,
+          beforeEdit: {},
+          editObject: {},
+          activeLine: {},
+          selectPointIndex: null,
+          clone: {
+            active: false,
+            point: null,
+            cloneObject: null
+          },
+          move: {
+            active: false,
+            point: null,
+            moveObject: null
+          }
         }
       }
-    }
-  })
+    })
+  }
 }
 
 export const selectPoint = (line, event, editor) => {
@@ -599,5 +620,94 @@ export const mirror = (object, editor, option) => {
         editObject
       }
     })
+  }
+}
+
+export const moveActive = (object) => {
+  return dispatch => {
+    dispatch({
+      type: EDIT_MOVE_OBJECT_ACTIVE,
+      payload: {
+        active: true,
+        moveObject: object
+      }
+    })
+  }
+}
+
+export const cancelMove = () => {
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_MOVE_OBJECT_CANCEL,
+      payload: {
+        move: {
+          active: false,
+          point: null,
+          moveObject: null
+        }
+      }
+    })
+  }
+}
+
+export const selectMovePoint = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing point')(dispatch) : movePointInfo(event, 'Click to select move point')(dispatch)
+  }
+}
+
+export const moveObjectPoint = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  const point = {
+    x: clickResult.point.x,
+    y: clickResult.point.y,
+    z: 0
+  }
+  return dispatch => {
+    dispatch({
+      type: EDIT_MOVE_OBJECT_POINT,
+      payload: {point}
+    })
+  }
+}
+
+export const disableMovePoint = (object) => {
+  fixPosition(object)
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_MOVE_DISABLE_POINT,
+      payload: {point: null}
+    })
+  }
+}
+
+export const moveObject = (event, editor) => {
+  let {scene, camera, renderer} = editor
+  let moveObject = editor.editMode.move.moveObject
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const p = !crossing ? mousePoint : crossing
+  moveObject.position.set(
+    p.x - editor.editMode.move.point.x,
+    p.y - editor.editMode.move.point.y,
+    0
+  )
+  renderer.render(scene, camera)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing point')(dispatch) : movePointInfo(event, 'Select paste point')(dispatch)
   }
 }

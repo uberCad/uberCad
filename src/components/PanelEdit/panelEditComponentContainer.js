@@ -8,7 +8,9 @@ import {
   deleteLine,
   cloneActive,
   cancelClone,
-  mirror
+  mirror,
+  moveActive,
+  cancelMove
 } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
@@ -48,6 +50,12 @@ const mapDispatchToProps = (dispatch) => {
     },
     mirror: function (object, editor, option) {
       mirror(object, editor, option)(dispatch)
+    },
+    moveActive: function (object) {
+      moveActive(object)(dispatch)
+    },
+    cancelMove: function () {
+      cancelMove()(dispatch)
     }
   }
 }

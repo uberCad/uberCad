@@ -23,12 +23,12 @@ import {
 import sceneService from '../../services/sceneService'
 import {
   centerCurve,
-  centerPoint, cloneObject, clonePoint,
+  centerPoint, cloneObject, clonePoint, disableMovePoint,
   drawLine,
-  firstPoint,
+  firstPoint, moveObject, moveObjectPoint,
   movePoint, radius, saveClone, saveNewCurve,
   saveNewLine,
-  savePoint, selectClonePoint,
+  savePoint, selectClonePoint, selectMovePoint,
   selectPoint, setClone,
   startNewLine,
   thetaLength,
@@ -133,6 +133,11 @@ const mapDispatchToProps = (dispatch) => {
           }
         }
 
+        //move object
+        if (editor.editMode.move.active && !editor.editMode.move.point ) {
+            moveObjectPoint(event, editor)(dispatch)
+        }
+
         if (editor.tool === TOOL_SELECT) {
           selectionBegin(event, editor)(dispatch)
         }
@@ -201,10 +206,18 @@ const mapDispatchToProps = (dispatch) => {
       //clone object
       if (editor.editMode.clone.active) {
         selectClonePoint(event, editor)(dispatch)
-        if (editor.editMode.clone.point && editor.editMode.clone.cloneObject ) {
+        if (editor.editMode.clone.point && editor.editMode.clone.cloneObject) {
           setClone(event, editor)(dispatch)
         }
       }
+      //move object
+      if (editor.editMode.move.active) {
+        selectMovePoint(event, editor)(dispatch)
+        if (editor.editMode.move.point && editor.editMode.move.moveObject) {
+          moveObject(event, editor)(dispatch)
+        }
+      }
+
     },
 
     onMouseUp: (event, editor) => {
@@ -230,6 +243,11 @@ const mapDispatchToProps = (dispatch) => {
       if (event.button === 0 && editor.tool === TOOL_POINT && editor.editMode.isEdit && editor.editMode.activeLine.id) {
         // do edit here
         savePoint(editor.editMode.selectPointIndex)(dispatch)
+      }
+
+      //move object
+      if (editor.editMode.move.active && editor.editMode.move.point) {
+        disableMovePoint(editor.editMode.move.moveObject)(dispatch)
       }
     },
 
