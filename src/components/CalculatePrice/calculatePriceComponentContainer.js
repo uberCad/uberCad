@@ -3,10 +3,7 @@ import CalculatePriceComponent from './calculatePriceComponent'
 import {
   calculate,
   calculateHide,
-  changeLaserOptions,
-  checkLaser,
-  checkObject,
-  setLength
+  order
 } from '../../actions/calculate'
 
 const mapStateToProps = (state, ownProps) => {
@@ -16,6 +13,7 @@ const mapStateToProps = (state, ownProps) => {
     polyamides: state.price.polyamideObjects,
     scene: state.cad.scene,
     forceRender: {},
+    form: state.form,
     ...ownProps
   }
 }
@@ -28,17 +26,8 @@ const mapDispatchToProps = (dispatch) => {
     calculateHide: function () {
       calculateHide()(dispatch)
     },
-    checkObject: function (object) {
-      checkObject(object)(dispatch)
-    },
-    checkLaser: function (object) {
-      checkLaser(object)(dispatch)
-    },
-    changeLaserOptions: function (object, event) {
-      changeLaserOptions(object, event)(dispatch)
-    },
-    setLength: function (object, length) {
-      setLength(object, length)(dispatch)
+    order: function (orderObjects, contactInformation) {
+      order(orderObjects, contactInformation)(dispatch)
     }
   }
 }
