@@ -3,6 +3,7 @@ import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import thunk from 'redux-thunk'
 import reducers from './reducers'
+import { reducer as formReduser } from 'redux-form'
 
 const rootPersistConfig = {
   key: 'root',
@@ -20,6 +21,7 @@ const cadPersistConfig = {
 
 const persistedReducer = persistReducer(rootPersistConfig, combineReducers({
   ...reducers,
+  form: formReduser,
   cad: persistReducer(cadPersistConfig, reducers.cad)
 }))
 

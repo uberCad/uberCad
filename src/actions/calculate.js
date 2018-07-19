@@ -5,6 +5,7 @@ import { spinnerShow, spinnerHide } from './spinner'
 
 export const CALCULATE = 'CALCULATE'
 export const CALCULATE_HIDE = 'CALCULATE_HIDE'
+export const CALCULATE_ORDER = 'CALCULATE_ORDER'
 
 export const calculate = (scene) => {
   const objects = scene.children[1].children
@@ -33,19 +34,20 @@ export const calculate = (scene) => {
     dispatch(spinnerShow())
     Api.post('/api/calculate', {data: infoPrice})
       .then(res => {
-        res.forEach((price, i) => {
-          polyamideObjects[i].userData.price = price
-        })
-        dispatch(spinnerHide())
-        dispatch({
-          type: CALCULATE,
-          payload: {
-            prices: res,
-            polyamideObjects,
-            info: infoPrice
-          }
-        })
-      }
+          res.forEach((item, i) => {
+            polyamideObjects[i].userData.price = item.price
+            polyamideObjects[i].userData.minOrderQty = Number(item.minOrderQty.replace(/\s+/g, '').replace(/,/g, '.'))
+          })
+          dispatch(spinnerHide())
+          dispatch({
+            type: CALCULATE,
+            payload: {
+              prices: res,
+              polyamideObjects,
+              info: infoPrice
+            }
+          })
+        }
       )
   }
 }
@@ -54,4 +56,27 @@ export const calculateHide = () => {
   return dispatch => dispatch({
     type: CALCULATE_HIDE
   })
+}
+
+export const order = (orderObjects, contactInformation) => {
+  const order = []
+  orderObjects.forEach(object => {
+    let data = {
+      material: object.userData.material,
+      options: object.userData.options
+    }
+    order.push(data)
+  })
+  return (dispatch) => {
+    dispatch(spinnerShow())
+    Api.post('/api/order', {data: {order, orderObjects, contactInformation}})
+      .then(res => {
+          dispatch(spinnerHide())
+          console.log('order res = ', res)
+          dispatch({
+            type: CALCULATE_ORDER
+          })
+        }
+      )
+  }
 }

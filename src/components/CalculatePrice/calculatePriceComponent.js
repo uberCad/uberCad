@@ -1,73 +1,57 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import consoleUtils from '../../services/consoleUtils'
-import { Button, Modal, ListGroup } from 'react-bootstrap'
+import { Button, Modal } from 'react-bootstrap'
 import './CalculatePrice.css'
 import { FormattedMessage } from 'react-intl'
+import Scene from '../../services/sceneService'
+import OrderForm from '../OrderForm/orderFormComponent'
 
 export default class CalculatePriceComponent extends Component {
   calculate = () => {
     this.props.calculate(this.props.scene)
   }
 
+  order = () => {
+    let form = this.props.form.order ? this.props.form.order.values : {}
+    let orderObjects = []
+    const {polyamides} = this.props
+
+    polyamides.forEach((object, i) => {
+      if (form.objects[i] && form.objects[i].checked) {
+        object.userData.options = form.objects[i]
+        orderObjects.push(object)
+      }
+    })
+    const contactInformation = {
+      addressCity: form.addressCity,
+      addressCountry: form.addressCountry,
+      addressStreet: form.addressStreet,
+      comment: form.comment,
+      company: form.company,
+      emailAddress: form.emailAddress,
+      firstName: form.firstName,
+      lastName: form.lastName,
+      phoneNumber: form.phoneNumber,
+      zipCode: form.zipCode
+    }
+    this.props.order(orderObjects, contactInformation)
+  }
+
   render () {
     const {polyamides} = this.props
-    const objects = this.props.scene.children[1].children
+    const objects = Scene.getObjects(this.props.scene, true)
+
     let systemWeight = 0
     objects.map((object) => {
       if (object.userData.info) return (systemWeight += object.userData.info.weight)
       else return systemWeight
     })
 
-    const ObjectComponent = ({object}) => {
-      return (
-        <li className='list-group-flush'>
-          <FormattedMessage id='calculatePrice.modal.object' defaultMessage='Object'>
-            {value =>
-              <h4>{value}: {object.name}</h4>
-            }
-          </FormattedMessage>
-          <FormattedMessage id='calculatePrice.modal.material' defaultMessage='Material'>
-            {value =>
-              <h3>{value}: {object.userData.material.name}</h3>
-            }
-          </FormattedMessage>
-          <FormattedMessage id='calculatePrice.modal.width' defaultMessage='Width'>
-            {value =>
-              <span>{value}: {Number(object.userData.info.width.toFixed(4))} mm</span>
-            }
-          </FormattedMessage>
-          <FormattedMessage id='calculatePrice.modal.height' defaultMessage='Height'>
-            {value =>
-              <span>{value}: {Number(object.userData.info.height.toFixed(4))} mm</span>
-            }
-          </FormattedMessage>
-          <FormattedMessage id='calculatePrice.modal.area' defaultMessage='Area'>
-            {value =>
-              <span>{value}: {Number(object.userData.info.area.toFixed(4))} mm2</span>
-            }
-          </FormattedMessage>
-          <FormattedMessage id='calculatePrice.modal.weight' defaultMessage='Weight'>
-            {value =>
-              <span>{value}: {Number(object.userData.info.weight).toFixed(4)} kg/m</span>
-            }
-          </FormattedMessage>
-          {object.userData.price &&
-          <FormattedMessage id='calculatePrice.modal.price' defaultMessage='Unit price'>
-            {value =>
-              <span><b>{value}: {object.userData.price}</b></span>
-            }
-          </FormattedMessage>}
-          <span className='profile col-sm-4 .col-md-4 .col-xs-4'>{consoleUtils.getSvg(object)}</span>
-        </li>
-      )
-    }
-
     return (
       <div>
         <FormattedMessage id='calculatePrice.btnCalculateTitle' defaultMessage='Calculate price'>
           {title =>
-            <button onClick={this.calculate} title={title} className='btn-calc' />
+            <button onClick={this.calculate} title={title} className='btn-calc'/>
           }
         </FormattedMessage>
 
@@ -81,38 +65,13 @@ export default class CalculatePriceComponent extends Component {
             </FormattedMessage>
           </Modal.Header>
           <Modal.Body>
-            <ListGroup componentClass='ul' className='polyamide-list'>
-              {polyamides.length &&
-              polyamides.map((object, i) => {
-                return (
-                  <ObjectComponent object={object} key={i} />
-                )
-              }
-              )}
+            {polyamides.length && <OrderForm objects={polyamides} />}
 
-              {objects.length &&
-              (objects.filter(object => (polyamides.indexOf(object) < 0)).map((object, i) => {
-                return (
-                  <ObjectComponent object={object} key={i} />
-                )
-              }
-              ))}
-              <hr />
-              {polyamides.length &&
-              <div>
-                <FormattedMessage id='calculatePrice.modal.systemWeight' defaultMessage='System weight'>
-                  {value =>
-                    <h3>{value}: <b>{systemWeight.toFixed(4)} kg/m</b></h3>
-                  }
-                </FormattedMessage>
-              </div>
-              }
-            </ListGroup>
           </Modal.Body>
           <Modal.Footer>
             <FormattedMessage id='btn.order' defaultMessage='Order'>
               {value =>
-                <Button bsStyle='info'>{value}</Button>
+                <Button bsStyle='info' onClick={this.order}>{value}</Button>
               }
             </FormattedMessage>
             <FormattedMessage id='btn.cancel' defaultMessage='Cancel'>
@@ -131,6 +90,7 @@ export default class CalculatePriceComponent extends Component {
     lang: PropTypes.string.isRequired,
     show: PropTypes.bool,
     polyamides: PropTypes.array,
-    scene: PropTypes.object
+    scene: PropTypes.object,
+    form: PropTypes.object
   }
 }

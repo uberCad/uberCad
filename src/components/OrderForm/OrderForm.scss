@@ -1,0 +1,37 @@
+@import "../../variables.scss";
+
+.form-custom {
+
+  legend {
+    padding: 0 15px;
+  }
+
+  .checkObject {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    display: block;
+    position: absolute;
+    left: 20px;
+    top: 5px;
+    box-shadow: 0 0 12px rgba(153, 153, 153, 0.4);
+  }
+
+  .panel-options {
+    margin: 45px 40px 20px -232px;
+    box-shadow: 0 0 12px rgba(153, 153, 153, 0.4);
+    padding-top: 10px;
+  }
+
+  .input-addon {
+    width: 50px;
+  }
+
+  .input-group{
+    width: 100%;
+  }
+
+  .disabled {
+    background-color: rgba(0,0,0,0.1);
+  }
+}

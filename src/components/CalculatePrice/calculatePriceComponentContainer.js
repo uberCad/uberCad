@@ -1,6 +1,10 @@
 import { connect } from 'react-redux'
 import CalculatePriceComponent from './calculatePriceComponent'
-import { calculate, calculateHide } from '../../actions/calculate'
+import {
+  calculate,
+  calculateHide,
+  order
+} from '../../actions/calculate'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -8,6 +12,8 @@ const mapStateToProps = (state, ownProps) => {
     show: state.price.show,
     polyamides: state.price.polyamideObjects,
     scene: state.cad.scene,
+    forceRender: {},
+    form: state.form,
     ...ownProps
   }
 }
@@ -19,6 +25,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     calculateHide: function () {
       calculateHide()(dispatch)
+    },
+    order: function (orderObjects, contactInformation) {
+      order(orderObjects, contactInformation)(dispatch)
     }
   }
 }
