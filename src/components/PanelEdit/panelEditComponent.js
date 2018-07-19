@@ -43,6 +43,7 @@ export default class PanelEditComponent extends Component {
   render () {
     const {activeLine, isNewLine, isNewCurve} = this.props.editMode
     const clone = this.props.editMode.clone.active
+    const move = this.props.editMode.move.active
     const editObject = this.props.editMode.editObject
     return (
       <div id='panel-edit'>
@@ -61,6 +62,7 @@ export default class PanelEditComponent extends Component {
             </div>)}
         </div>
 
+        {editObject.id &&
         <div className='toolbar'>
           {!isNewLine ? <button className='new-line' title='New line' onClick={this.newLine}/>
             : <button className='new-line active' title='Cancel new line' onClick={this.cancelNewLine}/>
@@ -68,12 +70,14 @@ export default class PanelEditComponent extends Component {
           {!isNewCurve ? <button onClick={this.newCurve} className='new-curve ' title='New curve'/>
             : <button onClick={this.cancelNewCurve} className='new-curve active' title='Cencel new curve'/>
           }
-          {!clone ? <button onClick={this.clone} className='clone' title='Clone object' />
-            : <button onClick={this.cancelClone} className='clone active' title='Cancel clone object' />
+          {!clone ? <button onClick={this.clone} className='clone' title='Clone object'/>
+            : <button onClick={this.cancelClone} className='clone active' title='Cancel clone object'/>
           }
-          {editObject.id && <button onClick={this.mirrorOx} className='mirror-h' title='Mirroring OX' />}
-          {editObject.id && <button onClick={this.mirrorOy} className='mirror-v' title='Mirroring OY' />}
-        </div>
+          {!move ? <button onClick={() => { this.props.moveActive(editObject) }} className='move' title='Move object'/>
+            : <button onClick={() => { this.props.cancelMove() }} className='move active' title='Cancel move object'/>}
+          <button onClick={this.mirrorOx} className='mirror-h' title='Mirroring OX'/>
+          <button onClick={this.mirrorOy} className='mirror-v' title='Mirroring OY'/>
+        </div>}
       </div>
     )
   }

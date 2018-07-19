@@ -67,6 +67,11 @@
         background-size: $sidebar-toolbar-size - 8px;
       }
 
+      &.move {
+        background: url("../PanelEdit/move.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
+
       &.active {
         display: inline-block;
         background-color: rgba(0, 0, 0, 0.1);;

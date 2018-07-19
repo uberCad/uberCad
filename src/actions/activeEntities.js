@@ -1,4 +1,4 @@
-import { CAD_TOGGLE_VISIBLE, CAD_DO_SELECTION, CAD_SHOW_ALL, CAD_GROUP_ENTITIES } from './cad'
+import { CAD_TOGGLE_VISIBLE, CAD_DO_SELECTION, CAD_SHOW_ALL, CAD_GROUP_ENTITIES, CAD_SELECT_LINE } from './cad'
 import sceneService from '../services/sceneService'
 
 export const toggleVisible = (entity, visible, editor) => {
@@ -24,7 +24,8 @@ export const unSelect = (idx, activeEntities, editor) => {
     dispatch({
       type: CAD_DO_SELECTION,
       payload: {
-        activeEntities
+        activeEntities,
+        activeLine: null
       }
     })
   }
@@ -36,13 +37,13 @@ export const selectEntity = (idx, activeEntities, editor) => {
     sceneService.highlightEntities(editor, activeEntities[idx])
     sceneService.setPointOfInterest(editor, activeEntities[idx])
     console.log('selectEntity', activeEntities[idx])
-
-    // dispatch({
-    //   type: CAD_SELECT_ENTITY,
-    //   payload: {
-    //     activeEntities
-    //   }
-    // })
+    const activeLine = activeEntities[idx]
+    dispatch({
+      type: CAD_SELECT_LINE,
+      payload: {
+        activeLine
+      }
+    })
   }
 }
 

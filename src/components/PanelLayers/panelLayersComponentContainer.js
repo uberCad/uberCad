@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import PanelLayersComponent from './panelLayersComponent'
 import { showAll } from '../../actions/activeEntities'
-import { toggleVisible } from '../../actions/panelLayers'
+import { toggleLayer, toggleVisible } from '../../actions/panelLayers'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -14,6 +14,7 @@ const mapStateToProps = (state, ownProps) => {
       activeEntities: state.cad.activeEntities,
       options: state.options
     },
+    activeLayer: state.sidebar.activeLayer,
     ...ownProps
   }
 }
@@ -25,6 +26,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     showAll: function (editor) {
       showAll(editor)(dispatch)
+    },
+    toggleLayer: function (editor, layer) {
+      toggleLayer(editor, layer)(dispatch)
     }
   }
 }

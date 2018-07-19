@@ -9,6 +9,7 @@ export const CAD_PARSE_DXF = 'CAD_PARSE_DXF'
 export const CAD_DRAW_DXF = 'CAD_DRAW_DXF'
 export const CAD_CLICK = 'CAD_CLICK'
 export const CAD_DO_SELECTION = 'CAD_DO_SELECTION'
+export const CAD_SELECT_LINE = 'CAD_SELECT_LINE'
 export const CAD_TOGGLE_VISIBLE = 'CAD_TOGGLE_VISIBLE'
 export const CAD_TOGGLE_VISIBLE_LAYER = 'CAD_TOGGLE_VISIBLE_LAYER'
 export const CAD_SHOW_ALL = 'CAD_SHOW_ALL'
@@ -166,6 +167,7 @@ export const cadClick = (event, editor) => {
             && !editor.editMode.isNewLine
             && !editor.editMode.isNewCurve
             && !editor.editMode.clone.active
+            && !editor.editMode.move.active
           ) {
             if (selectResult[0].id !== editor.editMode.activeLine.id) {
               if (editor.editMode.activeLine.id) {
@@ -185,7 +187,7 @@ export const cadClick = (event, editor) => {
             }
           } else {
             //unselect activeLine line
-            if (editor.editMode.activeLine.id) {
+            if (editor.editMode.activeLine.id && editor.editMode.activeLine !== editor.editMode.editObject) {
               unselectLine(editor.editMode.activeLine, scene)
               renderer.render(scene, camera)
               dispatch({

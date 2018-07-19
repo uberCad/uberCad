@@ -15,23 +15,26 @@ import {
 import { spinnerShow, spinnerHide } from '../../actions/spinner'
 
 import {
+  TOOL_NEW_CURVE,
+  TOOL_NEW_LINE,
   TOOL_POINT,
   TOOL_SELECT
 } from '../Toolbar/toolbarComponent'
 import sceneService from '../../services/sceneService'
 import {
   centerCurve,
-  centerPoint, cloneObject, clonePoint,
+  centerPoint, cloneObject, clonePoint, disableMovePoint,
   drawLine,
-  firstPoint,
+  firstPoint, moveObject, moveObjectPoint,
   movePoint, radius, saveClone, saveNewCurve,
   saveNewLine,
-  savePoint, selectClonePoint,
+  savePoint, selectClonePoint, selectMovePoint,
   selectPoint, setClone,
   startNewLine,
   thetaLength,
   thetaStart
 } from '../../actions/edit'
+import { PANEL_LAYERS_TOGGLE } from '../../actions/panelLayers'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -48,7 +51,8 @@ const mapStateToProps = (state, ownProps) => {
         threshold: state.options.threshold
       },
       editMode: state.cad.editMode,
-      selection: state.selection
+      selection: state.selection,
+      activeLayer: state.sidebar.activeLayer
     },
 
     sidebarExpanded: state.sidebar.active,
@@ -106,11 +110,11 @@ const mapDispatchToProps = (dispatch) => {
           }
         }
         //new line
-        if (editor.editMode.isNewLine) {
+        if (editor.tool === TOOL_NEW_LINE || editor.editMode.isNewLine) {
           !editor.editMode.newLineFirst ? firstPoint(event, editor)(dispatch) : saveNewLine(editor)(dispatch)
         }
         //new curve
-        if (editor.editMode.isNewCurve) {
+        if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
           if (!editor.editMode.newCurveCenter) {
             centerPoint(event, editor)(dispatch)
           } else if (!editor.editMode.thetaStart) {
@@ -127,6 +131,11 @@ const mapDispatchToProps = (dispatch) => {
           } else if (editor.editMode.clone.cloneObject) {
             saveClone(editor.editMode.clone.cloneObject)(dispatch)
           }
+        }
+
+        //move object
+        if (editor.editMode.move.active && !editor.editMode.move.point ) {
+            moveObjectPoint(event, editor)(dispatch)
         }
 
         if (editor.tool === TOOL_SELECT) {
@@ -159,26 +168,56 @@ const mapDispatchToProps = (dispatch) => {
       }
 
       //new Line
-      if (editor.editMode.isNewLine) {
-        !editor.editMode.newLineFirst ? startNewLine(event, editor)(dispatch) : drawLine(event, editor)(dispatch)
+      if (editor.tool === TOOL_NEW_LINE || editor.editMode.isNewLine) {
+        let parent = editor.tool === TOOL_NEW_LINE ? editor.activeLayer : editor.editMode.editObject
+        if (!parent || parent.metadata) {
+          parent = editor.scene.getObjectByName('Layers').children[0]
+          dispatch({
+            type: PANEL_LAYERS_TOGGLE,
+            payload: {
+              activeLayer: parent
+            }
+          })
+        }
+        !editor.editMode.newLineFirst ? startNewLine(event, editor)(dispatch) : drawLine(event, editor, parent)(dispatch)
       }
+
       //new Curve
-      if (editor.editMode.isNewCurve) {
+      if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
+        let parent = editor.tool === TOOL_NEW_CURVE ? editor.activeLayer : editor.editMode.editObject
+        if (!parent || parent.metadata) {
+          parent = editor.scene.getObjectByName('Layers').children[0]
+          dispatch({
+            type: PANEL_LAYERS_TOGGLE,
+            payload: {
+              activeLayer: parent
+            }
+          })
+        }
+
         if (!editor.editMode.newCurveCenter) {
           centerCurve(event, editor)(dispatch)
         } else if (!editor.editMode.thetaStart) {
           radius(event, editor)(dispatch)
         } else if (!editor.editMode.thetaLength) {
-          thetaLength(event, editor)(dispatch)
+          thetaLength(event, editor, parent)(dispatch)
         }
       }
       //clone object
       if (editor.editMode.clone.active) {
         selectClonePoint(event, editor)(dispatch)
-        if (editor.editMode.clone.point && editor.editMode.clone.cloneObject ) {
+        if (editor.editMode.clone.point && editor.editMode.clone.cloneObject) {
           setClone(event, editor)(dispatch)
         }
       }
+      //move object
+      if (editor.editMode.move.active) {
+        selectMovePoint(event, editor)(dispatch)
+        if (editor.editMode.move.point && editor.editMode.move.moveObject) {
+          moveObject(event, editor)(dispatch)
+        }
+      }
+
     },
 
     onMouseUp: (event, editor) => {
@@ -204,6 +243,11 @@ const mapDispatchToProps = (dispatch) => {
       if (event.button === 0 && editor.tool === TOOL_POINT && editor.editMode.isEdit && editor.editMode.activeLine.id) {
         // do edit here
         savePoint(editor.editMode.selectPointIndex)(dispatch)
+      }
+
+      //move object
+      if (editor.editMode.move.active && editor.editMode.move.point) {
+        disableMovePoint(editor.editMode.move.moveObject)(dispatch)
       }
     },
 

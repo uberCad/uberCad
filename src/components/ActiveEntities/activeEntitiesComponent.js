@@ -17,7 +17,8 @@ export default class ActiveEntitiesComponent extends Component {
   }
 
   shouldComponentUpdate (nextProps) {
-    return this.props.editor.activeEntities !== nextProps.editor.activeEntities
+    return this.props.editor.activeEntities !== nextProps.editor.activeEntities ||
+      this.props.editor.activeLine !== nextProps.editor.activeLine
   }
 
   selectEntity = ({currentTarget: {dataset: {idx}}}) => {
@@ -36,39 +37,48 @@ export default class ActiveEntitiesComponent extends Component {
     this.props.showAll(this.props.editor)
   }
 
+  editLine = () => {
+    if (this.props.editor.activeLine.parent.parent.name === 'Objects') {
+      this.props.isEdit(true, this.props.editor, this.props.editor.activeLine.parent)
+    } else {
+      this.props.isEdit(true, this.props.editor, this.props.editor.activeLine)
+    }
+  }
+
   render () {
     console.debug('render:', this)
-    const {activeEntities} = this.props.editor
+    const {activeEntities, activeLine} = this.props.editor
     return (
       <div id='activeEntities'>
         <div className='content'>
           {activeEntities.length
             ? activeEntities.map((entity, idx) => (
-              <div className='item'
-                key={idx}
-                data-idx={idx}
-                onClick={this.selectEntity}
+              <div className={`item ${activeLine === entity ? 'active' : ''}`}
+                   key={idx}
+                   data-idx={idx}
+                   onClick={this.selectEntity}
               >
                 id: {entity.id} parent: {entity.parent.name}
 
                 <button className='un-select' data-idx={idx}
-                  onClick={this.unSelect}
+                        onClick={this.unSelect}
                 />
+
 
                 <FormattedMessage id='activeEntities.checkboxVisibility' defaultMessage='Visibility'>
                   {title =>
                     <input type='checkbox' data-idx={idx}
-                      title={title}
-                      checked={entity.visible}
-                      onChange={this.onChangeVisible}
-                      onClick={this.stopPropagation}
+                           title={title}
+                           checked={entity.visible}
+                           onChange={this.onChangeVisible}
+                           onClick={this.stopPropagation}
                     />
                   }
                 </FormattedMessage>
               </div>
             ))
             : (
-              <FormattedMessage id='activeEntities.noEntities' defaultMessage='No active entities' />
+              <FormattedMessage id='activeEntities.noEntities' defaultMessage='No active entities'/>
             )
           }
         </div>
@@ -77,8 +87,8 @@ export default class ActiveEntitiesComponent extends Component {
             <FormattedMessage id='activeEntities.group' defaultMessage='Group'>
               {title =>
                 <button onClick={this.groupEntities}
-                  className='group'
-                  title={title}
+                        className='group'
+                        title={title}
                 />
               }
             </FormattedMessage>
@@ -86,11 +96,13 @@ export default class ActiveEntitiesComponent extends Component {
           <FormattedMessage id='activeEntities.show' defaultMessage='Show'>
             {title =>
               <button onClick={this.showAll}
-                className='show-all'
-                title={title}
+                      className='show-all'
+                      title={title}
               />
             }
           </FormattedMessage>
+
+          {activeLine && <button className='edit-line' onClick={this.editLine} title='Edit line'/>}
         </div>
       </div>
     )
@@ -102,7 +114,11 @@ export default class ActiveEntitiesComponent extends Component {
       activeEntities: PropTypes.array.isRequired,
       scene: PropTypes.object,
       camera: PropTypes.object,
-      renderer: PropTypes.object
+      renderer: PropTypes.object,
+      cadCanvas: PropTypes.object,
+      options: PropTypes.object,
+      isEdit: PropTypes.bool,
+      activeLine: PropTypes.object
     })
   }
 }

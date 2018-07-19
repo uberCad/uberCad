@@ -7,6 +7,7 @@ import {
   showAll,
   groupEntities
 } from '../../actions/activeEntities'
+import { isEdit } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -17,7 +18,9 @@ const mapStateToProps = (state, ownProps) => {
       renderer: state.cad.renderer,
       cadCanvas: state.cad.cadCanvas,
       activeEntities: state.cad.activeEntities,
-      options: state.options
+      options: state.options,
+      isEdit: state.cad.editMode.isEdit,
+      activeLine: state.cad.activeLine
     },
     ...ownProps
   }
@@ -39,6 +42,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     groupEntities: function (editor) {
       groupEntities(editor)(dispatch)
+    },
+    isEdit: function (option, editor, object) {
+      isEdit(option, editor, object)(dispatch)
     }
   }
 }

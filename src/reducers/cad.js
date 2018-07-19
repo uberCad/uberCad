@@ -9,7 +9,8 @@ import {
   CAD_GROUP_ENTITIES,
   CAD_EDITMODE_SET_ACTIVE_LINE,
   CAD_EDITMODE_UNSELECT_ACTIVE_LINE,
-  CAD_IS_CHANGED
+  CAD_IS_CHANGED,
+  CAD_SELECT_LINE
 } from '../actions/cad'
 
 import {
@@ -39,7 +40,11 @@ import {
   EDIT_CLONE_POINT,
   EDIT_CLONE_SAVE,
   EDIT_CLONE_CANCEL,
-  EDIT_MIRROR
+  EDIT_MIRROR,
+  EDIT_MOVE_OBJECT_ACTIVE,
+  EDIT_MOVE_OBJECT_CANCEL,
+  EDIT_MOVE_OBJECT_POINT,
+  EDIT_MOVE_DISABLE_POINT
 } from '../actions/edit'
 
 import {
@@ -55,6 +60,7 @@ let initialState = {
   renderer: null,
   cadCanvas: null,
   activeEntities: [],
+  activeLine: null,
   editMode: {
     isEdit: false,
     beforeEdit: {},
@@ -73,6 +79,11 @@ let initialState = {
       active: false,
       point: null,
       cloneObject: null
+    },
+    move: {
+      active: false,
+      point: null,
+      moveObject: null
     }
   },
   pointInfo: {
@@ -93,6 +104,34 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+    case CAD_SELECT_LINE:
+      return {
+        ...state,
+        activeLine: action.payload.activeLine
+      }
+
+    case EDIT_MOVE_OBJECT_ACTIVE:
+      return update(state, {
+        editMode: {
+          move: {
+            active: {$set: action.payload.active},
+            moveObject: {$set: action.payload.moveObject}
+          }
+        }
+      })
+    case EDIT_MOVE_OBJECT_CANCEL:
+      return update(state, {
+        editMode: {move: {$set: action.payload.move}}
+      })
+    case EDIT_MOVE_OBJECT_POINT:
+      return update(state, {
+        editMode: {move: {point: {$set: action.payload.point}}}
+      })
+    case EDIT_MOVE_DISABLE_POINT:
+      return update(state, {
+        editMode: {move: {point: {$set: action.payload.point}}}
+      })
+
     case EDIT_MIRROR:
       return update(state, {
         editMode: {editObject: {$set: action.payload.editObject}}
@@ -244,7 +283,8 @@ const cad = (state = initialState, action) => {
         editMode: {
           isEdit: {$set: action.payload.isEdit},
           beforeEdit: {$set: action.payload.beforeEdit},
-          editObject: {$set: action.payload.editObject}
+          editObject: {$set: action.payload.editObject},
+          activeLine: {$set: action.payload.activeLine}
         },
         scene: {$set: action.payload.scene},
         isChanged: {$set: action.payload.isChanged}
@@ -271,7 +311,10 @@ const cad = (state = initialState, action) => {
         cadCanvas: action.payload.cadCanvas
       }
     case CAD_DO_SELECTION:
-      return update(state, {activeEntities: {$set: [...action.payload.activeEntities]}})
+      return update(state, {
+        activeEntities: {$set: [...action.payload.activeEntities]},
+        activeLine: {$set: action.payload.activeLine}
+      })
     case CAD_TOGGLE_VISIBLE:
       return update(state, {activeEntities: {$set: [...state.activeEntities]}})
     case CAD_TOGGLE_VISIBLE_LAYER:

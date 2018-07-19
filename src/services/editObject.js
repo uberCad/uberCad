@@ -1,12 +1,12 @@
 import * as THREE from '../extend/THREE'
 
-let setColor = function (entity, bgColor, objName, objColor) {
+let setColor = function (entity, bgColor, objId, objColor) {
   entity.children.forEach(function (entity) {
     if (entity.children.length > 0) {
-      setColor(entity, bgColor, objName, objColor)
+      setColor(entity, bgColor, objId, objColor)
     } else {
       if (entity.type === 'Line' && entity.children.length === 0) {
-        if (entity.parent.name === objName) {
+        if (entity.parent.id === objId || entity.id === objId) {
           if (!entity.userData.originalColor) {
             entity.userData.originalColor = entity.material.color.clone()
           }
@@ -85,7 +85,8 @@ let addHelpPoints = (object, scene, radiusPoint) => {
 
 let getScale = (camera) => {
   let scale = camera.zoom
-  scale = scale >= 1 ? (1.5 / scale) : scale * 2
+  scale = scale >= 1 ? (1 / scale) : scale * 2
+  scale = scale > 0.5 ? 0.5 : scale
   return scale
 }
 
@@ -251,12 +252,24 @@ let radiusArc = (point, line) => Math.sqrt(
 let editThetaLenght = (mousePoint, line) => {
   let result = {}
 
-  let helpStart = line.userData.helpGeometry ? line.userData.helpGeometry.helpStart : line.geometry.parameters.thetaStart
-  let helpLength = line.userData.helpGeometry ? line.userData.helpGeometry.helpLength : line.geometry.parameters.thetaLength
-  let thetaLength = line.userData.helpGeometry ? line.userData.helpGeometry.thetaLength : line.geometry.parameters.thetaLength
-  let pastDeltaLength = line.userData.helpGeometry ? line.userData.helpGeometry.pastDeltaLength : -0.1
-  let overpastAngle = line.userData.helpGeometry ? line.userData.helpGeometry.overpastAngle : 0
-  let mouseAngles = line.userData.helpGeometry ? line.userData.helpGeometry.mouseAngles : [line.geometry.parameters.thetaStart]
+  let helpStart = (line.userData.helpGeometry && line.userData.helpGeometry.helpStart)
+    ? line.userData.helpGeometry.helpStart
+    : line.geometry.parameters.thetaStart
+  let helpLength = (line.userData.helpGeometry && line.userData.helpGeometry.helpLength)
+    ? line.userData.helpGeometry.helpLength
+    : line.geometry.parameters.thetaLength
+  let thetaLength = (line.userData.helpGeometry && line.userData.helpGeometry.thetaLength)
+    ? line.userData.helpGeometry.thetaLength
+    : line.geometry.parameters.thetaLength
+  let pastDeltaLength = (line.userData.helpGeometry && line.userData.helpGeometry.pastDeltaLength)
+    ? line.userData.helpGeometry.pastDeltaLength
+    : -0.1
+  let overpastAngle = (line.userData.helpGeometry && line.userData.helpGeometry.overpastAngle)
+    ? line.userData.helpGeometry.overpastAngle
+    : 0
+  let mouseAngles = (line.userData.helpGeometry && line.userData.helpGeometry.mouseAngles)
+    ? line.userData.helpGeometry.mouseAngles
+    : [line.geometry.parameters.thetaStart]
   let isOnClock = (arr) => {
     return (arr[0] < arr[1])
   }

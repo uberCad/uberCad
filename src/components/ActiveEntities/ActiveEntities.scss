@@ -34,6 +34,9 @@
         }
       }
     }
+    .active {
+      background-color: rgba(0,0,0,0.1);
+    }
   }
 
   .toolbar {
@@ -60,6 +63,10 @@
 
       &.show-all {
         background: url("show-all.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
+      &.edit-line {
+        background: url("edit.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
     }

@@ -7,6 +7,8 @@ import toolPoint from './point.svg'
 import toolSelect from './select.svg'
 import toolUndo from './undo.svg'
 import toolRedo from './redo.svg'
+import toolLine from './line.svg'
+import toolCurve from './curve.svg'
 import PropTypes from 'prop-types'
 import { FormattedMessage } from 'react-intl'
 
@@ -14,6 +16,8 @@ export const TOOL_POINT = 'TOOL_POINT'
 export const TOOL_SELECT = 'TOOL_SELECT'
 export const TOOL_UNDO = 'TOOL_UNDO'
 export const TOOL_REDO = 'TOOL_REDO'
+export const TOOL_NEW_LINE = 'TOOL_NEW_LINE'
+export const TOOL_NEW_CURVE = 'TOOL_NEW_CURVE'
 
 export default class ToolbarComponent extends Component {
   onClick = ({currentTarget: {dataset: {tool}}}) => {
@@ -69,6 +73,30 @@ export default class ToolbarComponent extends Component {
               title={value}
             >
               <img src={toolRedo} alt='Redo' />
+            </button>
+          }
+        </FormattedMessage>
+
+        <FormattedMessage id='toolbar.newLine' defaultMessage='New line'>
+          {value =>
+            <button className={`btn ${tool === TOOL_NEW_LINE ? 'btn-success' : ''}`}
+                    data-tool={TOOL_NEW_LINE}
+                    onClick={this.onClick}
+                    title={value}
+            >
+              <img src={toolLine} alt='New line' />
+            </button>
+          }
+        </FormattedMessage>
+
+        <FormattedMessage id='toolbar.newCurve' defaultMessage='New curve'>
+          {value =>
+            <button className={`btn ${tool === TOOL_NEW_CURVE ? 'btn-success' : ''}`}
+                    data-tool={TOOL_NEW_CURVE}
+                    onClick={this.onClick}
+                    title={value}
+            >
+              <img src={toolCurve} alt='New curve' />
             </button>
           }
         </FormattedMessage>

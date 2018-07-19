@@ -12,7 +12,9 @@ import {
   editThetaLenght,
   clone,
   fixPosition,
-  mirrorObject
+  mirrorObject,
+  getScale,
+  addHelpPoints
 } from '../services/editObject'
 import sceneService from '../services/sceneService'
 import GeometryUtils from '../services/GeometryUtils'
@@ -48,17 +50,31 @@ export const EDIT_CLONE_CANCEL = 'EDIT_CLONE_CANCEL'
 
 export const EDIT_MIRROR = 'EDIT_MIRROR'
 
+export const EDIT_MOVE_OBJECT_ACTIVE = 'EDIT_MOVE_OBJECT_ACTIVE'
+export const EDIT_MOVE_OBJECT_CANCEL = 'EDIT_MOVE_OBJECT_CANCEL'
+export const EDIT_MOVE_OBJECT_POINT = 'EDIT_MOVE_OBJECT_POINT'
+export const EDIT_MOVE_DISABLE_POINT = 'EDIT_MOVE_DISABLE_POINT'
+
 export const isEdit = (option, editor, object = {}) => {
-  if (option) {
-    let bgColor = new THREE.Color(0xaaaaaa)
-    let objColor = new THREE.Color(0x00ff00)
-    setColor(editor.scene, bgColor, object.name, objColor)
-  } else {
-    setOriginalColor(editor.scene)
-  }
+  let activeLine = {}
+  let {scene, camera, renderer} = editor
   object.userData.parentName = object.parent.name
   const beforeEdit = JSON.stringify(object)
-  editor.renderer.render(editor.scene, editor.camera)
+  if (option) {
+    scene.getObjectByName('HelpLayer').children = []
+    let bgColor = new THREE.Color(0xaaaaaa)
+    let objColor = new THREE.Color(0x00ff00)
+    setColor(scene, bgColor, object.id, objColor)
+  } else {
+    setOriginalColor(scene)
+  }
+  if (object instanceof THREE.Line) {
+    activeLine = object
+    const rPoint = getScale(camera)
+    object.name = 'ActiveLine'
+    addHelpPoints(object, scene, rPoint)
+  }
+  renderer.render(scene, camera)
   return dispatch => dispatch({
     type: EDIT_IS_EDIT,
     payload: {
@@ -66,7 +82,8 @@ export const isEdit = (option, editor, object = {}) => {
       beforeEdit: beforeEdit,
       editObject: object,
       scene: editor.scene,
-      isChanged: true
+      isChanged: true,
+      activeLine
     }
   })
 }
@@ -83,46 +100,62 @@ export const cancelEdit = (editor, editObject, backUp) => {
   GeometryUtils.fixObjectsPaths(editor.scene)
   setOriginalColor(editor.scene)
   editor.renderer.render(editor.scene, editor.camera)
-  return dispatch => dispatch({
-    type: EDIT_CANCEL,
-    payload: {
-      editMode: {
-        isEdit: false,
-        beforeEdit: {},
-        editObject: {},
-        activeLine: {},
-        selectPointIndex: null,
-        clone: {
-          active: false,
-          point: null,
-          cloneObject: null
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_CANCEL,
+      payload: {
+        editMode: {
+          isEdit: false,
+          beforeEdit: {},
+          editObject: {},
+          activeLine: {},
+          selectPointIndex: null,
+          clone: {
+            active: false,
+            point: null,
+            cloneObject: null
+          },
+          move: {
+            active: false,
+            point: null,
+            moveObject: null
+          }
         }
       }
-    }
-  })
+    })
+  }
 }
 
 export const saveEdit = (editor) => {
   editor.scene.getObjectByName('HelpLayer').children = []
   setOriginalColor(editor.scene)
   editor.renderer.render(editor.scene, editor.camera)
-  return dispatch => dispatch({
-    type: EDIT_SAVE,
-    payload: {
-      editMode: {
-        isEdit: false,
-        beforeEdit: {},
-        editObject: {},
-        activeLine: {},
-        selectPointIndex: null,
-        clone: {
-          active: false,
-          point: null,
-          cloneObject: null
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_SAVE,
+      payload: {
+        editMode: {
+          isEdit: false,
+          beforeEdit: {},
+          editObject: {},
+          activeLine: {},
+          selectPointIndex: null,
+          clone: {
+            active: false,
+            point: null,
+            cloneObject: null
+          },
+          move: {
+            active: false,
+            point: null,
+            moveObject: null
+          }
         }
       }
-    }
-  })
+    })
+  }
 }
 
 export const selectPoint = (line, event, editor) => {
@@ -243,7 +276,7 @@ export const startNewLine = (event, editor) => {
   }
 }
 
-export const drawLine = (event, editor) => {
+export const drawLine = (event, editor, parent) => {
   let {scene, camera, renderer, editMode} = editor
   let clickResult = sceneService.onClick(event, scene, camera)
   let mousePoint = {
@@ -258,8 +291,8 @@ export const drawLine = (event, editor) => {
     changeGeometry(changeLine, 1, secondPoint, scene)
   } else {
     const line = createLine(editMode.newLineFirst, secondPoint)
-    line.userData.originalColor = editMode.editObject.children[0].userData.originalColor
-    editMode.editObject.add(line)
+    line.userData.originalColor = parent.children[0].userData.originalColor
+    parent.add(line)
   }
   renderer.render(scene, camera)
   return dispatch => {
@@ -268,7 +301,10 @@ export const drawLine = (event, editor) => {
 }
 
 export const saveNewLine = (editor) => {
-  editor.scene.getObjectByName('newLine').name = ''
+  const line = editor.scene.getObjectByName('newLine')
+  if (line) {
+    line.name = ''
+  }
   return dispatch => {
     disablePoint()(dispatch)
     dispatch({
@@ -298,8 +334,8 @@ export const cancelNewCurve = (editor) => {
   const line = scene.getObjectByName('newLine')
   if (line) {
     line.parent.remove(line)
-    renderer.render(scene, camera)
   }
+  renderer.render(scene, camera)
   return dispatch => {
     disablePoint()(dispatch)
     dispatch({
@@ -387,7 +423,7 @@ export const thetaStart = (editor) => {
   }
 }
 
-export const thetaLength = (event, editor) => {
+export const thetaLength = (event, editor, parent) => {
   let {scene, camera, renderer, editMode} = editor
   const thetaStart = circleIntersectionAngle(editMode.thetaStart, editMode.newCurveCenter)
   const oldLine = scene.getObjectByName('newLine') || newArc(editMode.radius, thetaStart, 0.1)
@@ -407,8 +443,9 @@ export const thetaLength = (event, editor) => {
   line.position.y = editMode.newCurveCenter.y
 
   if (oldLine && oldLine.parent) oldLine.parent.remove(oldLine)
-  line.userData.originalColor = editMode.editObject.children[0].userData.originalColor
-  editMode.editObject.add(line)
+  line.userData.originalColor = parent.children[0].userData.originalColor
+  parent.add(line)
+
   renderer.render(scene, camera)
   return dispatch => {
     crossing ? movePointInfo(event, 'Crossing thetaLength')(dispatch) : movePointInfo(event, 'Click to add thetaLength')(dispatch)
@@ -421,7 +458,10 @@ export const thetaLength = (event, editor) => {
 
 export const saveNewCurve = (editor) => {
   let {scene, camera, renderer} = editor
-  scene.getObjectByName('newLine').name = ''
+  let line = scene.getObjectByName('newLine')
+  if (line) {
+    line.name = ''
+  }
   scene.getObjectByName('HelpLayer').children = []
   renderer.render(scene, camera)
   return dispatch => {
@@ -580,5 +620,94 @@ export const mirror = (object, editor, option) => {
         editObject
       }
     })
+  }
+}
+
+export const moveActive = (object) => {
+  return dispatch => {
+    dispatch({
+      type: EDIT_MOVE_OBJECT_ACTIVE,
+      payload: {
+        active: true,
+        moveObject: object
+      }
+    })
+  }
+}
+
+export const cancelMove = () => {
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_MOVE_OBJECT_CANCEL,
+      payload: {
+        move: {
+          active: false,
+          point: null,
+          moveObject: null
+        }
+      }
+    })
+  }
+}
+
+export const selectMovePoint = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing point')(dispatch) : movePointInfo(event, 'Click to select move point')(dispatch)
+  }
+}
+
+export const moveObjectPoint = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  const point = {
+    x: clickResult.point.x,
+    y: clickResult.point.y,
+    z: 0
+  }
+  return dispatch => {
+    dispatch({
+      type: EDIT_MOVE_OBJECT_POINT,
+      payload: {point}
+    })
+  }
+}
+
+export const disableMovePoint = (object) => {
+  fixPosition(object)
+  return dispatch => {
+    disablePoint()(dispatch)
+    dispatch({
+      type: EDIT_MOVE_DISABLE_POINT,
+      payload: {point: null}
+    })
+  }
+}
+
+export const moveObject = (event, editor) => {
+  let {scene, camera, renderer} = editor
+  let moveObject = editor.editMode.move.moveObject
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const p = !crossing ? mousePoint : crossing
+  moveObject.position.set(
+    p.x - editor.editMode.move.point.x,
+    p.y - editor.editMode.move.point.y,
+    0
+  )
+  renderer.render(scene, camera)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing point')(dispatch) : movePointInfo(event, 'Select paste point')(dispatch)
   }
 }

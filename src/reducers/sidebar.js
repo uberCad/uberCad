@@ -6,10 +6,13 @@ import {
 import { PANEL_OBJECTS_TOGGLE } from '../actions/panelObjects'
 import { LOCALE_SET } from '../actions/locale'
 import { EDIT_IS_EDIT } from '../actions/edit'
+import { MATERIAL_SET } from '../actions/materials'
+import { PANEL_LAYERS_TOGGLE } from '../actions/panelLayers'
 
 let initialState = {
   active: true,
   activeObject: null,
+  activeLayer: null,
   panels: [
     [
       {
@@ -69,6 +72,12 @@ const options = (state = initialState, action) => {
       state.panels[1][1].active = !state.panels[1][1].active
       return {...state}
 
+    case PANEL_LAYERS_TOGGLE:
+      return {
+        ...state,
+        activeLayer: action.payload.activeLayer
+      }
+
     case PANEL_OBJECTS_TOGGLE:
       return {
         ...state,
@@ -118,6 +127,11 @@ const options = (state = initialState, action) => {
         panels: {$set: [...state.panels]},
         active: {$set: active}
       })
+    case MATERIAL_SET:
+      return {
+        ...state,
+        activeObject: action.payload.object
+      }
     default:
       return state
   }
