@@ -8,6 +8,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     lang: state.locale.lang,
     userName: state.userLogin.userName,
+    pictureUrl: state.userLogin.pictureUrl,
     ...ownProps
   }
 }

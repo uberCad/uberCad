@@ -1,4 +1,6 @@
 import userService from '../services/UserService'
+import Api from '../services/apiService'
+import { spinnerHide, spinnerShow } from './spinner'
 
 export const LOGIN_ACTION = 'LOGIN_ACTION'
 export const LOGOUT_ACTION = 'LOGOUT_ACTION'
@@ -43,12 +45,18 @@ export const logout = (history) => {
 
 export const setUserName = (userName) => {
   return (dispatch) => {
-    dispatch({
-      type: SET_USER_NAME,
-      payload: {
-        userName
-      }
-    })
+    dispatch(spinnerShow())
+    Api.get('/api/picture-url')
+      .then((pictureUrl) => {
+        dispatch(spinnerHide())
+        dispatch({
+          type: SET_USER_NAME,
+          payload: {
+            userName,
+            pictureUrl
+          }
+        })
+      })
   }
 }
 
