@@ -1,11 +1,12 @@
 import { connect } from 'react-redux'
 import PanelObjectsComponent from './panelObjectsComponent'
-import { toggleVisible, combineEdgeModels, toggleObject } from '../../actions/panelObjects'
+import { toggleVisible, combineEdgeModels, toggleObject, loadObjectSnapshot } from '../../actions/panelObjects'
 import { showAll } from '../../actions/activeEntities'
 import { isEdit } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    snapshots: state.project.project.snapshots,
     lang: state.locale.lang,
     editor: {
       scene: state.cad.scene,
@@ -17,6 +18,8 @@ const mapStateToProps = (state, ownProps) => {
       isEdit: state.cad.editMode.isEdit
     },
     activeObject: state.sidebar.activeObject,
+    isChanged: state.cad.isChanged,
+    objectsIds: state.cad.objectsIds,
     ...ownProps
   }
 }
@@ -37,6 +40,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     toggleObject: function (editor, object) {
       toggleObject(editor, object)(dispatch)
+    },
+    loadObjectSnapshot: function (key, cadCanvas) {
+      loadObjectSnapshot(key, cadCanvas)(dispatch)
     }
   }
 }

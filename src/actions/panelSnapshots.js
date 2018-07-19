@@ -29,11 +29,30 @@ export const loadSnapshot = (snapshotKey, cadCanvas) => {
   return (dispatch) => {
     dispatch(spinnerShow())
     snapshotService.getSnapshotScene(snapshotKey)
-      .then(sceneData => {
+      .then(snapshot => {
         dispatch(spinnerHide())
         let loader = new THREE.ObjectLoader()
-        const scene = loader.parse(JSON.parse(sceneData))
-        sceneService.fixSceneAfterImport(scene)
+        const scene = cadCanvas.getScene()
+
+        let layers = scene.getObjectByName('Layers')
+        layers.children = []
+        const savedLayers = loader.parse(JSON.parse(snapshot.layers))
+        sceneService.fixSceneAfterImport(savedLayers)
+
+        while (savedLayers.children.length) {
+          const object = savedLayers.children.pop()
+          layers.add(object)
+        }
+        scene.add(savedLayers)
+
+        const objects = scene.getObjectByName('Objects')
+        objects.children = []
+        snapshot.objects.forEach(item => {
+          const object = loader.parse(JSON.parse(item.parameters))
+          sceneService.fixSceneAfterImport(object)
+          objects.add(object)
+        })
+
         GeometryUtils.fixObjectsPaths(scene)
         cadCanvas.setScene(scene)
         dispatch({

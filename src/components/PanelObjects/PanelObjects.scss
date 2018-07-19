@@ -16,15 +16,54 @@
         background-color: rgba(0,0,0,0.1);
       }
 
+      .directions {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        background: url("directions.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+        margin-left: 5px;
+      }
+
       span {
         float: right;
         background-color: $gray;
         border-radius: 8px;
         padding: 0 5px;
+        line-height: 22px;
       }
     }
     .active {
       background-color: rgba(0,0,0,0.1);
+    }
+
+    .object-snapshot{
+      display: none;
+      position: absolute;
+      width: 90%;
+      box-shadow: 0 0 16px rgba(153, 153, 153, 0.6);
+      z-index: 1;
+      background-color: #ffffff;
+
+      h4{
+        margin-left: 5px;
+        font-weight: bold;
+      }
+
+      ul {
+        margin: 0;
+        li {
+          padding: 5px;
+          &:hover {
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.1);
+          }
+        }
+      }
+    }
+
+    .show{
+      display: block;
     }
   }
 
