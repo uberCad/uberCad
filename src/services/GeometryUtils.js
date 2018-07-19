@@ -281,6 +281,47 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
   }
 }
 
+let rotatePoint = (center, angle, point) => {
+  let s = Math.sin(angle)
+  let c = Math.cos(angle)
+
+  // translate point back to origin:
+  // let x = point.x - center.x
+  // let y = point.y - center.y
+
+  let x = point.x
+  let y = point.y
+
+  // rotate point
+  let xNew = x * c - y * s
+  let yNew = x * s + y * c
+
+  // console.log('rotatePoint', x, y, xNew, yNew, point, center)
+
+  // return new THREE.Vector3(xNew + center.x, yNew + center.y, 0)
+  // return new THREE.Vector3(xNew + 10, yNew + 10, 0)
+  return new THREE.Vector3(xNew, yNew, 0)
+}
+
+/**
+ * @deprecated use editObject.js
+ * @param arcGeometry
+ * @param parameters
+ * @returns {CircleGeometry}
+ */
+let changeArcGeometry = (arcGeometry, parameters) => {
+  arcGeometry.dispose()
+  let geometry = new THREE.CircleGeometry(
+    parameters.radius,
+    32,
+    parameters.thetaStart,
+    parameters.thetaLength
+  )
+  geometry.vertices.shift()
+  return geometry
+}
+
+
 let buildChain = (vertices, startVertex, threshold = 0.000001, vertex, path = []) => {
   if (!vertex) {
     vertex = startVertex
@@ -2501,5 +2542,7 @@ export default {
   bugleToArc,
   getObjectInfo,
   fixObjectsPaths,
-  getThermalPoints
+  getThermalPoints,
+  rotatePoint,
+  changeArcGeometry
 }

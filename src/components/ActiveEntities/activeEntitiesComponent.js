@@ -36,7 +36,6 @@ export default class ActiveEntitiesComponent extends Component {
   }
 
   render () {
-    console.debug('render:', this)
     const {activeEntities} = this.props.editor
     return (
       <div id='activeEntities'>

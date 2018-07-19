@@ -438,22 +438,21 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
       }
     })
   } catch (e) {
-    console.error('errore', e)
-
     switch (e.userData.error) {
       case 'edge model':
-        if (e.userData.data && e.userData.data.error) {
-          switch (e.userData.data.error) {
+        // console.warn(e.userData.data.userData.error)
+        if (e.userData.data && e.userData.data.userData && e.userData.data.userData.error) {
+          switch (e.userData.data.userData.error) {
             case 'interruption':
               // show problem line
               console.error('show problem line', e)
 
-              this.highlightEntities(entities, true)
+              highlightEntities(editor, entities, true)
               // cadCanvas.highlightEntities($scope.editor.activeEntities, true);
 
-              e.userData.data.entity.userData.showInTop = true
-              this.highlightEntities([e.data.entity])
-              setPointOfInterest(editor, e.data.entity)
+              // e.userData.data.entity.userData.showInTop = true
+              highlightEntities(editor, [e.userData.data.userData.entity])
+              setPointOfInterest(editor, e.userData.data.userData.entity)
 
               ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg)
 
@@ -710,13 +709,13 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
 
       return `<path d="${object.userData.edgeModel.svgData.pathD} " style="fill:rgb(200,240,200);stroke:black;stroke-width:0.00001mm">\n` +
         materialSvg +
-        `<area outer value="${(object.userData.edgeModel.regions[0].area / 1000000).toFixed(6)}" />\n` +
+        `<area value="${(object.userData.edgeModel.regions[0].area / 1000000).toFixed(6)}" />\n` +
         `</path>\n` +
         ((!svgForFlixo && `<circle cx="${(object.userData.edgeModel.svgData.insidePoint.x / 1000).toFixed(4)}" cy="${(object.userData.edgeModel.svgData.insidePoint.y / 1000).toFixed(4)}" r="0.0005" style="fill:rgb(150,255,150); stroke:black;stroke-width:0.00001" />`) || '') +
         object.userData.edgeModel.svgData.subRegionsPathD.map((pathD, idx) => {
           return `<path d="${pathD} " style="fill:rgb(200,200,240);opacity:0.5; stroke:black;stroke-width:0.00001mm">\n` +
                            `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"/>\n` +
-                           `<area inner value="${(object.userData.edgeModel.regions[idx + 1].area / 1000000)}" />\n` +
+                           `<area value="${(object.userData.edgeModel.regions[idx + 1].area / 1000000)}" />\n` +
                          `</path>`
         }).join('')
     }).join('') +
