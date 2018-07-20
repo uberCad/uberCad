@@ -4,6 +4,7 @@ let express = require('express')
 let app = express()
 let bodyParser = require('body-parser')
 let http = require('http').Server(app)
+let path = require('path')
 let port = process.env.PORT || 5000
 // let config = require('./server/config')
 let fileUpload = require('express-fileupload')
@@ -48,6 +49,8 @@ router.post('/flixo', function (req, res) {
 })
 
 app.use('/api', router)
+
+app.use('/', express.static(path.join(__dirname, 'build')))
 
 http.listen(port, function () {
   console.log(`Server running at localhost:${port}`)
