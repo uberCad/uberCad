@@ -11,11 +11,27 @@ ul.polyamide-list {
     min-height: 250px;
     transition: All 0.3s;
     position: relative;
+    line-height: 1.5em;
+
+    h3 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 1.1;
+      color: inherit;
+    }
 
     h4 {
       text-align: left;
       margin: 0 0 5px 0;
       padding: 0;
+      font-size: 18px;
+      font-family: inherit;
+      font-weight: 500;
+      line-height: 1.1;
+      color: inherit;
     }
 
     label {
@@ -34,6 +50,7 @@ ul.polyamide-list {
       display: block;
       color: gray;
       font-style: italic;
+      font-size: 14px;
       margin-right: 5px;
 
       &.profile {
