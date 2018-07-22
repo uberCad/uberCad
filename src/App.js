@@ -15,6 +15,7 @@ import PropTypes from 'prop-types'
 import messages from './messages'
 import { flattenMessages } from './services/intlUtil'
 import history from './config/history'
+import Modal from './components/Modal/modalComponentContainer'
 
 class App extends Component {
   render () {
@@ -42,6 +43,7 @@ class App extends Component {
               </Switch>
             </div>
             <Spinner />
+            <Modal />
           </div>
         </Router>
       </IntlProvider>

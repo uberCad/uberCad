@@ -12,6 +12,7 @@ import userLogin from './userLogin'
 import materials from './materials'
 import price from './price'
 import locale from './locale'
+import modal from './modal'
 
 export default {
   counter,
@@ -27,5 +28,6 @@ export default {
   userLogin,
   materials,
   price,
-  locale
+  locale,
+  modal
 }
