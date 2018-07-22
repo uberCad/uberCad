@@ -44,7 +44,8 @@ import {
   EDIT_MOVE_OBJECT_ACTIVE,
   EDIT_MOVE_OBJECT_CANCEL,
   EDIT_MOVE_OBJECT_POINT,
-  EDIT_MOVE_DISABLE_POINT
+  EDIT_MOVE_DISABLE_POINT,
+  EDIT_UNGROUP
 } from '../actions/edit'
 
 import {
@@ -104,6 +105,12 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+    case EDIT_UNGROUP:
+      return {
+        ...state,
+        scene: action.payload.scene
+      }
+
     case CAD_SELECT_LINE:
       return {
         ...state,

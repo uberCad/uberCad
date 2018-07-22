@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import PanelObjectsComponent from './panelObjectsComponent'
 import { toggleVisible, combineEdgeModels, toggleObject, loadObjectSnapshot } from '../../actions/panelObjects'
 import { showAll } from '../../actions/activeEntities'
-import { isEdit } from '../../actions/edit'
+import { isEdit, ungroup } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -43,6 +43,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     loadObjectSnapshot: function (key, cadCanvas) {
       loadObjectSnapshot(key, cadCanvas)(dispatch)
+    },
+    ungroup: function (editor, object) {
+      ungroup(editor, object)(dispatch)
     }
   }
 }

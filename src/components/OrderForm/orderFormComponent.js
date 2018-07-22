@@ -41,7 +41,7 @@ const RenderObjects = ({objects, checkObjects}) => {
     <ul className='polyamide-list'>
       {objects && objects.map((object, i) => {
         return (
-          <li className={(checkObjects[i] && checkObjects[i].checked) ? 'list-group-flush' : 'list-group-flush disabled'} key={i}>
+          <li className={(checkObjects && checkObjects[i] && checkObjects[i].checked) ? 'list-group-flush' : 'list-group-flush disabled'} key={i}>
             <Field
               name={`objects[${i}].checked`}
               type='checkbox'

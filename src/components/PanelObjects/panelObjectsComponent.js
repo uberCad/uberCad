@@ -16,14 +16,14 @@ export default class PanelObjectsComponent extends Component {
     }
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
-    return (this.props.editor.scene !== nextProps.editor.scene) ||
-      (nextProps.editor.scene && nextProps.editor.scene.children !== this.props.editor.scene.children) ||
-      (this.props.editor.isEdit !== nextProps.editor.isEdit) ||
-      (this.props.activeObject !== nextProps.activeObject) ||
-      (this.props.objectsIds !== nextProps.objectsIds) ||
-      (this.state.show !== nextState.show)
-  }
+  // shouldComponentUpdate (nextProps, nextState) {
+  //   return (this.props.editor.scene !== nextProps.editor.scene) ||
+  //     (nextProps.editor.scene && nextProps.editor.scene.children !== this.props.editor.scene.children) ||
+  //     (this.props.editor.isEdit !== nextProps.editor.isEdit) ||
+  //     (this.props.activeObject !== nextProps.activeObject) ||
+  //     (this.props.objectsIds !== nextProps.objectsIds) ||
+  //     (this.state.show !== nextState.show)
+  // }
 
   onChangeVisible = ({currentTarget: {checked, dataset: {id}}}) => {
     const {scene} = this.props.editor
@@ -48,6 +48,16 @@ export default class PanelObjectsComponent extends Component {
     if (scene) {
       let object = scene.getObjectById(parseInt(id, 10))
       this.props.isEdit(!this.props.editor.isEdit, this.props.editor, object)
+    }
+  }
+
+  ungroup = (event) => {
+    event.stopPropagation()
+    let {currentTarget: {dataset: {id}}} = event
+    const {scene} = this.props.editor
+    if (scene) {
+      let object = scene.getObjectById(parseInt(id, 10))
+      this.props.ungroup(this.props.editor, object)
     }
   }
 
@@ -171,6 +181,12 @@ export default class PanelObjectsComponent extends Component {
             <button onClick={this.edit} data-id={this.props.activeObject.id} className='btn-edit'/>)
           }
           {objects && objects.children.length > 0 && <Calculate/>}
+
+          {this.props.activeObject &&
+          (!this.props.editor.isEdit &&
+            <button onClick={this.ungroup} data-id={this.props.activeObject.id} className='btn-ungroup' />)
+          }
+
         </div>
       </div>
     )
