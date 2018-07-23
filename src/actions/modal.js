@@ -7,18 +7,20 @@ export const modalHide = () => {
     payload: {
       show: false,
       message: '',
-      title: ''
+      title: '',
+      link: ''
     }
   })
 }
 
-export const modalShow = (title = 'Title', message) => {
+export const modalShow = (title = 'Title', message, link = '') => {
   return dispatch => dispatch({
     type: MODAL_SHOW,
     payload: {
       show: true,
       message,
-      title
+      title,
+      link
     }
   })
 }

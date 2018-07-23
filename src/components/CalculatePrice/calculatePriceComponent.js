@@ -17,7 +17,7 @@ export default class CalculatePriceComponent extends Component {
     const {polyamides} = this.props
 
     polyamides.forEach((object, i) => {
-      if (form.objects[i] && form.objects[i].checked) {
+      if (form.objects && form.objects[i] && form.objects[i].checked) {
         object.userData.options = form.objects[i]
         orderObjects.push(object)
       }
@@ -40,6 +40,7 @@ export default class CalculatePriceComponent extends Component {
   render () {
     const {polyamides} = this.props
     const objects = Scene.getObjects(this.props.scene, true)
+    const form = this.props.form.order
 
     let systemWeight = 0
     objects.map((object) => {
@@ -65,13 +66,19 @@ export default class CalculatePriceComponent extends Component {
             </FormattedMessage>
           </Modal.Header>
           <Modal.Body>
-            {polyamides.length && <OrderForm objects={polyamides} />}
+            {polyamides.length && <OrderForm objects={polyamides}/>}
 
           </Modal.Body>
           <Modal.Footer>
             <FormattedMessage id='btn.order' defaultMessage='Order'>
               {value =>
-                <Button bsStyle='info' onClick={this.order}>{value}</Button>
+                <Button
+                  bsStyle='info'
+                  onClick={
+                    form.syncErrors ? () => {console.log('have error')} : this.order
+                  }
+                  disabled={form.syncErrors ? true : false}
+                >{value}</Button>
               }
             </FormattedMessage>
             <FormattedMessage id='btn.cancel' defaultMessage='Cancel'>

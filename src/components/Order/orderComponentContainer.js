@@ -15,8 +15,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    getOrder: function (key) {
-      getOrder(key)(dispatch)
+    getOrder: function (key, hash) {
+      getOrder(key, hash)(dispatch)
     }
   }
 }

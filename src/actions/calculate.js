@@ -74,7 +74,7 @@ export const order = (orderObjects, contactInformation) => {
       .then(res => {
           dispatch(spinnerHide())
           dispatch(calculateHide())
-          dispatch(modalShow('Order', res))
+          dispatch(modalShow('Order', res.message, res.link))
           dispatch({
             type: CALCULATE_ORDER
           })

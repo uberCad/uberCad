@@ -14,7 +14,10 @@ export default class ModalComponent extends Component {
             <Modal.Title>{this.props.title}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {this.props.message && <div>{this.props.message}</div>}
+            {this.props.message && <div>
+              {this.props.message}
+              {this.props.link && <a href={this.props.link}> {this.props.title}</a>}
+            </div>}
 
           </Modal.Body>
           <Modal.Footer>
@@ -40,6 +43,7 @@ export default class ModalComponent extends Component {
     show: PropTypes.bool,
     message: PropTypes.string,
     title: PropTypes.string,
+    link: PropTypes.string,
     modalHide: PropTypes.func
   }
 }

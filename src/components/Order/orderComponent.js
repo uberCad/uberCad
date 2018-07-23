@@ -6,8 +6,8 @@ import PropTypes from 'prop-types'
 
 export default class OrderComponent extends Component {
   componentDidMount () {
-    const {key} = this.props.match.params
-    this.props.getOrder(key)
+    const {key, hash} = this.props.match.params
+    this.props.getOrder(key, hash)
   }
 
   render () {
@@ -117,7 +117,7 @@ export default class OrderComponent extends Component {
                   </i>
                 </div>
                 <span className='form-control input-md'>
-                  {this.props.contactInformation.firstName ? this.props.contactInformation.firstName : 'Not indicated'}
+                  {(this.props.contactInformation && this.props.contactInformation.firstName) ? this.props.contactInformation.firstName : 'Not indicated'}
                   </span>
               </div>
             </div>
@@ -133,7 +133,7 @@ export default class OrderComponent extends Component {
 
                 </div>
                 <span className='form-control input-md'>
-                  {this.props.contactInformation.lastName ? this.props.contactInformation.lastName : 'Not indicated'}
+                  {(this.props.contactInformation && this.props.contactInformation.lastName) ? this.props.contactInformation.lastName : 'Not indicated'}
                   </span>
               </div>
             </div>
@@ -148,7 +148,7 @@ export default class OrderComponent extends Component {
                   <i className='fa fa-institution'/>
                 </div>
                 <span className='form-control input-md'>
-                  {this.props.contactInformation.company ? this.props.contactInformation.company : 'Not indicated'}
+                  {(this.props.contactInformation && this.props.contactInformation.company) ? this.props.contactInformation.company : 'Not indicated'}
                   </span>
               </div>
             </div>
@@ -159,12 +159,12 @@ export default class OrderComponent extends Component {
             <label className='col-md-4 control-label col-xs-12' htmlFor='addressCountry'>Address</label>
             <div className='col-md-2  col-xs-4'>
               <span className='form-control input-md'>
-                  {this.props.contactInformation.addressCountry ? this.props.contactInformation.addressCountry : 'Not indicated'}
+                  {(this.props.contactInformation && this.props.contactInformation.addressCountry) ? this.props.contactInformation.addressCountry : 'Not indicated'}
                   </span>
             </div>
             <div className='col-md-2 col-xs-4'>
               <span className='form-control input-md'>
-                  {this.props.contactInformation.addressCity ? this.props.contactInformation.addressCity : 'Not indicated'}
+                  {(this.props.contactInformation && this.props.contactInformation.addressCity) ? this.props.contactInformation.addressCity : 'Not indicated'}
                   </span>
             </div>
           </div>
@@ -173,7 +173,7 @@ export default class OrderComponent extends Component {
             <label className='col-md-4 control-label' htmlFor='addressStreet'>Street</label>
             <div className='col-md-4  col-xs-4'>
               <span className='form-control input-md'>
-                  {this.props.contactInformation.addressStreet ? this.props.contactInformation.addressStreet : 'Not indicated'}
+                  {(this.props.contactInformation && this.props.contactInformation.addressStreet) ? this.props.contactInformation.addressStreet : 'Not indicated'}
                   </span>
             </div>
           </div>
@@ -182,7 +182,7 @@ export default class OrderComponent extends Component {
             <label className='col-md-4 control-label col-xs-12' htmlFor='zipCode'>Zip Code/Zone</label>
             <div className='col-md-4  col-xs-4'>
               <span className='form-control input-md'>
-                  {this.props.contactInformation.zipCode ? this.props.contactInformation.zipCode : 'Not indicated'}
+                  {(this.props.contactInformation && this.props.contactInformation.zipCode) ? this.props.contactInformation.zipCode : 'Not indicated'}
                   </span>
             </div>
           </div>
@@ -196,7 +196,7 @@ export default class OrderComponent extends Component {
                   <i className='fa fa-phone'/>
                 </div>
                 <span className='form-control input-md'>
-                  {this.props.contactInformation.phoneNumber ? this.props.contactInformation.phoneNumber : 'Not indicated'}
+                  {(this.props.contactInformation && this.props.contactInformation.phoneNumber) ? this.props.contactInformation.phoneNumber : 'Not indicated'}
                   </span>
               </div>
             </div>
@@ -211,7 +211,7 @@ export default class OrderComponent extends Component {
                   <i className='fa fa-envelope-o'/>
                 </div>
                 <span className='form-control input-md'>
-                  {this.props.contactInformation.emailAddress ? this.props.contactInformation.emailAddress : 'Not indicated'}
+                  {(this.props.contactInformation && this.props.contactInformation.emailAddress) ? this.props.contactInformation.emailAddress : 'Not indicated'}
                   </span>
               </div>
             </div>
@@ -221,7 +221,7 @@ export default class OrderComponent extends Component {
             <label className='col-md-4 control-label' htmlFor='comment'>Сomment</label>
             <div className='col-md-4'>
               <span className='form-control comment'>
-                  {this.props.contactInformation.comment ? this.props.contactInformation.comment : 'Not indicated'}
+                  {(this.props.contactInformation && this.props.contactInformation.comment) ? this.props.contactInformation.comment : 'Not indicated'}
                   </span>
             </div>
           </div>

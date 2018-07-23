@@ -4,10 +4,10 @@ import { spinnerShow, spinnerHide } from './spinner'
 
 export const ORDER_GET = 'ORDER_GET'
 
-export const getOrder = (key) => {
+export const getOrder = (key, hash) => {
   return (dispatch) => {
     dispatch(spinnerShow())
-    Api.get(`/api/order/${key}`)
+    Api.get(`/api/order/${key}/${hash}`)
       .then(res => {
           dispatch(spinnerHide())
           dispatch({

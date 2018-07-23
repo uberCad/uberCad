@@ -8,6 +8,7 @@ const mapStateToProps = (state, ownProps) => {
     show: state.modal.show,
     message: state.modal.message,
     title: state.modal.title,
+    link: state.modal.link,
     ...ownProps
   }
 }

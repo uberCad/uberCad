@@ -5,26 +5,78 @@ import { FormattedMessage } from 'react-intl'
 import { connect } from 'react-redux'
 import './OrderForm.css'
 
+/*
+const normalizePhone = (value, previousValue) => {
+  if (!value) {
+    return value
+  }
+  const onlyNums = value.replace(/[^\d]/g, '')
+  if (!previousValue || value.length > previousValue.length) {
+    // typing forward
+    if (onlyNums.length === 4) {
+      return onlyNums + '-'
+    }
+    if (onlyNums.length === 7) {
+      return onlyNums.slice(0, 4) + '-' + onlyNums.slice(4) + '-'
+    }
+  }
+  if (onlyNums.length <= 4) {
+    return onlyNums
+  }
+  if (onlyNums.length <= 7) {
+    return onlyNums.slice(0, 4) + '-' + onlyNums.slice(4)
+  }
+  return onlyNums.slice(0, 4) + '-' + onlyNums.slice(4, 7) + '-' + onlyNums.slice(7, 11)
+}
+*/
+
 const validate = (values) => {
   const errors = {}
   if (!values.firstName) {
     errors.firstName = 'Required'
   }
-  if (values) {
-    // console.log('values', values)
+  if (!values.lastName) {
+    errors.lastName = 'Required'
   }
-
+  if (!values.company) {
+    errors.company = 'Required'
+  }
+  if (!values.addressCountry) {
+    errors.addressCountry = 'Country required'
+  }
+  if (!values.addressCity) {
+    errors.addressCity = 'City required'
+  }
+  if (!values.addressStreet) {
+    errors.addressStreet = 'Street required'
+  }
+  if (!values.zipCode) {
+    errors.zipCode = 'Required'
+  }
+  if (!values.phoneNumber) {
+    errors.phoneNumber = 'Phone number required'
+  }
+  // else if (!/\d{4}-\d{3}-\d{4}/g.test(values.phoneNumber)) {
+  //   errors.phoneNumber = 'Invalid phone Number, 1234-123-4567'
+  // }
+  if (!values.emailAddress) {
+    errors.emailAddress = 'Required'
+  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.emailAddress)) {
+    errors.emailAddress = 'Invalid email address'
+  }
   return errors
 }
 
-const renderField = ({input, label, type, className, minOrderQty, meta: {touched, error}}) => (
+const renderField = ({input, label, type, className, minOrderQty, defaultVal, meta: {touched, error}}) => (
   <div className='form-group'>
     <label className='col-md-4 control-label'>{label}</label>
     <div className='col-md-6'>
       <input {...input}
+             value={input.value || defaultVal}
              type={type}
              placeholder={label}
-             className={className ? className : 'form-control input-md'}/>
+             className={className ? className : 'form-control input-md'}
+      />
 
       {touched && error && <span>{error}</span>}
 
@@ -36,12 +88,37 @@ const renderField = ({input, label, type, className, minOrderQty, meta: {touched
   </div>
 )
 
+const renderContactField = ({input, label, icon, type, className, minOrderQty, defaultVal, meta: {touched, error}}) => (
+  <div className={(touched && error) ? 'form-group has-error' : 'form-group'}>
+    <label className='col-md-4 control-label' htmlFor='firstName'>{label}</label>
+    <div className='col-md-4'>
+      <div className='input-group'>
+        <div className='input-group-addon input-addon'>
+          <i className={icon}>
+          </i>
+        </div>
+        <input {...input}
+               value={input.value || defaultVal}
+               type={type}
+               placeholder={label}
+               className={className ? className : 'form-control input-md'}
+        />
+      </div>
+    </div>
+    <div className='col-md-4 warning'>
+      {touched && error && <span>{error}</span>}
+    </div>
+  </div>
+)
+
 const RenderObjects = ({objects, checkObjects}) => {
   return (
     <ul className='polyamide-list'>
       {objects && objects.map((object, i) => {
         return (
-          <li className={(checkObjects && checkObjects[i] && checkObjects[i].checked) ? 'list-group-flush' : 'list-group-flush disabled'} key={i}>
+          <li
+            className={(checkObjects && checkObjects[i] && checkObjects[i].checked) ? 'list-group-flush' : 'list-group-flush disabled'}
+            key={i}>
             <Field
               name={`objects[${i}].checked`}
               type='checkbox'
@@ -89,52 +166,54 @@ const RenderObjects = ({objects, checkObjects}) => {
 
             {checkObjects && checkObjects[i] && checkObjects[i].checked && (
               <div className='panel panel-default panel-options'>
-              <Field
-                name={`objects[${i}].laserMarking`}
-                type='checkbox'
-                component={renderField}
-                label='Laser marking'
-              />
+                <Field
+                  name={`objects[${i}].laserMarking`}
+                  type='checkbox'
+                  component={renderField}
+                  label='Laser marking'
+                />
 
-              {checkObjects[i] && checkObjects[i].laserMarking && (<div>
-                <div className='form-group'>
-                  <label className='col-md-4 control-label'>Type</label>
-                  <div className='col-md-6'>
-                    <Field name={`objects[${i}].type`} component='select' className='form-control input-md'>
-                      <option/>
-                      <option value='standart'>Standart</option>
-                      <option value='logo'>Logo</option>
-                    </Field>
+                {checkObjects[i] && checkObjects[i].laserMarking && (<div>
+                  <div className='form-group'>
+                    <label className='col-md-4 control-label'>Type</label>
+                    <div className='col-md-6'>
+                      <Field name={`objects[${i}].type`} component='select' className='form-control input-md'>
+                        <option/>
+                        <option value='standart'>Standart</option>
+                        <option value='logo'>Logo</option>
+                      </Field>
+                    </div>
                   </div>
-                </div>
 
-                <div className='form-group'>
-                  <label className='col-md-4 control-label'>Color</label>
-                  <div className='col-md-6'>
-                    <Field name={`objects[${i}].color`} component='select' className='form-control input-md'>
-                      <option/>
-                      <option value='white'>White</option>
-                      <option value='grey'>Grey</option>
-                    </Field>
+                  <div className='form-group'>
+                    <label className='col-md-4 control-label'>Color</label>
+                    <div className='col-md-6'>
+                      <Field name={`objects[${i}].color`} component='select' className='form-control input-md'>
+                        <option/>
+                        <option value='white'>White</option>
+                        <option value='grey'>Grey</option>
+                      </Field>
+                    </div>
                   </div>
-                </div>
+                </div>)}
+
+                <Field
+                  name={`objects[${i}].length`}
+                  type='number'
+                  component={renderField}
+                  label='Length'
+                  defaultVal={6}
+                />
+
+                <Field
+                  name={`objects[${i}].orderQty`}
+                  type='number'
+                  component={renderField}
+                  label='Order quantity'
+                  minOrderQty={object.userData.minOrderQty}
+                  defaultVal={object.userData.minOrderQty}
+                />
               </div>)}
-
-              <Field
-                name={`objects[${i}].length`}
-                type='number'
-                component={renderField}
-                label='Length'
-              />
-
-              <Field
-                name={`objects[${i}].orderQty`}
-                type='number'
-                component={renderField}
-                label='Order quantity'
-                minOrderQty={object.userData.minOrderQty}
-              />
-            </div>)}
           </li>)
       })}
     </ul>
@@ -142,11 +221,11 @@ const RenderObjects = ({objects, checkObjects}) => {
 }
 
 let OrderForm = props => {
-  const {handleSubmit, checkObjects} = props
+  const {checkObjects} = props
   return (
     <div className='row'>
       <div>
-        <form className='form-horizontal form-custom' onSubmit={handleSubmit}>
+        <form className='form-horizontal form-custom' onSubmit={(values) => { console.log(values)}}>
           <div>
             <legend>Objects information</legend>
 
@@ -159,109 +238,75 @@ let OrderForm = props => {
 
           <div>
             <legend>Contact Information</legend>
-            {/*Text input First-Name*/}
-            <div className='form-group'>
-              <label className='col-md-4 control-label' htmlFor='firstName'>First Name</label>
-              <div className='col-md-4'>
-                <div className='input-group'>
-                  <div className='input-group-addon input-addon'>
-                    <i className='fa fa-user'>
-                    </i>
-                  </div>
-
-
-                  <Field name='firstName' component='input' type='text' placeholder='First Name'
-                         className='form-control input-md'/>
-                </div>
-              </div>
-            </div>
-
-            {/*Text input Last Name*/}
-            <div className='form-group'>
-              <label className='col-md-4 control-label' htmlFor='lastName'>Last Name</label>
-              <div className='col-md-4'>
-                <div className='input-group'>
-                  <div className='input-group-addon input-addon'>
-                    <i className='fa fa-male'/>
-
-                  </div>
-                  <Field name='lastName' component='input' type='text' placeholder='Last Name'
-                         className='form-control input-md'/>
-                </div>
-              </div>
-            </div>
-
-            {/*Text input Company*/}
-            <div className='form-group'>
-              <label className='col-md-4 control-label' htmlFor='company'>Company</label>
-              <div className='col-md-4'>
-                <div className='input-group'>
-                  <div className='input-group-addon input-addon'>
-                    <i className='fa fa-institution'/>
-                  </div>
-                  <Field name='company' component='input' type='text' placeholder='Company'
-                         className='form-control input-md'/>
-                </div>
-              </div>
-            </div>
-
-            {/*Text input place*/}
-            <div className='form-group'>
-              <label className='col-md-4 control-label col-xs-12' htmlFor='addressCountry'>Address</label>
-              <div className='col-md-2  col-xs-4'>
-                <Field name='addressCountry' component='input' type='text' placeholder='Country'
-                       className='form-control input-md'/>
-              </div>
-              <div className='col-md-2 col-xs-4'>
-                <Field name='addressCity' component='input' type='text' placeholder='City'
-                       className='form-control input-md'/>
-              </div>
-            </div>
-
-            <div className='form-group'>
-              <label className='col-md-4 control-label' htmlFor='addressStreet'>Street</label>
-              <div className='col-md-4  col-xs-4'>
-                <Field name='addressStreet' component='input' type='text' placeholder='Street'
-                       className='form-control input-md'/>
-              </div>
-            </div>
-
-            <div className='form-group'>
-              <label className='col-md-4 control-label col-xs-12' htmlFor='zipCode'>Zip Code/Zone</label>
-              <div className='col-md-4  col-xs-4'>
-                <Field name='zipCode' component='input' type='text' placeholder='Zip Code/Zone'
-                       className='form-control input-md'/>
-              </div>
-            </div>
-
-            {/*Text input Phone number*/}
-            <div className='form-group'>
-              <label className='col-md-4 control-label' htmlFor='phoneNumber '>Phone number </label>
-              <div className='col-md-4'>
-                <div className='input-group'>
-                  <div className='input-group-addon input-addon'>
-                    <i className='fa fa-phone'/>
-                  </div>
-                  <Field name='phoneNumber' component='input' type='number' placeholder='Phone number'
-                         className='form-control input-md'/>
-                </div>
-              </div>
-            </div>
-
-            {/*Text input Email Address*/}
-            <div className='form-group'>
-              <label className='col-md-4 control-label' htmlFor='emailAddress'>Email Address</label>
-              <div className='col-md-4'>
-                <div className='input-group'>
-                  <div className='input-group-addon input-addon'>
-                    <i className='fa fa-envelope-o'/>
-                  </div>
-                  <Field name='emailAddress' component='input' type='email' placeholder='Email address'
-                         className='form-control input-md'/>
-                </div>
-              </div>
-            </div>
-
+            <Field
+              name='firstName'
+              type='text'
+              component={renderContactField}
+              label='First Name'
+              icon='fa fa-user'
+              defaultVal=''
+            />
+            <Field
+              name='lastName'
+              type='text'
+              component={renderContactField}
+              label='Last Name'
+              icon='fa fa-male'
+              defaultVal=''
+            />
+            <Field
+              name='company'
+              type='text'
+              component={renderContactField}
+              label='Company'
+              icon='fa fa-institution'
+              defaultVal=''
+            />
+            <Field
+              name='addressCountry'
+              type='text'
+              component={renderContactField}
+              label='Country'
+              defaultVal=''
+            />
+            <Field
+              name='addressCity'
+              type='text'
+              component={renderContactField}
+              label='City'
+              defaultVal=''
+            />
+            <Field
+              name='addressStreet'
+              type='text'
+              component={renderContactField}
+              label='Street'
+              defaultVal=''
+            />
+            <Field
+              name='zipCode'
+              type='text'
+              component={renderContactField}
+              label='Zip Code/Zone'
+              defaultVal=''
+            />
+            <Field
+              name='phoneNumber'
+              type='text'
+              component={renderContactField}
+              label='Phone number'
+              icon='fa fa-phone'
+              defaultVal=''
+              // normalize={normalizePhone}
+            />
+            <Field
+              name='emailAddress'
+              type='email'
+              component={renderContactField}
+              label='Email address'
+              icon='fa fa-envelope-o'
+              defaultVal=''
+            />
             <div className='form-group'>
               <label className='col-md-4 control-label' htmlFor='comment'>Сomment</label>
               <div className='col-md-4'>

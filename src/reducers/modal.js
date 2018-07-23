@@ -5,7 +5,8 @@ import { MODAL_HIDE, MODAL_SHOW } from '../actions/modal'
 let initialState = {
   show: false,
   message: '',
-  title: ''
+  title: '',
+  link: ''
 }
 
 const modal = (state = initialState, action) => {
@@ -15,7 +16,8 @@ const modal = (state = initialState, action) => {
         ...state,
         show: action.payload.show,
         message: action.payload.message,
-        title: action.payload.title
+        title: action.payload.title,
+        link: action.payload.link
       }
 
     case MODAL_SHOW:
@@ -23,7 +25,8 @@ const modal = (state = initialState, action) => {
         ...state,
         show: action.payload.show,
         message: action.payload.message,
-        title: action.payload.title
+        title: action.payload.title,
+        link: action.payload.link
       }
 
     default:
