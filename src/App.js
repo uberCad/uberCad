@@ -6,6 +6,7 @@ import Spinner from './components/Spinner/spinnerComponentContainer'
 
 import Projects from './components/Projects/projectsComponentContainer'
 import Project from './components/Project/projectComponentContainer'
+import Order from './components/Order/orderComponentContainer'
 import Cad from './components/Cad/cadComponentContainer'
 import UserLogin from './components/UserLogin/userLoginComponentContainer'
 import SignUp from './components/SignUp/signUpComponentContainer'
@@ -30,6 +31,7 @@ class App extends Component {
               <Switch>
                 <Route path='/' exact component={Projects} />
                 <Route path='/project/:id' component={Project} />
+                <Route path='/order/:key' component={Order} />
                 <Route path='/cad/:projectId/:snapshotId?' component={Cad} />
                 <Route path='/login/:sid?/:userName?' component={UserLogin} />
                 <Route path='/sign-up' component={SignUp} />

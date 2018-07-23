@@ -13,6 +13,7 @@ import materials from './materials'
 import price from './price'
 import locale from './locale'
 import modal from './modal'
+import order from './order'
 
 export default {
   counter,
@@ -29,5 +30,6 @@ export default {
   materials,
   price,
   locale,
-  modal
+  modal,
+  order
 }
