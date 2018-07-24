@@ -55,6 +55,8 @@ export const EDIT_MOVE_OBJECT_CANCEL = 'EDIT_MOVE_OBJECT_CANCEL'
 export const EDIT_MOVE_OBJECT_POINT = 'EDIT_MOVE_OBJECT_POINT'
 export const EDIT_MOVE_DISABLE_POINT = 'EDIT_MOVE_DISABLE_POINT'
 
+export const EDIT_UNGROUP = 'EDIT_UNGROUP'
+
 export const isEdit = (option, editor, object = {}) => {
   let activeLine = {}
   let {scene, camera, renderer} = editor
@@ -710,4 +712,32 @@ export const moveObject = (event, editor) => {
   return dispatch => {
     crossing ? movePointInfo(event, 'Crossing point')(dispatch) : movePointInfo(event, 'Select paste point')(dispatch)
   }
+}
+
+export const ungroup = (editor, object) => {
+  let {scene, camera, renderer} = editor
+  let layers = scene.getObjectByName('Layers')
+  let parent
+  layers.children.forEach(item => {
+    if (item.name === object.name) {
+      parent = item
+    }
+  })
+  if (!parent) {
+    layers.add(object)
+  } else {
+    while (object.children.length) {
+      const line = object.children.pop()
+      parent.add(line)
+    }
+    object.parent.remove(object)
+  }
+  setOriginalColor(scene)
+  renderer.render(scene, camera)
+  return dispatch => dispatch({
+    type: EDIT_UNGROUP,
+    payload: {
+      scene
+    }
+  })
 }

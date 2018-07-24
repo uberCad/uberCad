@@ -107,6 +107,10 @@
         background: url("edit.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
+      &.btn-ungroup {
+        background: url("ungroup.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
     }
   }
 }
