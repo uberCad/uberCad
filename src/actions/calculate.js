@@ -2,6 +2,7 @@ import Api from '../services/apiService'
 import GeometryUtils from '../services/GeometryUtils'
 
 import { spinnerShow, spinnerHide } from './spinner'
+import { modalShow } from './modal'
 
 export const CALCULATE = 'CALCULATE'
 export const CALCULATE_HIDE = 'CALCULATE_HIDE'
@@ -72,7 +73,8 @@ export const order = (orderObjects, contactInformation) => {
     Api.post('/api/order', {data: {order, orderObjects, contactInformation}})
       .then(res => {
           dispatch(spinnerHide())
-          console.log('order res = ', res)
+          dispatch(calculateHide())
+          dispatch(modalShow('Order', res.message, res.link))
           dispatch({
             type: CALCULATE_ORDER
           })

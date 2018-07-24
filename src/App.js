@@ -6,6 +6,7 @@ import Spinner from './components/Spinner/spinnerComponentContainer'
 
 import Projects from './components/Projects/projectsComponentContainer'
 import Project from './components/Project/projectComponentContainer'
+import Order from './components/Order/orderComponentContainer'
 import Cad from './components/Cad/cadComponentContainer'
 import UserLogin from './components/UserLogin/userLoginComponentContainer'
 import SignUp from './components/SignUp/signUpComponentContainer'
@@ -15,6 +16,7 @@ import PropTypes from 'prop-types'
 import messages from './messages'
 import { flattenMessages } from './services/intlUtil'
 import history from './config/history'
+import Modal from './components/Modal/modalComponentContainer'
 
 class App extends Component {
   render () {
@@ -29,6 +31,7 @@ class App extends Component {
               <Switch>
                 <Route path='/' exact component={Projects} />
                 <Route path='/project/:id' component={Project} />
+                <Route path='/order/:key/:hash' component={Order} />
                 <Route path='/cad/:projectId/:snapshotId?' component={Cad} />
                 <Route path='/login/:sid?/:userName?' component={UserLogin} />
                 <Route path='/sign-up' component={SignUp} />
@@ -42,6 +45,7 @@ class App extends Component {
               </Switch>
             </div>
             <Spinner />
+            <Modal />
           </div>
         </Router>
       </IntlProvider>

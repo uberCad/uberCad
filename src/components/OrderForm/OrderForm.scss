@@ -1,7 +1,6 @@
 @import "../../variables.scss";
 
 .form-custom {
-
   legend {
     padding: 0 15px;
     font-size: 21px;
@@ -34,5 +33,11 @@
 
   .disabled {
     background-color: rgba(0,0,0,0.1);
+  }
+
+  .warning{
+    color: red;
+    height: 34px;
+    line-height: 34px;
   }
 }
