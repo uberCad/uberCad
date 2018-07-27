@@ -109,8 +109,6 @@ export default class PanelObjectsComponent extends Component {
   }
 
   render () {
-    console.debug('render:', this)
-
     const {scene} = this.props.editor
     let objects
     if (scene) {

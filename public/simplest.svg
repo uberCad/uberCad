@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25.0000cm" height="7.1053cm" viewBox="-0.2646 -0.1713 0.2850 0.0810">
+    <desc>
+        <schema desc="BuildingSVG" version="1.1"></schema>
+        <constr id="Dummy" scale="1"></constr>
+    </desc>
+    <g id="group_d">
+        <path d="M-0.1976,-0.0903 L-0.2646,-0.0903 -0.2646,-0.1713 -0.1976,-0.1713 -0.1976,-0.0903  " style="fill:rgb(200,240,200);stroke:black;stroke-width:0.00001mm">
+            <area value="0.005432" />
+        </path>
+        <path d="M-0.1976,-0.1473 L-0.1976,-0.1713 0.0204,-0.1713 0.0204,-0.1473 -0.1976,-0.1473  " style="fill:rgb(200,240,200);stroke:black;stroke-width:0.00001mm">
+            <area value="0.005232" />
+        </path>
+    </g>
+    <g id="temperature">
+        <bcprop id="External" x="-0.2646" y="-0.1713" temp="273.15" rs="0.04" rel_img="SvgjsImage1089" rel_id="0" rel="min"></bcprop>
+        <bcprop id="External" x="-0.1976" y="-0.1713" temp="273.15" rs="0.04" rel_img="SvgjsImage1090" rel_id="1" rel="max"></bcprop>
+        <bcprop id="Interior" x="-0.2646" y="-0.0903" temp="293.15" rs="0.13" rel_img="SvgjsImage1091" rel_id="2" rel="min"></bcprop>
+        <bcprop id="Interior" x="-0.1976" y="-0.0903" temp="293.15" rs="0.13" rel_img="SvgjsImage1092" rel_id="3" rel="max"></bcprop>
+    </g>
+
+</svg>

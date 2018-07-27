@@ -1,5 +1,6 @@
 import Api from '../services/apiService'
 import GeometryUtils from '../services/GeometryUtils'
+import sceneService from '../services/sceneService'
 
 import { spinnerShow, spinnerHide } from './spinner'
 import { modalShow } from './modal'
@@ -9,6 +10,8 @@ export const CALCULATE_HIDE = 'CALCULATE_HIDE'
 export const CALCULATE_ORDER = 'CALCULATE_ORDER'
 
 export const calculate = (scene) => {
+  // const objects = sceneService.getObjects(scene, true)
+  // const info = []
   const objects = scene.children[1].children
   const infoPrice = []
   const polyamideObjects = []

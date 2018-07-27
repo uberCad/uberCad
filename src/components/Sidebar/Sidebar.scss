@@ -41,8 +41,8 @@
     position: relative;
     margin: 0;
     border: none;
-    max-height: 33.33%;
-    overflow: hidden;
+    //max-height: 33%;
+    //overflow: hidden;
 
     &:last-child .tabs{
       border: none;
@@ -52,8 +52,8 @@
       list-style: none;
       margin: 0;
       background-color: #ebeff2;
-      height: 25px;
-      line-height: 25px;
+      height: $sidebar-header-size;
+      line-height: $sidebar-header-size;
       padding: 0 0 0 10px;
       border-bottom: 1px solid rgba(0,0,0,0.03);
 
@@ -81,8 +81,8 @@
     }
 
     .panel-content {
-      max-height: calc(30vh - 25px);
-      height: calc(30vh - 25px);
+      max-height: calc((100vh - #{$header-height}) / 3 - #{$sidebar-header-size});
+      height: calc((100vh - #{$header-height}) / 3 - #{$sidebar-header-size});
       overflow: auto;
     }
 

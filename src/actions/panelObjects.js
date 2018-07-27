@@ -41,7 +41,13 @@ export const toggleVisible = (layer, visible, editor) => {
 
 export const combineEdgeModels = editor => {
   return dispatch => {
-    sceneService.combineEdgeModels(editor)
+    let {svg} = sceneService.combineEdgeModels(editor, true)
+    try {
+      sceneService.sendToFlixo(svg)
+    } catch (e) {
+      console.error(e)
+    }
+
 
     dispatch({
       type: CAD_COMBINE_EDGE_MODELS,
