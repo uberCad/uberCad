@@ -567,18 +567,12 @@ export default class DxfService {
       }
 
       if (entity.rotation) {
-        group.rotation.z = entity.rotation * Math.PI / 180
-
-        if (returnArray) {
+        if (!returnArray) {
+          group.rotation.z = entity.rotation * Math.PI / 180
+        } else {
           // find center
-
-          // entity.rotation += -90
-
-          console.log('find center ', entity, entity.position)
-
           // debugger
           // TODO implement entities rotation here
-
           group.children.forEach(children => {
             if (children.geometry instanceof THREE.CircleGeometry) {
               let newPosition = GeometryUtils.rotatePoint(entity.position, entity.rotation * Math.PI / 180, children.position)
