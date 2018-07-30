@@ -182,7 +182,7 @@ export default class PanelObjectsComponent extends Component {
 
           {this.props.activeObject &&
           (!this.props.editor.isEdit &&
-            <button onClick={this.ungroup} data-id={this.props.activeObject.id} className='btn-ungroup' />)
+            <button onClick={this.ungroup} data-id={this.props.activeObject.id} className='btn-ungroup'/>)
           }
 
         </div>

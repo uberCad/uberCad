@@ -713,9 +713,9 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
         ((!svgForFlixo && `<circle cx="${(object.userData.edgeModel.svgData.insidePoint.x / 1000).toFixed(4)}" cy="${(object.userData.edgeModel.svgData.insidePoint.y / 1000).toFixed(4)}" r="0.0005" style="fill:rgb(150,255,150); stroke:black;stroke-width:0.00001" />`) || '') +
         object.userData.edgeModel.svgData.subRegionsPathD.map((pathD, idx) => {
           return `<path d="${pathD} " style="fill:rgb(200,200,240);opacity:0.5; stroke:black;stroke-width:0.00001mm">\n` +
-                           `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"/>\n` +
-                           `<area value="${(object.userData.edgeModel.regions[idx + 1].area / 1000000)}" />\n` +
-                         `</path>`
+            `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"/>\n` +
+            `<area value="${(object.userData.edgeModel.regions[idx + 1].area / 1000000)}" />\n` +
+            `</path>`
         }).join('')
     }).join('') +
     // cavities here
@@ -726,21 +726,15 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
       let vertexList = []
       let last = path[path.length - 1]
       let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(last.y / 1000).toFixed(4)}`
-
       let pathD = `M${lastVertex} L`
-    let vertexList = []
 
-    let last = path[path.length - 1]
-    let lastVertex = `${(last.x / 1000).toFixed(4)},${(last.y / 1000).toFixed(4)}`
-    let pathD = `M${lastVertex} L`
-
-    path.forEach(v => {
-      let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`
-      if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-        pathD += `${vertex} `
-        lastVertex = vertex
-        vertexList.push(vertex)
-      }
+      path.forEach(v => {
+        let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`
+        if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+          pathD += `${vertex} `
+          lastVertex = vertex
+          vertexList.push(vertex)
+        }
 
         // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
       })
@@ -755,22 +749,16 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
     <bcprop id="External" x="${(thermalPoints.cold2.x / 1000).toFixed(4)}" y="${(thermalPoints.cold2.y / 1000).toFixed(4)}" temp="273.15" rs="0.04" rel_img="SvgjsImage1090" rel_id="1" rel="max"></bcprop>
     <bcprop id="Interior" x="${(thermalPoints.hot1.x / 1000).toFixed(4)}" y="${(thermalPoints.hot1.y / 1000).toFixed(4)}" temp="293.15" rs="0.13" rel_img="SvgjsImage1091" rel_id="2" rel="min"></bcprop>
     <bcprop id="Interior" x="${(thermalPoints.hot2.x / 1000).toFixed(4)}" y="${(thermalPoints.hot2.y / 1000).toFixed(4)}" temp="293.15" rs="0.13" rel_img="SvgjsImage1092" rel_id="3" rel="max"></bcprop>
-      // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
-    })
-    return `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" />`
-  }).join('')
-}
-  </g>
   </g>
   ${(!svgForFlixo && `<g id="collisions">` +
-      collisionPoints.map(collisionPoint => {
-        let dot = ''
-        for (let i = 0; i <= collisionPoint.id; i++) {
-          // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
-        }
-        return `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(collisionPoint.point.y / 1000).toFixed(4)}" r="${collisionPoint.processed ? '0.0005' : '0.0005'}" style="fill:rgb(${collisionPoint.processed ? '255,200,200' : '200,200,255'}); stroke:black;stroke-width:0.00001" />` + dot
-      }).join('') +
-      `</g>`) || ''}
+    collisionPoints.map(collisionPoint => {
+      let dot = ''
+      for (let i = 0; i <= collisionPoint.id; i++) {
+        // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
+      }
+      return `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(collisionPoint.point.y / 1000).toFixed(4)}" r="${collisionPoint.processed ? '0.0005' : '0.0005'}" style="fill:rgb(${collisionPoint.processed ? '255,200,200' : '200,200,255'}); stroke:black;stroke-width:0.00001" />` + dot
+    }).join('') +
+    `</g>`) || ''}
   </svg>`
 
   console.log(svg)
