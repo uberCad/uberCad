@@ -6,7 +6,15 @@ import {
   setThreshold
 } from '../../actions/options'
 
-import { cancelEdit, cancelNewCurve, cancelNewLine, saveEdit, saveNewCurve, saveNewLine } from '../../actions/edit'
+import {
+  cancelEdit,
+  cancelNewCurve,
+  cancelNewLine,
+  rotationAngle,
+  saveEdit,
+  saveNewCurve,
+  saveNewLine
+} from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -22,6 +30,7 @@ const mapStateToProps = (state, ownProps) => {
     selectMode: state.options.selectMode,
     singleLayerSelect: state.options.singleLayerSelect,
     threshold: state.options.threshold,
+    rotationObject: state.cad.editMode.rotation.rotationObject,
     ...ownProps
   }
 }
@@ -56,6 +65,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     saveNewCurve: function (editor) {
       saveNewCurve(editor)(dispatch)
+    },
+    rotationAngle: function (angle, rotationObject, editor) {
+      rotationAngle(angle, rotationObject, editor)(dispatch)
     }
   }
 }

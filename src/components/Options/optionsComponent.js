@@ -47,6 +47,10 @@ export default class OptionsComponent extends Component {
     this.props.saveNewCurve(this.props.editor)
   }
 
+  rotationAngle = (event) => {
+    this.props.rotationAngle(event.target.value, this.props.rotationObject, this.props.editor)
+  }
+
   render () {
     const {
       tool,
@@ -164,6 +168,18 @@ export default class OptionsComponent extends Component {
         {editMode.isEdit && (
           <ul className='edit-group'>
             <label>Edit Object: </label>
+
+            <div className='tool-info'>
+              {editMode.rotation.active && <div>
+                <span>Rotation angle: </span>
+                <input value={editMode.rotation.angle}
+                       onChange={this.rotationAngle}
+                       type='number'
+                       min='0' max='360'/>
+              </div>
+              }
+            </div>
+
             <button className='save' onClick={this.saveEdit}>Save</button>
             <button className='cancel' onClick={this.cancelEdit}>Cancel</button>
             {/* <li> */}

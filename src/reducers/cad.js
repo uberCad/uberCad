@@ -45,7 +45,10 @@ import {
   EDIT_MOVE_OBJECT_CANCEL,
   EDIT_MOVE_OBJECT_POINT,
   EDIT_MOVE_DISABLE_POINT,
-  EDIT_UNGROUP
+  EDIT_UNGROUP,
+  EDIT_ROTATION_AVTIVE,
+  EDIT_ROTATION_ANGLE,
+  EDIT_ROTATION_SAVE
 } from '../actions/edit'
 
 import {
@@ -85,6 +88,11 @@ let initialState = {
       active: false,
       point: null,
       moveObject: null
+    },
+    rotation: {
+      active: false,
+      rotationObject: null,
+      angle: 0
     }
   },
   pointInfo: {
@@ -105,6 +113,35 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+
+    case EDIT_ROTATION_AVTIVE:
+      return update(state, {
+        editMode: {
+          rotation: {
+            active: {$set: action.payload.active},
+            rotationObject: {$set: action.payload.rotationObject}
+          }
+        }
+      })
+
+    case EDIT_ROTATION_ANGLE:
+      return update(state, {
+        editMode: {
+          rotation: {
+            angle: {$set: action.payload.angle}
+          }
+        }
+      })
+    case EDIT_ROTATION_SAVE:
+      return update(state, {
+        editMode: {
+          rotation: {
+            active: {$set: action.payload.active},
+            angle: {$set: action.payload.angle}
+          }
+        }
+      })
+
     case EDIT_UNGROUP:
       return {
         ...state,
