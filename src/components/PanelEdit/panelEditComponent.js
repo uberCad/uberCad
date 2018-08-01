@@ -40,10 +40,19 @@ export default class PanelEditComponent extends Component {
     this.props.mirror(this.props.editMode.editObject, this.props.editor, 'OY')
   }
 
+  rotation = () => {
+    this.props.rotationActive(this.props.editMode.rotation.active, this.props.editMode.editObject)
+  }
+
+  rotationSave = () => {
+    this.props.rotationSave()
+  }
+
   render () {
     const {activeLine, isNewLine, isNewCurve} = this.props.editMode
     const clone = this.props.editMode.clone.active
     const move = this.props.editMode.move.active
+    const rotation = this.props.editMode.rotation.active
     const editObject = this.props.editMode.editObject
     return (
       <div id='panel-edit'>
@@ -77,6 +86,8 @@ export default class PanelEditComponent extends Component {
             : <button onClick={() => { this.props.cancelMove() }} className='move active' title='Cancel move object'/>}
           <button onClick={this.mirrorOx} className='mirror-h' title='Mirroring OX'/>
           <button onClick={this.mirrorOy} className='mirror-v' title='Mirroring OY'/>
+          {!rotation ? <button onClick={this.rotation} className='rotation' title='Rotation'/>
+          : <button onClick={this.rotationSave} className='rotation active' title='Save rotation'/>}
         </div>}
       </div>
     )
