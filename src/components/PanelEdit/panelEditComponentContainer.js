@@ -10,7 +10,9 @@ import {
   cancelClone,
   mirror,
   moveActive,
-  cancelMove
+  cancelMove,
+  rotationActive,
+  rotationSave
 } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
@@ -56,6 +58,12 @@ const mapDispatchToProps = (dispatch) => {
     },
     cancelMove: function () {
       cancelMove()(dispatch)
+    },
+    rotationActive: function (active, rotationObject) {
+      rotationActive(active, rotationObject)(dispatch)
+    },
+    rotationSave: function (rotationObject, editor) {
+      rotationSave(rotationObject, editor)(dispatch)
     }
   }
 }

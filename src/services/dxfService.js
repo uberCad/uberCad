@@ -239,15 +239,16 @@ export default class DxfService {
       } else if (entity.type === 'POINT') {
         mesh = drawPoint(entity, data)
       } else if (entity.type === 'INSERT') {
-        mesh = drawBlock(entity, data)
+        // mesh = drawBlock(entity, data)
+        mesh = drawBlock(entity, data, true)
       } else if (entity.type === 'SPLINE') {
         mesh = drawSpline(entity, data)
-      } else if (entity.type === 'MTEXT') {
-        mesh = drawMtext(entity, data)
+      // } else if (entity.type === 'MTEXT') {
+        // mesh = drawMtext(entity, data)
       } else if (entity.type === 'ELLIPSE') {
         mesh = drawEllipse(entity, data)
       } else {
-        console.log('Unsupported Entity Type: ' + entity.type)
+        console.error('Unsupported Entity Type: ' + entity.type, entity)
       }
       return mesh
     }
@@ -396,13 +397,13 @@ export default class DxfService {
           let p1 = new THREE.Vector3(startPoint.x, startPoint.y, 0)
           let p2 = new THREE.Vector3(endPoint.x, endPoint.y, 0)
           let arc = GeometryUtils.bugleToArc(p1, p2, startPoint.bulge)
-
           let subEntity = Object.assign({}, entity)
           subEntity = Object.assign(subEntity, arc)
           entities.push(drawCircle(Object.assign(subEntity, {
             shape: false,
             type: 'ARC'
           }), data))
+
         } else {
           // unfortunately babel not correctly works with spread operator
           // entities.push(drawLine({...entity, vertices: [startPoint, endPoint]}, data));
@@ -568,7 +569,7 @@ export default class DxfService {
       scene.add(point)
     }
 
-    function drawBlock (entity, data) {
+    function drawBlock (entity, data, returnArray = false) {
       let block = data.blocks[entity.name]
 
       if (!block.entities) return null
@@ -578,16 +579,6 @@ export default class DxfService {
       if (entity.xScale) group.scale.x = entity.xScale
       if (entity.yScale) group.scale.y = entity.yScale
 
-      if (entity.rotation) {
-        group.rotation.z = entity.rotation * Math.PI / 180
-      }
-
-      if (entity.position) {
-        group.position.x = entity.position.x
-        group.position.y = entity.position.y
-        group.position.z = entity.position.z
-      }
-
       for (let i = 0; i < block.entities.length; i++) {
         let childEntity = drawEntity(block.entities[i], data, group)
         if (childEntity) {
@@ -595,68 +586,56 @@ export default class DxfService {
         }
       }
 
-      return group
+      if (entity.rotation) {
+        if (!returnArray) {
+          group.rotation.z = entity.rotation * Math.PI / 180
+        } else {
+          // find center
+          // debugger
+          // TODO implement entities rotation here
+          group.children.forEach(children => {
+            if (children.geometry instanceof THREE.CircleGeometry) {
+              let newPosition = GeometryUtils.rotatePoint(entity.position, entity.rotation * Math.PI / 180, children.position)
+              children.position.x = newPosition.x
+              children.position.y = newPosition.y
+              children.geometry.parameters.thetaStart += entity.rotation * Math.PI / 180
+              children.geometry = GeometryUtils.changeArcGeometry(children.geometry, children.geometry.parameters)
+            } else {
+              // console.log('line', children, children.geometry, children.geometry.vertices)
+              children.geometry.vertices = children.geometry.vertices.map(vertex => GeometryUtils.rotatePoint(entity.position, entity.rotation * Math.PI / 180, vertex))
+            }
+          })
+        }
+      }
 
-      // function drawBlock(entity, data, returnArray = false) {
-      //   let block = data.blocks[entity.name];
-      //
-      //   // console.log('drawBlock', entity, data, block);
-      //   let group = new THREE.Object3D()
-      //
-      //   if(entity.xScale) group.scale.x = entity.xScale;
-      //   if(entity.yScale) group.scale.y = entity.yScale;
-      //
-      //   for(let i = 0; i < block.entities.length; i++) {
-      //     let childEntity = drawEntity(block.entities[i], data, group);
-      //     if(childEntity) group.add(childEntity);
-      //   }
-      //
-      //   if(entity.rotation) {
-      //     group.rotation.z = entity.rotation * Math.PI / 180;
-      //
-      //     if (returnArray) {
-      //       //TODO implement entities rotation here
-      //
-      //       // group.children.forEach(children => {
-      //       //     if (children.geometry instanceof THREE.CircleGeometry) {
-      //       //         console.log('ch pos', children.position);
-      //       //     }
-      //       // })
-      //     }
-      //   }
-      //
-      //   if(entity.position) {
-      //     // console.log('POSITION', entity.position)
-      //     group.position.x = entity.position.x;
-      //     group.position.y = entity.position.y;
-      //     group.position.z = entity.position.z;
-      //
-      //     if (returnArray) {
-      //       group.children.forEach(children => {
-      //         if (children.geometry instanceof THREE.CircleGeometry) {
-      //           children.position.x += group.position.x;
-      //           children.position.y += group.position.y;
-      //           children.position.z += group.position.z;
-      //         } else {
-      //           children.geometry.vertices.forEach(v => {
-      //             v.x += group.position.x;
-      //             v.y += group.position.y;
-      //             v.z += group.position.z;
-      //           })
-      //         }
-      //
-      //
-      //       })
-      //     }
-      //
-      //   }
-      //
-      //   if (returnArray) {
-      //     return group.children;
-      //   }
-      //
-      //   return group;
-      // }
+      if (entity.position) {
+        // console.log('POSITION', entity.position)
+        group.position.x = entity.position.x
+        group.position.y = entity.position.y
+        group.position.z = entity.position.z
+
+        if (returnArray) {
+          group.children.forEach(children => {
+            if (children.geometry instanceof THREE.CircleGeometry) {
+              children.position.x += group.position.x
+              children.position.y += group.position.y
+              children.position.z += group.position.z
+            } else {
+              children.geometry.vertices.forEach(v => {
+                v.x += group.position.x
+                v.y += group.position.y
+                v.z += group.position.z
+              })
+            }
+          })
+        }
+      }
+
+      if (returnArray) {
+        return group.children
+      }
+
+      return group
     }
 
     function getColor (entity, data) {

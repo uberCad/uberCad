@@ -497,7 +497,11 @@ let crossingPoint = (pointMouse, activeEntities, entrainment = 0.05) => {
 }
 
 let createLine = (point0, point1) => {
-  if (point0.x && point0.y && point1.x && point1.y) {
+  if ((point0.x || point0.x === 0)
+    && (point0.y || point0.y === 0)
+    && (point1.x || point1.x === 0)
+    && (point1.y || point1.y === 0)
+  ) {
     let geometryLine = new THREE.Geometry()
     geometryLine.vertices.push(new THREE.Vector3(point0.x, point0.y, 0))
     geometryLine.vertices.push(new THREE.Vector3(point1.x, point1.y, 0))
@@ -560,7 +564,7 @@ let clone = (obj, name) => {
 
 let fixPosition = (object) => {
   object.children.forEach(line => {
-    if (line.geometry.type === 'Geometry') {
+    if (line.geometry instanceof THREE.Geometry) {
       line.geometry.vertices.forEach(vertex => {
         vertex.x = vertex.x + object.position.x
         vertex.y = vertex.y + object.position.y
@@ -569,7 +573,7 @@ let fixPosition = (object) => {
       line.geometry.verticesNeedUpdate = true
       line.computeLineDistances()
       line.geometry.computeBoundingSphere()
-    } else if (line.geometry.type === 'CircleGeometry') {
+    } else if (line.geometry instanceof THREE.CircleGeometry) {
       line.position.set(
         line.position.x + object.position.x,
         line.position.y + object.position.y,
@@ -616,6 +620,14 @@ let mirrorObject = (object, option) => {
   return object
 }
 
+let rotationPoint = (vertex, center, angle) => {
+  const r = Math.sqrt((vertex.x - center.x) * (vertex.x - center.x) + (vertex.y - center.y) * (vertex.y - center.y))
+  const alpha = circleIntersectionAngle(vertex, center) + angle
+  vertex.x = r * Math.cos(alpha) + center.x
+  vertex.y = r * Math.sin(alpha) + center.y
+  return vertex
+}
+
 export {
   setColor,
   setOriginalColor,
@@ -632,5 +644,7 @@ export {
   editThetaLenght,
   clone,
   fixPosition,
-  mirrorObject
+  mirrorObject,
+  rotationPoint,
+  changeArcGeometry
 }

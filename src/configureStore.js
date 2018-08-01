@@ -8,13 +8,18 @@ import { reducer as formReduser } from 'redux-form'
 const rootPersistConfig = {
   key: 'root',
   storage: storage,
-  blacklist: ['cad', 'options', 'selection', 'price']
+  blacklist: ['cad', 'options', 'selection', 'price', 'sidebar']
 }
 
 const cadPersistConfig = {
   key: 'cad',
   storage: storage,
-  blacklist: ['scene', 'camera', 'renderer', 'cadCanvas', 'activeEntities', 'pointInfo']
+  blacklist: ['scene', 'camera', 'renderer', 'cadCanvas', 'activeEntities', 'pointInfo', 'editMode']
+}
+const sidebarPersistConfig = {
+  key: 'sidebar',
+  storage: storage,
+  blacklist: ['activeObject']
 }
 
 // https://github.com/reactjs/redux/issues/749
@@ -22,7 +27,8 @@ const cadPersistConfig = {
 const persistedReducer = persistReducer(rootPersistConfig, combineReducers({
   ...reducers,
   form: formReduser,
-  cad: persistReducer(cadPersistConfig, reducers.cad)
+  cad: persistReducer(cadPersistConfig, reducers.cad),
+  sidebar: persistReducer(sidebarPersistConfig, reducers.sidebar),
 }))
 
 export default () => {

@@ -16,14 +16,6 @@ export default class AddProjectComponent extends Component {
     }
   }
 
-  getValidationState () {
-    const length = this.state.title.length
-    if (length > 10) return 'success'
-    else if (length > 5) return 'warning'
-    else if (length > 0) return 'error'
-    return null
-  }
-
   handleClose = () => {
     this.setState({show: false})
   }
@@ -92,7 +84,6 @@ export default class AddProjectComponent extends Component {
             }}>
               <FormGroup
                 controlId='formControlsText'
-                // validationState={this.getValidationState()}
               >
                 <FormattedMessage id='addProject.modal.inputLabel' defaultMessage='Project title'>
                   {value =>

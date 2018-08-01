@@ -14,11 +14,13 @@ import {
   fixPosition,
   mirrorObject,
   getScale,
-  addHelpPoints
+  addHelpPoints,
+  rotationPoint,
+  changeArcGeometry
 } from '../services/editObject'
 import sceneService from '../services/sceneService'
-import GeometryUtils from '../services/GeometryUtils'
 import { activePoint, disablePoint, movePointInfo } from './pointInfo'
+import GeometryUtils from '../services/GeometryUtils'
 
 export const EDIT_IS_EDIT = 'EDIT_IS_EDIT'
 export const EDIT_CANCEL = 'EDIT_CANCEL'
@@ -56,6 +58,10 @@ export const EDIT_MOVE_OBJECT_POINT = 'EDIT_MOVE_OBJECT_POINT'
 export const EDIT_MOVE_DISABLE_POINT = 'EDIT_MOVE_DISABLE_POINT'
 
 export const EDIT_UNGROUP = 'EDIT_UNGROUP'
+
+export const EDIT_ROTATION_AVTIVE = 'EDIT_ROTATION_AVTIVE'
+export const EDIT_ROTATION_ANGLE = 'EDIT_ROTATION_ANGLE'
+export const EDIT_ROTATION_SAVE = 'EDIT_ROTATION_SAVE'
 
 export const isEdit = (option, editor, object = {}) => {
   let activeLine = {}
@@ -122,6 +128,11 @@ export const cancelEdit = (editor, editObject, backUp) => {
             active: false,
             point: null,
             moveObject: null
+          },
+          rotation: {
+            active: false,
+            rotationObject: null,
+            angle: 0
           }
         }
       }
@@ -153,6 +164,11 @@ export const saveEdit = (editor) => {
             active: false,
             point: null,
             moveObject: null
+          },
+          rotation: {
+            active: false,
+            rotationObject: null,
+            angle: 0
           }
         }
       }
@@ -741,3 +757,72 @@ export const ungroup = (editor, object) => {
     }
   })
 }
+
+export const rotationActive = (active, rotationObject = null) => {
+  return dispatch => {
+    dispatch({
+      type: EDIT_ROTATION_AVTIVE,
+      payload: {
+        active: !active,
+        rotationObject: rotationObject.toJSON()
+      }
+    })
+  }
+}
+
+export const rotationAngle = (angle, object, editor) => {
+  let {scene, camera, renderer} = editor
+  let sceneOject = scene.getObjectByName(object.object.name)
+  let box0 = new THREE.BoxHelper(sceneOject, 0x222222)
+  sceneOject.children = []
+  const radian = angle === 0 ? 0 : angle * Math.PI / 180
+
+  let loader = new THREE.ObjectLoader()
+  const rotation = loader.parse(object)
+  sceneService.fixSceneAfterImport(rotation)
+  while (rotation.children.length) {
+    const line = rotation.children.pop()
+    sceneOject.add(line)
+  }
+
+  sceneOject.children.forEach(children => {
+    if (children.geometry instanceof THREE.CircleGeometry) {
+      const newPoint = rotationPoint(children.position, box0.geometry.boundingSphere.center, radian)
+      children.position.x = newPoint.x
+      children.position.y = newPoint.y
+
+      children.geometry.parameters.thetaStart += radian
+      children.geometry = changeArcGeometry(children.geometry, children.geometry.parameters)
+
+    } else if (children.geometry instanceof THREE.Geometry) {
+      children.geometry.vertices.forEach(vertex => {
+        vertex = rotationPoint(vertex, box0.geometry.boundingSphere.center, radian)
+      })
+      children.geometry.verticesNeedUpdate = true
+      children.computeLineDistances()
+      children.geometry.computeBoundingSphere()
+    }
+  })
+  renderer.render(scene, camera)
+  return dispatch => {
+    dispatch({
+      type: EDIT_ROTATION_ANGLE,
+      payload: {
+        angle
+      }
+    })
+  }
+}
+
+export const rotationSave = () => {
+  return dispatch => {
+    dispatch({
+      type: EDIT_ROTATION_SAVE,
+      payload: {
+        active: false,
+        angle: 0
+      }
+    })
+  }
+}
+

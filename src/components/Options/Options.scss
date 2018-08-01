@@ -107,6 +107,26 @@
   .edit-group {
     height: $toolSize;
     line-height: $toolSize;
+    font-size: 11px;
+
+    .tool-info{
+      float: left;
+      margin-left: 10px;
+    }
+
+    input[type=text], input[type=number] {
+      width: 70px;
+      height: 20px;
+      border-radius: 2px;
+      background-color: white;
+      border: 1px solid rgba(0,0,0,0.3);
+    }
+
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
 
     label {
       float: left;
@@ -115,7 +135,6 @@
       line-height: $toolSize;
       vertical-align: top;
       height: 100%;
-      font-size: 11px;
     }
 
     button {
