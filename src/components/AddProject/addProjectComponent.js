@@ -1,16 +1,18 @@
 import React, { Component } from 'react'
 
-import { Button, Modal, FormControl, Form, FormGroup, ControlLabel } from 'react-bootstrap'
+import { Button, Modal, FormControl, Form, FormGroup, ControlLabel, HelpBlock } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { FormattedMessage } from 'react-intl'
+import './AddProject.css'
 
 export default class AddProjectComponent extends Component {
   constructor (props) {
     super(props)
     this.state = {
       title: '',
-      file: '',
-      show: false
+      file: null,
+      show: false,
+      error: ''
     }
   }
 
@@ -25,18 +27,36 @@ export default class AddProjectComponent extends Component {
   handleChange = (event) => {
     const name = event.target.name
     if (name === 'file') {
-      this.setState({file: event.target.files[0]})
+      this.setState({
+        file: event.target.files[0],
+        error: ''
+      })
     } else {
-      this.setState({[name]: event.target.value})
+      this.setState({
+        [name]: event.target.value,
+        error: ''
+      })
     }
   }
 
   addProject = () => {
-    const project = new FormData()
-    project.append('file', this.state.file)
-    project.append('title', this.state.title)
-    this.props.addProject(project)
-    this.handleClose()
+    const titleLength = this.state.title.length
+    const file = this.state.file
+    if (titleLength <= 0) {
+      this.setState({error: 'Enter the name of the project'})
+    } else if (!file) {
+      this.setState({error: 'Missing project file'})
+    } else {
+      this.setState({error: ''})
+    }
+
+    if (titleLength > 0 && file) {
+      const project = new FormData()
+      project.append('file', this.state.file)
+      project.append('title', this.state.title)
+      this.props.addProject(project)
+      this.handleClose()
+    }
   }
 
   render () {
@@ -58,7 +78,10 @@ export default class AddProjectComponent extends Component {
 
           </Modal.Header>
           <Modal.Body>
-            <Form>
+            <Form onSubmit={(event) => {
+              event.preventDefault()
+              return false
+            }}>
               <FormGroup
                 controlId='formControlsText'
               >
@@ -67,7 +90,7 @@ export default class AddProjectComponent extends Component {
                     <ControlLabel>{value}</ControlLabel>
                   }
                 </FormattedMessage>
-                <FormattedMessage id='addProject.modal.inputPlaceholder' defaultMessage='Enter text'>
+                <FormattedMessage id='addProject.modal.inputPlaceholder' defaultMessage='Enter project title'>
                   {placeholder =>
                     <FormControl
                       type='text'
@@ -78,7 +101,7 @@ export default class AddProjectComponent extends Component {
                     />
                   }
                 </FormattedMessage>
-                <FormControl.Feedback />
+                <FormControl.Feedback/>
               </FormGroup>
 
               <FormGroup controlId='formControlsFile'>
@@ -92,22 +115,21 @@ export default class AddProjectComponent extends Component {
                     <FormControl
                       type='file'
                       name='file'
-                      accept='application/dxf, .dxf'
-                      required
+                      accept='.dxf'
                       placeholder={placeholder}
                       onChange={this.handleChange}
                     />
                   }
                 </FormattedMessage>
-                <FormControl.Feedback />
+                <HelpBlock>Only *.dxf file supported</HelpBlock>
+                <FormControl.Feedback/>
               </FormGroup>
             </Form>
           </Modal.Body>
           <Modal.Footer>
+            {this.state.error && <HelpBlock className='warning'>{this.state.error}</HelpBlock>}
             <FormattedMessage id='addProject.save' defaultMessage='Save'>
-              {value =>
-                <Button onClick={this.addProject}>{value}</Button>
-              }
+              {value => <Button onClick={this.addProject}>{value}</Button>}
             </FormattedMessage>
             <FormattedMessage id='btn.cancel' defaultMessage='Close'>
               {value =>

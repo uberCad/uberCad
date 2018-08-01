@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './PanelSnapshots.css'
-import { Button, Modal, Form, FormGroup, ControlLabel, FormControl } from 'react-bootstrap'
+import { Button, Modal, Form, FormGroup, ControlLabel, FormControl, HelpBlock } from 'react-bootstrap'
 import { FormattedMessage } from 'react-intl'
 
 export default class PanelSnapshotsComponent extends Component {
@@ -9,12 +9,17 @@ export default class PanelSnapshotsComponent extends Component {
     super(props)
     this.state = {
       title: '',
-      show: false
+      show: false,
+      error: ''
     }
   }
 
   handleClose = () => {
-    this.setState({show: false})
+    this.setState({
+      show: false,
+      title: '',
+      error: ''
+    })
   }
 
   handleShow = () => {
@@ -23,16 +28,23 @@ export default class PanelSnapshotsComponent extends Component {
 
   handleChange = (event) => {
     const name = event.target.name
-    this.setState({[name]: event.target.value})
+    this.setState({
+      [name]: event.target.value,
+      error: ''
+    })
   }
 
   addSnapshot = () => {
-    const snapshot = {
-      title: this.state.title,
-      scene: this.props.scene
+    if (this.state.title.length) {
+      const snapshot = {
+        title: this.state.title,
+        scene: this.props.scene
+      }
+      this.props.addSnapshot(snapshot, this.props.project._key)
+      this.handleClose()
+    } else {
+      this.setState({error: 'Enter title snapshot'})
     }
-    this.props.addSnapshot(snapshot, this.props.project._key)
-    this.handleClose()
   }
 
   loadSnapshot = (event) => {
@@ -60,10 +72,10 @@ export default class PanelSnapshotsComponent extends Component {
       <div id='snapshots'>
         <div className='content'>
           {snapshots.length ? snapshots.map(snapshot => (
-            <div className='item' key={snapshot._key} data-key={snapshot._key}
-              onClick={this.loadSnapshot}>{snapshot.title}
-              <button className='un-select' data-key={snapshot._key} onClick={this.deleteSnapshot} />
-            </div>))
+              <div className='item' key={snapshot._key} data-key={snapshot._key}
+                   onClick={this.loadSnapshot}>{snapshot.title}
+                <button className='un-select' data-key={snapshot._key} onClick={this.deleteSnapshot} />
+              </div>))
             : (<FormattedMessage id='panelSnapshots.noSnapshot' defaultMessage='No snapshot' />)
           }
         </div>
@@ -81,7 +93,11 @@ export default class PanelSnapshotsComponent extends Component {
             </FormattedMessage>
           </Modal.Header>
           <Modal.Body>
-            <Form>
+            <Form onSubmit={(event) => {
+              event.preventDefault()
+              this.addSnapshot()
+              return false
+            }}>
               <FormGroup controlId='formControlsText'>
                 <FormattedMessage id='panelSnapshots.modal.inputLabel' defaultMessage='Snapshot title'>
                   {value => <ControlLabel>{value}</ControlLabel>}
@@ -100,6 +116,7 @@ export default class PanelSnapshotsComponent extends Component {
             </Form>
           </Modal.Body>
           <Modal.Footer>
+            {this.state.error && <HelpBlock className='warning'>{this.state.error}</HelpBlock>}
             <FormattedMessage id='btn.save' defaultMessage='Save'>
               {value => <Button onClick={this.addSnapshot}>{value}</Button>}
             </FormattedMessage>
