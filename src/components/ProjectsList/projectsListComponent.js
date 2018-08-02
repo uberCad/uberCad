@@ -41,6 +41,7 @@ export default class ProjectsListComponent extends Component {
               </Col>
               <Col xs={3} className='table-data title'>
                 <Link to={`/project/${project._key}`}>{project.title}</Link>
+                {project.fileName && <p>File name: {project.fileName}</p>}
                 <p>34 minutes ago hardcoded</p>
               </Col>
               <Col xs={2} className='table-data'>

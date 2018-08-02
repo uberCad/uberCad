@@ -1,6 +1,6 @@
 import Api from '../services/apiService'
 import GeometryUtils from '../services/GeometryUtils'
-import sceneService from '../services/sceneService'
+// import sceneService from '../services/sceneService'
 
 import { spinnerShow, spinnerHide } from './spinner'
 import { modalShow } from './modal'
