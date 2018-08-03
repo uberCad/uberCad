@@ -3,7 +3,9 @@ import update from 'immutability-helper'
 import {
   PROJECT_FETCH_BEGIN,
   PROJECT_FETCH_SUCCESS,
-  PROJECT_FETCH_FAILURE
+  PROJECT_FETCH_FAILURE,
+  PROJECT_RENAME,
+  PROJECT_RENAME_SAVE
 } from '../actions/project'
 
 import {
@@ -21,6 +23,19 @@ let initialState = {
 
 const project = (state = initialState, action) => {
   switch (action.type) {
+    case PROJECT_RENAME_SAVE:
+      return update(state, {
+        project: {
+          title: {$set: action.payload.title}
+        }
+      })
+    case PROJECT_RENAME:
+      return update(state, {
+        project: {
+          title: {$set: action.payload.title}
+        }
+      })
+
     case SNAPSHOT_ADD:
       return update(state, {
         project: {

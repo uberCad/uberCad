@@ -7,10 +7,13 @@ import './Project.css'
 
 export default class ProjectComponent extends Component {
 
+  _input: ?HTMLInputElement
+
   constructor (props) {
     super(props)
     this.state = {
-      show: false
+      show: false,
+      renameProject: false
     }
   }
 
@@ -28,6 +31,10 @@ export default class ProjectComponent extends Component {
     this.props.fetchProject(id, preloadedProject)
   }
 
+  componentDidUpdate (prevProps, prevState) {
+    this._input.focus()
+  }
+
   componentWillReceiveProps (nextProps) {
     if (nextProps.match.params.id !== this.props.match.params.id) {
       const {id} = nextProps.match.params
@@ -41,23 +48,47 @@ export default class ProjectComponent extends Component {
     this.props.delProject(this.props.project._key)
   }
 
+  renameProject = (event) => {
+    this.props.renameProject(event.target.value)
+  }
+
+  renameProjectToggle = () => {
+    this.setState({renameProject: !this.state.renameProject})
+  }
+
+  saveProjectTitle = () => {
+    this.renameProjectToggle()
+    this.props.saveProjectTitle(this.props.project._key, this.props.project.title)
+  }
+
   render () {
     const {project} = this.props
     return (
       <div className='project-page'>
         {project &&
         <div className='head-project'>
-          <h3>Project: {project.title}</h3>
+          <h3>Project: </h3>
+          <input type='text'
+                 value={project.title}
+                 onChange={this.renameProject}
+                 disabled={!this.state.renameProject}
+                 autoFocus="true"
+                 ref={c => (this._input = c)}
+          />
           <FormattedMessage id='project.btnDel' defaultMessage='Delete project'>
             {value =>
-              <button title={value} className='del-project' onClick={this.handleShow} />
+              <button title={value} className='btn-project del' onClick={this.handleShow}/>
             }
           </FormattedMessage>
+          {this.state.renameProject &&
+          <button title='Save project title' className='btn-project save' onClick={this.saveProjectTitle}/>}
+          {!this.state.renameProject &&
+          <button title='Rename project' className='btn-project rename' onClick={this.renameProjectToggle}/>}
         </div>
         }
 
         <Modal show={this.state.show} onHide={this.handleClose}>
-          <Modal.Header >
+          <Modal.Header>
             <FormattedMessage id='project.delMsg' defaultMessage='Delete project'>
               {value =>
                 <Modal.Title>{value}</Modal.Title>
@@ -82,27 +113,27 @@ export default class ProjectComponent extends Component {
         {project && (
           <div>
             <Row className='table-head'>
-              <Col xs={0} sm={1} className='table-head-name' />
+              <Col xs={0} sm={1} className='table-head-name'/>
               <Col xs={3} sm={3} className='hidden-sm-down table-head-name'>
-                <FormattedMessage id='project.title' defaultMessage='title!' />
+                <FormattedMessage id='project.title' defaultMessage='title!'/>
               </Col>
               <Col xs={3} sm={2} className='hidden-sm-down table-head-name'>
-                <FormattedMessage id='project.createdBy' defaultMessage='created by' />
+                <FormattedMessage id='project.createdBy' defaultMessage='created by'/>
               </Col>
               <Col xs={2} sm={2}
-                className='hidden-sm-down table-head-name'>
-                <FormattedMessage id='project.rating' defaultMessage='rating' />
-                <br />
+                   className='hidden-sm-down table-head-name'>
+                <FormattedMessage id='project.rating' defaultMessage='rating'/>
+                <br/>
                 <i>
-                  <FormattedMessage id='projects.price' defaultMessage='price' />/
-                  <FormattedMessage id='projects.efficiency' defaultMessage='efficiency' />
+                  <FormattedMessage id='projects.price' defaultMessage='price'/>/
+                  <FormattedMessage id='projects.efficiency' defaultMessage='efficiency'/>
                 </i>
               </Col>
               <Col xs={2} sm={2} className='hidden-sm-down table-head-name'>
-                <FormattedMessage id='projects.details' defaultMessage='details' />
+                <FormattedMessage id='projects.details' defaultMessage='details'/>
               </Col>
               <Col xs={2} sm={2} className='hidden-sm-down table-head-name'>
-                <FormattedMessage id='projects.status' defaultMessage='status' />
+                <FormattedMessage id='projects.status' defaultMessage='status'/>
               </Col>
             </Row>
 
@@ -110,7 +141,7 @@ export default class ProjectComponent extends Component {
               project.snapshots.map((snapshot, i) =>
                 <Row key={i} className='table-row'>
                   <Col xs={1} className='table-data icon'>
-                    <i className='fa fa-cubes fa-eye' />
+                    <i className='fa fa-cubes fa-eye'/>
                   </Col>
                   <Col xs={3} className='table-data title'>
                     <Link to={`/cad/${project._key}/${snapshot._key}`}>{snapshot.title}</Link>
@@ -130,7 +161,7 @@ export default class ProjectComponent extends Component {
 
             <Row className='table-row'>
               <Col xs={1} className='table-data icon'>
-                <i className='fa fa-cubes fa-eye' />
+                <i className='fa fa-cubes fa-eye'/>
               </Col>
               <Col xs={3} className='table-data title'>
                 <Link to={`/cad/${project._key}`}>{project.title}</Link>

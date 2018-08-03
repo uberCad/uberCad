@@ -5,6 +5,8 @@ import history from '../config/history'
 export const PROJECT_FETCH_BEGIN = 'PROJECT_FETCH_BEGIN'
 export const PROJECT_FETCH_SUCCESS = 'PROJECT_FETCH_SUCCESS'
 export const PROJECT_FETCH_FAILURE = 'PROJECT_FETCH_FAILURE'
+export const PROJECT_RENAME = 'PROJECT_RENAME'
+export const PROJECT_RENAME_SAVE = 'PROJECT_RENAME_SAVE'
 
 export const requestProject = (id, preloadedProject) => ({
   type: PROJECT_FETCH_BEGIN,
@@ -52,4 +54,32 @@ export const delProject = (key) => dispatch => {
       history.push(`/projects`)
       dispatch(spinnerHide())
     })
+}
+
+export const renameProject = (title) => {
+  return dispatch => {
+    dispatch({
+      type: PROJECT_RENAME,
+      payload: {
+        title
+      }
+    })
+  }
+}
+
+export const saveProjectTitle = (key, title) => {
+  return (dispatch) => {
+    dispatch(spinnerShow())
+    Api.post('/api/project-rename', {data: {key, title}})
+      .then(res => {
+          dispatch(spinnerHide())
+          dispatch({
+            type: PROJECT_RENAME_SAVE,
+            payload: {
+              title: res
+            }
+          })
+        }
+      )
+  }
 }
