@@ -38,7 +38,7 @@ export default class CalculatePriceComponent extends Component {
   }
 
   render () {
-    const {polyamides} = this.props
+    const {polyamides, error} = this.props
     const objects = Scene.getObjects(this.props.scene, true)
     const form = this.props.form.order
 
@@ -66,21 +66,29 @@ export default class CalculatePriceComponent extends Component {
             </FormattedMessage>
           </Modal.Header>
           <Modal.Body>
-            {polyamides.length && <OrderForm objects={polyamides}/>}
+            {error && <div className='error-material'>
+              {error.msg}
+              <h4>Objects name: </h4>
+              <ul>
+                {error.objName.map((name, i) => <li key={i}>{name}</li>)}
+              </ul>
+              </div>}
+
+            {!error && polyamides.length && <OrderForm objects={polyamides}/>}
 
           </Modal.Body>
           <Modal.Footer>
-            <FormattedMessage id='btn.order' defaultMessage='Order'>
+            {!error && <FormattedMessage id='btn.order' defaultMessage='Order'>
               {value =>
                 <Button
                   bsStyle='info'
                   onClick={
-                    form.syncErrors ? () => {console.log('have error')} : this.order
+                    (form && form.syncErrors) ? () => {console.log('have error')} : this.order
                   }
-                  disabled={form.syncErrors ? true : false}
+                  disabled={(form && form.syncErrors) ? true : false}
                 >{value}</Button>
               }
-            </FormattedMessage>
+            </FormattedMessage>}
             <FormattedMessage id='btn.cancel' defaultMessage='Cancel'>
               {value =>
                 <Button onClick={this.props.calculateHide}>{value}</Button>

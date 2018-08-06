@@ -9,6 +9,7 @@ import {
 const mapStateToProps = (state, ownProps) => {
   return {
     lang: state.locale.lang,
+    error: state.price.error,
     show: state.price.show,
     polyamides: state.price.polyamideObjects,
     scene: state.cad.scene,

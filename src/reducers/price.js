@@ -8,7 +8,8 @@ let initialState = {
   prices: [],
   polyamideObjects: [],
   info: [],
-  show: false
+  show: false,
+  error: null
 }
 
 const price = (state = initialState, action) => {
@@ -16,6 +17,7 @@ const price = (state = initialState, action) => {
     case CALCULATE:
       return {
         ...state,
+        error: action.payload.error,
         prices: action.payload.prices,
         polyamideObjects: action.payload.polyamideObjects,
         info: action.payload.info,
