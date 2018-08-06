@@ -9,6 +9,7 @@ export const PROJECT_RENAME = 'PROJECT_RENAME'
 export const PROJECT_RENAME_SAVE = 'PROJECT_RENAME_SAVE'
 export const PROJECT_SNAPSHOT_RENAME = 'PROJECT_SNAPSHOT_RENAME'
 export const PROJECT_SNAPSHOT_RENAME_SAVE = 'PROJECT_SNAPSHOT_RENAME_SAVE'
+export const PROJECT_ARCHIVE = 'PROJECT_ARCHIVE'
 
 export const requestProject = (id, preloadedProject) => ({
   type: PROJECT_FETCH_BEGIN,
@@ -107,6 +108,23 @@ export const saveSnapshotTitle = (snapshot) => {
             type: PROJECT_SNAPSHOT_RENAME_SAVE,
             payload: {
               snapshot: res
+            }
+          })
+        }
+      )
+  }
+}
+
+export const archive = (project) => {
+  return (dispatch) => {
+    dispatch(spinnerShow())
+    Api.post('/api/project-archive', {data: {key: project._key, status: 'archive'}})
+      .then(res => {
+          dispatch(spinnerHide())
+          dispatch({
+            type: PROJECT_ARCHIVE,
+            payload: {
+              project: res
             }
           })
         }

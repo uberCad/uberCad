@@ -2,6 +2,7 @@ import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import ProjectComponent from './projectComponent'
 import {
+  archive,
   delProject,
   fetchProject,
   renameProject,
@@ -41,6 +42,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     saveSnapshotTitle: function (snapshot) {
       saveSnapshotTitle(snapshot)(dispatch)
+    },
+    archive: function (project) {
+      archive(project)(dispatch)
     }
   }
 }

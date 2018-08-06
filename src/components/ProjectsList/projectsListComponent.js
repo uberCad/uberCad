@@ -51,7 +51,7 @@ export default class ProjectsListComponent extends Component {
 
               <Col xs={2} className='table-data'>{project.rating}</Col>
               <Col xs={2} className='table-data'>{project.description}</Col>
-              <Col xs={1} className='table-data'>in progress</Col>
+              <Col xs={1} className='table-data'>{project.status}</Col>
             </Row>
           )
         }

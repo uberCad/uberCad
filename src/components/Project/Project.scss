@@ -36,13 +36,14 @@
       &.del {
         background: url("garbage.svg") no-repeat center transparent;
       }
-
       &.rename {
         background: url("rename.svg") no-repeat center transparent;
       }
-
       &.save {
         background: url("save.svg") no-repeat center transparent;
+      }
+      &.archive {
+        background: url("archive.svg") no-repeat center transparent;
       }
     }
   }

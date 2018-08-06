@@ -34,7 +34,7 @@ export default class ProjectComponent extends Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    this._input.focus()
+    if (this._input) this._input.focus()
   }
 
   componentWillReceiveProps (nextProps) {
@@ -87,6 +87,10 @@ export default class ProjectComponent extends Component {
     this.props.saveSnapshotTitle(snap)
   }
 
+  archive = () => {
+    this.props.archive(this.props.project)
+  }
+
   render () {
     const {project} = this.props
     return (
@@ -107,6 +111,9 @@ export default class ProjectComponent extends Component {
               <button title={value} className='btn-project del' onClick={this.handleShow}/>
             }
           </FormattedMessage>
+          {project.status !== 'archive' &&
+          <button title='Archive project' className='btn-project archive' onClick={this.archive}/>}
+
           {this.state.renameProject &&
           <button title='Save project title' className='btn-project save' onClick={this.saveProjectTitle}/>}
           {!this.state.renameProject &&
@@ -202,7 +209,7 @@ export default class ProjectComponent extends Component {
 
                   <Col xs={2} className='table-data'>rating...</Col>
                   <Col xs={2} className='table-data'>description...</Col>
-                  <Col xs={1} className='table-data'>in progress</Col>
+                  <Col xs={1} className='table-data'>{project.status}</Col>
                 </Row>
               )
             }
@@ -223,7 +230,7 @@ export default class ProjectComponent extends Component {
 
               <Col xs={2} className='table-data'>rating...</Col>
               <Col xs={2} className='table-data'>description...</Col>
-              <Col xs={1} className='table-data'>in progress</Col>
+              <Col xs={1} className='table-data'>{project.status}</Col>
             </Row>
           </div>)}
       </div>
