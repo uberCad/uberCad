@@ -13,7 +13,9 @@ export default class ProjectComponent extends Component {
     super(props)
     this.state = {
       show: false,
-      renameProject: false
+      renameProject: false,
+      renameSnapshot: false,
+      snapshotId: null
     }
   }
 
@@ -61,6 +63,30 @@ export default class ProjectComponent extends Component {
     this.props.saveProjectTitle(this.props.project._key, this.props.project.title)
   }
 
+  renameSnapshotToggle = (event) => {
+    let {currentTarget: {dataset: {idx}}} = event
+    idx = Number(idx)
+    idx = this.state.snapshotId === idx ? null : idx
+    this.setState({
+      renameSnapshot: !this.state.renameSnapshot,
+      snapshotId: idx
+    })
+  }
+
+  renameSnapshot = (event) => {
+    let {currentTarget: {dataset: {idx}}} = event
+    const snap = this.props.project.snapshots[idx]
+    snap.title = event.target.value
+    this.props.renameSnapshot(snap)
+  }
+
+  saveSnapshotTitle = (event) => {
+    this.renameSnapshotToggle(event)
+    let {currentTarget: {dataset: {idx}}} = event
+    const snap = this.props.project.snapshots[idx]
+    this.props.saveSnapshotTitle(snap)
+  }
+
   render () {
     const {project} = this.props
     return (
@@ -71,8 +97,9 @@ export default class ProjectComponent extends Component {
           <input type='text'
                  value={project.title}
                  onChange={this.renameProject}
+                 onKeyPress={(e) => {if (e.key === 'Enter') this.saveProjectTitle()}}
                  disabled={!this.state.renameProject}
-                 autoFocus="true"
+                 autoFocus='true'
                  ref={c => (this._input = c)}
           />
           <FormattedMessage id='project.btnDel' defaultMessage='Delete project'>
@@ -144,8 +171,29 @@ export default class ProjectComponent extends Component {
                     <i className='fa fa-cubes fa-eye'/>
                   </Col>
                   <Col xs={3} className='table-data title'>
-                    <Link to={`/cad/${project._key}/${snapshot._key}`}>{snapshot.title}</Link>
-                    <p>34 minutes ago hardcoded</p>
+                    <Col xs={10} className='cont'>
+                      {i !== this.state.snapshotId &&
+                      <Link to={`/cad/${project._key}/${snapshot._key}`}>{snapshot.title}</Link>}
+                      {this.state.renameSnapshot && i === this.state.snapshotId &&
+                      <input type='text'
+                             value={snapshot.title}
+                             onChange={this.renameSnapshot}
+                             onKeyPress={(e) => {if (e.key === 'Enter') this.saveSnapshotTitle(e)}}
+                             data-idx={i}
+                             autoFocus='true'
+                             ref={c => (this._input = c)}
+                             className='rename-snapshot'
+                      />}
+                      <p>34 minutes ago hardcoded</p>
+                    </Col>
+                    <Col xs={2}>
+                      {i !== this.state.snapshotId
+                      && <button title='Rename snapshot' className='btn-snapshot rename'
+                                 onClick={this.renameSnapshotToggle} data-idx={i}/>}
+                      {this.state.renameSnapshot && i === this.state.snapshotId
+                      && <button title='Rename snapshot' className='btn-snapshot save'
+                                 onClick={this.saveSnapshotTitle} data-idx={i}/>}
+                    </Col>
                   </Col>
                   <Col xs={2} className='table-data'>
                     project - createdBy
