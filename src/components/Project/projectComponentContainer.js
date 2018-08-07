@@ -1,7 +1,15 @@
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
 import ProjectComponent from './projectComponent'
-import { delProject, fetchProject } from '../../actions/project'
+import {
+  archive,
+  delProject,
+  fetchProject,
+  renameProject,
+  renameSnapshot,
+  saveProjectTitle,
+  saveSnapshotTitle
+} from '../../actions/project'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -22,6 +30,21 @@ const mapDispatchToProps = (dispatch) => {
     },
     delProject: function (key) {
       delProject(key)(dispatch)
+    },
+    renameProject: function (title) {
+      renameProject(title)(dispatch)
+    },
+    saveProjectTitle: function (key, title) {
+      saveProjectTitle(key, title)(dispatch)
+    },
+    renameSnapshot: function (snapshot) {
+      renameSnapshot(snapshot)(dispatch)
+    },
+    saveSnapshotTitle: function (snapshot) {
+      saveSnapshotTitle(snapshot)(dispatch)
+    },
+    archive: function (project) {
+      archive(project)(dispatch)
     }
   }
 }

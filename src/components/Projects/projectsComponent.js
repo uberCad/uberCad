@@ -23,7 +23,7 @@ export default class ProjectsComponent extends Component {
       <div className='Projects'>
         <ul className='ProjectsFilter'>
           {
-            ['all', 'shared', 'archive', '[some bad filter...]'].map(option =>
+            ['all', 'active', 'shared', 'archive', '[some bad filter...]'].map(option =>
               <li className={projectsFilter === option ? 'active' : ''} key={option} data-option={option} onClick={this.handleChange}>
                 {option}
               </li>

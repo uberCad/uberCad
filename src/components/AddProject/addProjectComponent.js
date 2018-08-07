@@ -54,6 +54,7 @@ export default class AddProjectComponent extends Component {
       const project = new FormData()
       project.append('file', this.state.file)
       project.append('title', this.state.title)
+      project.append('fileName', this.state.file.name)
       this.props.addProject(project)
       this.handleClose()
     }

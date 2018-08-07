@@ -1,6 +1,6 @@
 import Api from '../services/apiService'
 import GeometryUtils from '../services/GeometryUtils'
-import sceneService from '../services/sceneService'
+// import sceneService from '../services/sceneService'
 
 import { spinnerShow, spinnerHide } from './spinner'
 import { modalShow } from './modal'
@@ -12,47 +12,66 @@ export const CALCULATE_ORDER = 'CALCULATE_ORDER'
 export const calculate = (scene) => {
   // const objects = sceneService.getObjects(scene, true)
   // const info = []
-  const objects = scene.children[1].children
+  const objects = scene.getObjectByName('Objects').children
   const infoPrice = []
   const polyamideObjects = []
-
-  objects.forEach(object => {
-    const geometry = GeometryUtils.getObjectInfo(object)
-    let data = {
-      area: geometry[0].region.area,
-      height: geometry[0].region.height,
-      width: geometry[0].region.width,
-      weight: object.userData.material.density * geometry[0].region.area / 1000000,
-      type: geometry.length > 1 ? 2 : 1
-    }
-    object.userData.info = data
-
-    if (object.userData.material.material === 'polyamide') {
-      infoPrice.push(data)
-      polyamideObjects.push(object)
-    } else {
-      // nothing
+  let error = null
+  objects.forEach((item) => {
+    if (!item.userData.material) {
+      error = !error ? {objName: []} : error
+      error.objName.push(item.name)
     }
   })
-  return (dispatch) => {
-    dispatch(spinnerShow())
-    Api.post('/api/calculate', {data: infoPrice})
-      .then(res => {
-          res.forEach((item, i) => {
-            polyamideObjects[i].userData.price = item.price
-            polyamideObjects[i].userData.minOrderQty = Number(item.minOrderQty.replace(/\s+/g, '').replace(/,/g, '.'))
-          })
-          dispatch(spinnerHide())
-          dispatch({
-            type: CALCULATE,
-            payload: {
-              prices: res,
-              polyamideObjects,
-              info: infoPrice
-            }
-          })
+
+  if (!error) {
+    objects.forEach(object => {
+      const geometry = GeometryUtils.getObjectInfo(object)
+      let data = {
+        area: geometry[0].region.area,
+        height: geometry[0].region.height,
+        width: geometry[0].region.width,
+        weight: object.userData.material.density * geometry[0].region.area / 1000000,
+        type: geometry.length > 1 ? 2 : 1
+      }
+      object.userData.info = data
+
+      if (object.userData.material.material === 'polyamide') {
+        infoPrice.push(data)
+        polyamideObjects.push(object)
+      } else {
+        // nothing
+      }
+    })
+    return (dispatch) => {
+      dispatch(spinnerShow())
+      Api.post('/api/calculate', {data: infoPrice})
+        .then(res => {
+            res.forEach((item, i) => {
+              polyamideObjects[i].userData.price = item.price
+              polyamideObjects[i].userData.minOrderQty = Number(item.minOrderQty.replace(/\s+/g, '').replace(/,/g, '.'))
+            })
+            dispatch(spinnerHide())
+            dispatch({
+              type: CALCULATE,
+              payload: {
+                error,
+                prices: res,
+                polyamideObjects,
+                info: infoPrice
+              }
+            })
+          }
+        )
+    }
+  } else {
+    return (dispatch) => {
+      dispatch({
+        type: CALCULATE,
+        payload: {
+          error: {...error, msg: 'Not all objects are assigned materials'}
         }
-      )
+      })
+    }
   }
 }
 
