@@ -10,13 +10,16 @@
     line-height: 60px;
     padding: 0 25px;
     h3 {
+      margin: 0;
       float: left;
-      font-size: 24px;
+      height: 60px;
+      line-height: 60px;
+      font-size: 24px !important;
     }
     input, input[type="text" i]:disabled {
-      margin: 20px 0 10px 5px;
       width: 80%;
-      height: 28px;
+      height: 60px;
+      line-height: 60px;
       font-size: 24px;
       background-color: inherit;
     }
