@@ -10,16 +10,8 @@
   padding-top: 27px;
   z-index: 10;
 
-  //box-shadow: red 0 0 20px;
   box-shadow: 0 0 12px rgba(153, 153, 153, 0.4);
 
-
-  //padding-right: 5px;
-  //margin-right: 5px;
-  //border-right: 2px solid lavender;
-  //border: 1px solid red;
-  //float: left;
-  //
   button {
     float: left;
     width: $toolSize;
@@ -30,6 +22,7 @@
     border: none;
     margin: 2px 2px 0 2px;
     transition: All 0.2s;
+    color: white;
 
     img {
       max-width: 20px;
@@ -48,10 +41,6 @@
       opacity: 0.5;
       background-color: transparent;
     }
-
-    color: white;
-
-
 
     &.btn-success {
       color: white;

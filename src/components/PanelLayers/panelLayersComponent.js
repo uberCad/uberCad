@@ -69,12 +69,6 @@ export default class PanelLayersComponent extends Component {
           }
         </div>
         <div className='toolbar'>
-          {/* {activeEntities.length > 1 && ( */}
-          {/* <button onClick={this.groupEntities} */}
-          {/* className="group" */}
-          {/* title="Group to object" */}
-          {/* /> */}
-          {/* )} */}
           <FormattedMessage id='panelLayer.showAll' defaultMessage='Show all'>
             {value =>
               <button onClick={this.showAll}

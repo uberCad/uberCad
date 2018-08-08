@@ -1,7 +1,6 @@
 // ICONS: https://www.flaticon.com/free-icon/computer-mouse-cursor_70358#term=cursor&page=1&position=11
 
 import React, { Component } from 'react'
-// import PropTypes from 'prop-types'
 import './Toolbar.css'
 import toolPoint from './point.svg'
 import toolSelect from './select.svg'

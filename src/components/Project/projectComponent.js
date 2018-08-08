@@ -238,7 +238,6 @@ export default class ProjectComponent extends Component {
   }
 
   static propTypes = {
-    // projectsList: PropTypes.object.isRequired,
     loading: PropTypes.bool.isRequired,
     error: PropTypes.object,
     project: PropTypes.object,

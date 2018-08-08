@@ -34,7 +34,7 @@ export const selectionUpdate = (event) => {
   }
 }
 
-export const selectionEnd = (event, editor, selection) => {
+export const selectionEnd = (event, editor) => {
   let {scene, camera, renderer} = editor
   let clickResult = sceneService.onClick(event, scene, camera, renderer)
 

@@ -64,7 +64,6 @@
         transition: All .3s;
 
         &.active {
-          //font-weight: bold;
           color: #9ca2b2;
         }
 
@@ -85,8 +84,6 @@
       height: calc((100vh - #{$header-height}) / 3 - #{$sidebar-header-size});
       overflow: auto;
     }
-
-
   }
 
   .tabs-rotated {

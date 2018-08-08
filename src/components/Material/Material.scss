@@ -14,8 +14,9 @@ ul.materials-list {
   list-style: none;
 
   li {
-    padding: 5px 0 0 70px;
-    height: 60px;
+    padding: 5px 0 5px 70px;
+    min-height: 60px;
+    height: inherit;
     transition: All 0.3s;
     position: relative;
     cursor: pointer;
@@ -39,7 +40,6 @@ ul.materials-list {
         border-radius: 5px;
         width: 50px;
         height: 50px;
-        //border: 1px solid red;
         display: block;
         position: absolute;
         left: 10px;

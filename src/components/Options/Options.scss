@@ -2,7 +2,6 @@
 
 #options {
   .sidebar-collapsed & {
-    //ага, я й сам здивувався))
     width: calc(100% - #{$sidebar-collapsed-width});
   }
 
@@ -25,13 +24,11 @@
     float: left;
 
     li {
-      //background-color: royalblue;
       padding: 0 5px 0 0;
       margin: 0 5px 0 0;
       border-right: 2px solid lavender;
       height: $toolSize;
       line-height: $toolSize;
-
       float: left;
 
       label {

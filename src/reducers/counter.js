@@ -5,8 +5,6 @@ let initialState = {
 }
 
 const counter = (state = initialState, action) => {
-  // console.log('REDUCERS: counter(state, action)', state, action)
-
   switch (action.type) {
     case 'INCREMENT':
       return {count: state.count + 1}

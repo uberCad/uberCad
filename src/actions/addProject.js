@@ -12,8 +12,6 @@ export const addProject = (project) => {
     }
     Api.post('/api/add-project', {data: project}, config)
       .then((res) => {
-        // selectFilter('all')(dispatch)
-        // fetchProjects('all', true)(dispatch)
         history.push(`/project/${res._key}`)
         dispatch({
           type: ADD_PROJECT,

@@ -25,7 +25,6 @@ export default function spinner (state = initialState, action) {
       }
 
     default:
-      // ALWAYS have a default case in a reducer
       return state
   }
 }
