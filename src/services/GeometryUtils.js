@@ -2513,6 +2513,31 @@ let getThermalPoints = scene => {
   return false
 }
 
+let angleBetweenLines = (a, b, option = 'radian') => {
+  const A = {
+    x: a.geometry.vertices[1].x - a.geometry.vertices[0].x,
+    y: a.geometry.vertices[1].y - a.geometry.vertices[0].y,
+    z: a.geometry.vertices[1].z - a.geometry.vertices[0].z
+  }
+  const B = {
+    x: b.geometry.vertices[0].x - b.geometry.vertices[1].x,
+    y: b.geometry.vertices[0].y - b.geometry.vertices[1].y,
+    z: b.geometry.vertices[0].z - b.geometry.vertices[1].z
+  }
+  const lengthA = Math.sqrt(A.x*A.x + A.y*A.y + A.z*A.z)
+  const lengthB = Math.sqrt(B.x*B.x + B.y*B.y + B.z*B.z)
+  const scalarAB = A.x*B.x + A.y*B.y + A.z*B.z
+
+  if (option === 'degree') {
+    //return Fi in degree, 1 rad = 180°/π = 57.295779513°
+    return Math.acos(scalarAB / (lengthA * lengthB)) * 180/Math.PI
+  } else {
+    //return Fi in radian
+    return Math.acos(scalarAB / (lengthA * lengthB))
+  }
+}
+
+
 export default {
   distanceToLine,
   distanceToArc,
@@ -2543,5 +2568,6 @@ export default {
   fixObjectsPaths,
   getThermalPoints,
   rotatePoint,
-  changeArcGeometry
+  changeArcGeometry,
+  angleBetweenLines
 }

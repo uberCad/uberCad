@@ -1,7 +1,7 @@
 import DxfParser from 'dxf-parser'
 import dxfService from './../services/dxfService'
 import sceneService from './../services/sceneService'
-import { TOOL_POINT } from '../components/Toolbar/toolbarComponent'
+import { TOOL_MEASUREMENT, TOOL_POINT } from '../components/Toolbar/toolbarComponent'
 import { SELECT_MODE_NEW } from '../components/Options/optionsComponent'
 import { addHelpPoints, getScale, unselectLine } from '../services/editObject'
 
@@ -227,6 +227,32 @@ export const cadClick = (event, editor) => {
         })
       }
         break
+
+      case TOOL_MEASUREMENT: {
+        // let clickResult = sceneService.onClick(event, scene, camera)
+        // console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
+        //
+        // let payload = {
+        //   ...clickResult,
+        //   object: null
+        // }
+        //
+        // let selectResult = clickResult.activeEntities
+        //
+        // if (selectResult.length) {
+        //   // check if entity belongs to object
+        //   if (selectResult[0].userData.belongsToObject) {
+        //     payload.object = selectResult[0].parent
+        //   }
+        // }
+        //
+        // dispatch({
+        //   type: CAD_CLICK,
+        //   payload
+        // })
+      }
+        break
+
       default:
         console.log(`cadClick not handled for tool: ${tool}`)
         break

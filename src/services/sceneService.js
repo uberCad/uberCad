@@ -10,6 +10,7 @@ import {
   SELECT_MODE_INTERSECT
 } from '../components/Options/optionsComponent'
 import axios from 'axios'
+import { MEASUREMENT_ANGLE } from '../actions/measurement'
 
 let onClick = (event, scene, camera, renderer) => {
   let result = {
@@ -60,6 +61,9 @@ let onClick = (event, scene, camera, renderer) => {
 let doSelection = (selectResult, editor) => {
   highlightEntities(editor, editor.activeEntities, true, undefined, false)
   switch (editor.options.selectMode) {
+    case MEASUREMENT_ANGLE:
+      editor.activeEntities = selectResult
+      break
     case SELECT_MODE_NEW:
       editor.activeEntities = selectResult
       break
