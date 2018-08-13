@@ -321,7 +321,6 @@ let changeArcGeometry = (arcGeometry, parameters) => {
   return geometry
 }
 
-
 let buildChain = (vertices, startVertex, threshold = 0.000001, vertex, path = []) => {
   if (!vertex) {
     vertex = startVertex
@@ -2514,29 +2513,57 @@ let getThermalPoints = scene => {
 }
 
 let angleBetweenLines = (a, b, option = 'radian') => {
-  const A = {
+  let A, B, A1, B1, lengthA1, lengthB1, scalarAB1, fi1
+  A = {
     x: a.geometry.vertices[1].x - a.geometry.vertices[0].x,
     y: a.geometry.vertices[1].y - a.geometry.vertices[0].y,
     z: a.geometry.vertices[1].z - a.geometry.vertices[0].z
   }
-  const B = {
-    x: b.geometry.vertices[0].x - b.geometry.vertices[1].x,
-    y: b.geometry.vertices[0].y - b.geometry.vertices[1].y,
-    z: b.geometry.vertices[0].z - b.geometry.vertices[1].z
+  B = {
+    x: b.geometry.vertices[1].x - b.geometry.vertices[0].x,
+    y: b.geometry.vertices[1].y - b.geometry.vertices[0].y,
+    z: b.geometry.vertices[1].z - b.geometry.vertices[0].z
   }
-  const lengthA = Math.sqrt(A.x*A.x + A.y*A.y + A.z*A.z)
-  const lengthB = Math.sqrt(B.x*B.x + B.y*B.y + B.z*B.z)
-  const scalarAB = A.x*B.x + A.y*B.y + A.z*B.z
 
-  if (option === 'degree') {
-    //return Fi in degree, 1 rad = 180°/π = 57.295779513°
-    return Math.acos(scalarAB / (lengthA * lengthB)) * 180/Math.PI
+  if (a.geometry instanceof THREE.CircleGeometry) {
+    A1 = {
+      x: a.geometry.vertices[a.geometry.vertices.length - 2].x - a.geometry.vertices[a.geometry.vertices.length - 1].x,
+      y: a.geometry.vertices[a.geometry.vertices.length - 2].y - a.geometry.vertices[a.geometry.vertices.length - 1].y,
+      z: a.geometry.vertices[a.geometry.vertices.length - 2].z - a.geometry.vertices[a.geometry.vertices.length - 1].z
+    }
+    lengthA1 = Math.sqrt(A1.x * A1.x + A1.y * A1.y + A1.z * A1.z)
+    scalarAB1 = A1.x * B.x + A1.y * B.y + A1.z * B.z
+  } else {}
+
+  if (b.geometry instanceof THREE.CircleGeometry) {
+    B1 = {
+      x: b.geometry.vertices[b.geometry.vertices.length - 2].x - b.geometry.vertices[b.geometry.vertices.length - 1].x,
+      y: b.geometry.vertices[b.geometry.vertices.length - 2].y - b.geometry.vertices[b.geometry.vertices.length - 1].y,
+      z: b.geometry.vertices[b.geometry.vertices.length - 2].z - b.geometry.vertices[b.geometry.vertices.length - 1].z
+    }
+    lengthB1 = Math.sqrt(B1.x * B1.x + B1.y * B1.y + B1.z * B1.z)
+    scalarAB1 = A.x * B1.x + A.y * B1.y + A.z * B1.z
+  } else {}
+  const lengthA = Math.sqrt(A.x * A.x + A.y * A.y + A.z * A.z)
+  const lengthB = Math.sqrt(B.x * B.x + B.y * B.y + B.z * B.z)
+  const scalarAB = A.x * B.x + A.y * B.y + A.z * B.z
+  const fi = Math.acos(scalarAB / (lengthA * lengthB))
+
+  if (lengthA1 && scalarAB1) {
+    fi1 = Math.acos(scalarAB1 / (lengthA1 * lengthB))
+  } else if (lengthB1 && scalarAB1) {
+    fi1 = Math.acos(scalarAB1 / (lengthA * lengthB1))
   } else {
-    //return Fi in radian
-    return Math.acos(scalarAB / (lengthA * lengthB))
+    fi1 = Math.PI - fi
+  }
+  if (option === 'degree') {
+    //return fi in degree, 1 rad = 180°/π = 57.295779513°
+    return [fi * 180 / Math.PI, fi1 * 180 / Math.PI]
+  } else {
+    //return fi in radian
+    return [fi, fi1]
   }
 }
-
 
 export default {
   distanceToLine,

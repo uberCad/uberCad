@@ -7,7 +7,8 @@ import {
   MEASUREMENT_LINE_ERASE,
   MEASUREMENT_LINE_FIRST,
   MEASUREMENT_LINE_SECOND,
-  MEASUREMENT_POINT
+  MEASUREMENT_POINT,
+  MEASUREMENT_RADIAL_LINE
 } from '../actions/measurement'
 
 let initialState = {
@@ -17,6 +18,9 @@ let initialState = {
       first: null,
       second: null,
       distance: null
+    },
+    radial: {
+      line: null
     },
     angle: {
       firstLine: null,
@@ -51,6 +55,11 @@ const tools = (state = initialState, action) => {
     case MEASUREMENT_LINE_ERASE:
       return update(state, {
         measurement: {line: {$set: action.payload.line}}
+      })
+
+    case MEASUREMENT_RADIAL_LINE:
+      return update(state, {
+        measurement: {radial: {line: {$set: action.payload.line}}}
       })
 
     case MEASUREMENT_ANGLE_ERASE:

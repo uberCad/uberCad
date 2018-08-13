@@ -3,6 +3,7 @@ import sceneService from '../services/sceneService'
 import { disablePoint, movePointInfo } from './pointInfo'
 import GeometryUtils from '../services/GeometryUtils'
 import { CAD_DO_SELECTION } from './cad'
+import * as THREE from '../extend/THREE'
 
 export const MEASUREMENT_POINT = 'MEASUREMENT_POINT'
 
@@ -12,6 +13,7 @@ export const MEASUREMENT_LINE_SECOND = 'MEASUREMENT_LINE_SECOND'
 export const MEASUREMENT_LINE_ERASE = 'MEASUREMENT_LINE_ERASE'
 
 export const MEASUREMENT_RADIAL = 'MEASUREMENT_RADIAL'
+export const MEASUREMENT_RADIAL_LINE = 'MEASUREMENT_RADIAL_LINE'
 
 export const MEASUREMENT_ANGLE = 'MEASUREMENT_ANGLE'
 export const MEASUREMENT_ANGLE_FIRST_LINE = 'MEASUREMENT_ANGLE_FIRST_LINE'
@@ -203,6 +205,37 @@ export const eraseAngle = () => {
           angleValue: null
         }
       }
+    })
+  }
+}
+
+export const radialInfo = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const circle = clickResult.activeEntities.filter(item => {
+    return (item.geometry instanceof THREE.CircleGeometry)
+  })
+
+  let activeEntities = sceneService.doSelection(circle, editor)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select arc')(dispatch)
+    dispatch({
+      type: CAD_DO_SELECTION,
+      payload: {activeEntities}
+    })
+  }
+}
+
+export const radialSelectLine = (line) => {
+  return dispatch => {
+    dispatch({
+      type: MEASUREMENT_RADIAL_LINE,
+      payload: {line}
     })
   }
 }

@@ -44,7 +44,7 @@ import {
   MEASUREMENT_LINE,
   MEASUREMENT_POINT,
   MEASUREMENT_RADIAL,
-  pointInfo, pointSelect
+  pointInfo, pointSelect, radialInfo, radialSelectLine
 } from '../../actions/measurement'
 
 const mapStateToProps = (state, ownProps) => {
@@ -167,7 +167,7 @@ const mapDispatchToProps = (dispatch) => {
                 : lineSecondPoint(event, editor, editor.measurement.line.first)(dispatch)
             }
           } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
-            console.log('click MEASUREMENT_RADIAL')
+            radialSelectLine(editor.activeEntities[0])(dispatch)
           } else if (editor.options.selectMode === MEASUREMENT_ANGLE) {
             if (editor.measurement.angle.firstLine && editor.measurement.angle.secondLine) {
               eraseAngle()(dispatch)
@@ -267,7 +267,7 @@ const mapDispatchToProps = (dispatch) => {
             lineSecondInfo(event, editor)(dispatch)
           }
         } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
-          console.log('move MEASUREMENT_RADIAL')
+          radialInfo(event, editor)(dispatch)
         } else if (editor.options.selectMode === MEASUREMENT_ANGLE) {
           if (!editor.measurement.angle.firstLine) {
             angleFirstInfo(event, editor)(dispatch)
