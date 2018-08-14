@@ -12,6 +12,8 @@ import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/lib/integration/react'
 import configureStore from './configureStore'
 
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
+
 let {store, persistor} = configureStore()
 
 addLocaleData([...en, ...ru])
