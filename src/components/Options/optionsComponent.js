@@ -53,6 +53,15 @@ export default class OptionsComponent extends Component {
     this.props.rotationAngle(event.target.value, this.props.rotationObject, this.props.editor)
   }
 
+  scaleChange = (event) => {
+    this.props.scaleChange(event.target.value)
+  }
+
+  setScale = () => {
+    this.props.setScale(this.props.editMode.scale.scale, this.props.editMode.scale.scaleObject, this.props.editor)
+
+  }
+
   render () {
     const {
       tool,
@@ -178,6 +187,18 @@ export default class OptionsComponent extends Component {
                        onChange={this.rotationAngle}
                        type='number'
                        min='0' max='360'/>
+              </div>
+              }
+
+              {editMode.scale.active && <div>
+                <span>Scale: </span>
+                <input value={editMode.scale.scale}
+                       onChange={this.scaleChange}
+                       type='number'
+                       min='0'
+                       // max='360'
+                />
+                <button className='apply' onClick={this.setScale}>setScale</button>
               </div>
               }
             </div>

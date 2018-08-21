@@ -2565,6 +2565,29 @@ let angleBetweenLines = (a, b, option = 'radian') => {
   }
 }
 
+let scale = (object, scale) => {
+  object.children.map(item => {
+    if (item.geometry instanceof THREE.CircleGeometry) {
+      item.geometry.parameters.radius = item.geometry.parameters.radius * scale
+      item.geometry = changeArcGeometry(item.geometry, item.geometry.parameters)
+      item.position.x = item.position.x * scale
+      item.position.y = item.position.y * scale
+      item.position.z = item.position.z * scale
+    } else if (item.geometry instanceof THREE.Geometry) {
+      item.geometry.vertices.forEach(vertex => {
+        vertex.x = vertex.x * scale
+        vertex.y = vertex.y * scale
+        vertex.z = vertex.z * scale
+        item.geometry.verticesNeedUpdate = true
+        item.computeLineDistances()
+        item.geometry.computeBoundingSphere()
+      })
+    }
+    return item
+  })
+  return object
+}
+
 export default {
   distanceToLine,
   distanceToArc,
@@ -2596,5 +2619,6 @@ export default {
   getThermalPoints,
   rotatePoint,
   changeArcGeometry,
-  angleBetweenLines
+  angleBetweenLines,
+  scale
 }

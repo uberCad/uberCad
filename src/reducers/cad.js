@@ -48,7 +48,10 @@ import {
   EDIT_UNGROUP,
   EDIT_ROTATION_AVTIVE,
   EDIT_ROTATION_ANGLE,
-  EDIT_ROTATION_SAVE
+  EDIT_ROTATION_SAVE,
+  EDIT_SCALE_AVTIVE,
+  EDIT_SCALE_SAVE,
+  EDIT_SCALE_CHANGE
 } from '../actions/edit'
 
 import {
@@ -93,6 +96,11 @@ let initialState = {
       active: false,
       rotationObject: null,
       angle: 0
+    },
+    scale: {
+      active: false,
+      scaleObject: null,
+      scale: 1
     }
   },
   pointInfo: {
@@ -113,6 +121,35 @@ let initialState = {
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+
+    case EDIT_SCALE_AVTIVE:
+      return update(state, {
+        editMode: {
+          scale: {
+            active: {$set: action.payload.active},
+            scaleObject: {$set: action.payload.scaleObject}
+          }
+        }
+      })
+
+    case EDIT_SCALE_SAVE:
+      return update(state, {
+        editMode: {
+          scale: {
+            active: {$set: action.payload.active},
+            scaleObject: {$set: action.payload.scaleObject},
+            scale: {$set: action.payload.scale}
+          }
+        }
+      })
+    case EDIT_SCALE_CHANGE:
+      return update(state, {
+        editMode: {
+          scale: {
+            scale: {$set: action.payload.scale}
+          }
+        }
+      })
 
     case EDIT_ROTATION_AVTIVE:
       return update(state, {

@@ -75,6 +75,10 @@
         background: url("../PanelEdit/rotation.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
+      &.scale {
+        background: url("../PanelEdit/scale.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
 
       &.active {
         display: inline-block;
