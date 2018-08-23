@@ -1,5 +1,6 @@
 import { connect } from 'react-redux'
 import ProjectsListComponent from './projectsListComponent'
+import { sortField } from '../../actions/projects'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -8,4 +9,12 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps)(ProjectsListComponent)
+const mapDispatchToProps = (dispatch) => {
+  return {
+    sortField: function (projects, filter, field, sortUp) {
+      sortField(projects, filter, field, sortUp)(dispatch)
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectsListComponent)

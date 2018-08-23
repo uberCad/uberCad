@@ -16,7 +16,7 @@ export default class ProjectsComponent extends Component {
   }
 
   render () {
-    const {projectsFilter, items, loading} = this.props
+    const {projectsFilter, items, loading, sortUp, sortFieldName} = this.props
 
     const isEmpty = 0 && items.length === 0
     return (
@@ -43,7 +43,11 @@ export default class ProjectsComponent extends Component {
         {isEmpty
           ? (loading ? <h2>Loading...</h2> : <h2>Empty.</h2>)
           : <div style={{opacity: loading ? 0.5 : 1}}>
-            <ProjectsList projects={items} />
+            <ProjectsList projects={items}
+                          projectsFilter={projectsFilter}
+                          sortUp={sortUp}
+                          sortFieldName={sortFieldName}
+            />
           </div>
         }
       </div>
