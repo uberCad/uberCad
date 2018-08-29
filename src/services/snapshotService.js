@@ -48,7 +48,7 @@ export default class snapshotService {
   }
 
   static delSnapshot (snapshotKey) {
-    return api.get(`/api/del-snapshot/${snapshotKey}`)
+    return api.delete(`/api/snapshot/${snapshotKey}`)
       .then(res => {
         return res
       })
