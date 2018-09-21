@@ -19,6 +19,7 @@ export const TOOL_REDO = 'TOOL_REDO'
 export const TOOL_NEW_LINE = 'TOOL_NEW_LINE'
 export const TOOL_NEW_CURVE = 'TOOL_NEW_CURVE'
 export const TOOL_MEASUREMENT = 'TOOL_MEASUREMENT'
+export const TOOL_LINE = 'TOOL_LINE'
 
 export default class ToolbarComponent extends Component {
   onClick = ({currentTarget: {dataset: {tool}}}) => {
@@ -86,6 +87,14 @@ export default class ToolbarComponent extends Component {
           }
         </FormattedMessage>
 
+        <button className={`btn ${tool === TOOL_LINE ? 'btn-success' : ''}`}
+                data-tool={TOOL_LINE}
+                onClick={this.onClick}
+                title='Line'
+        >
+          <img src={toolLine} alt='Line'/>
+        </button>
+
         <FormattedMessage id='toolbar.newLine' defaultMessage='New line'>
           {value =>
             <button className={`btn ${tool === TOOL_NEW_LINE ? 'btn-success' : ''}`}
@@ -93,7 +102,7 @@ export default class ToolbarComponent extends Component {
                     onClick={this.onClick}
                     title={value}
             >
-              <img src={toolLine} alt='New line'/>
+              <img src={toolLine} alt='Line'/>
             </button>
           }
         </FormattedMessage>

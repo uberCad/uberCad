@@ -15,6 +15,7 @@ import {
 import { spinnerShow, spinnerHide } from '../../actions/spinner'
 
 import {
+  TOOL_LINE,
   TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
   TOOL_NEW_LINE,
@@ -46,6 +47,18 @@ import {
   MEASUREMENT_RADIAL,
   pointInfo, pointSelect, radialInfo, radialSelectLine
 } from '../../actions/measurement'
+import {
+  LINE_PARALLEL,
+  LINE_PERPENDICULAR,
+  LINE_TANGENT_TO_ARC,
+  LINE_TWO_POINT,
+  parallelLine,
+  parallelLineFirstPoint,
+  parallelLineFirstPointSelect,
+  parallelLineSecondPoint,
+  parallelLineSecondPointSelect,
+  parallelLineSelect
+} from '../../actions/line'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -64,7 +77,8 @@ const mapStateToProps = (state, ownProps) => {
       editMode: state.cad.editMode,
       selection: state.selection,
       activeLayer: state.sidebar.activeLayer,
-      measurement: state.tools.measurement
+      measurement: state.tools.measurement,
+      line: state.tools.line
     },
 
     sidebarExpanded: state.sidebar.active,
@@ -178,8 +192,27 @@ const mapDispatchToProps = (dispatch) => {
             }
           }
         }
-      }
 
+        //mouse down
+        if (editor.tool === TOOL_LINE) {
+          if (editor.options.selectMode === LINE_TWO_POINT) {
+            console.log(LINE_TWO_POINT, 'mouse down')
+            !editor.editMode.newLineFirst ? firstPoint(event, editor)(dispatch) : saveNewLine(editor)(dispatch)
+          } else if (editor.options.selectMode === LINE_PARALLEL) {
+            if (!editor.line.parallel.baseLine) {
+              parallelLineSelect(editor.activeEntities[0])(dispatch)
+            } else if (!editor.line.parallel.firstPoint) {
+              parallelLineFirstPointSelect(event, editor, editor.line.parallel.baseLine)(dispatch)
+            } else {
+              parallelLineSecondPointSelect(event, editor)(dispatch)
+            }
+          } else if (editor.options.selectMode === LINE_PERPENDICULAR) {
+            console.log(LINE_PERPENDICULAR, 'mouse down')
+          } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
+            console.log(LINE_TANGENT_TO_ARC, 'mouse down')
+          }
+        }
+      }
     },
 
     onMouseMove: (event, editor) => {
@@ -277,6 +310,34 @@ const mapDispatchToProps = (dispatch) => {
         }
       }
 
+      //mouse move event
+      if (editor.tool === TOOL_LINE) {
+        if (editor.options.selectMode === LINE_TWO_POINT) {
+          let parent = editor.tool === TOOL_NEW_LINE ? editor.activeLayer : editor.editMode.editObject
+          if (!parent || parent.metadata) {
+            parent = editor.scene.getObjectByName('Layers').children[0]
+            dispatch({
+              type: PANEL_LAYERS_TOGGLE,
+              payload: {
+                activeLayer: parent
+              }
+            })
+          }
+          !editor.editMode.newLineFirst ? startNewLine(event, editor)(dispatch) : drawLine(event, editor, parent)(dispatch)
+        } else if (editor.options.selectMode === LINE_PARALLEL) {
+          if (!editor.line.parallel.baseLine) {
+            parallelLine(event, editor)(dispatch)
+          } else if (!editor.line.parallel.firstPoint) {
+            parallelLineFirstPoint(event, editor)(dispatch)
+          } else {
+            parallelLineSecondPoint(event, editor, editor.line.parallel.baseLine, editor.line.parallel.firstPoint, editor.line.parallel.distance)(dispatch)
+          }
+        } else if (editor.options.selectMode === LINE_PERPENDICULAR) {
+          console.log(LINE_PERPENDICULAR, 'mouse move')
+        } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
+          console.log(LINE_TANGENT_TO_ARC, 'mouse move')
+        }
+      }
     },
 
     onMouseUp:

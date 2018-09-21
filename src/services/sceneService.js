@@ -11,6 +11,7 @@ import {
 } from '../components/Options/optionsComponent'
 import axios from 'axios'
 import { MEASUREMENT_ANGLE, MEASUREMENT_RADIAL } from '../actions/measurement'
+import { LINE_PARALLEL } from '../actions/line'
 
 let onClick = (event, scene, camera, renderer) => {
   let result = {
@@ -61,6 +62,9 @@ let onClick = (event, scene, camera, renderer) => {
 let doSelection = (selectResult, editor) => {
   highlightEntities(editor, editor.activeEntities, true, undefined, false)
   switch (editor.options.selectMode) {
+    case LINE_PARALLEL:
+      editor.activeEntities = selectResult
+      break
     case MEASUREMENT_RADIAL:
       editor.activeEntities = selectResult
       break

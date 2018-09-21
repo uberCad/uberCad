@@ -1,7 +1,7 @@
 import DxfParser from 'dxf-parser'
 import dxfService from './../services/dxfService'
 import sceneService from './../services/sceneService'
-import { TOOL_MEASUREMENT, TOOL_POINT } from '../components/Toolbar/toolbarComponent'
+import { TOOL_LINE, TOOL_MEASUREMENT, TOOL_POINT } from '../components/Toolbar/toolbarComponent'
 import { SELECT_MODE_NEW } from '../components/Options/optionsComponent'
 import { addHelpPoints, getScale, unselectLine } from '../services/editObject'
 
@@ -229,6 +229,11 @@ export const cadClick = (event, editor) => {
         break
 
       case TOOL_MEASUREMENT: {
+        let clickResult = sceneService.onClick(event, scene, camera)
+        console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
+      }
+        break
+      case TOOL_LINE: {
         let clickResult = sceneService.onClick(event, scene, camera)
         console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
       }
