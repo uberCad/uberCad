@@ -56,13 +56,10 @@
   }
 
   .user-pic {
-    //float: left;
     margin-top: -5px;
     margin-right: 10px;
     height: 50px;
     border-radius: 50%;
-    //margin: #{($header-height - 50px) / 2} 10px 0 0;
-    //display: inline-block;
     box-shadow: 0 0 24px rgba(153, 153, 153, 0.3);
   }
 }

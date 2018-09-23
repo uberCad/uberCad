@@ -15,6 +15,7 @@ import {
 import { spinnerShow, spinnerHide } from '../../actions/spinner'
 
 import {
+  TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
   TOOL_NEW_LINE,
   TOOL_POINT,
@@ -35,6 +36,16 @@ import {
   thetaStart
 } from '../../actions/edit'
 import { PANEL_LAYERS_TOGGLE } from '../../actions/panelLayers'
+import {
+  angleFirstInfo, angleSecondInfo, angleSelectFirstLine, angleSelectSecondLine, eraseAngle,
+  eraseLine,
+  lineFirstInfo, lineFirstPoint, lineSecondInfo, lineSecondPoint,
+  MEASUREMENT_ANGLE,
+  MEASUREMENT_LINE,
+  MEASUREMENT_POINT,
+  MEASUREMENT_RADIAL,
+  pointInfo, pointSelect, radialInfo, radialSelectLine
+} from '../../actions/measurement'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -52,7 +63,8 @@ const mapStateToProps = (state, ownProps) => {
       },
       editMode: state.cad.editMode,
       selection: state.selection,
-      activeLayer: state.sidebar.activeLayer
+      activeLayer: state.sidebar.activeLayer,
+      measurement: state.tools.measurement
     },
 
     sidebarExpanded: state.sidebar.active,
@@ -134,14 +146,40 @@ const mapDispatchToProps = (dispatch) => {
         }
 
         //move object
-        if (editor.editMode.move.active && !editor.editMode.move.point ) {
-            moveObjectPoint(event, editor)(dispatch)
+        if (editor.editMode.move.active && !editor.editMode.move.point) {
+          moveObjectPoint(event, editor)(dispatch)
         }
 
         if (editor.tool === TOOL_SELECT) {
           selectionBegin(event, editor)(dispatch)
         }
+
+        //mouse down
+        if (editor.tool === TOOL_MEASUREMENT) {
+          if (editor.options.selectMode === MEASUREMENT_POINT) {
+            pointSelect(event, editor)(dispatch)
+          } else if (editor.options.selectMode === MEASUREMENT_LINE) {
+            if (editor.measurement.line.first && editor.measurement.line.second) {
+              eraseLine()(dispatch)
+            } else {
+              !editor.measurement.line.first ?
+                lineFirstPoint(event, editor)(dispatch)
+                : lineSecondPoint(event, editor, editor.measurement.line.first)(dispatch)
+            }
+          } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
+            radialSelectLine(editor.activeEntities[0])(dispatch)
+          } else if (editor.options.selectMode === MEASUREMENT_ANGLE) {
+            if (editor.measurement.angle.firstLine && editor.measurement.angle.secondLine) {
+              eraseAngle()(dispatch)
+            } else {
+              !editor.measurement.angle.firstLine ?
+                angleSelectFirstLine(editor.activeEntities[0])(dispatch)
+                : angleSelectSecondLine(editor.measurement.angle.firstLine, editor.activeEntities[0])(dispatch)
+            }
+          }
+        }
       }
+
     },
 
     onMouseMove: (event, editor) => {
@@ -218,42 +256,65 @@ const mapDispatchToProps = (dispatch) => {
         }
       }
 
-    },
-
-    onMouseUp: (event, editor) => {
-      // console.log('onMouseUp', event, editor)
-
-      if (editor.tool === TOOL_SELECT) {
-        // end select
-        if (editor.selection.active) {
-          let drawRectangle = selectionEnd(event, editor)(dispatch)
-          let selectResult = sceneService.selectInFrustum(drawRectangle, editor.scene)
-          let activeEntities = sceneService.doSelection(selectResult, editor)
-          dispatch({
-            type: CAD_DO_SELECTION,
-            payload: {
-              activeEntities
-            }
-          })
+      //mouse move event
+      if (editor.tool === TOOL_MEASUREMENT) {
+        if (editor.options.selectMode === MEASUREMENT_POINT) {
+          pointInfo(event, editor)(dispatch)
+        } else if (editor.options.selectMode === MEASUREMENT_LINE) {
+          if (!editor.measurement.line.first) {
+            lineFirstInfo(event, editor)(dispatch)
+          } else if (!editor.measurement.line.second) {
+            lineSecondInfo(event, editor)(dispatch)
+          }
+        } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
+          radialInfo(event, editor)(dispatch)
+        } else if (editor.options.selectMode === MEASUREMENT_ANGLE) {
+          if (!editor.measurement.angle.firstLine) {
+            angleFirstInfo(event, editor)(dispatch)
+          } else if (!editor.measurement.angle.secondLine) {
+            angleSecondInfo(event, editor, editor.measurement.angle.firstLine)(dispatch)
+          }
         }
-        // console.warn('selectResult', selectResult)
       }
 
-      // do edit here
-      if (event.button === 0 && editor.tool === TOOL_POINT && editor.editMode.isEdit && editor.editMode.activeLine.id) {
-        // do edit here
-        savePoint(editor.editMode.selectPointIndex)(dispatch)
-      }
-
-      //move object
-      if (editor.editMode.move.active && editor.editMode.move.point) {
-        disableMovePoint(editor.editMode.move.moveObject)(dispatch)
-      }
     },
 
-    toggleChanged: (isChanged) => {
-      toggleChanged(isChanged)(dispatch)
-    }
+    onMouseUp:
+      (event, editor) => {
+        // console.log('onMouseUp', event, editor)
+
+        if (editor.tool === TOOL_SELECT) {
+          // end select
+          if (editor.selection.active) {
+            let drawRectangle = selectionEnd(event, editor)(dispatch)
+            let selectResult = sceneService.selectInFrustum(drawRectangle, editor.scene)
+            let activeEntities = sceneService.doSelection(selectResult, editor)
+            dispatch({
+              type: CAD_DO_SELECTION,
+              payload: {
+                activeEntities
+              }
+            })
+          }
+          // console.warn('selectResult', selectResult)
+        }
+
+        // do edit here
+        if (event.button === 0 && editor.tool === TOOL_POINT && editor.editMode.isEdit && editor.editMode.activeLine.id) {
+          // do edit here
+          savePoint(editor.editMode.selectPointIndex)(dispatch)
+        }
+
+        //move object
+        if (editor.editMode.move.active && editor.editMode.move.point) {
+          disableMovePoint(editor.editMode.move.moveObject)(dispatch)
+        }
+      },
+
+    toggleChanged:
+      (isChanged) => {
+        toggleChanged(isChanged)(dispatch)
+      }
 
   }
 }

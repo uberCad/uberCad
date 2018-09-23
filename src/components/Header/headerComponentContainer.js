@@ -13,7 +13,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = (dispatch) => {
   return {
     changeStateProps: (prop, value) => {
       dispatch(changeStateProps(prop, value))

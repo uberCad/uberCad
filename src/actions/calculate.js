@@ -10,8 +10,6 @@ export const CALCULATE_HIDE = 'CALCULATE_HIDE'
 export const CALCULATE_ORDER = 'CALCULATE_ORDER'
 
 export const calculate = (scene) => {
-  // const objects = sceneService.getObjects(scene, true)
-  // const info = []
   const objects = scene.getObjectByName('Objects').children
   const infoPrice = []
   const polyamideObjects = []

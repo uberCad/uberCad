@@ -12,7 +12,9 @@ import {
   moveActive,
   cancelMove,
   rotationActive,
-  rotationSave
+  rotationSave,
+  scaleActive,
+  scaleSave
 } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
@@ -64,6 +66,12 @@ const mapDispatchToProps = (dispatch) => {
     },
     rotationSave: function (rotationObject, editor) {
       rotationSave(rotationObject, editor)(dispatch)
+    },
+    scaleActive: function (scaleObject) {
+      scaleActive(scaleObject)(dispatch)
+    },
+    scaleSave: function () {
+      scaleSave()(dispatch)
     }
   }
 }

@@ -13,7 +13,9 @@ import {
   rotationAngle,
   saveEdit,
   saveNewCurve,
-  saveNewLine
+  saveNewLine,
+  scaleChange,
+  setScale
 } from '../../actions/edit'
 
 const mapStateToProps = (state, ownProps) => {
@@ -68,6 +70,12 @@ const mapDispatchToProps = (dispatch) => {
     },
     rotationAngle: function (angle, rotationObject, editor) {
       rotationAngle(angle, rotationObject, editor)(dispatch)
+    },
+    scaleChange: function (scale) {
+      scaleChange(scale)(dispatch)
+    },
+    setScale: function (scale, scaleObject, editor) {
+      setScale(scale, scaleObject, editor)(dispatch)
     }
   }
 }

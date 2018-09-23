@@ -74,22 +74,3 @@ export default class ApiService {
     })
   }
 }
-//
-//
-// export default {
-//   get: (url, json = true) => {
-//     return fetch(url)
-//       .then(handleErrors)
-//       .then(res => {
-//         return json ? res.json() : res.text()
-//       })
-//   }
-// }
-//
-// // Handle HTTP errors since fetch won't.
-// function handleErrors (response) {
-//   if (!response.ok) {
-//     throw Error(response.statusText)
-//   }
-//   return response
-// }

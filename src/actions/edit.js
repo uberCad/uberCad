@@ -63,6 +63,10 @@ export const EDIT_ROTATION_AVTIVE = 'EDIT_ROTATION_AVTIVE'
 export const EDIT_ROTATION_ANGLE = 'EDIT_ROTATION_ANGLE'
 export const EDIT_ROTATION_SAVE = 'EDIT_ROTATION_SAVE'
 
+export const EDIT_SCALE_AVTIVE = 'EDIT_SCALE_AVTIVE'
+export const EDIT_SCALE_SAVE = 'EDIT_SCALE_SAVE'
+export const EDIT_SCALE_CHANGE = 'EDIT_SCALE_CHANGE'
+
 export const isEdit = (option, editor, object = {}) => {
   let activeLine = {}
   let {scene, camera, renderer} = editor
@@ -133,6 +137,11 @@ export const cancelEdit = (editor, editObject, backUp) => {
             active: false,
             rotationObject: null,
             angle: 0
+          },
+          scale: {
+            active: false,
+            scaleObject: null,
+            scale: 1
           }
         }
       }
@@ -169,6 +178,11 @@ export const saveEdit = (editor) => {
             active: false,
             rotationObject: null,
             angle: 0
+          },
+          scale: {
+            active: false,
+            scaleObject: null,
+            scale: 1
           }
         }
       }
@@ -823,6 +837,66 @@ export const rotationSave = () => {
         angle: 0
       }
     })
+  }
+}
+
+export const scaleActive = (scaleObject) => {
+  return dispatch => {
+    dispatch({
+      type: EDIT_SCALE_AVTIVE,
+      payload: {
+        active: true,
+        scaleObject: scaleObject.toJSON()
+      }
+    })
+  }
+}
+
+export const scaleSave = () => {
+  return dispatch => {
+    dispatch({
+      type: EDIT_SCALE_SAVE,
+      payload: {
+        active: false,
+        scaleObject: null,
+        scale: 1
+      }
+    })
+  }
+}
+
+export const scaleChange= (scale) => {
+  return dispatch => {
+    dispatch({
+      type: EDIT_SCALE_CHANGE,
+      payload: {scale}
+    })
+  }
+}
+
+export const setScale = (scale, object, editor) => {
+  let {scene, camera, renderer} = editor
+  let sceneOject = scene.getObjectByName(object.object.name)
+  sceneOject.children = []
+
+  let loader = new THREE.ObjectLoader()
+  const scaleObject = loader.parse(object)
+  sceneService.fixSceneAfterImport(scaleObject)
+  while (scaleObject.children.length) {
+    const line = scaleObject.children.pop()
+    sceneOject.add(line)
+  }
+  let box0 = new THREE.BoxHelper(sceneOject, 0x222222)
+  GeometryUtils.scale(sceneOject, scale)
+  let box1 = new THREE.BoxHelper(sceneOject, 0x222222)
+  sceneOject.position.set(
+    box0.geometry.boundingSphere.center.x - box1.geometry.boundingSphere.center.x,
+    box0.geometry.boundingSphere.center.y - box1.geometry.boundingSphere.center.y,
+    box0.geometry.boundingSphere.center.z - box1.geometry.boundingSphere.center.z
+    )
+  fixPosition(sceneOject)
+  renderer.render(scene, camera)
+  return dispatch => {
   }
 }
 

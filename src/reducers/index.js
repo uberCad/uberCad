@@ -14,6 +14,7 @@ import price from './price'
 import locale from './locale'
 import modal from './modal'
 import order from './order'
+import tools from './tools'
 
 export default {
   counter,
@@ -31,5 +32,6 @@ export default {
   price,
   locale,
   modal,
-  order
+  order,
+  tools
 }

@@ -9,6 +9,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     activeObject: state.sidebar.activeObject,
     material,
+    measurement: state.tools.measurement,
+    selectMode: state.options.selectMode,
     ...ownProps
   }
 }

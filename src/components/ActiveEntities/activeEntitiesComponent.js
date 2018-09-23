@@ -64,7 +64,6 @@ export default class ActiveEntitiesComponent extends Component {
                         onClick={this.unSelect}
                 />
 
-
                 <FormattedMessage id='activeEntities.checkboxVisibility' defaultMessage='Visibility'>
                   {title =>
                     <input type='checkbox' data-idx={idx}

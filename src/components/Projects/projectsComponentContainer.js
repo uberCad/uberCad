@@ -8,7 +8,9 @@ const mapStateToProps = (state, ownProps) => {
   const {
     loading,
     lastUpdated,
-    items
+    items,
+    sortUp,
+    sortFieldName
   } = projectsByFilter[projectsFilter] || {
     loading: true,
     items: []
@@ -20,6 +22,8 @@ const mapStateToProps = (state, ownProps) => {
     items,
     loading,
     lastUpdated,
+    sortUp,
+    sortFieldName,
     ...ownProps
   }
 }

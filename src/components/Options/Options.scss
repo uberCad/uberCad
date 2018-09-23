@@ -2,7 +2,6 @@
 
 #options {
   .sidebar-collapsed & {
-    //ага, я й сам здивувався))
     width: calc(100% - #{$sidebar-collapsed-width});
   }
 
@@ -25,13 +24,11 @@
     float: left;
 
     li {
-      //background-color: royalblue;
       padding: 0 5px 0 0;
       margin: 0 5px 0 0;
       border-right: 2px solid lavender;
       height: $toolSize;
       line-height: $toolSize;
-
       float: left;
 
       label {
@@ -54,8 +51,8 @@
 
       input[type=radio] {
         -webkit-appearance: none;
-        -moz-appearance:    none;
-        appearance:         none;
+        -moz-appearance: none;
+        appearance: none;
 
         display: inline-block;
         width: 22px;
@@ -79,12 +76,11 @@
         }
 
         &:checked {
-          background-color: rgba(0,0,0,0.1);
+          background-color: rgba(0, 0, 0, 0.1);
           border-radius: 3px;
-          border: 1px solid rgba(0,0,0,0.3);
+          border: 1px solid rgba(0, 0, 0, 0.3);
           outline: none;
         }
-
 
       }
 
@@ -93,7 +89,7 @@
         height: 20px;
         border-radius: 2px;
         background-color: white;
-        border: 1px solid rgba(0,0,0,0.3);
+        border: 1px solid rgba(0, 0, 0, 0.3);
       }
 
       button {
@@ -109,17 +105,16 @@
     line-height: $toolSize;
     font-size: 11px;
 
-    .tool-info{
+    .tool-info {
       float: left;
       margin-left: 10px;
     }
-
     input[type=text], input[type=number] {
       width: 70px;
       height: 20px;
       border-radius: 2px;
       background-color: white;
-      border: 1px solid rgba(0,0,0,0.3);
+      border: 1px solid rgba(0, 0, 0, 0.3);
     }
 
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
@@ -127,6 +122,11 @@
       margin: 0;
     }
 
+    .apply {
+      float: right;
+      background: url("apply.svg") no-repeat left transparent;
+      background-size: $toolSize - 25px;
+    }
 
     label {
       float: left;

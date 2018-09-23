@@ -47,8 +47,6 @@ export const combineEdgeModels = editor => {
     } catch (e) {
       console.error(e)
     }
-
-
     dispatch({
       type: CAD_COMBINE_EDGE_MODELS,
       payload: {}

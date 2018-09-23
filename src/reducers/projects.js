@@ -4,7 +4,8 @@ import {
   PROJECTS_INVALIDATE_FILTER,
   PROJECTS_FETCH_BEGIN,
   PROJECTS_FETCH_SUCCESS,
-  PROJECTS_FETCH_FAILURE
+  PROJECTS_FETCH_FAILURE,
+  PROJECTS_SORT_FIELD
 } from '../actions/projects'
 
 let initialState = {
@@ -12,7 +13,9 @@ let initialState = {
   didInvalidate: false,
   items: [],
   error: null,
-  lastUpdated: null
+  lastUpdated: null,
+  sortUp: true,
+  sortFieldName: ''
 }
 
 const projects = (state = initialState, action) => {
@@ -43,6 +46,14 @@ const projects = (state = initialState, action) => {
         items: [],
         error: action.payload.error
       }
+    case PROJECTS_SORT_FIELD:
+      return {
+        ...state,
+        loading: false,
+        items: action.payload.projects,
+        sortUp: action.payload.sortUp,
+        sortFieldName: action.payload.field
+      }
     default:
       return state
   }
@@ -54,6 +65,7 @@ const projectsByFilter = (state = {}, action) => {
     case PROJECTS_FETCH_SUCCESS:
     case PROJECTS_FETCH_BEGIN:
     case PROJECTS_FETCH_FAILURE:
+    case PROJECTS_SORT_FIELD:
       return {
         ...state,
         [action.payload.filter]: projects(state[action.payload.filter], action)

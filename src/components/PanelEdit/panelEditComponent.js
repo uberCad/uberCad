@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-// import PropTypes from 'prop-types'
 import './PanelEdit.css'
 import PropTypes from 'prop-types'
 
@@ -48,11 +47,20 @@ export default class PanelEditComponent extends Component {
     this.props.rotationSave()
   }
 
+  scale = () => {
+    this.props.scaleActive (this.props.editMode.editObject)
+  }
+
+  scaleSave = () => {
+    this.props.scaleSave()
+  }
+
   render () {
     const {activeLine, isNewLine, isNewCurve} = this.props.editMode
     const clone = this.props.editMode.clone.active
     const move = this.props.editMode.move.active
     const rotation = this.props.editMode.rotation.active
+    const scale = this.props.editMode.scale.active
     const editObject = this.props.editMode.editObject
     return (
       <div id='panel-edit'>
@@ -88,6 +96,8 @@ export default class PanelEditComponent extends Component {
           <button onClick={this.mirrorOy} className='mirror-v' title='Mirroring OY'/>
           {!rotation ? <button onClick={this.rotation} className='rotation' title='Rotation'/>
           : <button onClick={this.rotationSave} className='rotation active' title='Save rotation'/>}
+          {!scale ? <button onClick={this.scale} className='scale' title='Scale'/>
+            : <button onClick={this.scaleSave} className='scale active' title='Save scale'/>}
         </div>}
       </div>
     )

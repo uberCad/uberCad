@@ -73,19 +73,19 @@ export default class CalculatePriceComponent extends Component {
                 {error.objName.map((name, i) => <li key={i}>{name}</li>)}
               </ul>
               </div>}
-
-            {!error && polyamides.length && <OrderForm objects={polyamides}/>}
+            {!error && polyamides.length === 0 && <div>No objects with material 'Polyamide'</div>}
+            {!error && polyamides.length > 0 && <OrderForm objects={polyamides}/>}
 
           </Modal.Body>
           <Modal.Footer>
-            {!error && <FormattedMessage id='btn.order' defaultMessage='Order'>
+            {!error && polyamides.length > 0 && <FormattedMessage id='btn.order' defaultMessage='Order'>
               {value =>
                 <Button
                   bsStyle='info'
                   onClick={
                     (form && form.syncErrors) ? () => {console.log('have error')} : this.order
                   }
-                  disabled={(form && form.syncErrors) ? true : false}
+                  disabled={((form && form.syncErrors) || !form) ? true : false}
                 >{value}</Button>
               }
             </FormattedMessage>}

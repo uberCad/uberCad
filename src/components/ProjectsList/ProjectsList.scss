@@ -29,8 +29,14 @@
     line-height: 15px;
     height: 50px;
 
-    .table-head-name:first-child {
-      padding-left: 25px;
+    .table-head-name {
+      &:first-child {
+        padding-left: 25px;
+      }
+
+      span {
+        cursor: pointer;
+      }
     }
 
     .table-head-name i {
