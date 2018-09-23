@@ -14,7 +14,7 @@ export const addProject = (project) => {
       .then((res) => {
         // selectFilter('all')(dispatch)
         // fetchProjects('all', true)(dispatch)
-        history.push(`/project/${res._key}`)
+        history.push(`${process.env.PUBLIC_URL}/project/${res._key}`)
         dispatch({
           type: ADD_PROJECT,
           payload: {}

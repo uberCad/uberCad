@@ -20,7 +20,7 @@ export default class UserLoginComponent extends Component {
     if (sid && userName) {
       UserService.updateSid(sid)
       this.props.setUserName(userName)
-      this.props.history.push('/')
+      this.props.history.push(`${process.env.PUBLIC_URL}/`)
     }
   }
 

@@ -18,7 +18,7 @@ export default class HeaderComponent extends Component {
       <Navbar className='nav-head header' collapseOnSelect fluid>
         <Navbar.Header>
           <Navbar.Brand>
-            <a href='/' className='logo navbar-brand'>
+            <a href={`${process.env.PUBLIC_URL}/`} className='logo navbar-brand'>
               {appName}
               <img src={logo} alt='logo' width={24} />
             </a>
@@ -27,13 +27,13 @@ export default class HeaderComponent extends Component {
         </Navbar.Header>
         <Navbar.Collapse>
           <Nav className='nav-group'>
-            <NavItem href='/'>
+            <NavItem href={`${process.env.PUBLIC_URL}/`}>
               <FormattedMessage id='header.projects' defaultMessage='Projects!' />
             </NavItem>
-            <NavItem href='/demo'>
+            <NavItem href={`${process.env.PUBLIC_URL}/demo`}>
               <FormattedMessage id='header.store' defaultMessage='Store' />
             </NavItem>
-            <NavItem href='/demo'>
+            <NavItem href={`${process.env.PUBLIC_URL}/demo`}>
               <FormattedMessage id='header.creators' defaultMessage='Creators' />
             </NavItem>
           </Nav>
@@ -58,10 +58,10 @@ export default class HeaderComponent extends Component {
                 <FormattedMessage id='header.logout' defaultMessage='Logout' />
               </MenuItem>
             </NavDropdown>}
-            {!this.props.userName && <NavItem href='/login'>
+            {!this.props.userName && <NavItem href={`${process.env.PUBLIC_URL}/login`}>
               <FormattedMessage id='header.login' defaultMessage='Login' />
             </NavItem>}
-            {!this.props.userName && <NavItem href='/sign-up'>
+            {!this.props.userName && <NavItem href={`${process.env.PUBLIC_URL}/sign-up`}>
               <FormattedMessage id='header.signUp' defaultMessage='Sign Up' />
             </NavItem>}
 

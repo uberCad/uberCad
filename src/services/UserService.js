@@ -34,7 +34,7 @@ export default class UserService {
           window.localStorage.clear()
           axios.defaults.headers.common['X-Session-Id'] = ''
           resolve(res)
-          history.push('/login')
+          history.push(`${process.env.PUBLIC_URL}/login`)
         })
         .catch((error) => {
           reject(error)

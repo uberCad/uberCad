@@ -12,7 +12,7 @@ export const authorize = (username, password, history) => {
     return userService.login(username, password)
       .then(res => {
         if (res.sid) {
-          history.push('/')
+          history.push(`${process.env.PUBLIC_URL}/`)
           dispatch({
             type: LOGIN_ACTION,
             payload: {
@@ -31,7 +31,7 @@ export const logout = (history) => {
   return (dispatch) => {
     userService.logout()
       .then(() => {
-        history.push('/login')
+        history.push(`${process.env.PUBLIC_URL}/login`)
         dispatch({
           type: LOGOUT_ACTION,
           payload: {
@@ -65,7 +65,7 @@ export const register = (user, history) => {
     return userService.createUser(user)
       .then(res => {
         if (res && res.sid) {
-          history.push('/')
+          history.push(`${process.env.PUBLIC_URL}/`)
           dispatch({
             type: REGISTER_USER,
             payload: {

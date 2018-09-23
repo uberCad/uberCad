@@ -31,7 +31,7 @@ export default class ToolbarComponent extends Component {
       <div id='toolbar'>
         <FormattedMessage id='toolbar.point' defaultMessage='Point (v)'>
           {value =>
-            <button className={`btn ${tool === TOOL_POINT ? 'btn-success' : ''}`}
+            <button className={`button-tool btn ${tool === TOOL_POINT ? 'btn-success' : ''}`}
               data-tool={TOOL_POINT}
               onClick={this.onClick}
               title={value}
@@ -43,7 +43,7 @@ export default class ToolbarComponent extends Component {
 
         <FormattedMessage id='toolbar.select' defaultMessage='Select (m)'>
           {value =>
-            <button className={`btn ${tool === TOOL_SELECT ? 'btn-success' : ''}`}
+            <button className={`button-tool btn ${tool === TOOL_SELECT ? 'btn-success' : ''}`}
               data-tool={TOOL_SELECT}
               onClick={this.onClick}
               title={value}
@@ -55,7 +55,7 @@ export default class ToolbarComponent extends Component {
 
         <FormattedMessage id='toolbar.undo' defaultMessage='Undo'>
           {value =>
-            <button className={`btn ${tool === TOOL_UNDO ? 'btn-success' : ''}`}
+            <button className={`button-tool btn ${tool === TOOL_UNDO ? 'btn-success' : ''}`}
               data-tool={TOOL_UNDO}
               onClick={this.onClick}
               title={value}
@@ -67,7 +67,7 @@ export default class ToolbarComponent extends Component {
 
         <FormattedMessage id='toolbar.redo' defaultMessage='Redo'>
           {value =>
-            <button className={`btn ${tool === TOOL_REDO ? 'btn-success' : ''}`}
+            <button className={`button-tool btn ${tool === TOOL_REDO ? 'btn-success' : ''}`}
               data-tool={TOOL_REDO}
               onClick={this.onClick}
               title={value}
@@ -79,7 +79,7 @@ export default class ToolbarComponent extends Component {
 
         <FormattedMessage id='toolbar.newLine' defaultMessage='New line'>
           {value =>
-            <button className={`btn ${tool === TOOL_NEW_LINE ? 'btn-success' : ''}`}
+            <button className={`button-tool btn ${tool === TOOL_NEW_LINE ? 'btn-success' : ''}`}
                     data-tool={TOOL_NEW_LINE}
                     onClick={this.onClick}
                     title={value}
@@ -91,7 +91,7 @@ export default class ToolbarComponent extends Component {
 
         <FormattedMessage id='toolbar.newCurve' defaultMessage='New curve'>
           {value =>
-            <button className={`btn ${tool === TOOL_NEW_CURVE ? 'btn-success' : ''}`}
+            <button className={`button-tool btn ${tool === TOOL_NEW_CURVE ? 'btn-success' : ''}`}
                     data-tool={TOOL_NEW_CURVE}
                     onClick={this.onClick}
                     title={value}

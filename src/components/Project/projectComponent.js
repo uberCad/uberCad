@@ -180,7 +180,7 @@ export default class ProjectComponent extends Component {
                   <Col xs={3} className='table-data title'>
                     <Col xs={10} className='cont'>
                       {i !== this.state.snapshotId &&
-                      <Link to={`/cad/${project._key}/${snapshot._key}`}>{snapshot.title}</Link>}
+                      <Link to={`${process.env.PUBLIC_URL}/cad/${project._key}/${snapshot._key}`}>{snapshot.title}</Link>}
                       {this.state.renameSnapshot && i === this.state.snapshotId &&
                       <input type='text'
                              value={snapshot.title}
@@ -219,7 +219,7 @@ export default class ProjectComponent extends Component {
                 <i className='fa fa-cubes fa-eye'/>
               </Col>
               <Col xs={3} className='table-data title'>
-                <Link to={`/cad/${project._key}`}>{project.title}</Link>
+                <Link to={`${process.env.PUBLIC_URL}/cad/${project._key}`}>{project.title}</Link>
                 {project.fileName && <p>File name: {project.fileName}</p>}
                 <p>34 minutes ago hardcoded</p>
               </Col>

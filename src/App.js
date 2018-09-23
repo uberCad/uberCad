@@ -29,16 +29,16 @@ class App extends Component {
             <Header />
             <div className='content'>
               <Switch>
-                <Route path='/' exact component={Projects} />
-                <Route path='/project/:id' component={Project} />
-                <Route path='/order/:key/:hash' component={Order} />
-                <Route path='/cad/:projectId/:snapshotId?' component={Cad} />
-                <Route path='/login/:sid?/:userName?' component={UserLogin} />
-                <Route path='/sign-up' component={SignUp} />
+                <Route path={`${process.env.PUBLIC_URL}/`} exact component={Projects} />
+                <Route path={`${process.env.PUBLIC_URL}/project/:id`} component={Project} />
+                <Route path={`${process.env.PUBLIC_URL}/order/:key/:hash`} component={Order} />
+                <Route path={`${process.env.PUBLIC_URL}/cad/:projectId/:snapshotId?`} component={Cad} />
+                <Route path={`${process.env.PUBLIC_URL}/login/:sid?/:userName?`} component={UserLogin} />
+                <Route path={`${process.env.PUBLIC_URL}/sign-up`} component={SignUp} />
 
                 <Route path='*' render={() => {
                   return (
-                    <Redirect to='/' />
+                    <Redirect to={`${process.env.PUBLIC_URL}/`} />
                   )
                 }}
                 />

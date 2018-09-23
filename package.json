@@ -87,5 +87,6 @@
   "standard": {
     "parser": "babel-eslint"
   },
-  "proxy": "http://localhost:5000"
+  "proxy": "http://localhost:5000",
+  "homepage": "https://arangodb.aditim.ru/_db/cad/api/"
 }
