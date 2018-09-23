@@ -1,0 +1,63 @@
+@import "../../../variables.scss";
+
+.tools-measurement {
+  list-style: none;
+
+  padding: 0 5px 0 0;
+  margin: 0 5px 0 0;
+  border-right: 2px solid lavender;
+  height: $toolSize;
+  line-height: $toolSize;
+  float: left;
+
+  label {
+    font-weight: normal;
+    display: inline-block;
+    line-height: $toolSize;
+    vertical-align: top;
+    height: 100%;
+    font-size: 11px;
+  }
+
+  input {
+    margin: 0;
+    vertical-align: middle;
+
+    &:active, &:focus {
+      outline: none;
+    }
+  }
+
+  input[type=radio] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    display: inline-block;
+    margin: 5px;
+    width: 22px;
+    height: 22px;
+
+
+    &.two-point {
+      background: url("line.svg") no-repeat;
+    }
+    &.parallel {
+      background: url("parallel.svg") no-repeat;
+    }
+    &.perpendicular {
+      background: url("perpendicular.svg") no-repeat;
+    }
+    &.tangent-to-arc {
+      background: url("tangent-to-arc.svg") no-repeat;
+    }
+
+    &:checked {
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 3px;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      outline: none;
+    }
+
+  }
+}

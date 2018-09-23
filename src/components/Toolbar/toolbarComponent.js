@@ -1,7 +1,6 @@
 // ICONS: https://www.flaticon.com/free-icon/computer-mouse-cursor_70358#term=cursor&page=1&position=11
 
 import React, { Component } from 'react'
-// import PropTypes from 'prop-types'
 import './Toolbar.css'
 import toolPoint from './point.svg'
 import toolSelect from './select.svg'
@@ -9,6 +8,7 @@ import toolUndo from './undo.svg'
 import toolRedo from './redo.svg'
 import toolLine from './line.svg'
 import toolCurve from './curve.svg'
+import toolMeasurement from './measurement.svg'
 import PropTypes from 'prop-types'
 import { FormattedMessage } from 'react-intl'
 
@@ -18,6 +18,7 @@ export const TOOL_UNDO = 'TOOL_UNDO'
 export const TOOL_REDO = 'TOOL_REDO'
 export const TOOL_NEW_LINE = 'TOOL_NEW_LINE'
 export const TOOL_NEW_CURVE = 'TOOL_NEW_CURVE'
+export const TOOL_MEASUREMENT = 'TOOL_MEASUREMENT'
 
 export default class ToolbarComponent extends Component {
   onClick = ({currentTarget: {dataset: {tool}}}) => {
@@ -32,11 +33,11 @@ export default class ToolbarComponent extends Component {
         <FormattedMessage id='toolbar.point' defaultMessage='Point (v)'>
           {value =>
             <button className={`btn ${tool === TOOL_POINT ? 'btn-success' : ''}`}
-              data-tool={TOOL_POINT}
-              onClick={this.onClick}
-              title={value}
+                    data-tool={TOOL_POINT}
+                    onClick={this.onClick}
+                    title={value}
             >
-              <img src={toolPoint} alt='Point' />
+              <img src={toolPoint} alt='Point'/>
             </button>
           }
         </FormattedMessage>
@@ -44,23 +45,31 @@ export default class ToolbarComponent extends Component {
         <FormattedMessage id='toolbar.select' defaultMessage='Select (m)'>
           {value =>
             <button className={`btn ${tool === TOOL_SELECT ? 'btn-success' : ''}`}
-              data-tool={TOOL_SELECT}
-              onClick={this.onClick}
-              title={value}
+                    data-tool={TOOL_SELECT}
+                    onClick={this.onClick}
+                    title={value}
             >
-              <img src={toolSelect} alt='Select' />
+              <img src={toolSelect} alt='Select'/>
             </button>
           }
         </FormattedMessage>
 
+        <button className={`btn ${tool === TOOL_MEASUREMENT ? 'btn-success' : ''}`}
+                data-tool={TOOL_MEASUREMENT}
+                onClick={this.onClick}
+                title='Measurement'
+        >
+          <img src={toolMeasurement} alt='Measurement'/>
+        </button>
+
         <FormattedMessage id='toolbar.undo' defaultMessage='Undo'>
           {value =>
             <button className={`btn ${tool === TOOL_UNDO ? 'btn-success' : ''}`}
-              data-tool={TOOL_UNDO}
-              onClick={this.onClick}
-              title={value}
+                    data-tool={TOOL_UNDO}
+                    onClick={this.onClick}
+                    title={value}
             >
-              <img src={toolUndo} alt='Undo' />
+              <img src={toolUndo} alt='Undo'/>
             </button>
           }
         </FormattedMessage>
@@ -68,11 +77,11 @@ export default class ToolbarComponent extends Component {
         <FormattedMessage id='toolbar.redo' defaultMessage='Redo'>
           {value =>
             <button className={`btn ${tool === TOOL_REDO ? 'btn-success' : ''}`}
-              data-tool={TOOL_REDO}
-              onClick={this.onClick}
-              title={value}
+                    data-tool={TOOL_REDO}
+                    onClick={this.onClick}
+                    title={value}
             >
-              <img src={toolRedo} alt='Redo' />
+              <img src={toolRedo} alt='Redo'/>
             </button>
           }
         </FormattedMessage>
@@ -84,7 +93,7 @@ export default class ToolbarComponent extends Component {
                     onClick={this.onClick}
                     title={value}
             >
-              <img src={toolLine} alt='New line' />
+              <img src={toolLine} alt='New line'/>
             </button>
           }
         </FormattedMessage>
@@ -96,7 +105,7 @@ export default class ToolbarComponent extends Component {
                     onClick={this.onClick}
                     title={value}
             >
-              <img src={toolCurve} alt='New curve' />
+              <img src={toolCurve} alt='New curve'/>
             </button>
           }
         </FormattedMessage>

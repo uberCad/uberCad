@@ -10,6 +10,7 @@ import {
   MEASUREMENT_POINT,
   MEASUREMENT_RADIAL_LINE
 } from '../actions/measurement'
+import { LINE_PARALLEL_BASE, LINE_PARALLEL_CLEAR, LINE_PARALLEL_FIRST_POINT } from '../actions/line'
 
 let initialState = {
   measurement: {
@@ -26,6 +27,13 @@ let initialState = {
       firstLine: null,
       secondLine: null,
       angleValue: null
+    }
+  },
+  line: {
+    parallel: {
+      baseLine: null,
+      firstPoint: null,
+      distance: null
     }
   }
 }
@@ -78,6 +86,30 @@ const tools = (state = initialState, action) => {
             angleValue: {$set: action.payload.angleValue}
           }
         }
+      })
+
+    case LINE_PARALLEL_CLEAR:
+      return update(state, {
+        line: {
+          parallel: {
+            baseLine: {$set: null},
+            firstPoint: {$set: null},
+            distance: {$set: null}
+
+          }
+        }
+      })
+    case LINE_PARALLEL_BASE:
+      return update(state, {
+        line: {parallel: {baseLine: {$set: action.payload.baseLine}}}
+      })
+
+    case LINE_PARALLEL_FIRST_POINT:
+      return update(state, {
+        line: {parallel: {
+          firstPoint: {$set: action.payload.first},
+            distance: {$set: action.payload.distance}
+        }}
       })
 
     default:

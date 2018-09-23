@@ -2588,6 +2588,30 @@ let scale = (object, scale) => {
   return object
 }
 
+let distanseToLinePoint = (line, point) => {
+  return (
+    Math.abs(
+      (line.geometry.vertices[1].y - line.geometry.vertices[0].y) * point.x -
+      (line.geometry.vertices[1].x - line.geometry.vertices[0].x) * point.y +
+      (line.geometry.vertices[1].x * line.geometry.vertices[0].y) -
+      (line.geometry.vertices[1].y * line.geometry.vertices[0].x)
+    ) /
+    Math.sqrt(
+      (line.geometry.vertices[1].y - line.geometry.vertices[0].y) *
+      (line.geometry.vertices[1].y - line.geometry.vertices[0].y) +
+      (line.geometry.vertices[1].x - line.geometry.vertices[0].x) *
+      (line.geometry.vertices[1].x - line.geometry.vertices[0].x)
+    )
+  )
+}
+
+let pointIntersect = (a, b, c, d) => {
+  let T = {}
+  T.x = -((a.x*b.y-b.x*a.y)*(d.x-c.x)-(c.x*d.y-d.x*c.y)*(b.x-a.x))/((a.y-b.y)*(d.x-c.x)-(c.y-d.y)*(b.x-a.x));
+  T.y = ((c.y-d.y)*(-T.x)-(c.x*d.y-d.x*c.y))/(d.x-c.x);
+  return T
+}
+
 export default {
   distanceToLine,
   distanceToArc,
@@ -2620,5 +2644,8 @@ export default {
   rotatePoint,
   changeArcGeometry,
   angleBetweenLines,
-  scale
+  scale,
+  distanceToEntity,
+  distanseToLinePoint,
+  pointIntersect
 }

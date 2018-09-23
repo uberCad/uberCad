@@ -16,6 +16,9 @@ export const setSelectMode = mode => {
         mode
       }
     })
+    dispatch({
+      type: `${mode}_CLEAR`
+    })
   }
 }
 
