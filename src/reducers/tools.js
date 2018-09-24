@@ -10,7 +10,14 @@ import {
   MEASUREMENT_POINT,
   MEASUREMENT_RADIAL_LINE
 } from '../actions/measurement'
-import { LINE_PARALLEL_BASE, LINE_PARALLEL_CLEAR, LINE_PARALLEL_FIRST_POINT } from '../actions/line'
+import {
+  LINE_PARALLEL_BASE,
+  LINE_PARALLEL_CLEAR,
+  LINE_PARALLEL_FIRST_POINT,
+  LINE_PERPENDICULAR_BASE,
+  LINE_PERPENDICULAR_CLEAR,
+  LINE_PERPENDICULAR_FIRST_POINT
+} from '../actions/line'
 
 let initialState = {
   measurement: {
@@ -34,6 +41,10 @@ let initialState = {
       baseLine: null,
       firstPoint: null,
       distance: null
+    },
+    perpendicular: {
+      baseLine: null,
+      firstPoint: null
     }
   }
 }
@@ -110,6 +121,24 @@ const tools = (state = initialState, action) => {
           firstPoint: {$set: action.payload.first},
             distance: {$set: action.payload.distance}
         }}
+      })
+
+    case LINE_PERPENDICULAR_CLEAR:
+      return update(state, {
+        line: {
+          perpendicular: {
+            baseLine: {$set: null},
+            firstPoint: {$set: null}
+          }
+        }
+      })
+    case LINE_PERPENDICULAR_BASE:
+      return update(state, {
+        line: {perpendicular: {baseLine: {$set: action.payload.baseLine}}}
+      })
+    case LINE_PERPENDICULAR_FIRST_POINT:
+      return update(state, {
+        line: {perpendicular: {firstPoint: {$set: action.payload.first}}}
       })
 
     default:

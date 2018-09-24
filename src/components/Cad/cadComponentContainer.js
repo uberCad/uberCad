@@ -57,7 +57,13 @@ import {
   parallelLineFirstPointSelect,
   parallelLineSecondPoint,
   parallelLineSecondPointSelect,
-  parallelLineSelect
+  parallelLineSelect,
+  perpendicularBaseLine,
+  perpendicularDraw,
+  perpendicularFirstPoint,
+  perpendicularFirstPointSelect,
+  perpendicularLineSelect,
+  perpendicularSecondPointSelect
 } from '../../actions/line'
 
 const mapStateToProps = (state, ownProps) => {
@@ -207,7 +213,13 @@ const mapDispatchToProps = (dispatch) => {
               parallelLineSecondPointSelect(event, editor)(dispatch)
             }
           } else if (editor.options.selectMode === LINE_PERPENDICULAR) {
-            console.log(LINE_PERPENDICULAR, 'mouse down')
+            if (!editor.line.perpendicular.baseLine) {
+              perpendicularLineSelect(editor.activeEntities[0])(dispatch)
+            } else if (!editor.line.perpendicular.firstPoint) {
+              perpendicularFirstPointSelect(event, editor)(dispatch)
+            } else {
+              perpendicularSecondPointSelect(event, editor)(dispatch)
+            }
           } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
             console.log(LINE_TANGENT_TO_ARC, 'mouse down')
           }
@@ -333,7 +345,13 @@ const mapDispatchToProps = (dispatch) => {
             parallelLineSecondPoint(event, editor, editor.line.parallel.baseLine, editor.line.parallel.firstPoint, editor.line.parallel.distance)(dispatch)
           }
         } else if (editor.options.selectMode === LINE_PERPENDICULAR) {
-          console.log(LINE_PERPENDICULAR, 'mouse move')
+          if (!editor.line.perpendicular.baseLine) {
+            perpendicularBaseLine(event, editor)(dispatch)
+          } else if (!editor.line.perpendicular.firstPoint) {
+            perpendicularFirstPoint(event, editor)(dispatch)
+          } else {
+            perpendicularDraw(event, editor, editor.line.perpendicular.baseLine, editor.line.perpendicular.firstPoint)(dispatch)
+          }
         } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
           console.log(LINE_TANGENT_TO_ARC, 'mouse move')
         }
