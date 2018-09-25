@@ -63,7 +63,11 @@ import {
   perpendicularFirstPoint,
   perpendicularFirstPointSelect,
   perpendicularLineSelect,
-  perpendicularSecondPointSelect
+  perpendicularSecondPointSelect,
+  tangentBaseArc,
+  tangentBaseArcSelect,
+  tangentLineDraw,
+  tangentLineEnd
 } from '../../actions/line'
 
 const mapStateToProps = (state, ownProps) => {
@@ -221,7 +225,11 @@ const mapDispatchToProps = (dispatch) => {
               perpendicularSecondPointSelect(event, editor)(dispatch)
             }
           } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
-            console.log(LINE_TANGENT_TO_ARC, 'mouse down')
+            if (!editor.line.tangent.baseArc) {
+              tangentBaseArcSelect(editor.activeEntities[0])(dispatch)
+            } else {
+              tangentLineEnd(event, editor)(dispatch)
+            }
           }
         }
       }
@@ -353,7 +361,11 @@ const mapDispatchToProps = (dispatch) => {
             perpendicularDraw(event, editor, editor.line.perpendicular.baseLine, editor.line.perpendicular.firstPoint)(dispatch)
           }
         } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
-          console.log(LINE_TANGENT_TO_ARC, 'mouse move')
+          if (!editor.line.tangent.baseArc) {
+            tangentBaseArc(event, editor)(dispatch)
+          } else {
+            tangentLineDraw(event, editor, editor.line.tangent.baseArc)(dispatch)
+          }
         }
       }
     },

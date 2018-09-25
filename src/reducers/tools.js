@@ -16,7 +16,9 @@ import {
   LINE_PARALLEL_FIRST_POINT,
   LINE_PERPENDICULAR_BASE,
   LINE_PERPENDICULAR_CLEAR,
-  LINE_PERPENDICULAR_FIRST_POINT
+  LINE_PERPENDICULAR_FIRST_POINT,
+  LINE_TANGENT_TO_ARC_BASE,
+  LINE_TANGENT_TO_ARC_CLEAR
 } from '../actions/line'
 
 let initialState = {
@@ -45,6 +47,9 @@ let initialState = {
     perpendicular: {
       baseLine: null,
       firstPoint: null
+    },
+    tangent: {
+      baseArc: null
     }
   }
 }
@@ -117,10 +122,12 @@ const tools = (state = initialState, action) => {
 
     case LINE_PARALLEL_FIRST_POINT:
       return update(state, {
-        line: {parallel: {
-          firstPoint: {$set: action.payload.first},
+        line: {
+          parallel: {
+            firstPoint: {$set: action.payload.first},
             distance: {$set: action.payload.distance}
-        }}
+          }
+        }
       })
 
     case LINE_PERPENDICULAR_CLEAR:
@@ -140,6 +147,16 @@ const tools = (state = initialState, action) => {
       return update(state, {
         line: {perpendicular: {firstPoint: {$set: action.payload.first}}}
       })
+
+    case LINE_TANGENT_TO_ARC_CLEAR:
+      return update(state, {
+        line: {tangent: {baseArc: {$set: null}}}
+      })
+    case LINE_TANGENT_TO_ARC_BASE:
+      return update(state, {
+        line: {tangent: {baseArc: {$set: action.payload.baseArc}}}
+      })
+
 
     default:
       return state

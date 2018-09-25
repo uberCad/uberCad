@@ -1,4 +1,4 @@
-import { createLine, crossingPoint } from '../services/editObject'
+import { createLine, crossingPoint, helpArc } from '../services/editObject'
 import sceneService from '../services/sceneService'
 import { movePointInfo } from './pointInfo'
 import { CAD_DO_SELECTION } from './cad'
@@ -18,6 +18,10 @@ export const LINE_PERPENDICULAR_BASE = 'LINE_PERPENDICULAR_BASE'
 export const LINE_PERPENDICULAR_FIRST_POINT = 'LINE_PERPENDICULAR_FIRST_POINT'
 
 export const LINE_TANGENT_TO_ARC = 'LINE_TANGENT_TO_ARC'
+export const LINE_TANGENT_TO_ARC_CLEAR = 'LINE_TANGENT_TO_ARC_CLEAR'
+export const LINE_TANGENT_TO_ARC_BASE = 'LINE_TANGENT_TO_ARC_BASE'
+
+const tangentName = 'tangentLine'
 
 export const parallelLine = (event, editor) => {
   let {scene, camera} = editor
@@ -298,6 +302,84 @@ export const perpendicularSecondPointSelect = (event, editor) => {
   return dispatch => {
     dispatch({
       type: LINE_PERPENDICULAR_CLEAR
+    })
+  }
+}
+
+export const tangentBaseArc = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  const circle = clickResult.activeEntities.filter(item => {
+    return (item.geometry instanceof THREE.CircleGeometry)
+  })
+  let activeEntities = sceneService.doSelection(circle, editor)
+  return dispatch => {
+    movePointInfo(event, 'Click to select base arc')(dispatch)
+    dispatch({
+      type: CAD_DO_SELECTION,
+      payload: {activeEntities}
+    })
+  }
+}
+
+export const tangentBaseArcSelect = (baseArc) => {
+  return dispatch => {
+    dispatch({
+      type: LINE_TANGENT_TO_ARC_BASE,
+      payload: {baseArc}
+    })
+  }
+}
+
+export const tangentLineDraw = (event, editor, baseArc) => {
+  let {scene, camera, renderer} = editor
+  sceneService.removeLineByName(tangentName, scene)
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let newLayer = scene.getObjectByName('newLayer')
+  if (!newLayer) {
+    newLayer = new THREE.Object3D()
+    newLayer.name = 'newLayer'
+    scene.getObjectByName('Layers').add(newLayer)
+  }
+  const distance = GeometryUtils.getDistance(mousePoint, baseArc.position)
+  const radius = baseArc.geometry.parameters.radius
+  const helpRadius = Math.sqrt(distance * distance - radius * radius)
+  const helpArc1 = helpArc(helpRadius)
+  helpArc1.position.x = mousePoint.x
+  helpArc1.position.y = mousePoint.y
+  const intersect = GeometryUtils.arcsIntersect(baseArc, helpArc1)
+  if (intersect) {
+    const tangentLine = createLine(mousePoint, intersect.intersectPoint)
+    tangentLine.name = tangentName
+    newLayer.add(tangentLine)
+  }
+  renderer.render(scene, camera)
+  return dispatch => {
+    if (crossing) {
+      movePointInfo(event, 'Crossing')(dispatch)
+    } else if (!intersect) {
+      movePointInfo(event, 'It is impossible to construct a tangent')(dispatch)
+    } else {
+      movePointInfo(event, 'Click to select point')(dispatch)
+    }
+  }
+}
+
+export const tangentLineEnd = (event, editor) => {
+  let {scene, camera, renderer} = editor
+  const tangent = scene.getObjectByName(tangentName)
+  if (tangent) {
+    tangent.name = ''
+    renderer.render(scene, camera)
+  }
+  return dispatch => {
+    dispatch({
+      type: LINE_TANGENT_TO_ARC_CLEAR
     })
   }
 }
