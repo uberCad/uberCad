@@ -2647,5 +2647,6 @@ export default {
   scale,
   distanceToEntity,
   distanseToLinePoint,
-  pointIntersect
+  pointIntersect,
+  arcsIntersect
 }

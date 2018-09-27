@@ -18,7 +18,6 @@ import {
   TOOL_LINE,
   TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
-  TOOL_NEW_LINE,
   TOOL_POINT,
   TOOL_SELECT
 } from '../Toolbar/toolbarComponent'
@@ -57,7 +56,17 @@ import {
   parallelLineFirstPointSelect,
   parallelLineSecondPoint,
   parallelLineSecondPointSelect,
-  parallelLineSelect
+  parallelLineSelect,
+  perpendicularBaseLine,
+  perpendicularDraw,
+  perpendicularFirstPoint,
+  perpendicularFirstPointSelect,
+  perpendicularLineSelect,
+  perpendicularSecondPointSelect,
+  tangentBaseArc,
+  tangentBaseArcSelect,
+  tangentLineDraw,
+  tangentLineEnd
 } from '../../actions/line'
 
 const mapStateToProps = (state, ownProps) => {
@@ -136,7 +145,7 @@ const mapDispatchToProps = (dispatch) => {
           }
         }
         //new line
-        if (editor.tool === TOOL_NEW_LINE || editor.editMode.isNewLine) {
+        if (editor.editMode.isNewLine) {
           !editor.editMode.newLineFirst ? firstPoint(event, editor)(dispatch) : saveNewLine(editor)(dispatch)
         }
         //new curve
@@ -207,9 +216,19 @@ const mapDispatchToProps = (dispatch) => {
               parallelLineSecondPointSelect(event, editor)(dispatch)
             }
           } else if (editor.options.selectMode === LINE_PERPENDICULAR) {
-            console.log(LINE_PERPENDICULAR, 'mouse down')
+            if (!editor.line.perpendicular.baseLine) {
+              perpendicularLineSelect(editor.activeEntities[0])(dispatch)
+            } else if (!editor.line.perpendicular.firstPoint) {
+              perpendicularFirstPointSelect(event, editor)(dispatch)
+            } else {
+              perpendicularSecondPointSelect(event, editor)(dispatch)
+            }
           } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
-            console.log(LINE_TANGENT_TO_ARC, 'mouse down')
+            if (!editor.line.tangent.baseArc) {
+              tangentBaseArcSelect(editor.activeEntities[0])(dispatch)
+            } else {
+              tangentLineEnd(event, editor)(dispatch)
+            }
           }
         }
       }
@@ -239,8 +258,8 @@ const mapDispatchToProps = (dispatch) => {
       }
 
       //new Line
-      if (editor.tool === TOOL_NEW_LINE || editor.editMode.isNewLine) {
-        let parent = editor.tool === TOOL_NEW_LINE ? editor.activeLayer : editor.editMode.editObject
+      if (editor.editMode.isNewLine) {
+        let parent = editor.editMode.editObject
         if (!parent || parent.metadata) {
           parent = editor.scene.getObjectByName('Layers').children[0]
           dispatch({
@@ -313,7 +332,7 @@ const mapDispatchToProps = (dispatch) => {
       //mouse move event
       if (editor.tool === TOOL_LINE) {
         if (editor.options.selectMode === LINE_TWO_POINT) {
-          let parent = editor.tool === TOOL_NEW_LINE ? editor.activeLayer : editor.editMode.editObject
+          let parent = editor.tool === TOOL_LINE ? editor.activeLayer : editor.editMode.editObject
           if (!parent || parent.metadata) {
             parent = editor.scene.getObjectByName('Layers').children[0]
             dispatch({
@@ -333,9 +352,19 @@ const mapDispatchToProps = (dispatch) => {
             parallelLineSecondPoint(event, editor, editor.line.parallel.baseLine, editor.line.parallel.firstPoint, editor.line.parallel.distance)(dispatch)
           }
         } else if (editor.options.selectMode === LINE_PERPENDICULAR) {
-          console.log(LINE_PERPENDICULAR, 'mouse move')
+          if (!editor.line.perpendicular.baseLine) {
+            perpendicularBaseLine(event, editor)(dispatch)
+          } else if (!editor.line.perpendicular.firstPoint) {
+            perpendicularFirstPoint(event, editor)(dispatch)
+          } else {
+            perpendicularDraw(event, editor, editor.line.perpendicular.baseLine, editor.line.perpendicular.firstPoint)(dispatch)
+          }
         } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
-          console.log(LINE_TANGENT_TO_ARC, 'mouse move')
+          if (!editor.line.tangent.baseArc) {
+            tangentBaseArc(event, editor)(dispatch)
+          } else {
+            tangentLineDraw(event, editor, editor.line.tangent.baseArc)(dispatch)
+          }
         }
       }
     },
