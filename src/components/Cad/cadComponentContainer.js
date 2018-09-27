@@ -333,7 +333,7 @@ const mapDispatchToProps = (dispatch) => {
       //mouse move event
       if (editor.tool === TOOL_LINE) {
         if (editor.options.selectMode === LINE_TWO_POINT) {
-          let parent = editor.tool === TOOL_NEW_LINE ? editor.activeLayer : editor.editMode.editObject
+          let parent = editor.tool === TOOL_LINE ? editor.activeLayer : editor.editMode.editObject
           if (!parent || parent.metadata) {
             parent = editor.scene.getObjectByName('Layers').children[0]
             dispatch({
