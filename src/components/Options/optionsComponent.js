@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './Options.css'
-import { TOOL_NEW_CURVE, TOOL_NEW_LINE, TOOL_POINT, TOOL_SELECT, TOOL_MEASUREMENT, TOOL_LINE } from '../Toolbar/toolbarComponent'
+import { TOOL_NEW_CURVE, TOOL_POINT, TOOL_SELECT, TOOL_MEASUREMENT, TOOL_LINE } from '../Toolbar/toolbarComponent'
 import { FormattedMessage } from 'react-intl'
 
 import Measurement from './Measurement/measurementComponent'
@@ -160,15 +160,7 @@ export default class OptionsComponent extends Component {
             </li>
           </ul>
         )}
-
-        {tool === TOOL_NEW_LINE && (
-          <ul className='edit-group'>
-            <label>NEW LINE: </label>
-            <button className='save' onClick={this.saveNewLine}>Save</button>
-            <button className='cancel' onClick={this.cancelNewLine}>Cancel</button>
-          </ul>
-        )}
-
+        
         {tool === TOOL_NEW_CURVE && (
           <ul className='edit-group'>
             <label>NEW CURVE: </label>

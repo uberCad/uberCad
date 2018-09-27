@@ -16,7 +16,6 @@ export const TOOL_POINT = 'TOOL_POINT'
 export const TOOL_SELECT = 'TOOL_SELECT'
 export const TOOL_UNDO = 'TOOL_UNDO'
 export const TOOL_REDO = 'TOOL_REDO'
-export const TOOL_NEW_LINE = 'TOOL_NEW_LINE'
 export const TOOL_NEW_CURVE = 'TOOL_NEW_CURVE'
 export const TOOL_MEASUREMENT = 'TOOL_MEASUREMENT'
 export const TOOL_LINE = 'TOOL_LINE'
@@ -94,18 +93,6 @@ export default class ToolbarComponent extends Component {
         >
           <img src={toolLine} alt='Line'/>
         </button>
-
-        <FormattedMessage id='toolbar.newLine' defaultMessage='New line'>
-          {value =>
-            <button className={`btn ${tool === TOOL_NEW_LINE ? 'btn-success' : ''}`}
-                    data-tool={TOOL_NEW_LINE}
-                    onClick={this.onClick}
-                    title={value}
-            >
-              <img src={toolLine} alt='Line'/>
-            </button>
-          }
-        </FormattedMessage>
 
         <FormattedMessage id='toolbar.newCurve' defaultMessage='New curve'>
           {value =>

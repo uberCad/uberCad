@@ -18,7 +18,6 @@ import {
   TOOL_LINE,
   TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
-  TOOL_NEW_LINE,
   TOOL_POINT,
   TOOL_SELECT
 } from '../Toolbar/toolbarComponent'
@@ -146,7 +145,7 @@ const mapDispatchToProps = (dispatch) => {
           }
         }
         //new line
-        if (editor.tool === TOOL_NEW_LINE || editor.editMode.isNewLine) {
+        if (editor.editMode.isNewLine) {
           !editor.editMode.newLineFirst ? firstPoint(event, editor)(dispatch) : saveNewLine(editor)(dispatch)
         }
         //new curve
@@ -259,8 +258,8 @@ const mapDispatchToProps = (dispatch) => {
       }
 
       //new Line
-      if (editor.tool === TOOL_NEW_LINE || editor.editMode.isNewLine) {
-        let parent = editor.tool === TOOL_NEW_LINE ? editor.activeLayer : editor.editMode.editObject
+      if (editor.editMode.isNewLine) {
+        let parent = editor.editMode.editObject
         if (!parent || parent.metadata) {
           parent = editor.scene.getObjectByName('Layers').children[0]
           dispatch({
