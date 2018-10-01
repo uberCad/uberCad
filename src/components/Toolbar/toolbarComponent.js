@@ -8,6 +8,7 @@ import toolUndo from './undo.svg'
 import toolRedo from './redo.svg'
 import toolLine from './line.svg'
 import toolCurve from './curve.svg'
+import toolRectangle from './rectangle.svg'
 import toolMeasurement from './measurement.svg'
 import PropTypes from 'prop-types'
 import { FormattedMessage } from 'react-intl'
@@ -19,6 +20,7 @@ export const TOOL_REDO = 'TOOL_REDO'
 export const TOOL_NEW_CURVE = 'TOOL_NEW_CURVE'
 export const TOOL_MEASUREMENT = 'TOOL_MEASUREMENT'
 export const TOOL_LINE = 'TOOL_LINE'
+export const TOOL_RECTANGLE = 'TOOL_RECTANGLE'
 
 export default class ToolbarComponent extends Component {
   onClick = ({currentTarget: {dataset: {tool}}}) => {
@@ -105,6 +107,14 @@ export default class ToolbarComponent extends Component {
             </button>
           }
         </FormattedMessage>
+
+        <button className={`btn ${tool === TOOL_RECTANGLE ? 'btn-success' : ''}`}
+                data-tool={TOOL_RECTANGLE}
+                onClick={this.onClick}
+                title='Rectangle'
+        >
+          <img src={toolRectangle} alt='Rectangle'/>
+        </button>
 
         {/* <button className="btn" id="back" type="submit" disabled="true" ng-click="back()" title="Back"><i */}
         {/* class="fa fa-rotate-left"></i></button> */}

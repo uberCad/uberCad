@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './Options.css'
-import { TOOL_NEW_CURVE, TOOL_POINT, TOOL_SELECT, TOOL_MEASUREMENT, TOOL_LINE } from '../Toolbar/toolbarComponent'
+import { TOOL_NEW_CURVE, TOOL_POINT, TOOL_SELECT, TOOL_MEASUREMENT, TOOL_LINE, TOOL_RECTANGLE } from '../Toolbar/toolbarComponent'
 import { FormattedMessage } from 'react-intl'
 
 import Measurement from './Measurement/measurementComponent'
 import Line from './Line/lineComponent'
+import Rectangle from './Rectangle/rectangleComponent'
 
 export const SELECT_MODE_NEW = 'SELECT_MODE_NEW'
 export const SELECT_MODE_ADD = 'SELECT_MODE_ADD'
@@ -210,6 +211,12 @@ export default class OptionsComponent extends Component {
         {tool === TOOL_LINE &&
         <Line
           lineMode={selectMode}
+          setSelectMode={this.props.setSelectMode}
+        />}
+
+        {tool === TOOL_RECTANGLE &&
+        < Rectangle
+          rectangleMode={selectMode}
           setSelectMode={this.props.setSelectMode}
         />}
 

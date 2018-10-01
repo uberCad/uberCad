@@ -20,6 +20,7 @@ import {
   LINE_TANGENT_TO_ARC_BASE,
   LINE_TANGENT_TO_ARC_CLEAR
 } from '../actions/line'
+import { RECTANGLE_TWO_POINT_CLEAR, RECTANGLE_TWO_POINT_FIRST_POINT } from '../actions/rectangle'
 
 let initialState = {
   measurement: {
@@ -51,6 +52,9 @@ let initialState = {
     tangent: {
       baseArc: null
     }
+  },
+  rectangle: {
+    firstPoint: null
   }
 }
 
@@ -157,6 +161,16 @@ const tools = (state = initialState, action) => {
         line: {tangent: {baseArc: {$set: action.payload.baseArc}}}
       })
 
+    case RECTANGLE_TWO_POINT_CLEAR:
+      console.log('RECTANGLE_TWO_POINT_CLEAR')
+      return update(state, {
+        rectangle: {firstPoint: {$set: null}}
+      })
+    case RECTANGLE_TWO_POINT_FIRST_POINT:
+      console.log('action.payload.firstPoint = ', action.payload.firstPoint)
+      return update(state, {
+        rectangle: {firstPoint: {$set: action.payload.firstPoint}}
+      })
 
     default:
       return state

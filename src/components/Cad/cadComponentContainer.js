@@ -19,6 +19,7 @@ import {
   TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
   TOOL_POINT,
+  TOOL_RECTANGLE,
   TOOL_SELECT
 } from '../Toolbar/toolbarComponent'
 import sceneService from '../../services/sceneService'
@@ -68,6 +69,12 @@ import {
   tangentLineDraw,
   tangentLineEnd
 } from '../../actions/line'
+import {
+  RECTANGLE_TWO_POINT,
+  rectangleClear, rectangleDraw,
+  rectangleFirstPoint,
+  rectangleFirstPointSelect
+} from '../../actions/rectangle'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -87,7 +94,8 @@ const mapStateToProps = (state, ownProps) => {
       selection: state.selection,
       activeLayer: state.sidebar.activeLayer,
       measurement: state.tools.measurement,
-      line: state.tools.line
+      line: state.tools.line,
+      rectangle: state.tools.rectangle,
     },
 
     sidebarExpanded: state.sidebar.active,
@@ -231,6 +239,16 @@ const mapDispatchToProps = (dispatch) => {
             }
           }
         }
+
+        if (editor.tool === TOOL_RECTANGLE) {
+          if (editor.options.selectMode === RECTANGLE_TWO_POINT) {
+            if (!editor.rectangle.firstPoint) {
+              rectangleFirstPointSelect(event, editor)(dispatch)
+            } else {
+              rectangleClear(event, editor)(dispatch)
+            }
+          }
+        }
       }
     },
 
@@ -364,6 +382,16 @@ const mapDispatchToProps = (dispatch) => {
             tangentBaseArc(event, editor)(dispatch)
           } else {
             tangentLineDraw(event, editor, editor.line.tangent.baseArc)(dispatch)
+          }
+        }
+      }
+
+      if (editor.tool === TOOL_RECTANGLE) {
+        if (editor.options.selectMode === RECTANGLE_TWO_POINT) {
+          if (!editor.rectangle.firstPoint) {
+            rectangleFirstPoint(event, editor)(dispatch)
+          } else {
+            rectangleDraw(event, editor, editor.rectangle.firstPoint)(dispatch)
           }
         }
       }
