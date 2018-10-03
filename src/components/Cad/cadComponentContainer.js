@@ -15,6 +15,7 @@ import {
 import { spinnerShow, spinnerHide } from '../../actions/spinner'
 
 import {
+  TOOL_CHAMFER,
   TOOL_LINE,
   TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
@@ -75,6 +76,13 @@ import {
   rectangleFirstPoint,
   rectangleFirstPointSelect
 } from '../../actions/rectangle'
+import {
+  CHAMFER_TWO_LENGTH,
+  chamferDraw,
+  chamferFirstLine,
+  chamferFirstLineSelect,
+  chamferSecondLine
+} from '../../actions/chamfer'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -96,6 +104,7 @@ const mapStateToProps = (state, ownProps) => {
       measurement: state.tools.measurement,
       line: state.tools.line,
       rectangle: state.tools.rectangle,
+      chamfer: state.tools.chamfer,
     },
 
     sidebarExpanded: state.sidebar.active,
@@ -249,6 +258,23 @@ const mapDispatchToProps = (dispatch) => {
             }
           }
         }
+
+        if (editor.tool === TOOL_CHAMFER) {
+          if (editor.options.selectMode === CHAMFER_TWO_LENGTH) {
+            if (!editor.chamfer.twoLength.lineOne) {
+              chamferFirstLineSelect(editor.activeEntities[0])(dispatch)
+            } else {
+              chamferDraw(
+                event,
+                editor,
+                editor.chamfer.twoLength.lineOne,
+                editor.activeEntities[0],
+                editor.chamfer.twoLength.lengthOne,
+                editor.chamfer.twoLength.lengthTwo
+              )(dispatch)
+            }
+          }
+        }
       }
     },
 
@@ -392,6 +418,16 @@ const mapDispatchToProps = (dispatch) => {
             rectangleFirstPoint(event, editor)(dispatch)
           } else {
             rectangleDraw(event, editor, editor.rectangle.firstPoint)(dispatch)
+          }
+        }
+      }
+
+      if (editor.tool === TOOL_CHAMFER) {
+        if (editor.options.selectMode === CHAMFER_TWO_LENGTH) {
+          if (!editor.chamfer.twoLength.lineOne) {
+            chamferFirstLine(event, editor)(dispatch)
+          } else {
+            chamferSecondLine(event, editor)(dispatch)
           }
         }
       }

@@ -21,6 +21,11 @@ import {
   LINE_TANGENT_TO_ARC_CLEAR
 } from '../actions/line'
 import { RECTANGLE_TWO_POINT_CLEAR, RECTANGLE_TWO_POINT_FIRST_POINT } from '../actions/rectangle'
+import {
+  CHAMFER_TWO_LENGTH_CLEAR,
+  CHAMFER_TWO_LENGTH_LINE_ONE,
+  CHAMFER_TWO_LENGTH_INPUT_CHANGE
+} from '../actions/chamfer'
 
 let initialState = {
   measurement: {
@@ -55,6 +60,14 @@ let initialState = {
   },
   rectangle: {
     firstPoint: null
+  },
+  chamfer: {
+    twoLength: {
+      lineOne: null,
+      lengthOne: "1",
+      lineTwo: null,
+      lengthTwo: "1"
+    }
   }
 }
 
@@ -162,14 +175,43 @@ const tools = (state = initialState, action) => {
       })
 
     case RECTANGLE_TWO_POINT_CLEAR:
-      console.log('RECTANGLE_TWO_POINT_CLEAR')
       return update(state, {
         rectangle: {firstPoint: {$set: null}}
       })
     case RECTANGLE_TWO_POINT_FIRST_POINT:
-      console.log('action.payload.firstPoint = ', action.payload.firstPoint)
       return update(state, {
         rectangle: {firstPoint: {$set: action.payload.firstPoint}}
+      })
+
+    case CHAMFER_TWO_LENGTH_CLEAR:
+      return update(state, {
+        chamfer: {
+          twoLength: {
+            lineOne: {$set: null},
+            lengthOne: {$set: "1"},
+            lineTwo: {$set: null},
+            lengthTwo: {$set: "1"}
+          }
+        }
+      })
+    case CHAMFER_TWO_LENGTH_INPUT_CHANGE:
+      switch (action.payload.name) {
+        case 'lengthOne' : {
+          return update(state, {
+            chamfer: {twoLength: {lengthOne: {$set: action.payload.lengthOne}}}
+          })
+        }
+        case 'lengthTwo' : {
+          return update(state, {
+            chamfer: {twoLength: {lengthTwo: {$set: action.payload.lengthTwo}}}
+          })
+        }
+        default:
+          return state
+      }
+    case CHAMFER_TWO_LENGTH_LINE_ONE:
+      return update(state, {
+        chamfer: {twoLength: {lineOne: {$set: action.payload.lineOne}}}
       })
 
     default:

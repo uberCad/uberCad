@@ -2612,6 +2612,41 @@ let pointIntersect = (a, b, c, d) => {
   return T
 }
 
+/**
+ * http://mathprofi.ru/delenie_otrezka_v_dannom_otnoshenii.html
+ * @line - base line
+ * @length - chamfer length
+ * @intersectPoint - point there set chamfer
+ * @result - new point on the base line
+ */
+let pointChamfer = (line, length, intersectPoint) => {
+  let result = null
+  const lineLength = getDistance(line.geometry.vertices[0], line.geometry.vertices[1])
+  const lambda = (length / lineLength) / (1 - (length / lineLength))
+  if ((intersectPoint.x).toFixed(5) === (line.geometry.vertices[0].x).toFixed(5) &&
+    (intersectPoint.y).toFixed(5) === (line.geometry.vertices[0].y).toFixed(5)) {
+    result = {
+      x: (line.geometry.vertices[0].x + lambda * line.geometry.vertices[1].x) / (1 + lambda),
+      y: (line.geometry.vertices[0].y + lambda * line.geometry.vertices[1].y) / (1 + lambda)
+    }
+    line.geometry.vertices[0].x = result.x
+    line.geometry.vertices[0].y = result.y
+
+  } else if ((intersectPoint.x).toFixed(5) === (line.geometry.vertices[1].x).toFixed(5) &&
+    (intersectPoint.y).toFixed(5) === (line.geometry.vertices[1].y).toFixed(5)) {
+    result = {
+      x: (line.geometry.vertices[1].x + lambda * line.geometry.vertices[0].x) / (1 + lambda),
+      y: (line.geometry.vertices[1].y + lambda * line.geometry.vertices[0].y) / (1 + lambda)
+    }
+    line.geometry.vertices[1].x = result.x
+    line.geometry.vertices[1].y = result.y
+  }
+  line.geometry.verticesNeedUpdate = true
+  line.computeLineDistances()
+  line.geometry.computeBoundingSphere()
+  return result
+}
+
 export default {
   distanceToLine,
   distanceToArc,
@@ -2648,5 +2683,6 @@ export default {
   distanceToEntity,
   distanseToLinePoint,
   pointIntersect,
-  arcsIntersect
+  arcsIntersect,
+  pointChamfer
 }

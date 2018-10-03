@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg18"
+   y="0px"
+   x="0px"
+   version="1.1"
+   viewBox="0 0 52 63.75">
+  <metadata
+     id="metadata24">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>014.Fillet</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs22" />
+  <title
+     id="title2">014.Fillet</title>
+  <desc
+     id="desc4">Created with Sketch.</desc>
+  <g
+     style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:round"
+     transform="translate(-0.66853053,1.2415567)"
+     id="g12">
+    <g
+       style="stroke:#000000;stroke-width:2"
+       id="g10"
+       transform="translate(1,1)">
+      <path
+         id="path6"
+         d="M 41.359427,5.9044957 C 20.704478,13.923771 16.256418,13.448806 7.0955043,41.263923 L 7,49 H 50 V 6 l -8.640573,-0.095504" />
+      <path
+         id="path8"
+         d="m 6.2361892,18.145829 c -0.056591,4.901341 -0.0083,10.704898 0.1845687,9.120309" />
+    </g>
+  </g>
+  <path
+     id="path8-5"
+     d="m 6.3542602,8.095012 0.089064,7.019213"
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round" />
+  <path
+     id="path8-3"
+     d="m 24.11807,7.7129947 8.684454,-0.04811"
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round" />
+  <path
+     id="path8-3-6"
+     d="m 10.69971,8.0472603 8.111427,-0.04811"
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round" />
+</svg>

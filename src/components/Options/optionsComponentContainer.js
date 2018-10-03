@@ -17,6 +17,7 @@ import {
   scaleChange,
   setScale
 } from '../../actions/edit'
+import { inputChange } from '../../actions/chamfer'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -33,6 +34,7 @@ const mapStateToProps = (state, ownProps) => {
     singleLayerSelect: state.options.singleLayerSelect,
     threshold: state.options.threshold,
     rotationObject: state.cad.editMode.rotation.rotationObject,
+    chamferOptions: state.tools.chamfer,
     ...ownProps
   }
 }
@@ -76,6 +78,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     setScale: function (scale, scaleObject, editor) {
       setScale(scale, scaleObject, editor)(dispatch)
+    },
+    inputChange: function (name, value) {
+      inputChange(name, value)(dispatch)
     }
   }
 }

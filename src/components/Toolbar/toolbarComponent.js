@@ -8,6 +8,7 @@ import toolUndo from './undo.svg'
 import toolRedo from './redo.svg'
 import toolLine from './line.svg'
 import toolCurve from './curve.svg'
+import toolChamfer from './chamfer.svg'
 import toolRectangle from './rectangle.svg'
 import toolMeasurement from './measurement.svg'
 import PropTypes from 'prop-types'
@@ -21,6 +22,7 @@ export const TOOL_NEW_CURVE = 'TOOL_NEW_CURVE'
 export const TOOL_MEASUREMENT = 'TOOL_MEASUREMENT'
 export const TOOL_LINE = 'TOOL_LINE'
 export const TOOL_RECTANGLE = 'TOOL_RECTANGLE'
+export const TOOL_CHAMFER = 'TOOL_CHAMFER'
 
 export default class ToolbarComponent extends Component {
   onClick = ({currentTarget: {dataset: {tool}}}) => {
@@ -107,6 +109,14 @@ export default class ToolbarComponent extends Component {
             </button>
           }
         </FormattedMessage>
+
+        <button className={`btn ${tool === TOOL_CHAMFER ? 'btn-success' : ''}`}
+                data-tool={TOOL_CHAMFER}
+                onClick={this.onClick}
+                title='Chamfer & rounding'
+        >
+          <img src={toolChamfer} alt='Chamfer'/>
+        </button>
 
         <button className={`btn ${tool === TOOL_RECTANGLE ? 'btn-success' : ''}`}
                 data-tool={TOOL_RECTANGLE}
