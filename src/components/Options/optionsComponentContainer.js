@@ -79,8 +79,8 @@ const mapDispatchToProps = (dispatch) => {
     setScale: function (scale, scaleObject, editor) {
       setScale(scale, scaleObject, editor)(dispatch)
     },
-    inputChange: function (name, value) {
-      inputChange(name, value)(dispatch)
+    inputChange: function (name, value, mode) {
+      inputChange(name, value, mode)(dispatch)
     }
   }
 }

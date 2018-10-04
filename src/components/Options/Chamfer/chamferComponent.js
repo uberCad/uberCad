@@ -9,7 +9,7 @@ export default class chamferComponent extends Component {
   }
   inputChange = (event) => {
     let {currentTarget: {dataset: {name}}} = event
-    this.props.inputChange(name, event.target.value)
+    this.props.inputChange(name, event.target.value, this.props.mode)
   }
 
   render () {
@@ -60,6 +60,23 @@ export default class chamferComponent extends Component {
             <input type="number"
                    value={options.twoLength.lengthTwo}
                    data-name='lengthTwo'
+                   onChange={this.inputChange}/>
+          </label>
+        </div>
+        }
+
+        {mode === CHAMFER_LENGTH_ANGLE &&
+        <div className='chamfer-options'>
+          <label>First line length
+            <input type="number"
+                   value={options.lengthAngle.length}
+                   data-name='length'
+                   onChange={this.inputChange}/>
+          </label>
+          <label>Angle
+            <input type="number"
+                   value={options.lengthAngle.angle}
+                   data-name='angle'
                    onChange={this.inputChange}/>
           </label>
         </div>

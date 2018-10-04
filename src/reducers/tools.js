@@ -24,7 +24,10 @@ import { RECTANGLE_TWO_POINT_CLEAR, RECTANGLE_TWO_POINT_FIRST_POINT } from '../a
 import {
   CHAMFER_TWO_LENGTH_CLEAR,
   CHAMFER_TWO_LENGTH_LINE_ONE,
-  CHAMFER_TWO_LENGTH_INPUT_CHANGE
+  CHAMFER_TWO_LENGTH_INPUT_CHANGE,
+  CHAMFER_LENGTH_ANGLE_INPUT_CHANGE,
+  CHAMFER_LENGTH_ANGLE_CLEAR,
+  CHAMFER_LENGTH_ANGLE_LINE_ONE
 } from '../actions/chamfer'
 
 let initialState = {
@@ -64,9 +67,15 @@ let initialState = {
   chamfer: {
     twoLength: {
       lineOne: null,
-      lengthOne: "1",
+      lengthOne: '1',
       lineTwo: null,
-      lengthTwo: "1"
+      lengthTwo: '1'
+    },
+    lengthAngle: {
+      lineOne: null,
+      lineTwo: null,
+      length: '1',
+      angle: '0',
     }
   }
 }
@@ -188,9 +197,9 @@ const tools = (state = initialState, action) => {
         chamfer: {
           twoLength: {
             lineOne: {$set: null},
-            lengthOne: {$set: "1"},
+            lengthOne: {$set: '1'},
             lineTwo: {$set: null},
-            lengthTwo: {$set: "1"}
+            lengthTwo: {$set: '1'}
           }
         }
       })
@@ -212,6 +221,38 @@ const tools = (state = initialState, action) => {
     case CHAMFER_TWO_LENGTH_LINE_ONE:
       return update(state, {
         chamfer: {twoLength: {lineOne: {$set: action.payload.lineOne}}}
+      })
+
+    case CHAMFER_LENGTH_ANGLE_CLEAR:
+      return update(state, {
+        chamfer: {
+          lengthAngle: {
+            lineOne: {$set: null},
+            lineTwo: {$set: null},
+            length: {$set: '1'},
+            angle: {$set: '45'}
+          }
+        }
+      })
+    case CHAMFER_LENGTH_ANGLE_INPUT_CHANGE:
+      switch (action.payload.name) {
+        case 'length' : {
+          return update(state, {
+            chamfer: {lengthAngle: {length: {$set: action.payload.length}}}
+          })
+        }
+        case 'angle' : {
+          return update(state, {
+            chamfer: {lengthAngle: {angle: {$set: action.payload.angle}}}
+          })
+        }
+        default:
+          return state
+      }
+
+    case CHAMFER_LENGTH_ANGLE_LINE_ONE:
+      return update(state, {
+        chamfer: {lengthAngle: {lineOne: {$set: action.payload.lineOne}}}
       })
 
     default:

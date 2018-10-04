@@ -77,10 +77,13 @@ import {
   rectangleFirstPointSelect
 } from '../../actions/rectangle'
 import {
+  CHAMFER_LENGTH_ANGLE,
   CHAMFER_TWO_LENGTH,
   chamferDraw,
   chamferFirstLine,
   chamferFirstLineSelect,
+  chamferLengthAngleDraw,
+  chamferLengthAngleFirstLineSelect,
   chamferSecondLine
 } from '../../actions/chamfer'
 
@@ -260,19 +263,39 @@ const mapDispatchToProps = (dispatch) => {
         }
 
         if (editor.tool === TOOL_CHAMFER) {
-          if (editor.options.selectMode === CHAMFER_TWO_LENGTH) {
-            if (!editor.chamfer.twoLength.lineOne) {
-              chamferFirstLineSelect(editor.activeEntities[0])(dispatch)
-            } else {
-              chamferDraw(
-                event,
-                editor,
-                editor.chamfer.twoLength.lineOne,
-                editor.activeEntities[0],
-                editor.chamfer.twoLength.lengthOne,
-                editor.chamfer.twoLength.lengthTwo
-              )(dispatch)
-            }
+            switch (editor.options.selectMode) {
+              case CHAMFER_TWO_LENGTH:
+                if (!editor.chamfer.twoLength.lineOne) {
+                  chamferFirstLineSelect(editor.activeEntities[0])(dispatch)
+                } else {
+                  chamferDraw(
+                    event,
+                    editor,
+                    editor.chamfer.twoLength.lineOne,
+                    editor.activeEntities[0],
+                    editor.chamfer.twoLength.lengthOne,
+                    editor.chamfer.twoLength.lengthTwo
+                  )(dispatch)
+                }
+                break
+              case CHAMFER_LENGTH_ANGLE:
+                if (!editor.chamfer.lengthAngle.lineOne) {
+                  chamferLengthAngleFirstLineSelect(editor.activeEntities[0])(dispatch)
+                } else {
+                  chamferLengthAngleDraw(
+                    event,
+                    editor,
+                    editor.chamfer.lengthAngle.lineOne,
+                    editor.activeEntities[0],
+                    editor.chamfer.lengthAngle.length,
+                    editor.chamfer.lengthAngle.angle
+                  )(dispatch)
+                }
+                break
+
+              default:
+                console.warn(`Unhandled mouse down for select mode ${editor.options.selectMode} in ${TOOL_CHAMFER}`)
+
           }
         }
       }
@@ -423,12 +446,24 @@ const mapDispatchToProps = (dispatch) => {
       }
 
       if (editor.tool === TOOL_CHAMFER) {
-        if (editor.options.selectMode === CHAMFER_TWO_LENGTH) {
-          if (!editor.chamfer.twoLength.lineOne) {
-            chamferFirstLine(event, editor)(dispatch)
-          } else {
-            chamferSecondLine(event, editor)(dispatch)
-          }
+        switch (editor.options.selectMode) {
+          case CHAMFER_TWO_LENGTH:
+            if (!editor.chamfer.twoLength.lineOne) {
+              chamferFirstLine(event, editor)(dispatch)
+            } else {
+              chamferSecondLine(event, editor)(dispatch)
+            }
+            break
+          case CHAMFER_LENGTH_ANGLE:
+            if (!editor.chamfer.lengthAngle.lineOne) {
+              chamferFirstLine(event, editor)(dispatch)
+            } else {
+              chamferSecondLine(event, editor)(dispatch)
+            }
+            break
+
+          default:
+            console.warn(`Unhandled select mode ${editor.options.selectMode} in ${TOOL_CHAMFER}`)
         }
       }
     },
