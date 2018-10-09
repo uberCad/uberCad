@@ -93,6 +93,17 @@ export default class chamferComponent extends Component {
         </div>
         }
 
+        {mode === ROUNDING_LENGTH &&
+        <div className='chamfer-options'>
+          <label>Length
+            <input type="number"
+                   value={options.roundingLength.length}
+                   data-name='length'
+                   onChange={this.inputChange}/>
+          </label>
+        </div>
+        }
+
       </Fragment>
     )
   }

@@ -20,6 +20,10 @@ export const ROUNDING_RADIUS_INPUT = 'ROUNDING_RADIUS_INPUT'
 export const ROUNDING_RADIUS_LINE_ONE = 'ROUNDING_RADIUS_LINE_ONE'
 
 export const ROUNDING_LENGTH = 'ROUNDING_LENGTH'
+export const ROUNDING_LENGTH_CLEAR = 'ROUNDING_LENGTH_CLEAR'
+export const ROUNDING_LENGTH_INPUT = 'ROUNDING_LENGTH_INPUT'
+export const ROUNDING_LENGTH_LINE_ONE = 'ROUNDING_LENGTH_LINE_ONE'
+
 
 export const inputChange = (name, value, mode) => {
   let type
@@ -32,6 +36,9 @@ export const inputChange = (name, value, mode) => {
       break
     case ROUNDING_RADIUS:
       type = ROUNDING_RADIUS_INPUT
+      break
+    case ROUNDING_LENGTH:
+      type = ROUNDING_LENGTH_INPUT
       break
     default:
       console.warn(`Unhandled input change for mode ${mode}`)
@@ -314,6 +321,119 @@ export const roundingRadiusDraw = (event, editor, lineOne, lineTwo, radius) => {
     return dispatch => {
       dispatch({
         type: ROUNDING_RADIUS_CLEAR
+      })
+    }
+  } else {
+    return dispatch => {
+      movePointInfo(event, 'Lines don\'t intersects')(dispatch)
+    }
+  }
+}
+
+
+export const chamferRoundingLengthFirstLineSelect = (lineOne) => {
+  return dispatch => {
+    dispatch({
+      type: ROUNDING_LENGTH_LINE_ONE,
+      payload: {lineOne}
+    })
+  }
+}
+
+export const roundingLengthDraw = (event, editor, lineOne, lineTwo, length) => {
+  let {scene, camera, renderer} = editor
+  const intersect = GeometryUtils.linesIntersect(
+    lineOne.geometry.vertices[0],
+    lineOne.geometry.vertices[1],
+    lineTwo.geometry.vertices[0],
+    lineTwo.geometry.vertices[1]
+  )
+  if (intersect.isIntersects) {
+    const angle = GeometryUtils.angleVector(lineOne, lineTwo, intersect.points[0].point)
+    const radius = length * Math.tan(angle / 2)
+    const pointA = GeometryUtils.pointChamfer(lineOne, length, intersect.points[0].point)
+    const pointB = GeometryUtils.pointChamfer(lineTwo, length, intersect.points[0].point)
+    let center, thetaStart, thetaLength
+    if ((lineOne.geometry.vertices[1].y).toFixed(12) === (lineOne.geometry.vertices[0].y).toFixed(12)) {
+      if (pointA.y > pointB.y) {
+        center = {
+          x: pointA.x,
+          y: pointA.y - radius
+        }
+      } else {
+        center = {
+          x: pointA.x,
+          y: pointA.y + Number(radius)
+        }
+      }
+    } else if ((lineTwo.geometry.vertices[1].y).toFixed(12) === (lineTwo.geometry.vertices[0].y).toFixed(12)) {
+      if (pointA.y < pointB.y) {
+        center = {
+          x: pointB.x,
+          y: pointB.y - radius
+        }
+      } else {
+        center = {
+          x: pointB.x,
+          y: pointB.y + Number(radius)
+        }
+      }
+    } else {
+      /**
+       * k = (y2 - y1) / (x2 - x1) => (x1, y1) first line point, (x2, y2) second line point,
+       * k1 = -1/ k2 => Perpendicular
+       * b = y - kx
+       * point intersects y1 & y2 :
+       * pointX = (b2 - b1) / (k1 - k2)
+       * pointY = k1 * ((b2 - b1) / (k1 - k2)) + b1
+       */
+      const kOne = (lineOne.geometry.vertices[1].y - lineOne.geometry.vertices[0].y) /
+        (lineOne.geometry.vertices[1].x - lineOne.geometry.vertices[0].x)
+      const kOnePerpendicular = -1 / kOne
+      const bOnePerpendicular = pointA.y - kOnePerpendicular * pointA.x
+
+      const kTwo = (lineTwo.geometry.vertices[1].y - lineTwo.geometry.vertices[0].y) /
+        (lineTwo.geometry.vertices[1].x - lineTwo.geometry.vertices[0].x)
+      const kTwoPerpendicular = -1 / kTwo
+      const bTwoPerpendicular = pointB.y - kTwoPerpendicular * pointB.x
+
+      center = {
+        x: (bTwoPerpendicular - bOnePerpendicular) / (kOnePerpendicular - kTwoPerpendicular),
+        y: kOnePerpendicular * ((bTwoPerpendicular - bOnePerpendicular) / (kOnePerpendicular - kTwoPerpendicular)) + bOnePerpendicular
+      }
+    }
+
+    const angle1Ox = GeometryUtils.angleVectorOx(createLine(pointA, center), center)
+    const angle2Ox = GeometryUtils.angleVectorOx(createLine(pointB, center), center)
+    if (angle1Ox < angle2Ox) {
+      if (angle2Ox - angle1Ox < 2 * Math.PI - angle2Ox + angle1Ox) {
+        thetaStart = angle1Ox
+      } else {
+        thetaStart = angle2Ox
+      }
+    } else {
+      if (angle1Ox - angle2Ox < 2 * Math.PI - angle1Ox + angle2Ox) {
+        thetaStart = angle2Ox
+      } else {
+        thetaStart = angle1Ox
+      }
+    }
+
+    if ((thetaStart || thetaStart === 0) && center) {
+      const line1 = createLine(pointA, center)
+      const line2 = createLine(pointB, center)
+      thetaLength = GeometryUtils.angleVector(line1, line2, center)
+      let arc = newArc(radius, thetaStart, thetaLength)
+      arc.position.x = center.x
+      arc.position.y = center.y
+      arc.material.color.set(lineOne.material.color)
+      lineOne.parent.add(arc)
+    }
+
+    renderer.render(scene, camera)
+    return dispatch => {
+      dispatch({
+        type: ROUNDING_LENGTH_CLEAR
       })
     }
   } else {

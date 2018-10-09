@@ -27,7 +27,13 @@ import {
   CHAMFER_TWO_LENGTH_INPUT_CHANGE,
   CHAMFER_LENGTH_ANGLE_INPUT_CHANGE,
   CHAMFER_LENGTH_ANGLE_CLEAR,
-  CHAMFER_LENGTH_ANGLE_LINE_ONE, ROUNDING_RADIUS_INPUT, ROUNDING_RADIUS_CLEAR, ROUNDING_RADIUS_LINE_ONE
+  CHAMFER_LENGTH_ANGLE_LINE_ONE,
+  ROUNDING_RADIUS_INPUT,
+  ROUNDING_RADIUS_CLEAR,
+  ROUNDING_RADIUS_LINE_ONE,
+  ROUNDING_LENGTH_CLEAR,
+  ROUNDING_LENGTH_INPUT,
+  ROUNDING_LENGTH_LINE_ONE
 } from '../actions/chamfer'
 
 let initialState = {
@@ -81,6 +87,11 @@ let initialState = {
       lineOne: null,
       lineTwo: null,
       radius: '1'
+    },
+    roundingLength: {
+      lineOne: null,
+      lineTwo: null,
+      length: '1'
     }
   }
 }
@@ -278,6 +289,26 @@ const tools = (state = initialState, action) => {
     case ROUNDING_RADIUS_LINE_ONE:
       return update(state, {
         chamfer: {rounding: {lineOne: {$set: action.payload.lineOne}}}
+      })
+
+    case ROUNDING_LENGTH_CLEAR:
+      return update(state, {
+        chamfer: {
+          roundingLength: {
+            lineOne: {$set: null},
+            lineTwo: {$set: null},
+            length: {$set: '1'}
+          }
+        }
+      })
+    case ROUNDING_LENGTH_INPUT:
+      return update(state, {
+        chamfer: {roundingLength: {length: {$set: action.payload.length}}}
+      })
+
+    case ROUNDING_LENGTH_LINE_ONE:
+      return update(state, {
+        chamfer: {roundingLength: {lineOne: {$set: action.payload.lineOne}}}
       })
 
     default:

@@ -83,10 +83,12 @@ import {
   chamferFirstLine,
   chamferFirstLineSelect,
   chamferLengthAngleDraw,
-  chamferLengthAngleFirstLineSelect,
+  chamferLengthAngleFirstLineSelect, chamferRoundingLengthFirstLineSelect,
   chamferRoundingRadiusFirstLineSelect,
   chamferSecondLine,
+  ROUNDING_LENGTH,
   ROUNDING_RADIUS,
+  roundingLengthDraw,
   roundingRadiusDraw
 } from '../../actions/chamfer'
 
@@ -308,6 +310,19 @@ const mapDispatchToProps = (dispatch) => {
                   )(dispatch)
                 }
                 break
+              case ROUNDING_LENGTH:
+                if (!editor.chamfer.roundingLength.lineOne) {
+                  chamferRoundingLengthFirstLineSelect(editor.activeEntities[0])(dispatch)
+                } else {
+                  roundingLengthDraw(
+                    event,
+                    editor,
+                    editor.chamfer.roundingLength.lineOne,
+                    editor.activeEntities[0],
+                    editor.chamfer.roundingLength.length
+                  )(dispatch)
+                }
+                break
 
               default:
                 console.warn(`Unhandled mouse down for select mode ${editor.options.selectMode} in ${TOOL_CHAMFER}`)
@@ -460,7 +475,7 @@ const mapDispatchToProps = (dispatch) => {
           }
         }
       }
-
+      //mouse move event
       if (editor.tool === TOOL_CHAMFER) {
         switch (editor.options.selectMode) {
           case CHAMFER_TWO_LENGTH:
@@ -479,6 +494,13 @@ const mapDispatchToProps = (dispatch) => {
             break
           case ROUNDING_RADIUS:
             if (!editor.chamfer.rounding.lineOne) {
+              chamferFirstLine(event, editor)(dispatch)
+            } else {
+              chamferSecondLine(event, editor)(dispatch)
+            }
+            break
+          case ROUNDING_LENGTH:
+            if (!editor.chamfer.roundingLength.lineOne) {
               chamferFirstLine(event, editor)(dispatch)
             } else {
               chamferSecondLine(event, editor)(dispatch)
