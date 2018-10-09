@@ -82,6 +82,17 @@ export default class chamferComponent extends Component {
         </div>
         }
 
+        {mode === ROUNDING_RADIUS &&
+        <div className='chamfer-options'>
+          <label>Radius
+            <input type="number"
+                   value={options.rounding.radius}
+                   data-name='radius'
+                   onChange={this.inputChange}/>
+          </label>
+        </div>
+        }
+
       </Fragment>
     )
   }

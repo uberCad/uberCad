@@ -84,7 +84,10 @@ import {
   chamferFirstLineSelect,
   chamferLengthAngleDraw,
   chamferLengthAngleFirstLineSelect,
-  chamferSecondLine
+  chamferRoundingRadiusFirstLineSelect,
+  chamferSecondLine,
+  ROUNDING_RADIUS,
+  roundingRadiusDraw
 } from '../../actions/chamfer'
 
 const mapStateToProps = (state, ownProps) => {
@@ -292,6 +295,19 @@ const mapDispatchToProps = (dispatch) => {
                   )(dispatch)
                 }
                 break
+              case ROUNDING_RADIUS:
+                if (!editor.chamfer.rounding.lineOne) {
+                  chamferRoundingRadiusFirstLineSelect(editor.activeEntities[0])(dispatch)
+                } else {
+                  roundingRadiusDraw(
+                    event,
+                    editor,
+                    editor.chamfer.rounding.lineOne,
+                    editor.activeEntities[0],
+                    editor.chamfer.rounding.radius
+                  )(dispatch)
+                }
+                break
 
               default:
                 console.warn(`Unhandled mouse down for select mode ${editor.options.selectMode} in ${TOOL_CHAMFER}`)
@@ -456,6 +472,13 @@ const mapDispatchToProps = (dispatch) => {
             break
           case CHAMFER_LENGTH_ANGLE:
             if (!editor.chamfer.lengthAngle.lineOne) {
+              chamferFirstLine(event, editor)(dispatch)
+            } else {
+              chamferSecondLine(event, editor)(dispatch)
+            }
+            break
+          case ROUNDING_RADIUS:
+            if (!editor.chamfer.rounding.lineOne) {
               chamferFirstLine(event, editor)(dispatch)
             } else {
               chamferSecondLine(event, editor)(dispatch)

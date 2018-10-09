@@ -2607,8 +2607,8 @@ let distanseToLinePoint = (line, point) => {
 
 let pointIntersect = (a, b, c, d) => {
   let T = {}
-  T.x = -((a.x*b.y-b.x*a.y)*(d.x-c.x)-(c.x*d.y-d.x*c.y)*(b.x-a.x))/((a.y-b.y)*(d.x-c.x)-(c.y-d.y)*(b.x-a.x));
-  T.y = ((c.y-d.y)*(-T.x)-(c.x*d.y-d.x*c.y))/(d.x-c.x);
+  T.x = -((a.x * b.y - b.x * a.y) * (d.x - c.x) - (c.x * d.y - d.x * c.y) * (b.x - a.x)) / ((a.y - b.y) * (d.x - c.x) - (c.y - d.y) * (b.x - a.x))
+  T.y = ((c.y - d.y) * (-T.x) - (c.x * d.y - d.x * c.y)) / (d.x - c.x)
   return T
 }
 
@@ -2645,6 +2645,53 @@ let pointChamfer = (line, length, intersectPoint) => {
   line.computeLineDistances()
   line.geometry.computeBoundingSphere()
   return result
+}
+
+let vector = (line, point) => {
+  let vector = null
+  if (line.geometry.vertices[0].x - point.x < 0.001 &&
+    line.geometry.vertices[0].x - point.x > -0.001 &&
+    line.geometry.vertices[0].y - point.y < 0.001 &&
+    line.geometry.vertices[0].y - point.y > -0.001
+  ) {
+    vector = {
+      x: line.geometry.vertices[1].x - point.x,
+      y: line.geometry.vertices[1].y - point.y
+    }
+  } else {
+    vector = {
+      x: line.geometry.vertices[0].x - point.x,
+      y: line.geometry.vertices[0].y - point.y
+    }
+  }
+  return vector
+}
+
+let angleVector = (lineOne, lineTwo, pointIntersect) => {
+  const vectorOne = vector(lineOne, pointIntersect)
+  const vectorTwo = vector(lineTwo, pointIntersect)
+  const scalar = vectorOne.x * vectorTwo.x + vectorOne.y * vectorTwo.y
+  const moduleVectorOne = Math.sqrt(vectorOne.x * vectorOne.x + vectorOne.y * vectorOne.y)
+  const moduleVectorTwo = Math.sqrt(vectorTwo.x * vectorTwo.x + vectorTwo.y * vectorTwo.y)
+  return Math.acos(scalar / (moduleVectorOne * moduleVectorTwo))
+}
+
+let angleVectorOx = (line, pointIntersect) => {
+  let angle
+  const vectorOne = vector(line, pointIntersect)
+  const vectorTwo = {
+    x: Math.abs(pointIntersect.x) + 1,
+    y: 0
+  }
+  const scalar = vectorOne.x * vectorTwo.x + vectorOne.y * vectorTwo.y
+  const moduleVectorOne = Math.sqrt(vectorOne.x * vectorOne.x + vectorOne.y * vectorOne.y)
+  const moduleVectorTwo = Math.sqrt(vectorTwo.x * vectorTwo.x + vectorTwo.y * vectorTwo.y)
+  angle = Math.acos(scalar / (moduleVectorOne * moduleVectorTwo))
+  angle = vectorOne.y < 0 ? 2 * Math.PI - angle : angle
+  if (angle === 0 && vectorOne.x < 0 ) {
+    angle = Math.PI
+  }
+  return angle
 }
 
 export default {
@@ -2684,5 +2731,8 @@ export default {
   distanseToLinePoint,
   pointIntersect,
   arcsIntersect,
-  pointChamfer
+  pointChamfer,
+  vector,
+  angleVector,
+  angleVectorOx
 }
