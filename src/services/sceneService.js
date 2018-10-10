@@ -13,6 +13,7 @@ import axios from 'axios'
 import { MEASUREMENT_ANGLE, MEASUREMENT_RADIAL } from '../actions/measurement'
 import { LINE_PARALLEL, LINE_PERPENDICULAR, LINE_TANGENT_TO_ARC } from '../actions/line'
 import { CHAMFER_LENGTH_ANGLE, CHAMFER_TWO_LENGTH, ROUNDING_LENGTH, ROUNDING_RADIUS } from '../actions/chamfer'
+import { ARC_TANGENT_LINE } from '../actions/arc'
 
 let onClick = (event, scene, camera, renderer) => {
   let result = {
@@ -63,6 +64,9 @@ let onClick = (event, scene, camera, renderer) => {
 let doSelection = (selectResult, editor) => {
   highlightEntities(editor, editor.activeEntities, true, undefined, false)
   switch (editor.options.selectMode) {
+    case ARC_TANGENT_LINE:
+      editor.activeEntities = selectResult
+      break
     case ROUNDING_LENGTH:
       editor.activeEntities = selectResult
       break

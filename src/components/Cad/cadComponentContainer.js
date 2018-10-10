@@ -15,6 +15,7 @@ import {
 import { spinnerShow, spinnerHide } from '../../actions/spinner'
 
 import {
+  TOOL_ARC,
   TOOL_CHAMFER,
   TOOL_LINE,
   TOOL_MEASUREMENT,
@@ -91,6 +92,15 @@ import {
   roundingLengthDraw,
   roundingRadiusDraw
 } from '../../actions/chamfer'
+import {
+  ARC_RADIUS_TWO_POINT,
+  ARC_TANGENT_LINE,
+  arcRadiusFirstPoint,
+  saveTangentArc,
+  tangentArcDraw,
+  tangentFirstPoint,
+  tangentFirstPointSelect
+} from '../../actions/arc'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -113,6 +123,7 @@ const mapStateToProps = (state, ownProps) => {
       line: state.tools.line,
       rectangle: state.tools.rectangle,
       chamfer: state.tools.chamfer,
+      arc: state.tools.arc
     },
 
     sidebarExpanded: state.sidebar.active,
@@ -329,6 +340,30 @@ const mapDispatchToProps = (dispatch) => {
 
           }
         }
+
+        if (editor.tool === TOOL_ARC) {
+          switch (editor.options.selectMode) {
+            case ARC_RADIUS_TWO_POINT:
+              if (!editor.arc.radiusTwoPoint.pointOne) {
+                // arcRadiusFirstPoint(event, editor)(dispatch)
+              } else {
+                // chamferSecondLine(event, editor)(dispatch)
+              }
+              break
+            case ARC_TANGENT_LINE:
+              if (!editor.arc.tangentLine.pointOne) {
+                if (editor.activeEntities[0]){
+                  tangentFirstPointSelect(event, editor, editor.activeEntities[0])(dispatch)
+                }
+              } else {
+                saveTangentArc(editor)(dispatch)
+              }
+              break
+
+            default:
+              console.warn(`Unhandled move event select mode ${editor.options.selectMode} in ${TOOL_ARC}`)
+          }
+        }
       }
     },
 
@@ -509,6 +544,29 @@ const mapDispatchToProps = (dispatch) => {
 
           default:
             console.warn(`Unhandled select mode ${editor.options.selectMode} in ${TOOL_CHAMFER}`)
+        }
+      }
+
+      if (editor.tool === TOOL_ARC) {
+        switch (editor.options.selectMode) {
+          case ARC_RADIUS_TWO_POINT:
+            if (!editor.arc.radiusTwoPoint.pointOne) {
+              arcRadiusFirstPoint(event, editor)(dispatch)
+            } else {
+              // chamferSecondLine(event, editor)(dispatch)
+            }
+            break
+
+          case ARC_TANGENT_LINE:
+            if (!editor.arc.tangentLine.pointOne) {
+              tangentFirstPoint(event, editor)(dispatch)
+            } else {
+              tangentArcDraw(event, editor, editor.arc.tangentLine.line, editor.arc.tangentLine.pointOne)(dispatch)
+            }
+            break
+
+          default:
+            console.warn(`Unhandled move event select mode ${editor.options.selectMode} in ${TOOL_ARC}`)
         }
       }
     },

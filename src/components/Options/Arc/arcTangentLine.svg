@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg18"
+   y="0px"
+   x="0px"
+   version="1.1"
+   viewBox="0 0 52 63.75"
+   sodipodi:docname="arcTangentLine.svg"
+   inkscape:version="0.92.3 (d244b95, 2018-08-02)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1871"
+     inkscape:window-height="1025"
+     id="namedview11"
+     showgrid="false"
+     inkscape:snap-bbox="false"
+     inkscape:zoom="11.147025"
+     inkscape:cx="-2.6005956"
+     inkscape:cy="32.442912"
+     inkscape:window-x="49"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg18"
+     showguides="false" />
+  <metadata
+     id="metadata24">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>014.Fillet</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs22" />
+  <title
+     id="title2">014.Fillet</title>
+  <desc
+     id="desc4">Created with Sketch.</desc>
+  <g
+     style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:round"
+     transform="translate(-0.66853053,1.2415567)"
+     id="g12">
+    <g
+       style="stroke:#000000;stroke-width:2"
+       id="g10"
+       transform="translate(1,1)" />
+  </g>
+  <path
+     sodipodi:type="spiral"
+     style="fill:none;fill-rule:evenodd;stroke:#000000"
+     id="path218"
+     sodipodi:cx="20.264767"
+     sodipodi:cy="24.715446"
+     sodipodi:expansion="1.04"
+     sodipodi:revolution="0.97658533"
+     sodipodi:radius="15.70546"
+     sodipodi:argument="-17.588501"
+     sodipodi:t0="0.45486677"
+     d="m 16.01927,19.24791 c 2.783546,-4.500816 9.163251,-4.322388 12.944071,-1.286833 5.816553,4.67001 5.350982,13.499544 0.601889,18.731915 -0.713695,0.786323 -1.511022,1.496134 -2.372276,2.117194"
+     transform="matrix(2.1340214,0,0,1.8063558,-26.847284,-22.683015)" />
+  <ellipse
+     style="fill:#000000;stroke-width:1.7932117"
+     id="path220-7"
+     cx="31.134335"
+     cy="48.128555"
+     rx="6.102787"
+     ry="5.0847187" />
+  <path
+     style="fill:none;stroke:#000000;stroke-width:1.53630698px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 51.615093,37.979023 3.1137379,60.699229"
+     id="path3959"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="cc" />
+  <ellipse
+     style="fill:#ffffff;stroke-width:1.61955214"
+     id="path3980"
+     cx="31.232203"
+     cy="48.276443"
+     rx="3.1105268"
+     ry="2.713949" />
+  <ellipse
+     style="fill:#000000;stroke-width:1.7932117"
+     id="path220-7-5"
+     cx="6.0809369"
+     cy="13.716721"
+     rx="6.102787"
+     ry="5.0847187" />
+  <ellipse
+     style="fill:#ffffff;stroke-width:1.61955214"
+     id="path3980-6"
+     cx="6.1788049"
+     cy="13.864609"
+     rx="3.1105268"
+     ry="2.713949" />
+</svg>

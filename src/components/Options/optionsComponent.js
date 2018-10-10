@@ -8,12 +8,13 @@ import {
   TOOL_MEASUREMENT,
   TOOL_LINE,
   TOOL_RECTANGLE,
-  TOOL_CHAMFER
+  TOOL_CHAMFER, TOOL_ARC
 } from '../Toolbar/toolbarComponent'
 import { FormattedMessage } from 'react-intl'
 
 import Measurement from './Measurement/measurementComponent'
 import Line from './Line/lineComponent'
+import Arc from './Arc/arcComponent'
 import Rectangle from './Rectangle/rectangleComponent'
 import Chamfer from './Chamfer/chamferComponent'
 
@@ -221,6 +222,14 @@ export default class OptionsComponent extends Component {
         <Line
           lineMode={selectMode}
           setSelectMode={this.props.setSelectMode}
+        />}
+
+        {tool === TOOL_ARC &&
+        <Arc
+          mode={selectMode}
+          options={this.props.arcOptions}
+          setSelectMode={this.props.setSelectMode}
+          inputRadius={this.props.inputRadius}
         />}
 
         {tool === TOOL_CHAMFER &&

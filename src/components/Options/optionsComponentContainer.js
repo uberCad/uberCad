@@ -18,6 +18,7 @@ import {
   setScale
 } from '../../actions/edit'
 import { inputChange } from '../../actions/chamfer'
+import { inputRadius } from '../../actions/arc'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -35,6 +36,7 @@ const mapStateToProps = (state, ownProps) => {
     threshold: state.options.threshold,
     rotationObject: state.cad.editMode.rotation.rotationObject,
     chamferOptions: state.tools.chamfer,
+    arcOptions: state.tools.arc,
     ...ownProps
   }
 }
@@ -81,6 +83,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     inputChange: function (name, value, mode) {
       inputChange(name, value, mode)(dispatch)
+    },
+    inputRadius: function (radius) {
+      inputRadius(radius)(dispatch)
     }
   }
 }

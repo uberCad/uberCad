@@ -2688,10 +2688,95 @@ let angleVectorOx = (line, pointIntersect) => {
   const moduleVectorTwo = Math.sqrt(vectorTwo.x * vectorTwo.x + vectorTwo.y * vectorTwo.y)
   angle = Math.acos(scalar / (moduleVectorOne * moduleVectorTwo))
   angle = vectorOne.y < 0 ? 2 * Math.PI - angle : angle
-  if (angle === 0 && vectorOne.x < 0 ) {
+  if (angle === 0 && vectorOne.x < 0) {
     angle = Math.PI
   }
   return angle
+}
+
+let pointOnLine = (point, line) => {
+  let result
+  if ((line.geometry.vertices[1].y).toFixed(12) - (line.geometry.vertices[0].y).toFixed(12) === 0){
+    result = {
+      x: point.x,
+      y: line.geometry.vertices[0].y
+    }
+  } else if ((line.geometry.vertices[1].x).toFixed(12) - (line.geometry.vertices[0].x).toFixed(12) === 0){
+    result = {
+      x: line.geometry.vertices[0].x,
+      y: point.y
+    }
+  } else {
+    /**
+     * y = kx + b
+     * k = (y2 - y1) / (x2 - x1) => (x1, y1) first line point, (x2, y2) second line point,
+     * k1 = -1/ k2 => Perpendicular
+     * b = y - kx
+     * y1 = k1 * x1 + b1
+     * y2 = k2 * x2 + b2
+     * point intersects y1 & y2 :
+     * pointX = (b2 - b1) / (k1 - k2)
+     * pointY = k1 * ((b2 - b1) / (k1 - k2)) + b1
+     */
+    const kLine = (line.geometry.vertices[1].y - line.geometry.vertices[0].y) /
+      (line.geometry.vertices[1].x - line.geometry.vertices[0].x)
+    const bLine = line.geometry.vertices[0].y - kLine * line.geometry.vertices[0].x
+    const kLinePerpendicular = -1 / kLine
+    const bLinePerpendicular = point.y - kLinePerpendicular * point.x
+    result = {
+      x: (bLinePerpendicular - bLine) / (kLine - kLinePerpendicular),
+      y: kLine * (bLinePerpendicular - bLine) / (kLine - kLinePerpendicular) + bLine
+    }
+  }
+  return result
+}
+
+let centerTangentArc = (pointOne, pointTwo, line) => {
+  let center
+  /**
+   * y = kx + b
+   * k = (y2 - y1) / (x2 - x1) => (x1, y1) first line point, (x2, y2) second line point,
+   * k1 = -1/ k2 => Perpendicular
+   * b = y - kx
+   * xMid = (x1 + x2) / 2
+   * yMid = (y1 + y2) / 2
+   * y1 = k1 * x1 + b1
+   * y2 = k2 * x2 + b2
+   * point intersects y1 & y2 :
+   * pointX = (b2 - b1) / (k1 - k2)
+   * pointY = k1 * ((b2 - b1) / (k1 - k2)) + b1
+   */
+  if ((line.geometry.vertices[1].y).toFixed(12) - (line.geometry.vertices[0].y).toFixed(12) === 0){
+    const kChord = (pointTwo.y - pointOne.y)/(pointTwo.x - pointOne.x)
+    const kChordPerpendicular = -1 / kChord
+    const midChord = {
+      x: (pointTwo.x + pointOne.x)/2,
+      y: (pointTwo.y + pointOne.y)/2
+    }
+    const bChordPerpendicular = midChord.y - kChordPerpendicular * midChord.x
+    center = {
+      x: pointOne.x,
+      y: kChordPerpendicular * pointOne.x + bChordPerpendicular,
+    }
+  } else {
+    const kLine = (line.geometry.vertices[1].y - line.geometry.vertices[0].y) /
+      (line.geometry.vertices[1].x - line.geometry.vertices[0].x)
+    const kLinePerpendicular = -1 / kLine
+    const bLinePerpendicular = pointOne.y - kLinePerpendicular * pointOne.x
+
+    const kChord = (pointTwo.y - pointOne.y)/(pointTwo.x - pointOne.x)
+    const kChordPerpendicular = -1 / kChord
+    const midChord = {
+      x: (pointTwo.x + pointOne.x)/2,
+      y: (pointTwo.y + pointOne.y)/2
+    }
+    const bChordPerpendicular = midChord.y - kChordPerpendicular * midChord.x
+    center = {
+      x: (bChordPerpendicular - bLinePerpendicular)/(kLinePerpendicular - kChordPerpendicular),
+      y: kLinePerpendicular * (bChordPerpendicular - bLinePerpendicular)/(kLinePerpendicular - kChordPerpendicular) + bLinePerpendicular,
+    }
+  }
+  return center
 }
 
 export default {
@@ -2734,5 +2819,7 @@ export default {
   pointChamfer,
   vector,
   angleVector,
-  angleVectorOx
+  angleVectorOx,
+  pointOnLine,
+  centerTangentArc
 }

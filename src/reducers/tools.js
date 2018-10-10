@@ -35,6 +35,12 @@ import {
   ROUNDING_LENGTH_INPUT,
   ROUNDING_LENGTH_LINE_ONE
 } from '../actions/chamfer'
+import {
+  ARC_RADIUS_TWO_POINT_CLEAR,
+  ARC_RADIUS_TWO_POINT_INPUT,
+  ARC_TANGENT_LINE_CLEAR,
+  ARC_TANGENT_LINE_FIRST_POINT
+} from '../actions/arc'
 
 let initialState = {
   measurement: {
@@ -65,6 +71,16 @@ let initialState = {
     },
     tangent: {
       baseArc: null
+    }
+  },
+  arc: {
+    radiusTwoPoint: {
+      radius: '1',
+      pointOne: null
+    },
+    tangentLine: {
+      line: null,
+      pointOne: null
     }
   },
   rectangle: {
@@ -309,6 +325,39 @@ const tools = (state = initialState, action) => {
     case ROUNDING_LENGTH_LINE_ONE:
       return update(state, {
         chamfer: {roundingLength: {lineOne: {$set: action.payload.lineOne}}}
+      })
+
+    case ARC_RADIUS_TWO_POINT_CLEAR:
+      return update(state, {
+        arc: {
+          radiusTwoPoint: {
+            radius: {$set: '1'},
+            pointOne: {$set: null}
+          }
+        }
+      })
+
+    case ARC_RADIUS_TWO_POINT_INPUT:
+      return update(state, {
+        arc: {radiusTwoPoint: {radius: {$set: action.payload.radius}}}
+      })
+
+    case ARC_TANGENT_LINE_CLEAR:
+      return update(state, {
+        arc: {
+          tangentLine: {
+            line: {$set: null},
+            pointOne: {$set: null}
+          }
+        }
+      })
+
+    case ARC_TANGENT_LINE_FIRST_POINT:
+      return update(state, {
+        arc: {tangentLine: {
+            line: {$set: action.payload.line},
+            pointOne: {$set: action.payload.pointOne},
+        }}
       })
 
     default:

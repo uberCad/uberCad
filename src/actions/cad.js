@@ -2,6 +2,7 @@ import DxfParser from 'dxf-parser'
 import dxfService from './../services/dxfService'
 import sceneService from './../services/sceneService'
 import {
+  TOOL_ARC,
   TOOL_CHAMFER,
   TOOL_LINE,
   TOOL_MEASUREMENT,
@@ -250,6 +251,11 @@ export const cadClick = (event, editor) => {
       }
         break
       case TOOL_CHAMFER: {
+        let clickResult = sceneService.onClick(event, scene, camera)
+        console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
+      }
+        break
+      case TOOL_ARC: {
         let clickResult = sceneService.onClick(event, scene, camera)
         console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
       }
