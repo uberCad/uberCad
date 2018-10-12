@@ -7,7 +7,6 @@ import toolSelect from './select.svg'
 import toolUndo from './undo.svg'
 import toolRedo from './redo.svg'
 import toolLine from './line.svg'
-import toolCurve from './curve.svg'
 import toolArc from './curve.svg'
 import toolChamfer from './chamfer.svg'
 import toolRectangle from './rectangle.svg'
@@ -19,7 +18,6 @@ export const TOOL_POINT = 'TOOL_POINT'
 export const TOOL_SELECT = 'TOOL_SELECT'
 export const TOOL_UNDO = 'TOOL_UNDO'
 export const TOOL_REDO = 'TOOL_REDO'
-export const TOOL_NEW_CURVE = 'TOOL_NEW_CURVE'
 export const TOOL_ARC = 'TOOL_ARC'
 export const TOOL_MEASUREMENT = 'TOOL_MEASUREMENT'
 export const TOOL_LINE = 'TOOL_LINE'
@@ -107,18 +105,6 @@ export default class ToolbarComponent extends Component {
         >
           <img src={toolArc} alt='Arc'/>
         </button>
-
-        <FormattedMessage id='toolbar.newCurve' defaultMessage='New curve'>
-          {value =>
-            <button className={`btn ${tool === TOOL_NEW_CURVE ? 'btn-success' : ''}`}
-                    data-tool={TOOL_NEW_CURVE}
-                    onClick={this.onClick}
-                    title={value}
-            >
-              <img src={toolCurve} alt='New curve'/>
-            </button>
-          }
-        </FormattedMessage>
 
         <button className={`btn ${tool === TOOL_CHAMFER ? 'btn-success' : ''}`}
                 data-tool={TOOL_CHAMFER}

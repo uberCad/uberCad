@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './Options.css'
 import {
-  TOOL_NEW_CURVE,
   TOOL_POINT,
   TOOL_SELECT,
   TOOL_MEASUREMENT,
@@ -169,14 +168,6 @@ export default class OptionsComponent extends Component {
                 }
               </FormattedMessage>
             </li>
-          </ul>
-        )}
-        
-        {tool === TOOL_NEW_CURVE && (
-          <ul className='edit-group'>
-            <label>NEW CURVE: </label>
-            <button className='save' onClick={this.saveNewCurve}>Save</button>
-            <button className='cancel' onClick={this.cancelNewCurve}>Cancel</button>
           </ul>
         )}
 

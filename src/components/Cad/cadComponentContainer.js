@@ -19,7 +19,6 @@ import {
   TOOL_CHAMFER,
   TOOL_LINE,
   TOOL_MEASUREMENT,
-  TOOL_NEW_CURVE,
   TOOL_POINT,
   TOOL_RECTANGLE,
   TOOL_SELECT
@@ -195,7 +194,7 @@ const mapDispatchToProps = (dispatch) => {
           !editor.editMode.newLineFirst ? firstPoint(event, editor)(dispatch) : saveNewLine(editor)(dispatch)
         }
         //new curve
-        if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
+        if (editor.editMode.isNewCurve) {
           if (!editor.editMode.newCurveCenter) {
             centerPoint(event, editor)(dispatch)
           } else if (!editor.editMode.thetaStart) {
@@ -429,8 +428,8 @@ const mapDispatchToProps = (dispatch) => {
       }
 
       //new Curve
-      if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
-        let parent = editor.tool === TOOL_NEW_CURVE ? editor.activeLayer : editor.editMode.editObject
+      if (editor.editMode.isNewCurve) {
+        let parent = editor.editMode.editObject
         if (!parent || parent.metadata) {
           parent = editor.scene.getObjectByName('Layers').children[0]
           dispatch({
