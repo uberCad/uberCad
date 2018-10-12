@@ -95,8 +95,12 @@ import {
 import {
   ARC_RADIUS_TWO_POINT,
   ARC_TANGENT_LINE,
+  arcRadiusDraw,
   arcRadiusFirstPoint,
-  saveTangentArc,
+  arcRadiusFirstPointSelect,
+  choseArc,
+  saveRadiusArc,
+  saveTangentArc, stopDraw,
   tangentArcDraw,
   tangentFirstPoint,
   tangentFirstPointSelect
@@ -345,9 +349,12 @@ const mapDispatchToProps = (dispatch) => {
           switch (editor.options.selectMode) {
             case ARC_RADIUS_TWO_POINT:
               if (!editor.arc.radiusTwoPoint.pointOne) {
-                // arcRadiusFirstPoint(event, editor)(dispatch)
-              } else {
-                // chamferSecondLine(event, editor)(dispatch)
+                arcRadiusFirstPointSelect(event, editor)(dispatch)
+              } else  if (editor.arc.radiusTwoPoint.drawing){
+                stopDraw()(dispatch)
+                // arcRadiusDraw(event, editor, editor.arc.radiusTwoPoint.pointOne, editor.arc.radiusTwoPoint.radius)(dispatch)
+              } else  if (editor.activeEntities[0]){
+                saveRadiusArc(event, editor, editor.activeEntities[0])(dispatch)
               }
               break
             case ARC_TANGENT_LINE:
@@ -552,8 +559,10 @@ const mapDispatchToProps = (dispatch) => {
           case ARC_RADIUS_TWO_POINT:
             if (!editor.arc.radiusTwoPoint.pointOne) {
               arcRadiusFirstPoint(event, editor)(dispatch)
+            } else if (editor.arc.radiusTwoPoint.drawing) {
+              arcRadiusDraw(event, editor, editor.arc.radiusTwoPoint.pointOne, editor.arc.radiusTwoPoint.radius)(dispatch)
             } else {
-              // chamferSecondLine(event, editor)(dispatch)
+              choseArc(event, editor)(dispatch)
             }
             break
 

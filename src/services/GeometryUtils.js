@@ -2,6 +2,7 @@ import * as THREE from '../extend/THREE'
 import kMeans from '../../node_modules/kmeans-js/kMeans'
 import sceneService from './sceneService'
 import Path from '../classes/Path'
+import { createLine } from './editObject'
 
 let buildEdgeModel = (object, threshold = 0.000001) => {
   let vertices = getVertices(object.children)
@@ -2779,6 +2780,62 @@ let centerTangentArc = (pointOne, pointTwo, line) => {
   return center
 }
 
+let centerRadiusArc = (pointOne, pointTwo, radius) => {
+  let center
+  if ((pointOne.y).toFixed(12) - (pointTwo.y).toFixed(12) === 0){
+    const midChord = {
+      x: (pointTwo.x + pointOne.x)/2,
+      y: (pointTwo.y + pointOne.y)/2
+    }
+    const mid = getDistance(pointOne, midChord)
+    const c = Math.sqrt(radius * radius - mid * mid)
+    center = [{x: midChord.x, y: pointOne.y - c}, {x: midChord.x, y: pointOne.y + c}]
+  } else {
+    const kChord = (pointTwo.y - pointOne.y)/(pointTwo.x - pointOne.x)
+    const kLine = -1 / kChord
+    const midChord = {
+      x: (pointTwo.x + pointOne.x)/2,
+      y: (pointTwo.y + pointOne.y)/2
+    }
+    const bLine = midChord.y - kLine * midChord.x
+
+    const a = kLine * kLine + 1
+    const b = 2 * kLine * bLine - 2 * pointOne.x - 2 * pointOne.y * kLine
+    const c = pointOne.x * pointOne.x + pointOne.y * pointOne.y + bLine * bLine - radius * radius - 2 * pointOne.y * bLine
+
+    const x1 = (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a)
+    const x2 = (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a)
+    const y1 = kLine * x1 + bLine
+    const y2 = kLine * x2 + bLine
+    center = [{x: x1, y: y1}, {x: x2, y: y2}]
+  }
+  return center
+}
+
+let arcParameters = (pointOne, pointTwo, center) => {
+  let thetaStart
+  const line1 = createLine(pointOne, center)
+  const line2 = createLine(pointTwo, center)
+  const thetaLength = angleVector(line1, line2, center)
+
+  const angle1Ox = angleVectorOx(line1, center)
+  const angle2Ox = angleVectorOx(line2, center)
+  if (angle1Ox < angle2Ox) {
+    if (angle2Ox - angle1Ox < 2 * Math.PI - angle2Ox + angle1Ox) {
+      thetaStart = angle1Ox
+    } else {
+      thetaStart = angle2Ox
+    }
+  } else {
+    if (angle1Ox - angle2Ox < 2 * Math.PI - angle1Ox + angle2Ox) {
+      thetaStart = angle2Ox
+    } else {
+      thetaStart = angle1Ox
+    }
+  }
+  return {thetaStart, thetaLength}
+}
+
 export default {
   distanceToLine,
   distanceToArc,
@@ -2821,5 +2878,7 @@ export default {
   angleVector,
   angleVectorOx,
   pointOnLine,
-  centerTangentArc
+  centerTangentArc,
+  centerRadiusArc,
+  arcParameters
 }

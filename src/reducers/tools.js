@@ -38,6 +38,8 @@ import {
 import {
   ARC_RADIUS_TWO_POINT_CLEAR,
   ARC_RADIUS_TWO_POINT_INPUT,
+  ARC_RADIUS_TWO_POINT_ONE_SELECT,
+  ARC_RADIUS_TWO_POINT_STOP_DRAW,
   ARC_TANGENT_LINE_CLEAR,
   ARC_TANGENT_LINE_FIRST_POINT
 } from '../actions/arc'
@@ -76,7 +78,8 @@ let initialState = {
   arc: {
     radiusTwoPoint: {
       radius: '1',
-      pointOne: null
+      pointOne: null,
+      drawing: false
     },
     tangentLine: {
       line: null,
@@ -332,7 +335,8 @@ const tools = (state = initialState, action) => {
         arc: {
           radiusTwoPoint: {
             radius: {$set: '1'},
-            pointOne: {$set: null}
+            pointOne: {$set: null},
+            drawing: {$set: false}
           }
         }
       })
@@ -340,6 +344,20 @@ const tools = (state = initialState, action) => {
     case ARC_RADIUS_TWO_POINT_INPUT:
       return update(state, {
         arc: {radiusTwoPoint: {radius: {$set: action.payload.radius}}}
+      })
+
+    case ARC_RADIUS_TWO_POINT_ONE_SELECT:
+      return update(state, {
+        arc: {
+          radiusTwoPoint: {
+            pointOne: {$set: action.payload.pointOne},
+            drawing: {$set: action.payload.drawing}
+          }
+        }
+      })
+    case ARC_RADIUS_TWO_POINT_STOP_DRAW:
+      return update(state, {
+        arc: {radiusTwoPoint: {drawing: {$set: action.payload.drawing}}}
       })
 
     case ARC_TANGENT_LINE_CLEAR:
@@ -354,10 +372,12 @@ const tools = (state = initialState, action) => {
 
     case ARC_TANGENT_LINE_FIRST_POINT:
       return update(state, {
-        arc: {tangentLine: {
+        arc: {
+          tangentLine: {
             line: {$set: action.payload.line},
             pointOne: {$set: action.payload.pointOne},
-        }}
+          }
+        }
       })
 
     default:
