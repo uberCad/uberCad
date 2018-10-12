@@ -1,4 +1,11 @@
-import { createLine, crossingPoint, newArc } from '../services/editObject'
+import {
+  circleIntersectionAngle,
+  createLine,
+  crossingPoint,
+  editThetaLenght,
+  helpArc,
+  newArc
+} from '../services/editObject'
 import sceneService from '../services/sceneService'
 import { movePointInfo } from './pointInfo'
 import { CAD_DO_SELECTION } from './cad'
@@ -6,6 +13,9 @@ import GeometryUtils from '../services/GeometryUtils'
 import * as THREE from 'three'
 
 export const ARC_CENTER_TWO_POINT = 'ARC_CENTER_TWO_POINT'
+export const ARC_CENTER_TWO_POINT_CLEAR = 'ARC_CENTER_TWO_POINT_CLEAR'
+export const ARC_CENTER_TWO_POINT_CENTER_SELECT = 'ARC_CENTER_TWO_POINT_CENTER_SELECT'
+export const ARC_CENTER_TWO_POINT_ONE_SELECT = 'ARC_CENTER_TWO_POINT_ONE_SELECT'
 
 export const ARC_RADIUS_TWO_POINT = 'ARC_RADIUS_TWO_POINT'
 export const ARC_RADIUS_TWO_POINT_CLEAR = 'ARC_RADIUS_TWO_POINT_CLEAR'
@@ -19,6 +29,125 @@ export const ARC_TANGENT_LINE_FIRST_POINT = 'ARC_TANGENT_LINE_FIRST_POINT'
 const tangentArc = 'tangentArc'
 const radiusArc1 = 'radiusArc1'
 const radiusArc2 = 'radiusArc2'
+
+export const arcCenterPoint = (event, editor) => {
+  let {scene, camera} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to add center arc')(dispatch)
+  }
+}
+
+export const arcCenterFirstPoint = (event, editor, center) => {
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const pointOne = crossing ? crossing : mousePoint
+  const radius = GeometryUtils.getDistance(pointOne, center)
+
+  let helpLine = helpArc(radius)
+  helpLine.position.x = center.x
+  helpLine.position.y = center.y
+  const oldHelpLine = scene.getObjectByName('helpLine')
+  if (oldHelpLine) oldHelpLine.parent.remove(oldHelpLine)
+  scene.getObjectByName('HelpLayer').add(helpLine)
+  renderer.render(scene, camera)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to add first point')(dispatch)
+  }
+}
+
+export const arcCenterDraw = (event, editor, center, pointOne) => {
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera)
+  let mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const pointTwo = crossing ? crossing : mousePoint
+  const radius = GeometryUtils.getDistance(pointOne, center)
+
+  let newLayer = scene.getObjectByName('newLayer')
+  if (!newLayer) {
+    newLayer = new THREE.Object3D()
+    newLayer.name = 'newLayer'
+    scene.getObjectByName('Layers').add(newLayer)
+  }
+
+  const thetaStart = circleIntersectionAngle(pointOne, center)
+  const oldLine = scene.getObjectByName('newLine') || newArc(radius, thetaStart, 0.1)
+  const t = editThetaLenght(pointTwo, oldLine)
+  let line = newArc(radius, t.thetaStart, t.thetaLength)
+  line.userData.helpGeometry = t
+  line.position.x = center.x
+  line.position.y = center.y
+  if (oldLine && oldLine.parent) oldLine.parent.remove(oldLine)
+  newLayer.add(line)
+
+  renderer.render(scene, camera)
+  return dispatch => {
+    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to add end point')(dispatch)
+  }
+}
+
+export const arcCenterPointSelect = (event, editor) => {
+  let {scene, camera} = editor
+  const clickResult = sceneService.onClick(event, scene, camera)
+  const mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const center = crossing ? crossing : mousePoint
+
+  return dispatch => {
+    dispatch({
+      type: ARC_CENTER_TWO_POINT_CENTER_SELECT,
+      payload: {center}
+    })
+  }
+}
+
+export const arcCenterFirstPointSelect = (event, editor) => {
+  let {scene, camera} = editor
+  const clickResult = sceneService.onClick(event, scene, camera)
+  const mousePoint = {
+    x: clickResult.point.x,
+    y: clickResult.point.y
+  }
+  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  const pointOne = crossing ? crossing : mousePoint
+
+  return dispatch => {
+    dispatch({
+      type: ARC_CENTER_TWO_POINT_ONE_SELECT,
+      payload: {pointOne}
+    })
+  }
+}
+
+export const saveCenterArc = (event, editor) => {
+  let {scene, camera, renderer} = editor
+  let arc = scene.getObjectByName('newLine')
+  if (arc) arc.name = ''
+  scene.getObjectByName('HelpLayer').children = []
+  renderer.render(scene, camera)
+  return dispatch => {
+    dispatch({
+      type: ARC_CENTER_TWO_POINT_CLEAR
+    })
+  }
+}
 
 export const inputRadius = (radius) => {
   return dispatch => {

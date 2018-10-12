@@ -36,6 +36,9 @@ import {
   ROUNDING_LENGTH_LINE_ONE
 } from '../actions/chamfer'
 import {
+  ARC_CENTER_TWO_POINT_CENTER_SELECT,
+  ARC_CENTER_TWO_POINT_CLEAR,
+  ARC_CENTER_TWO_POINT_ONE_SELECT,
   ARC_RADIUS_TWO_POINT_CLEAR,
   ARC_RADIUS_TWO_POINT_INPUT,
   ARC_RADIUS_TWO_POINT_ONE_SELECT,
@@ -76,6 +79,10 @@ let initialState = {
     }
   },
   arc: {
+    centerTwoPoint: {
+      center: null,
+      pointOne: null
+    },
     radiusTwoPoint: {
       radius: '1',
       pointOne: null,
@@ -328,6 +335,24 @@ const tools = (state = initialState, action) => {
     case ROUNDING_LENGTH_LINE_ONE:
       return update(state, {
         chamfer: {roundingLength: {lineOne: {$set: action.payload.lineOne}}}
+      })
+
+    case ARC_CENTER_TWO_POINT_CLEAR:
+      return update(state, {
+        arc: {
+          centerTwoPoint: {
+            center: {$set: null},
+            pointOne: {$set: null}
+          }
+        }
+      })
+    case ARC_CENTER_TWO_POINT_CENTER_SELECT:
+      return update(state, {
+        arc: {centerTwoPoint: {center: {$set: action.payload.center}}}
+      })
+    case ARC_CENTER_TWO_POINT_ONE_SELECT:
+      return update(state, {
+        arc: {centerTwoPoint: {pointOne: {$set: action.payload.pointOne}}}
       })
 
     case ARC_RADIUS_TWO_POINT_CLEAR:

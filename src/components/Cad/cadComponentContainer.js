@@ -93,12 +93,18 @@ import {
   roundingRadiusDraw
 } from '../../actions/chamfer'
 import {
+  ARC_CENTER_TWO_POINT,
   ARC_RADIUS_TWO_POINT,
   ARC_TANGENT_LINE,
+  arcCenterDraw,
+  arcCenterFirstPoint,
+  arcCenterFirstPointSelect,
+  arcCenterPoint,
+  arcCenterPointSelect,
   arcRadiusDraw,
   arcRadiusFirstPoint,
   arcRadiusFirstPointSelect,
-  choseArc,
+  choseArc, saveCenterArc,
   saveRadiusArc,
   saveTangentArc, stopDraw,
   tangentArcDraw,
@@ -347,6 +353,16 @@ const mapDispatchToProps = (dispatch) => {
 
         if (editor.tool === TOOL_ARC) {
           switch (editor.options.selectMode) {
+            case ARC_CENTER_TWO_POINT:
+              if (!editor.arc.centerTwoPoint.center) {
+                arcCenterPointSelect(event, editor)(dispatch)
+              } else if (!editor.arc.centerTwoPoint.pointOne) {
+                arcCenterFirstPointSelect(event, editor)(dispatch)
+              } else {
+                saveCenterArc(event, editor)(dispatch)
+              }
+              break
+
             case ARC_RADIUS_TWO_POINT:
               if (!editor.arc.radiusTwoPoint.pointOne) {
                 arcRadiusFirstPointSelect(event, editor)(dispatch)
@@ -556,6 +572,16 @@ const mapDispatchToProps = (dispatch) => {
 
       if (editor.tool === TOOL_ARC) {
         switch (editor.options.selectMode) {
+          case ARC_CENTER_TWO_POINT:
+            if (!editor.arc.centerTwoPoint.center) {
+              arcCenterPoint(event, editor)(dispatch)
+            } else if (!editor.arc.centerTwoPoint.pointOne) {
+              arcCenterFirstPoint(event, editor, editor.arc.centerTwoPoint.center)(dispatch)
+            } else {
+              arcCenterDraw(event, editor, editor.arc.centerTwoPoint.center, editor.arc.centerTwoPoint.pointOne)(dispatch)
+            }
+            break
+
           case ARC_RADIUS_TWO_POINT:
             if (!editor.arc.radiusTwoPoint.pointOne) {
               arcRadiusFirstPoint(event, editor)(dispatch)
