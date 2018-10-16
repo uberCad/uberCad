@@ -76,6 +76,11 @@ export default class DxfService {
       helpLayer.userData['container'] = true
       scene.add(helpLayer)
 
+      let gridLayer = new THREE.Object3D()
+      gridLayer.name = 'GridLayer'
+      gridLayer.userData['container'] = true
+      scene.add(gridLayer)
+
       Object.keys(data.tables.layer.layers).forEach(layerName => {
         layersEntity.add(layers[layerName])
       })
@@ -98,6 +103,11 @@ export default class DxfService {
       helpLayer.name = 'HelpLayer'
       helpLayer.userData['container'] = true
       scene.add(helpLayer)
+
+      let gridLayer = new THREE.Object3D()
+      gridLayer.name = 'GridLayer'
+      gridLayer.userData['container'] = true
+      scene.add(gridLayer)
 
       let objects = scene.getObjectByName('Objects')
       snapshot.objects.forEach(item => {

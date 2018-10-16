@@ -7,7 +7,7 @@ import {
   TOOL_MEASUREMENT,
   TOOL_LINE,
   TOOL_RECTANGLE,
-  TOOL_CHAMFER, TOOL_ARC
+  TOOL_CHAMFER, TOOL_ARC, TOOL_GRID
 } from '../Toolbar/toolbarComponent'
 import { FormattedMessage } from 'react-intl'
 
@@ -16,6 +16,7 @@ import Line from './Line/lineComponent'
 import Arc from './Arc/arcComponent'
 import Rectangle from './Rectangle/rectangleComponent'
 import Chamfer from './Chamfer/chamferComponent'
+import Grid from './Grid/gridComponentContainer'
 
 export const SELECT_MODE_NEW = 'SELECT_MODE_NEW'
 export const SELECT_MODE_ADD = 'SELECT_MODE_ADD'
@@ -237,6 +238,7 @@ export default class OptionsComponent extends Component {
           setSelectMode={this.props.setSelectMode}
         />}
 
+        {tool === TOOL_GRID && < Grid/>}
       </div>
 
     )

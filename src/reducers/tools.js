@@ -46,6 +46,7 @@ import {
   ARC_TANGENT_LINE_CLEAR,
   ARC_TANGENT_LINE_FIRST_POINT
 } from '../actions/arc'
+import { GRID_STEP, GRID_VIEW } from '../actions/grid'
 
 let initialState = {
   measurement: {
@@ -119,6 +120,11 @@ let initialState = {
       lineTwo: null,
       length: '1'
     }
+  },
+  grid: {
+    view: false,
+    style: 'point',
+    step: 5
   }
 }
 
@@ -403,6 +409,16 @@ const tools = (state = initialState, action) => {
             pointOne: {$set: action.payload.pointOne},
           }
         }
+      })
+
+    case GRID_VIEW:
+      return update(state, {
+        grid: {view: {$set: action.payload.view}}
+      })
+
+    case GRID_STEP:
+      return update(state, {
+        grid: {step: {$set: action.payload.step}}
       })
 
     default:

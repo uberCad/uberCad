@@ -1,0 +1,30 @@
+import { connect } from 'react-redux'
+import gridComponent from './gridComponent'
+import { setStep, show } from '../../../actions/grid'
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    lang: state.locale.lang,
+    grid: state.tools.grid,
+    editor: {
+      scene: state.cad.scene,
+      camera: state.cad.camera,
+      renderer: state.cad.renderer
+    },
+    ...ownProps
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    show: function (editor, view, step) {
+      show(editor, view, step)(dispatch)
+    },
+    setStep: function (editor, view, step) {
+      setStep(editor, view, step)(dispatch)
+    },
+
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(gridComponent)
