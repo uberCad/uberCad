@@ -1,4 +1,4 @@
-import { createLine, crossingPoint } from '../services/editObject'
+import { createLine} from '../services/editObject'
 import sceneService from '../services/sceneService'
 import { movePointInfo } from './pointInfo'
 import * as THREE from 'three'
@@ -13,15 +13,10 @@ const CD = 'CD'
 const DA = 'DA'
 
 export const rectangleFirstPoint = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select first point')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select first point')(dispatch)
   }
 }
 
@@ -31,8 +26,8 @@ export const rectangleDraw = (event, editor, A) => {
   sceneService.removeLineByName(BC, scene)
   sceneService.removeLineByName(CD, scene)
   sceneService.removeLineByName(DA, scene)
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
+  const C = {
     x: clickResult.point.x,
     y: clickResult.point.y
   }
@@ -41,11 +36,6 @@ export const rectangleDraw = (event, editor, A) => {
     newLayer = new THREE.Object3D()
     newLayer.name = 'newLayer'
     scene.getObjectByName('Layers').add(newLayer)
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
-  const C = {
-    x: crossing ? crossing.x : mousePoint.x,
-    y: crossing ? crossing.y : mousePoint.y
   }
   const B = {
     x: C.x,
@@ -74,19 +64,17 @@ export const rectangleDraw = (event, editor, A) => {
 
   renderer.render(scene, camera)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select second point')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select second point')(dispatch)
   }
 }
 
 export const rectangleFirstPointSelect = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
+  let firstPoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
   }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
-  const firstPoint = crossing ? crossing : mousePoint
   return dispatch => {
     dispatch({
       type: RECTANGLE_TWO_POINT_FIRST_POINT,

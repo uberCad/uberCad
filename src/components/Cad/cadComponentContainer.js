@@ -110,6 +110,7 @@ import {
   tangentFirstPoint,
   tangentFirstPointSelect
 } from '../../actions/arc'
+import { showGrid } from '../../actions/grid'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -132,7 +133,8 @@ const mapStateToProps = (state, ownProps) => {
       line: state.tools.line,
       rectangle: state.tools.rectangle,
       chamfer: state.tools.chamfer,
-      arc: state.tools.arc
+      arc: state.tools.arc,
+      grid: state.tools.grid
     },
 
     sidebarExpanded: state.sidebar.active,
@@ -640,7 +642,11 @@ const mapDispatchToProps = (dispatch) => {
     toggleChanged:
       (isChanged) => {
         toggleChanged(isChanged)(dispatch)
-      }
+      },
+
+    showGrid: function (editor, view, step) {
+      showGrid(editor, view, step)
+    }
 
   }
 }

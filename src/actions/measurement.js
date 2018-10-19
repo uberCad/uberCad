@@ -1,4 +1,3 @@
-import { crossingPoint } from '../services/editObject'
 import sceneService from '../services/sceneService'
 import { disablePoint, movePointInfo } from './pointInfo'
 import GeometryUtils from '../services/GeometryUtils'
@@ -21,27 +20,23 @@ export const MEASUREMENT_ANGLE_SECOND_LINE = 'MEASUREMENT_ANGLE_SECOND_LINE'
 export const MEASUREMENT_ANGLE_ERASE = 'MEASUREMENT_ANGLE_ERASE'
 
 export const pointInfo = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
+
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select point')(dispatch)
+    clickResult.binding ?
+      movePointInfo(event, `${clickResult.binding} x:${clickResult.point.x}, y:${clickResult.point.y}`)(dispatch)
+      : movePointInfo(event, `Click to select point x:${clickResult.point.x}, y:${clickResult.point.y}`)(dispatch)
   }
 }
 
 export const pointSelect = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
+  let point = {
     x: clickResult.point.x,
     y: clickResult.point.y
   }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
-  const point = crossing ? crossing : mousePoint
 
   return dispatch => {
     dispatch({
@@ -52,41 +47,28 @@ export const pointSelect = (event, editor) => {
 }
 
 export const lineFirstInfo = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select first point')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select first point')(dispatch)
   }
 }
 
 export const lineSecondInfo = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select second point')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select second point')(dispatch)
   }
 }
 
 export const lineFirstPoint = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
+  let first = {
     x: clickResult.point.x,
     y: clickResult.point.y
   }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
-  const first = crossing ? crossing : mousePoint
-
   return dispatch => {
     dispatch({
       type: MEASUREMENT_LINE_FIRST,
@@ -96,15 +78,12 @@ export const lineFirstPoint = (event, editor) => {
 }
 
 export const lineSecondPoint = (event, editor, first) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
+  let second = {
     x: clickResult.point.x,
     y: clickResult.point.y
   }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
-  const second = crossing ? crossing : mousePoint
-
   const distance = GeometryUtils.getDistance(first, second)
   return dispatch => {
     disablePoint()(dispatch)
@@ -134,16 +113,11 @@ export const eraseLine = () => {
 }
 
 export const angleFirstInfo = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let activeEntities = sceneService.doSelection(clickResult.activeEntities, editor)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select first line')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select first line')(dispatch)
     dispatch({
       type: CAD_DO_SELECTION,
       payload: {activeEntities}
@@ -152,18 +126,13 @@ export const angleFirstInfo = (event, editor) => {
 }
 
 export const angleSecondInfo = (event, editor, firstLine) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   clickResult.activeEntities.push(firstLine)
   let activeEntities = sceneService.doSelection(clickResult.activeEntities, editor)
 
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select second line')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select second line')(dispatch)
     dispatch({
       type: CAD_DO_SELECTION,
       payload: {activeEntities}
@@ -210,20 +179,15 @@ export const eraseAngle = () => {
 }
 
 export const radialInfo = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   const circle = clickResult.activeEntities.filter(item => {
     return (item.geometry instanceof THREE.CircleGeometry)
   })
 
   let activeEntities = sceneService.doSelection(circle, editor)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select arc')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select arc')(dispatch)
     dispatch({
       type: CAD_DO_SELECTION,
       payload: {activeEntities}

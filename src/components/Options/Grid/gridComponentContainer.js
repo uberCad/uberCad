@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import gridComponent from './gridComponent'
-import { setStep, show } from '../../../actions/grid'
+import { setStep, toggleShow } from '../../../actions/grid'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -17,8 +17,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    show: function (editor, view, step) {
-      show(editor, view, step)(dispatch)
+    toggleShow: function (editor, view, step) {
+      toggleShow(editor, view, step)(dispatch)
     },
     setStep: function (editor, view, step) {
       setStep(editor, view, step)(dispatch)

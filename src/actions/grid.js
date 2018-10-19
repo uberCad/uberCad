@@ -18,7 +18,17 @@ let createGrid = (step, scene) => {
   return new THREE.Points(geometry, material)
 }
 
-export const show = (editor, view, step) => {
+export const showGrid = (editor, view, step) => {
+  let {scene, camera, renderer} = editor
+  let gridLayer = scene.getObjectByName('GridLayer')
+  gridLayer.children = []
+  if (view) {
+    gridLayer.add(createGrid(step, scene))
+    renderer.render(scene, camera)
+  }
+}
+
+export const toggleShow = (editor, view, step) => {
   let {scene, camera, renderer} = editor
   let gridLayer = scene.getObjectByName('GridLayer')
   gridLayer.children = []

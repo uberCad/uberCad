@@ -30,6 +30,7 @@ export default class CadComponent extends Component {
         } else {
           this.props.drawDxf(Dxf.parse(data), this.container)
         }
+        this.props.showGrid(this.props.editor, this.props.editor.grid.view, this.props.editor.grid.step)
         this.props.spinnerHide()
       })
       .catch(error => {

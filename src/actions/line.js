@@ -1,4 +1,4 @@
-import { createLine, crossingPoint, helpArc } from '../services/editObject'
+import { createLine, helpArc } from '../services/editObject'
 import sceneService from '../services/sceneService'
 import { movePointInfo } from './pointInfo'
 import { CAD_DO_SELECTION } from './cad'
@@ -24,17 +24,11 @@ export const LINE_TANGENT_TO_ARC_BASE = 'LINE_TANGENT_TO_ARC_BASE'
 const tangentName = 'tangentLine'
 
 export const parallelLine = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  // console.log('clickResult =', clickResult)
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let activeEntities = sceneService.doSelection(clickResult.activeEntities, editor)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select base line')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select base line')(dispatch)
     dispatch({
       type: CAD_DO_SELECTION,
       payload: {activeEntities}
@@ -52,26 +46,20 @@ export const parallelLineSelect = (baseLine) => {
 }
 
 export const parallelLineFirstPoint = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select first point')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select first point')(dispatch)
   }
 }
 
-export const parallelLineSecondPoint = (event, editor, baseLine, firstPoint, distance) => {
+export const parallelLineSecondPoint = (event, editor, baseLine, firstPoint) => {
   let {scene, camera, renderer} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
   }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
 
   let newLayer = scene.getObjectByName('newLayer')
   if (!newLayer) {
@@ -140,19 +128,17 @@ export const parallelLineSecondPoint = (event, editor, baseLine, firstPoint, dis
 
   renderer.render(scene, camera)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select second point')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select second point')(dispatch)
   }
 }
 
 export const parallelLineFirstPointSelect = (event, editor, baseLine) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
+  let first = {
     x: clickResult.point.x,
     y: clickResult.point.y
   }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
-  const first = crossing ? crossing : mousePoint
   const distance = GeometryUtils.distanseToLinePoint(baseLine, first)
   return dispatch => {
     dispatch({
@@ -175,8 +161,8 @@ export const parallelLineSecondPointSelect = (event, editor) => {
 }
 
 export const perpendicularBaseLine = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let activeEntities = sceneService.doSelection(clickResult.activeEntities, editor)
   return dispatch => {
     movePointInfo(event, 'Click to select base line')(dispatch)
@@ -197,27 +183,20 @@ export const perpendicularLineSelect = (baseLine) => {
 }
 
 export const perpendicularFirstPoint = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select first point')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select first point')(dispatch)
   }
 }
 
 export const perpendicularFirstPointSelect = (event, editor, baseLine) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
-  let mousePoint = {
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
+  let first = {
     x: clickResult.point.x,
     y: clickResult.point.y
   }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
-  const first = crossing ? crossing : mousePoint
   return dispatch => {
     dispatch({
       type: LINE_PERPENDICULAR_FIRST_POINT,
@@ -229,12 +208,11 @@ export const perpendicularFirstPointSelect = (event, editor, baseLine) => {
 export const perpendicularDraw = (event, editor, baseLine, firstPoint) => {
   let secondPoint
   let {scene, camera, renderer} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
   }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
 
   let newLayer = scene.getObjectByName('newLayer')
   if (!newLayer) {
@@ -288,7 +266,7 @@ export const perpendicularDraw = (event, editor, baseLine, firstPoint) => {
   newLayer.add(linePerpendicular)
   renderer.render(scene, camera)
   return dispatch => {
-    crossing ? movePointInfo(event, 'Crossing')(dispatch) : movePointInfo(event, 'Click to select point')(dispatch)
+    clickResult.binding ? movePointInfo(event, clickResult.binding)(dispatch) : movePointInfo(event, 'Click to select point')(dispatch)
   }
 }
 
@@ -307,8 +285,8 @@ export const perpendicularSecondPointSelect = (event, editor) => {
 }
 
 export const tangentBaseArc = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   const circle = clickResult.activeEntities.filter(item => {
     return (item.geometry instanceof THREE.CircleGeometry)
   })
@@ -334,12 +312,11 @@ export const tangentBaseArcSelect = (baseArc) => {
 export const tangentLineDraw = (event, editor, baseArc) => {
   let {scene, camera, renderer} = editor
   sceneService.removeLineByName(tangentName, scene)
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
   }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities)
   let newLayer = scene.getObjectByName('newLayer')
   if (!newLayer) {
     newLayer = new THREE.Object3D()
@@ -360,8 +337,8 @@ export const tangentLineDraw = (event, editor, baseArc) => {
   }
   renderer.render(scene, camera)
   return dispatch => {
-    if (crossing) {
-      movePointInfo(event, 'Crossing')(dispatch)
+    if (clickResult.binding) {
+      movePointInfo(event, clickResult.binding)(dispatch)
     } else if (!intersect) {
       movePointInfo(event, 'It is impossible to construct a tangent')(dispatch)
     } else {

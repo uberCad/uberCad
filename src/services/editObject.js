@@ -98,6 +98,7 @@ let unselectLine = (line, scene) => {
 }
 
 let closestPoint = (arr, c) => {
+  // console.time('closestPointTime');
   let index
   arr.forEach(function (item) {
     item.distance = Math.sqrt((item.x - c.x) * (item.x - c.x) + (item.y - c.y) * (item.y - c.y))
@@ -112,6 +113,7 @@ let closestPoint = (arr, c) => {
       index = i
     }
   }
+  // console.timeEnd('closestPointTime');
   return index
 }
 
@@ -444,6 +446,9 @@ let circleHelpPoint = (arc, scene) => {
   }
 }
 
+/**
+ * @deprecated use binding.js
+ */
 let crossingPoint = (pointMouse, activeEntities, entrainment = 0.05) => {
   try {
     if (activeEntities.length > 0 && pointMouse) {
@@ -646,5 +651,7 @@ export {
   fixPosition,
   mirrorObject,
   rotationPoint,
-  changeArcGeometry
+  changeArcGeometry,
+  closestPoint,
+  isPoint
 }

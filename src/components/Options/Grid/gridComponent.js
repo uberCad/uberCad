@@ -9,7 +9,7 @@ export default class gridComponent extends Component {
     return (
       <div className='grid-options'>
         <label>View:</label>
-        <button onClick={() => this.props.show(editor, view, step)}>{view ? 'On' : 'Off'}</button>
+        <button onClick={() => this.props.toggleShow(editor, view, step)}>{view ? 'On' : 'Off'}</button>
 
         <label>Style: {style}</label>
         <label>Step:
@@ -24,7 +24,7 @@ export default class gridComponent extends Component {
 
   static propTypes = {
     grid: PropTypes.object.isRequired,
-    show: PropTypes.func.isRequired,
+    toggleShow: PropTypes.func.isRequired,
     setStep: PropTypes.func.isRequired,
   }
 }

@@ -14,6 +14,7 @@ import { MEASUREMENT_ANGLE, MEASUREMENT_RADIAL } from '../actions/measurement'
 import { LINE_PARALLEL, LINE_PERPENDICULAR, LINE_TANGENT_TO_ARC } from '../actions/line'
 import { CHAMFER_LENGTH_ANGLE, CHAMFER_TWO_LENGTH, ROUNDING_LENGTH, ROUNDING_RADIUS } from '../actions/chamfer'
 import { ARC_RADIUS_TWO_POINT, ARC_TANGENT_LINE } from '../actions/arc'
+import { binding } from './binging'
 
 let onClick = (event, scene, camera, renderer) => {
   let result = {
@@ -40,15 +41,29 @@ let onClick = (event, scene, camera, renderer) => {
   result.point = mouse
 
   rayCaster.intersectObjects(scene.children, true).forEach(intersection => {
-    if (result.activeEntities.indexOf(intersection.object) < 0) {
+    if (result.activeEntities.indexOf(intersection.object) < 0
+      && intersection.object.parent.name !== 'BindingPoint'
+      && intersection.object.parent.name !== 'GridLayer'
+      && intersection.object.parent.parent.name !== 'GridLayer'
+      && intersection.object.name !== 'BindingPoint'
+      && intersection.object.name !== 'ActiveLine'
+      && intersection.object.name !== 'point1'
+      && intersection.object.name !== 'point2'
+      && intersection.object.name !== 'Center'
+      && intersection.object.name !== 'Start'
+      && intersection.object.name !== 'End'
+      && intersection.object.name !== 'Radius'
+      && intersection.object.name !== 'newLine'
+      && intersection.object.name !== 'helpLine'
+    ) {
       result.activeEntities.push(intersection.object)
     }
   })
 
   result.activeEntities.forEach(function (line) {
-    if (line.geometry.type === 'Geometry') {
+    if (line.geometry instanceof THREE.Geometry) {
       line.userData.mouseDistance = GeometryUtils.distanceToLine(result.point, line)
-    } else if (line.geometry.type === 'CircleGeometry') {
+    } else if (line.geometry instanceof THREE.CircleGeometry) {
       line.userData.mouseDistance = GeometryUtils.distanceToArc(result.point, line)
     }
   })
@@ -57,6 +72,8 @@ let onClick = (event, scene, camera, renderer) => {
     if (a.userData.mouseDistance < b.userData.mouseDistance) return -1
   }
   result.activeEntities.sort(compare)
+
+  result = binding(result, scene, camera, renderer)
 
   return result
 }
@@ -788,14 +805,14 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
     <bcprop id="Interior" x="${(thermalPoints.hot2.x / 1000).toFixed(4)}" y="${(thermalPoints.hot2.y / 1000).toFixed(4)}" temp="293.15" rs="0.13" rel_img="SvgjsImage1092" rel_id="3" rel="max"></bcprop>
   </g>
   ${(!svgForFlixo && `<g id="collisions">` +
-    collisionPoints.map(collisionPoint => {
-      let dot = ''
-      for (let i = 0; i <= collisionPoint.id; i++) {
-        // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
-      }
-      return `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(collisionPoint.point.y / 1000).toFixed(4)}" r="${collisionPoint.processed ? '0.0005' : '0.0005'}" style="fill:rgb(${collisionPoint.processed ? '255,200,200' : '200,200,255'}); stroke:black;stroke-width:0.00001" />` + dot
-    }).join('') +
-    `</g>`) || ''}
+      collisionPoints.map(collisionPoint => {
+        let dot = ''
+        for (let i = 0; i <= collisionPoint.id; i++) {
+          // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
+        }
+        return `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(collisionPoint.point.y / 1000).toFixed(4)}" r="${collisionPoint.processed ? '0.0005' : '0.0005'}" style="fill:rgb(${collisionPoint.processed ? '255,200,200' : '200,200,255'}); stroke:black;stroke-width:0.00001" />` + dot
+      }).join('') +
+      `</g>`) || ''}
   </svg>`
 
   console.log(svg)

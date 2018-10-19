@@ -191,8 +191,8 @@ export const saveEdit = (editor) => {
 }
 
 export const selectPoint = (line, event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -217,7 +217,7 @@ export const selectPoint = (line, event, editor) => {
 
 export const movePoint = (line, index, event, editor) => {
   let {scene, camera, renderer} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let point = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -278,8 +278,8 @@ export const cancelNewLine = (editor) => {
 }
 
 export const firstPoint = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -296,8 +296,8 @@ export const firstPoint = (event, editor) => {
 }
 
 export const startNewLine = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -310,7 +310,7 @@ export const startNewLine = (event, editor) => {
 
 export const drawLine = (event, editor, parent) => {
   let {scene, camera, renderer, editMode} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -385,8 +385,8 @@ export const cancelNewCurve = (editor) => {
 }
 
 export const centerPoint = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -403,8 +403,8 @@ export const centerPoint = (event, editor) => {
 }
 
 export const centerCurve = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -417,7 +417,7 @@ export const centerCurve = (event, editor) => {
 
 export const radius = (event, editor) => {
   let {scene, camera, renderer, editMode} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -460,7 +460,7 @@ export const thetaLength = (event, editor, parent) => {
   const thetaStart = circleIntersectionAngle(editMode.thetaStart, editMode.newCurveCenter)
   const oldLine = scene.getObjectByName('newLine') || newArc(editMode.radius, thetaStart, 0.1)
 
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -543,7 +543,7 @@ export const cloneObject = (editor, object) => {
 export const setClone = (event, editor) => {
   let {scene, camera, renderer} = editor
   let cloneObject = editor.editMode.clone.cloneObject
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -566,8 +566,8 @@ export const setClone = (event, editor) => {
 }
 
 export const selectClonePoint = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -579,8 +579,8 @@ export const selectClonePoint = (event, editor) => {
 }
 
 export const clonePoint = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   const point = {
     x: clickResult.point.x,
     y: clickResult.point.y,
@@ -684,8 +684,8 @@ export const cancelMove = () => {
 }
 
 export const selectMovePoint = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
@@ -697,8 +697,8 @@ export const selectMovePoint = (event, editor) => {
 }
 
 export const moveObjectPoint = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   const point = {
     x: clickResult.point.x,
     y: clickResult.point.y,
@@ -726,7 +726,7 @@ export const disableMovePoint = (object) => {
 export const moveObject = (event, editor) => {
   let {scene, camera, renderer} = editor
   let moveObject = editor.editMode.move.moveObject
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y

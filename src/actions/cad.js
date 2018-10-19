@@ -148,7 +148,7 @@ export const cadClick = (event, editor) => {
 
     switch (tool) {
       case TOOL_POINT: {
-        let clickResult = sceneService.onClick(event, scene, camera)
+        let clickResult = sceneService.onClick(event, scene, camera, renderer)
         console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
 
         let payload = {
@@ -236,27 +236,27 @@ export const cadClick = (event, editor) => {
         break
 
       case TOOL_MEASUREMENT: {
-        let clickResult = sceneService.onClick(event, scene, camera)
+        let clickResult = sceneService.onClick(event, scene, camera, renderer)
         console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
       }
         break
       case TOOL_LINE: {
-        let clickResult = sceneService.onClick(event, scene, camera)
+        let clickResult = sceneService.onClick(event, scene, camera, renderer)
         console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
       }
         break
       case TOOL_RECTANGLE: {
-        let clickResult = sceneService.onClick(event, scene, camera)
+        let clickResult = sceneService.onClick(event, scene, camera, renderer)
         console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
       }
         break
       case TOOL_CHAMFER: {
-        let clickResult = sceneService.onClick(event, scene, camera)
+        let clickResult = sceneService.onClick(event, scene, camera, renderer)
         console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
       }
         break
       case TOOL_ARC: {
-        let clickResult = sceneService.onClick(event, scene, camera)
+        let clickResult = sceneService.onClick(event, scene, camera, renderer)
         console.log(`Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
       }
         break
@@ -270,14 +270,14 @@ export const cadClick = (event, editor) => {
 
 export const cadDoubleClick = (event, editor) => {
   return dispatch => {
-    let {scene, camera, tool} = editor
+    let {scene, camera, tool, renderer} = editor
 
     // console.warn('Double click: TODO recursive select entities')
 
     switch (tool) {
       case TOOL_POINT:
         if (!editor.editMode.isEdit) {
-          let clickResult = sceneService.onClick(event, scene, camera)
+          let clickResult = sceneService.onClick(event, scene, camera, renderer)
           console.log(`DOUBLE Click position [${clickResult.point.x.toFixed(4)}, ${clickResult.point.y.toFixed(4)}]`, clickResult)
 
           if (clickResult.activeEntities.length) {

@@ -55,8 +55,8 @@ export const inputChange = (name, value, mode) => {
 }
 
 export const chamferFirstLine = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let activeEntities = sceneService.doSelection(clickResult.activeEntities, editor)
   return dispatch => {
     movePointInfo(event, 'Click to select first line')(dispatch)
@@ -68,8 +68,8 @@ export const chamferFirstLine = (event, editor) => {
 }
 
 export const chamferSecondLine = (event, editor) => {
-  let {scene, camera} = editor
-  let clickResult = sceneService.onClick(event, scene, camera)
+  let {scene, camera, renderer} = editor
+  let clickResult = sceneService.onClick(event, scene, camera, renderer)
   let activeEntities = sceneService.doSelection(clickResult.activeEntities, editor)
   return dispatch => {
     movePointInfo(event, 'Click to select second line')(dispatch)
