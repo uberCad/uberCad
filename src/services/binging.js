@@ -14,6 +14,12 @@ export const binding = (click, scene, camera, renderer) => {
       click.point = crossing
       click.binding = 'crossing'
     }
+
+    const middle = midline(click.point, click.activeEntities[0])
+    if (middle) {
+      click.point = middle
+      click.binding = 'midline'
+    }
   }
 
   if (!click.binding) {
@@ -152,5 +158,26 @@ let removeBindingView = (scene) => {
   let pointScene = scene.getObjectByName('BindingPoint')
   if (pointScene) {
     pointScene.parent.remove(pointScene)
+  }
+}
+
+let midline = (pointMouse, line, entrainment = 0.5) => {
+  let midPoint
+  if (line.geometry instanceof THREE.CircleGeometry) {
+    const angle = line.geometry.parameters.thetaStart + line.geometry.parameters.thetaLength / 2
+    midPoint = {
+      x: line.position.x + line.geometry.parameters.radius * Math.cos(angle),
+      y: line.position.y + line.geometry.parameters.radius * Math.sin(angle)
+    }
+    return midPoint
+
+  } else if (line.geometry instanceof THREE.Geometry) {
+     midPoint = {
+      x: (line.geometry.vertices[0].x + line.geometry.vertices[1].x) / 2,
+      y: (line.geometry.vertices[0].y + line.geometry.vertices[1].y) / 2
+    }
+    if (isPoint(pointMouse, entrainment, midPoint)){
+       return midPoint
+    }
   }
 }
