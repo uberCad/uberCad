@@ -1,23 +1,25 @@
-import { closestPoint, isPoint } from './editObject'
+import { circleIntersectionAngle, closestPoint, isPoint } from './editObject'
 import * as THREE from '../extend/THREE'
 
 export const binding = (click, scene, camera, renderer) => {
+  let bindingPoint
+
   if (click.activeEntities.length) {
     const pOnLine = pointOnLine(click.point, click.activeEntities[0])
     if (pOnLine) {
-      click.point = pOnLine
+      bindingPoint = pOnLine
       click.binding = 'pointOnLine'
     }
 
     const crossing = crossingPoint(click.point, click.activeEntities[0])
     if (crossing) {
-      click.point = crossing
+      bindingPoint = crossing
       click.binding = 'crossing'
     }
 
     const middle = midline(click.point, click.activeEntities[0])
     if (middle) {
-      click.point = middle
+      bindingPoint = middle
       click.binding = 'midline'
     }
   }
@@ -25,13 +27,14 @@ export const binding = (click, scene, camera, renderer) => {
   if (!click.binding) {
     const grid = gridPoint(click.point, scene)
     if (grid) {
-      click.point = grid
+      bindingPoint = grid
       click.binding = 'gridPoint'
     }
   }
 
-  if (click.binding) {
-    viewBindingPoint(click.point, scene, camera, renderer)
+  if (bindingPoint) {
+    viewBindingPoint(bindingPoint, scene, camera, renderer)
+    click.point = bindingPoint
   } else {
     removeBindingView(scene)
   }
@@ -78,36 +81,44 @@ let crossingPoint = (pointMouse, line, entrainment = 0.05) => {
 let pointOnLine = (point, line) => {
   let result = null
   if (line.type !== 'Points' || line.parent.name !== 'BindingPoint') {
-    if ((line.geometry.vertices[1].y).toFixed(12) - (line.geometry.vertices[0].y).toFixed(12) === 0) {
+    if (line.geometry instanceof THREE.CircleGeometry) {
+      const angle = circleIntersectionAngle(point, line.position)
       result = {
-        x: point.x,
-        y: line.geometry.vertices[0].y
+        x: line.position.x + line.geometry.parameters.radius * Math.cos(angle),
+        y: line.position.y + line.geometry.parameters.radius * Math.sin(angle)
       }
-    } else if ((line.geometry.vertices[1].x).toFixed(12) - (line.geometry.vertices[0].x).toFixed(12) === 0) {
-      result = {
-        x: line.geometry.vertices[0].x,
-        y: point.y
-      }
-    } else {
-      /**
-       * y = kx + b
-       * k = (y2 - y1) / (x2 - x1) => (x1, y1) first line point, (x2, y2) second line point,
-       * k1 = -1/ k2 => Perpendicular
-       * b = y - kx
-       * y1 = k1 * x1 + b1
-       * y2 = k2 * x2 + b2
-       * point intersects y1 & y2 :
-       * pointX = (b2 - b1) / (k1 - k2)
-       * pointY = k1 * ((b2 - b1) / (k1 - k2)) + b1
-       */
-      const kLine = (line.geometry.vertices[1].y - line.geometry.vertices[0].y) /
-        (line.geometry.vertices[1].x - line.geometry.vertices[0].x)
-      const bLine = line.geometry.vertices[0].y - kLine * line.geometry.vertices[0].x
-      const kLinePerpendicular = -1 / kLine
-      const bLinePerpendicular = point.y - kLinePerpendicular * point.x
-      result = {
-        x: (bLinePerpendicular - bLine) / (kLine - kLinePerpendicular),
-        y: kLine * (bLinePerpendicular - bLine) / (kLine - kLinePerpendicular) + bLine
+    } else if (line.geometry instanceof THREE.Geometry) {
+      if ((line.geometry.vertices[1].y).toFixed(12) - (line.geometry.vertices[0].y).toFixed(12) === 0) {
+        result = {
+          x: point.x,
+          y: line.geometry.vertices[0].y
+        }
+      } else if ((line.geometry.vertices[1].x).toFixed(12) - (line.geometry.vertices[0].x).toFixed(12) === 0) {
+        result = {
+          x: line.geometry.vertices[0].x,
+          y: point.y
+        }
+      } else {
+        /**
+         * y = kx + b
+         * k = (y2 - y1) / (x2 - x1) => (x1, y1) first line point, (x2, y2) second line point,
+         * k1 = -1/ k2 => Perpendicular
+         * b = y - kx
+         * y1 = k1 * x1 + b1
+         * y2 = k2 * x2 + b2
+         * point intersects y1 & y2 :
+         * pointX = (b2 - b1) / (k1 - k2)
+         * pointY = k1 * ((b2 - b1) / (k1 - k2)) + b1
+         */
+        const kLine = (line.geometry.vertices[1].y - line.geometry.vertices[0].y) /
+          (line.geometry.vertices[1].x - line.geometry.vertices[0].x)
+        const bLine = line.geometry.vertices[0].y - kLine * line.geometry.vertices[0].x
+        const kLinePerpendicular = -1 / kLine
+        const bLinePerpendicular = point.y - kLinePerpendicular * point.x
+        result = {
+          x: (bLinePerpendicular - bLine) / (kLine - kLinePerpendicular),
+          y: kLine * (bLinePerpendicular - bLine) / (kLine - kLinePerpendicular) + bLine
+        }
       }
     }
   }
@@ -169,15 +180,14 @@ let midline = (pointMouse, line, entrainment = 0.5) => {
       x: line.position.x + line.geometry.parameters.radius * Math.cos(angle),
       y: line.position.y + line.geometry.parameters.radius * Math.sin(angle)
     }
-    return midPoint
-
   } else if (line.geometry instanceof THREE.Geometry) {
      midPoint = {
       x: (line.geometry.vertices[0].x + line.geometry.vertices[1].x) / 2,
       y: (line.geometry.vertices[0].y + line.geometry.vertices[1].y) / 2
     }
-    if (isPoint(pointMouse, entrainment, midPoint)){
-       return midPoint
-    }
+  }
+
+  if (midPoint && isPoint(pointMouse, entrainment, midPoint)){
+    return midPoint
   }
 }
