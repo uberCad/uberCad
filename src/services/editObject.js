@@ -122,6 +122,12 @@ let isPoint = (a, r, rCenter) => {
   return rXy <= r
 }
 
+let choseLinePoint = (point, line, entrainment = 0.005) => {
+  const index = closestPoint(line.geometry.vertices, point)
+  const p = isPoint(point, entrainment, line.geometry.vertices[index])
+  if (p) return new THREE.Vector3(line.geometry.vertices[index].x, line.geometry.vertices[index].y, 0)
+}
+
 let startPointIndex = (line, mousePoint, scale = 1) => {
   if (line.geometry.type === 'Geometry') {
     let index = closestPoint(
@@ -653,5 +659,6 @@ export {
   rotationPoint,
   changeArcGeometry,
   closestPoint,
-  isPoint
+  isPoint,
+  choseLinePoint
 }

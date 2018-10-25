@@ -55,6 +55,8 @@ let onClick = (event, scene, camera, renderer) => {
       && intersection.object.name !== 'Radius'
       && intersection.object.name !== 'newLine'
       && intersection.object.name !== 'helpLine'
+      && intersection.object.name !== 'AlignmentLine'
+      && intersection.object.parent.name !== 'AlignmentLine'
     ) {
       result.activeEntities.push(intersection.object)
     }

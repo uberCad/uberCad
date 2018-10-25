@@ -1,5 +1,7 @@
-import { circleIntersectionAngle, closestPoint, isPoint } from './editObject'
+import { choseLinePoint, circleIntersectionAngle, closestPoint, isPoint } from './editObject'
 import * as THREE from '../extend/THREE'
+import sceneService from './sceneService'
+import GeometryUtils from './GeometryUtils'
 
 export const binding = (click, scene, camera, renderer) => {
   let bindingPoint
@@ -21,6 +23,14 @@ export const binding = (click, scene, camera, renderer) => {
     if (middle) {
       bindingPoint = middle
       click.binding = 'midline'
+    }
+  }
+
+  if (!click.binding) {
+    const alignmentPoint = alignment(click.point, scene)
+    if (alignmentPoint) {
+      bindingPoint = alignmentPoint
+      click.binding = 'alignment'
     }
   }
 
@@ -162,7 +172,7 @@ let viewBindingPoint = (point, scene) => {
   bindingPoint.add(line2)
   bindingPoint.add(arc)
   let helpLayer = scene.getObjectByName('HelpLayer')
-  helpLayer.add(bindingPoint)
+  if (helpLayer) helpLayer.add(bindingPoint)
 }
 
 let removeBindingView = (scene) => {
@@ -181,13 +191,126 @@ let midline = (pointMouse, line, entrainment = 0.5) => {
       y: line.position.y + line.geometry.parameters.radius * Math.sin(angle)
     }
   } else if (line.geometry instanceof THREE.Geometry) {
-     midPoint = {
+    midPoint = {
       x: (line.geometry.vertices[0].x + line.geometry.vertices[1].x) / 2,
       y: (line.geometry.vertices[0].y + line.geometry.vertices[1].y) / 2
     }
   }
 
-  if (midPoint && isPoint(pointMouse, entrainment, midPoint)){
+  if (midPoint && isPoint(pointMouse, entrainment, midPoint)) {
     return midPoint
   }
+}
+
+let alignment = (pointMouse, scene, entrainment = 0.5) => {
+  let result
+  sceneService.removeLineByName('AlignmentLine', scene)
+
+  let box = new THREE.BoxHelper(scene, 0xffff00)
+  const radius = Number((box.geometry.boundingSphere.radius).toFixed(0))
+
+  let material = new THREE.LineBasicMaterial({color: 0x94e54e})
+  material.opacity = 0.5
+  material.transparent = true
+
+  let geometryLine1 = new THREE.Geometry()
+  let geometryLine2 = new THREE.Geometry()
+  geometryLine1.vertices.push(new THREE.Vector3(pointMouse.x, pointMouse.y + 2 * radius, 0))
+  geometryLine1.vertices.push(new THREE.Vector3(pointMouse.x, pointMouse.y - 2 * radius, 0))
+  geometryLine2.vertices.push(new THREE.Vector3(pointMouse.x + 2 * radius, pointMouse.y, 0))
+  geometryLine2.vertices.push(new THREE.Vector3(pointMouse.x - 2 * radius, pointMouse.y, 0))
+  let lineOy = new THREE.Line(geometryLine1, material)
+  let lineOx = new THREE.Line(geometryLine2, material)
+
+  let closestIntersectPoint = (scene, line, point, entrainment) => {
+    let returnPoint
+    let intersect = []
+    let intersects = (scene, line, point, entrainment) => {
+      scene.children.forEach(object => {
+        if (!object.children.length) {
+          if (object.geometry instanceof THREE.CircleGeometry && object.parent.name !== 'BindingPoint') {
+            const check = GeometryUtils.lineArcIntersectNew(lineOy, object, 0)
+            if (check.isIntersects && check.type === 'intersect') {
+              check.points.forEach(item => {
+                item.line = object
+                item.distance = GeometryUtils.getDistance(point, item.point)
+                intersect.push(item)
+              })
+            }
+
+          } else if (object.geometry instanceof THREE.Geometry && object.parent.name !== 'BindingPoint') {
+            const check = GeometryUtils.linesIntersect(
+              object.geometry.vertices[0],
+              object.geometry.vertices[1],
+              line.geometry.vertices[0],
+              line.geometry.vertices[1],
+              entrainment
+            )
+            if (check.isIntersects && check.type === 'intersecting') {
+              check.points.forEach(item => {
+                item.line = object
+                item.distance = GeometryUtils.getDistance(point, item.point)
+                intersect.push(item)
+              })
+            }
+          }
+        } else {
+          intersects(object, line, point, entrainment)
+        }
+      })
+    }
+    intersects(scene, line, point, entrainment)
+
+    if (intersect.length) {
+      let compare = (a, b) => {
+        if (a.distance > b.distance) return 1
+        if (a.distance < b.distance) return -1
+      }
+      intersect.sort(compare)
+      if (intersect[0].line.geometry instanceof THREE.CircleGeometry) {
+        returnPoint = {
+          line: intersect[0].line,
+          point: new THREE.Vector3(intersect[0].point.x, intersect[0].point.y, 0)
+        }
+      } else if (intersect[0].line.geometry instanceof THREE.Geometry) {
+        const p = choseLinePoint(intersect[0].point, intersect[0].line, entrainment)
+        if (p) {
+          returnPoint = {
+            line: intersect[0].line,
+            point: p
+          }
+        }
+      }
+    }
+    return returnPoint
+  }
+
+  let alignmentLine = new THREE.Object3D()
+  alignmentLine.name = 'AlignmentLine'
+
+  let pointOx = closestIntersectPoint(scene, lineOx, pointMouse, entrainment)
+  if (pointOx) {
+    result = new THREE.Vector3(pointMouse.x, pointOx.point.y, 0)
+    lineOx.geometry.vertices[0] = pointOx.point
+    lineOx.geometry.vertices[1] = result
+    alignmentLine.add(lineOx)
+  }
+
+  const pointOy = closestIntersectPoint(scene, lineOy, pointMouse, entrainment)
+  if (pointOy) {
+    if (result instanceof THREE.Vector3 && pointOx.line !== pointOy.line) {
+      result.x = pointOy.point.x
+    } else {
+      result = new THREE.Vector3(pointOy.point.x, pointMouse.y, 0)
+    }
+    lineOy.geometry.vertices[0] = pointOy.point
+    lineOy.geometry.vertices[1] = result
+    alignmentLine.add(lineOy)
+  }
+
+  if (alignmentLine.children.length) {
+    let helpLayer = scene.getObjectByName('HelpLayer')
+    helpLayer.add(alignmentLine)
+  }
+  return result
 }

@@ -2880,5 +2880,7 @@ export default {
   pointOnLine,
   centerTangentArc,
   centerRadiusArc,
-  arcParameters
+  arcParameters,
+  lineArcIntersect,
+  lineArcIntersectNew
 }
