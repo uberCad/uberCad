@@ -1,4 +1,4 @@
-import { choseLinePoint, circleIntersectionAngle, closestPoint, isPoint } from './editObject'
+import { circleIntersectionAngle, closestPoint, isPoint } from './editObject'
 import * as THREE from '../extend/THREE'
 import sceneService from './sceneService'
 import GeometryUtils from './GeometryUtils'
@@ -223,19 +223,47 @@ let alignment = (pointMouse, scene, entrainment = 0.5) => {
   let lineOx = new THREE.Line(geometryLine2, material)
 
   let closestIntersectPoint = (scene, line, point, entrainment) => {
-    let returnPoint
-    let intersect = []
-    let intersects = (scene, line, point, entrainment) => {
+    let desiredPoint
+    let intersects = []
+    const Ox = Math.abs(line.geometry.vertices[0].y - line.geometry.vertices[1].y) < 0.00001
+    const Oy = Math.abs(line.geometry.vertices[0].x - line.geometry.vertices[1].x) < 0.00001
+    let getIntersects = (scene, line, point, entrainment) => {
       scene.children.forEach(object => {
         if (!object.children.length) {
           if (object.geometry instanceof THREE.CircleGeometry && object.parent.name !== 'BindingPoint') {
             const check = GeometryUtils.lineArcIntersectNew(lineOy, object, 0)
             if (check.isIntersects && check.type === 'intersect') {
-              check.points.forEach(item => {
-                item.line = object
-                item.distance = GeometryUtils.getDistance(point, item.point)
-                intersect.push(item)
-              })
+              let center = {
+                  x: object.position.x,
+                  y: object.position.y
+              }
+
+              //check if mouse point in the range near the Ox or Oy line and point of intersecting line
+              if ((Ox && Math.abs(point.y - center.y) < entrainment) ||
+                (Oy && Math.abs(point.x - center.x) < entrainment)) {
+                center.distance = GeometryUtils.getDistance(point, center)
+                intersects.push(center)
+              } else {}
+
+              let start = {
+                  x: object.geometry.vertices[0].x + object.position.x,
+                  y: object.geometry.vertices[0].y + object.position.y
+              }
+              if ((Ox && Math.abs(point.y - start.y) < entrainment) ||
+                (Oy && Math.abs(point.x - start.x) < entrainment)) {
+                start.distance = GeometryUtils.getDistance(point, start)
+                intersects.push(start)
+              } else {}
+
+              let end = {
+                  x: object.geometry.vertices[object.geometry.vertices.length - 1].x + object.position.x,
+                  y: object.geometry.vertices[object.geometry.vertices.length - 1].y + object.position.y
+              }
+              if ((Ox && Math.abs(point.y - end.y) < entrainment) ||
+                (Oy && Math.abs(point.x - end.x) < entrainment)) {
+                end.distance = GeometryUtils.getDistance(point, end)
+                intersects.push(end)
+              } else {}
             }
 
           } else if (object.geometry instanceof THREE.Geometry && object.parent.name !== 'BindingPoint') {
@@ -247,42 +275,48 @@ let alignment = (pointMouse, scene, entrainment = 0.5) => {
               entrainment
             )
             if (check.isIntersects && check.type === 'intersecting') {
-              check.points.forEach(item => {
-                item.line = object
-                item.distance = GeometryUtils.getDistance(point, item.point)
-                intersect.push(item)
-              })
+              let first = object.geometry.vertices[0]
+              let second = object.geometry.vertices[1]
+              let mid = {
+                x: (first.x + second.x) / 2,
+                y: (first.y + second.y) / 2
+              }
+
+              if ((Ox && Math.abs(point.y - first.y) < entrainment) ||
+                (Oy && Math.abs(point.x - first.x) < entrainment)) {
+                first.distance = GeometryUtils.getDistance(point, first)
+                intersects.push(first)
+              } else {}
+
+              if ((Ox && Math.abs(point.y - second.y) < entrainment) ||
+                (Oy && Math.abs(point.x - second.x) < entrainment)) {
+                second.distance = GeometryUtils.getDistance(point, second)
+                intersects.push(second)
+              } else {}
+
+              if ((Ox && Math.abs(point.y - mid.y) < entrainment) ||
+                (Oy && Math.abs(point.x - mid.x) < entrainment)) {
+                mid.distance = GeometryUtils.getDistance(point, mid)
+                intersects.push(mid)
+              } else {}
             }
           }
         } else {
-          intersects(object, line, point, entrainment)
+          getIntersects(object, line, point, entrainment)
         }
       })
     }
-    intersects(scene, line, point, entrainment)
+    getIntersects(scene, line, point, entrainment)
 
-    if (intersect.length) {
+    if (intersects.length) {
       let compare = (a, b) => {
         if (a.distance > b.distance) return 1
         if (a.distance < b.distance) return -1
       }
-      intersect.sort(compare)
-      if (intersect[0].line.geometry instanceof THREE.CircleGeometry) {
-        returnPoint = {
-          line: intersect[0].line,
-          point: new THREE.Vector3(intersect[0].point.x, intersect[0].point.y, 0)
-        }
-      } else if (intersect[0].line.geometry instanceof THREE.Geometry) {
-        const p = choseLinePoint(intersect[0].point, intersect[0].line, entrainment)
-        if (p) {
-          returnPoint = {
-            line: intersect[0].line,
-            point: p
-          }
-        }
-      }
+      intersects.sort(compare)
+      desiredPoint = new THREE.Vector3(intersects[0].x, intersects[0].y, 0)
     }
-    return returnPoint
+    return desiredPoint
   }
 
   let alignmentLine = new THREE.Object3D()
@@ -290,20 +324,20 @@ let alignment = (pointMouse, scene, entrainment = 0.5) => {
 
   let pointOx = closestIntersectPoint(scene, lineOx, pointMouse, entrainment)
   if (pointOx) {
-    result = new THREE.Vector3(pointMouse.x, pointOx.point.y, 0)
-    lineOx.geometry.vertices[0] = pointOx.point
+    result = new THREE.Vector3(pointMouse.x, pointOx.y, 0)
+    lineOx.geometry.vertices[0] = pointOx
     lineOx.geometry.vertices[1] = result
     alignmentLine.add(lineOx)
   }
 
   const pointOy = closestIntersectPoint(scene, lineOy, pointMouse, entrainment)
   if (pointOy) {
-    if (result instanceof THREE.Vector3 && pointOx.line !== pointOy.line) {
-      result.x = pointOy.point.x
+    if (result instanceof THREE.Vector3) {
+      result.x = pointOy.x
     } else {
-      result = new THREE.Vector3(pointOy.point.x, pointMouse.y, 0)
+      result = new THREE.Vector3(pointOy.x, pointMouse.y, 0)
     }
-    lineOy.geometry.vertices[0] = pointOy.point
+    lineOy.geometry.vertices[0] = pointOy
     lineOy.geometry.vertices[1] = result
     alignmentLine.add(lineOy)
   }
