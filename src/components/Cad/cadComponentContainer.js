@@ -111,6 +111,7 @@ import {
   tangentFirstPointSelect
 } from '../../actions/arc'
 import { showGrid } from '../../actions/grid'
+import { setBinding } from '../../actions/binding'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -646,6 +647,9 @@ const mapDispatchToProps = (dispatch) => {
 
     showGrid: function (editor, view, step) {
       showGrid(editor, view, step)
+    },
+    setBinding: function (scene, binding) {
+      setBinding(scene, binding)
     }
 
   }

@@ -5,42 +5,59 @@ import GeometryUtils from './GeometryUtils'
 
 export const binding = (click, scene, camera, renderer) => {
   let bindingPoint
+  const bindingTool = scene.userData.binding
 
-  if (click.activeEntities.length) {
-    const pOnLine = pointOnLine(click.point, click.activeEntities[0])
-    if (pOnLine) {
-      bindingPoint = pOnLine
-      click.binding = 'pointOnLine'
+  bindingTool.forEach(tool => {
+    if (click.activeEntities.length) {
+      if (tool.name === 'PointOnLine' && tool.active) {
+        const pOnLine = pointOnLine(click.point, click.activeEntities[0])
+        if (pOnLine) {
+          bindingPoint = pOnLine
+          click.binding = tool.name
+        }
+      }
+
+      if (tool.name === 'Crossing' && tool.active) {
+        const crossing = crossingPoint(click.point, click.activeEntities[0])
+        if (crossing) {
+          bindingPoint = crossing
+          click.binding = tool.name
+        }
+      }
+
+      if (tool.name === 'Midline' && tool.active) {
+        const middle = midline(click.point, click.activeEntities[0])
+        if (middle) {
+          bindingPoint = middle
+          click.binding = tool.name
+        }
+      }
     }
 
-    const crossing = crossingPoint(click.point, click.activeEntities[0])
-    if (crossing) {
-      bindingPoint = crossing
-      click.binding = 'crossing'
+    if (tool.name === 'Alignment' && tool.active) {
+      if (!click.binding) {
+        const alignmentPoint = alignment(click.point, scene)
+        if (alignmentPoint) {
+          bindingPoint = alignmentPoint
+          click.binding = tool.name
+        } else {
+          sceneService.removeLineByName('AlignmentLine', scene)
+        }
+      } else {
+        sceneService.removeLineByName('AlignmentLine', scene)
+      }
     }
 
-    const middle = midline(click.point, click.activeEntities[0])
-    if (middle) {
-      bindingPoint = middle
-      click.binding = 'midline'
+    if (tool.name === 'GridPoint' && tool.active) {
+      if (!click.binding) {
+        const grid = gridPoint(click.point, scene)
+        if (grid) {
+          bindingPoint = grid
+          click.binding = tool.name
+        }
+      }
     }
-  }
-
-  if (!click.binding) {
-    const alignmentPoint = alignment(click.point, scene)
-    if (alignmentPoint) {
-      bindingPoint = alignmentPoint
-      click.binding = 'alignment'
-    }
-  }
-
-  if (!click.binding) {
-    const grid = gridPoint(click.point, scene)
-    if (grid) {
-      bindingPoint = grid
-      click.binding = 'gridPoint'
-    }
-  }
+  })
 
   if (bindingPoint) {
     viewBindingPoint(bindingPoint, scene, camera, renderer)
@@ -234,8 +251,8 @@ let alignment = (pointMouse, scene, entrainment = 0.5) => {
             const check = GeometryUtils.lineArcIntersectNew(lineOy, object, 0)
             if (check.isIntersects && check.type === 'intersect') {
               let center = {
-                  x: object.position.x,
-                  y: object.position.y
+                x: object.position.x,
+                y: object.position.y
               }
 
               //check if mouse point in the range near the Ox or Oy line and point of intersecting line
@@ -246,8 +263,8 @@ let alignment = (pointMouse, scene, entrainment = 0.5) => {
               } else {}
 
               let start = {
-                  x: object.geometry.vertices[0].x + object.position.x,
-                  y: object.geometry.vertices[0].y + object.position.y
+                x: object.geometry.vertices[0].x + object.position.x,
+                y: object.geometry.vertices[0].y + object.position.y
               }
               if ((Ox && Math.abs(point.y - start.y) < entrainment) ||
                 (Oy && Math.abs(point.x - start.x) < entrainment)) {
@@ -256,8 +273,8 @@ let alignment = (pointMouse, scene, entrainment = 0.5) => {
               } else {}
 
               let end = {
-                  x: object.geometry.vertices[object.geometry.vertices.length - 1].x + object.position.x,
-                  y: object.geometry.vertices[object.geometry.vertices.length - 1].y + object.position.y
+                x: object.geometry.vertices[object.geometry.vertices.length - 1].x + object.position.x,
+                y: object.geometry.vertices[object.geometry.vertices.length - 1].y + object.position.y
               }
               if ((Ox && Math.abs(point.y - end.y) < entrainment) ||
                 (Oy && Math.abs(point.x - end.x) < entrainment)) {

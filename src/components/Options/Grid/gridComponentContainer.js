@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
 import gridComponent from './gridComponent'
 import { setStep, toggleShow } from '../../../actions/grid'
+import { checkBinding } from '../../../actions/binding'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -23,7 +24,9 @@ const mapDispatchToProps = (dispatch) => {
     setStep: function (editor, view, step) {
       setStep(editor, view, step)(dispatch)
     },
-
+    checkBinding: function (scene, idx, checked) {
+      checkBinding(scene, idx, checked)(dispatch)
+    }
   }
 }
 

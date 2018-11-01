@@ -47,6 +47,7 @@ import {
   ARC_TANGENT_LINE_FIRST_POINT
 } from '../actions/arc'
 import { GRID_STEP, GRID_VIEW } from '../actions/grid'
+import { BINDING_CHECK } from '../actions/binding'
 
 let initialState = {
   measurement: {
@@ -124,7 +125,29 @@ let initialState = {
   grid: {
     view: false,
     style: 'point',
-    step: 5
+    step: 5,
+    binding: [
+      {
+        name: 'PointOnLine',
+        active: false
+      },
+      {
+        name: 'Crossing',
+        active: false
+      },
+      {
+        name: 'Midline',
+        active: false
+      },
+      {
+        name: 'Alignment',
+        active: false
+      },
+      {
+        name: 'GridPoint',
+        active: false
+      }
+    ]
   }
 }
 
@@ -419,6 +442,17 @@ const tools = (state = initialState, action) => {
     case GRID_STEP:
       return update(state, {
         grid: {step: {$set: action.payload.step}}
+      })
+
+    case BINDING_CHECK:
+      const binding = state.grid.binding.map((item, idx) => {
+        if(idx === action.payload.idx){
+          return { ...item, active: action.payload.checked}
+        }
+        return item
+      })
+      return update(state, {
+        grid: {binding: {$set: binding}}
       })
 
     default:
