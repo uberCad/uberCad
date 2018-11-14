@@ -4,6 +4,7 @@ import { movePointInfo } from './pointInfo'
 import { CAD_DO_SELECTION } from './cad'
 import GeometryUtils from '../services/GeometryUtils'
 import * as THREE from 'three'
+import { addHistory } from './history'
 
 export const LINE_TWO_POINT = 'LINE_TWO_POINT'
 
@@ -22,6 +23,7 @@ export const LINE_TANGENT_TO_ARC_CLEAR = 'LINE_TANGENT_TO_ARC_CLEAR'
 export const LINE_TANGENT_TO_ARC_BASE = 'LINE_TANGENT_TO_ARC_BASE'
 
 const tangentName = 'tangentLine'
+const parallelName = 'parallelLine'
 
 export const parallelLine = (event, editor) => {
   let {scene, camera, renderer} = editor
@@ -68,7 +70,7 @@ export const parallelLineSecondPoint = (event, editor, baseLine, firstPoint) => 
     scene.getObjectByName('Layers').add(newLayer)
   }
 
-  const parallelLine = scene.getObjectByName('parallelLine')
+  const parallelLine = scene.getObjectByName(parallelName)
   const perpendicular = scene.getObjectByName('linePerpendicular')
 
   if (parallelLine) {
@@ -123,7 +125,7 @@ export const parallelLineSecondPoint = (event, editor, baseLine, firstPoint) => 
   }
 
   const lineParallel = createLine(firstPoint, parallelPoint)
-  lineParallel.name = 'parallelLine'
+  lineParallel.name = parallelName
   newLayer.add(lineParallel)
 
   renderer.render(scene, camera)
@@ -149,11 +151,15 @@ export const parallelLineFirstPointSelect = (event, editor, baseLine) => {
 }
 
 export const parallelLineSecondPointSelect = (event, editor) => {
-  let {scene, camera, renderer} = editor
-  const parallelLine = scene.getObjectByName('parallelLine')
-  parallelLine.name = ''
-  renderer.render(scene, camera)
   return dispatch => {
+    let {scene, camera, renderer} = editor
+    const parallelLine = scene.getObjectByName(parallelName)
+
+    parallelLine.name = 'newLine'
+    addHistory(parallelLine, scene)(dispatch)
+
+    parallelLine.name = ''
+    renderer.render(scene, camera)
     dispatch({
       type: LINE_PARALLEL_CLEAR
     })

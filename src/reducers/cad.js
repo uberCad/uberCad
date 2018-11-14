@@ -60,6 +60,7 @@ import {
   POINT_INFO_DISABLE
 } from '../actions/pointInfo'
 import { SNAPSHOT_LOAD_OBJECT } from '../actions/panelObjects'
+import { HISTORY_ADD, HISTORY_BACK, HISTORY_CLEAR, HISTORY_FORWARD } from '../actions/history'
 
 let initialState = {
   scene: null,
@@ -116,11 +117,37 @@ let initialState = {
   error: null,
   lastUpdated: null,
   isChanged: false,
-  objectsIds: []
+  objectsIds: [],
+  history: {
+    index: -1,
+    changes: []
+  }
 }
 
 const cad = (state = initialState, action) => {
   switch (action.type) {
+    case HISTORY_ADD:
+      let history = {...state.history}
+      history.changes = [...state.history.changes]
+      history.index +=1
+      history.changes.splice(history.index, history.changes.length - history.index, action.payload.change)
+      return {
+        ...state,
+        history
+      }
+    case HISTORY_CLEAR:
+      return {
+        ...state,
+        history: action.payload.history
+      }
+    case HISTORY_BACK:
+      return update(state, {
+        history: {index: {$set: action.payload.index}}
+      })
+    case HISTORY_FORWARD:
+      return update(state, {
+        history: {index: {$set: action.payload.index}}
+      })
 
     case EDIT_SCALE_AVTIVE:
       return update(state, {

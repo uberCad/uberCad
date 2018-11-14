@@ -988,6 +988,23 @@ let removeLineByName = (name, scene) => {
   }
 }
 
+let getLineByUuid = (scene, uuid) => {
+  let objectUUID;
+  let find = (object, uuid) => {
+    object.children.forEach(function (object) {
+      if (object.children.length > 0 && object.uuid !== uuid) {
+        find(object, uuid)
+      } else {
+        if (object.uuid === uuid) {
+          objectUUID = object
+        }
+      }
+    });
+  };
+  find(scene, uuid);
+  return objectUUID
+};
+
 export default {
   onClick,
   doSelection,
@@ -1006,7 +1023,8 @@ export default {
   fixSceneAfterImport,
   sendToFlixo,
   someSvg,
-  removeLineByName
+  removeLineByName,
+  getLineByUuid
 }
 
 function getOffset (elem) {

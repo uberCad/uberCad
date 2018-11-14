@@ -21,6 +21,7 @@ import {
 import sceneService from '../services/sceneService'
 import { activePoint, disablePoint, movePointInfo } from './pointInfo'
 import GeometryUtils from '../services/GeometryUtils'
+import { addHistory } from './history'
 
 export const EDIT_IS_EDIT = 'EDIT_IS_EDIT'
 export const EDIT_CANCEL = 'EDIT_CANCEL'
@@ -333,11 +334,12 @@ export const drawLine = (event, editor, parent) => {
 }
 
 export const saveNewLine = (editor) => {
-  const line = editor.scene.getObjectByName('newLine')
-  if (line) {
-    line.name = ''
-  }
   return dispatch => {
+    const line = editor.scene.getObjectByName('newLine')
+    if (line) {
+      addHistory(line, editor.scene)(dispatch)
+      line.name = ''
+    }
     disablePoint()(dispatch)
     dispatch({
       type: EDIT_NEW_LINE_SAVE,

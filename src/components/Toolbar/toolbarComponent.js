@@ -32,7 +32,7 @@ export default class ToolbarComponent extends Component {
   }
 
   render () {
-    const {tool} = this.props
+    const {tool, editor, history, back, forward} = this.props
 
     return (
       <div id='toolbar'>
@@ -70,9 +70,9 @@ export default class ToolbarComponent extends Component {
 
         <FormattedMessage id='toolbar.undo' defaultMessage='Undo'>
           {value =>
-            <button className={`btn ${tool === TOOL_UNDO ? 'btn-success' : ''}`}
+            <button className={`btn ${history.index < 0 ? 'disabled' : ''}`}
                     data-tool={TOOL_UNDO}
-                    onClick={this.onClick}
+                    onClick={() => history.index >= 0 ? back(history, editor) : console.log('no back history')}
                     title={value}
             >
               <img src={toolUndo} alt='Undo'/>
@@ -81,11 +81,11 @@ export default class ToolbarComponent extends Component {
         </FormattedMessage>
 
         <FormattedMessage id='toolbar.redo' defaultMessage='Redo'>
-          {value =>
-            <button className={`btn ${tool === TOOL_REDO ? 'btn-success' : ''}`}
-                    data-tool={TOOL_REDO}
-                    onClick={this.onClick}
-                    title={value}
+          {value => <button
+              className={`btn ${history.index >= history.changes.length - 1 ? 'disabled' : ''}`}
+              data-tool={TOOL_REDO}
+              onClick={() => history.index < history.changes.length - 1 ? forward(history, editor) : console.log('head of the history button')}
+              title={value}
             >
               <img src={toolRedo} alt='Redo'/>
             </button>

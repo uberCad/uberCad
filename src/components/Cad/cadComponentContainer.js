@@ -112,6 +112,7 @@ import {
 } from '../../actions/arc'
 import { showGrid } from '../../actions/grid'
 import { setBinding } from '../../actions/binding'
+import { clearHistory } from '../../actions/history'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -650,6 +651,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     setBinding: function (scene, binding) {
       setBinding(scene, binding)
+    },
+    clearHistory: function () {
+      clearHistory()(dispatch)
     }
 
   }
