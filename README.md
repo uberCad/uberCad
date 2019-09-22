@@ -32,3 +32,19 @@ Just clone this repository and modify it as you want. Than create pull request a
 
 If you need more info, visit http://thermevo.com/ubercad/en
 
+### Build docker image 
+
+```
+docker image build -t shus/cra-docker:latest .
+docker images
+docker tag 6c763f716e3e shus/cra-docker:latest
+docker push shus/cra-docker
+```
+
+### Deploy docker image
+
+```
+docker-compose stop
+docker pull shus/cra-docker:latest
+docker-compose -f docker-compose.yml up -d
+```
