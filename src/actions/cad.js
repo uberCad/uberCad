@@ -1,5 +1,5 @@
 import DxfParser from 'dxf-parser'
-import dxfService from './../services/dxfService'
+import { Viewer } from './../services/dxfService'
 import sceneService from './../services/sceneService'
 import { TOOL_LINE, TOOL_MEASUREMENT, TOOL_POINT } from '../components/Toolbar/toolbarComponent'
 import { SELECT_MODE_NEW } from '../components/Options/optionsComponent'
@@ -20,7 +20,7 @@ export const CAD_EDITMODE_UNSELECT_ACTIVE_LINE = 'CAD_EDITMODE_UNSELECT_ACTIVE_L
 export const CAD_IS_CHANGED = 'CAD_IS_CHANGED'
 
 export const drawDxf = (data = null, container, snapshot = null) => {
-  let cadCanvas = new dxfService.Viewer(data, container, snapshot)
+  let cadCanvas = new Viewer(data, container, snapshot)
   let scene = cadCanvas.getScene()
   let camera = cadCanvas.getCamera()
   let renderer = cadCanvas.getRenderer()

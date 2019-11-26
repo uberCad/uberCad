@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import throttle from 'lodash/throttle'
 import PropTypes from 'prop-types'
 import Api from '../../services/apiService'
-import Dxf from '../../services/dxfService'
+import { parseDxf } from '../../services/dxfService'
 import Toolbar from '../Toolbar/toolbarComponentContainer'
 import Options from '../Options/optionsComponentContainer'
 import Sidebar from '../Sidebar/sidebarComponentContainer'
@@ -28,7 +28,7 @@ export default class CadComponent extends Component {
         if (snapshotId) {
           this.props.drawDxf(null, this.container, data)
         } else {
-          this.props.drawDxf(Dxf.parse(data), this.container)
+          this.props.drawDxf(parseDxf(data), this.container)
         }
         this.props.spinnerHide()
       })
