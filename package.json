@@ -5,59 +5,33 @@
   "repository": "git@gitlab.com:Potter/uberCad.git",
   "author": "Gary <netzver@gmail.com>",
   "dependencies": {
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-scripts": "3.2.0",
-    "dxf-parser": "^0.5.1",
-    "react-redux": "^5.0.7",
-    "react-router-dom": "^4.2.2",
-    "redux": "^3.7.2",
-
-
-    "antd": "^3.1.4",
-    "axios": "^0.18.0",
-    "body-parser": "^1.18.3",
-    "bootstrap": "^3.3.7",
-    "express": "^4.16.3",
-    "express-fileupload": "^1.1.6",
-    "immutability-helper": "^2.6.5",
+    "axios": "^0.19.0",
+    "dxf-parser": "^1.0.0-alpha.1",
+    "immutability-helper": "^3.0.1",
     "kmeans-js": "^0.1.2",
+    "node-sass": "^4.13.0",
+    "npm-run-all": "^4.1.5",
+    "react": "^16.12.0",
+    "react-bootstrap": "^0.32.1",
+    "react-dom": "^16.12.0",
+    "react-redux": "^7.1.3",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.2.0",
+    "redux": "^4.0.4",
+    "redux-form": "^8.2.6",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0",
+    "three": "^0.110.0",
+    "three-orbit-controls": "^82.1.0",
+    "bootstrap": "^3.3.7",
+    "antd": "^3.1.4",
+    "body-parser": "^1.18.3",
     "lodash": "^4.17.5",
     "prop-types": "^15.6.1",
-    "react-bootstrap": "^0.32.1",
     "react-intl": "^2.4.0",
-    "redux-form": "^7.4.2",
-    "redux-persist": "^5.9.1",
-    "redux-thunk": "^2.2.0",
     "socket.io-client": "^2.0.4",
-    "three": "^0.90.0",
     "three-dxf": "^0.3.1",
-    "three-orbit-controls": "^82.1.0"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-eslint": "10.0.3",
-    "babel-plugin-transform-es2015-destructuring": "^6.23.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-es2017": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
-    "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
-    "eslint": "^6.1.0",
-    "faucet": "0.0.1",
-    "ignore-styles": "^5.0.1",
-    "jsdom": "^11.5.1",
-    "node-sass": "^4.9.0",
-    "npm-run-all": "^4.1.2",
-    "react-test-utils": "0.0.1",
-    "react-unit": "^3.0.2",
-    "reselect": "^3.0.1",
-    "snazzy": "^7.1.1",
-    "standard": "^11.0.1",
-    "tape": "^4.8.0"
   },
   "scripts": {
     "build": "npm run build:css && react-scripts build",
@@ -71,23 +45,10 @@
     "eject": "react-scripts eject",
     "jest": "react-scripts test --env=jsdom"
   },
-  "babel": {
-    "presets": [
-      "es2015",
-      "es2017",
-      "react",
-      "stage-0"
-    ],
-    "plugins": [
-      "transform-es2015-destructuring",
-      "transform-object-rest-spread"
-    ]
-  },
-  "standard": {
-    "parser": "babel-eslint"
+  "eslintConfig": {
+    "extends": "react-app"
   },
   "proxy": "http://localhost:5000",
-
   "browserslist": {
     "production": [
       ">0.2%",
