@@ -4,12 +4,16 @@
     "browser": true,
     "commonjs": true,
     "es6": true,
-    "node": true
+    "node": true,
+    "jest": true
   },
   "rules": {
     "linebreak-style": ["error", "unix"],
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+
+
+
   },
   "plugins": [
     "react",
@@ -23,5 +27,6 @@
     "react": {
       "version": "detect"
     }
-  }
+  },
+  "parser": "babel-eslint"
 }

@@ -1,14 +1,17 @@
 // import update from 'immutability-helper'
 
 import {
-  LOGIN_ACTION, LOGOUT_ACTION, SET_USER_NAME, REGISTER_USER
-} from '../actions/userLogin'
+  LOGIN_ACTION,
+  LOGOUT_ACTION,
+  SET_USER_NAME,
+  REGISTER_USER
+} from '../actions/userLogin';
 
 let initialState = {
   sid: '',
   userName: '',
   pictureUrl: ''
-}
+};
 
 const userLogin = (state = initialState, action) => {
   switch (action.type) {
@@ -17,29 +20,29 @@ const userLogin = (state = initialState, action) => {
         ...state,
         sid: action.payload.sid,
         userName: action.payload.userName
-      }
+      };
     case SET_USER_NAME:
       return {
         ...state,
         userName: action.payload.userName,
         pictureUrl: action.payload.pictureUrl
-      }
+      };
     case LOGOUT_ACTION:
       return {
         ...state,
         sid: action.payload.sid,
         userName: action.payload.userName
-      }
+      };
     case REGISTER_USER:
       return {
         ...state,
         sid: action.payload.sid,
         userName: action.payload.userName
-      }
+      };
 
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default userLogin
+export default userLogin;

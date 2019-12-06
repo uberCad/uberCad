@@ -1,10 +1,10 @@
-import { connect } from 'react-redux'
-import PanelInfoComponent from './panelInfoComponent'
+import { connect } from 'react-redux';
+import PanelInfoComponent from './panelInfoComponent';
 
 const mapStateToProps = (state, ownProps) => {
-  let material
+  let material;
   if (state.sidebar.activeObject && state.sidebar.activeObject.userData) {
-    material = state.sidebar.activeObject.userData.material
+    material = state.sidebar.activeObject.userData.material;
   }
   return {
     activeObject: state.sidebar.activeObject,
@@ -12,11 +12,7 @@ const mapStateToProps = (state, ownProps) => {
     measurement: state.tools.measurement,
     selectMode: state.options.selectMode,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
-  return {}
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(PanelInfoComponent)
+export default connect(mapStateToProps)(PanelInfoComponent);

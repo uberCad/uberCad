@@ -1,18 +1,16 @@
-import {
-  ADD_PROJECT
-} from '../actions/addProject'
+import { ADD_PROJECT } from '../actions/addProject';
 
-let initialState = {}
+let initialState = {};
 
 const addProject = (state = initialState, action) => {
   switch (action.type) {
     case ADD_PROJECT:
       return {
         ...state
-      }
+      };
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default addProject
+export default addProject;

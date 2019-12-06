@@ -5,7 +5,6 @@ services:
     container_name: "portainer"
     restart: always
     image: "portainer/portainer"
-    command: --templates http://templates/templates.json
     ports:
      - "9000:9000"
      - "8000:8000"

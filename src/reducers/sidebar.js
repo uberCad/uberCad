@@ -1,13 +1,11 @@
-import update from 'immutability-helper'
+import update from 'immutability-helper';
 
-import {
-  SIDEBAR_TOGGLE, TOGGLE_TAB
-} from '../actions/sidebar'
-import { PANEL_OBJECTS_TOGGLE } from '../actions/panelObjects'
-import { LOCALE_SET } from '../actions/locale'
-import { EDIT_IS_EDIT } from '../actions/edit'
-import { MATERIAL_SET } from '../actions/materials'
-import { PANEL_LAYERS_TOGGLE } from '../actions/panelLayers'
+import { SIDEBAR_TOGGLE, TOGGLE_TAB } from '../actions/sidebar';
+import { PANEL_OBJECTS_TOGGLE } from '../actions/panelObjects';
+import { LOCALE_SET } from '../actions/locale';
+import { EDIT_IS_EDIT } from '../actions/edit';
+import { MATERIAL_SET } from '../actions/materials';
+import { PANEL_LAYERS_TOGGLE } from '../actions/panelLayers';
 
 let initialState = {
   active: true,
@@ -63,78 +61,81 @@ let initialState = {
       }
     ]
   ]
-}
+};
 
 const options = (state = initialState, action) => {
   switch (action.type) {
     case EDIT_IS_EDIT:
-      state.panels[1][0].active = !state.panels[1][0].active
-      state.panels[1][1].active = !state.panels[1][1].active
-      return {...state}
+      state.panels[1][0].active = !state.panels[1][0].active;
+      state.panels[1][1].active = !state.panels[1][1].active;
+      return { ...state };
 
     case PANEL_LAYERS_TOGGLE:
       return {
         ...state,
         activeLayer: action.payload.activeLayer
-      }
+      };
 
     case PANEL_OBJECTS_TOGGLE:
       return {
         ...state,
         activeObject: action.payload.activeObject
-      }
+      };
     case SIDEBAR_TOGGLE:
       return {
         ...state,
         active: action.payload.active
-      }
+      };
 
     case LOCALE_SET:
       state.panels.forEach(panel => {
         panel.forEach(tab => {
-          tab.title = tab['title_' + action.payload.lang]
-        })
-      })
+          tab.title = tab['title_' + action.payload.lang];
+        });
+      });
       return update(state, {
-        panels: {$set: [...state.panels]}
-      })
-    case TOGGLE_TAB:
-      let active = false
+        panels: { $set: [...state.panels] }
+      });
+    case TOGGLE_TAB: {
+      let active = false;
 
       try {
         state.panels.forEach((panel, panelIdx) => {
           panel.forEach((tab, tabIdx) => {
             if (panelIdx === action.payload.panelIdx) {
               if (tabIdx === action.payload.tabIdx) {
-                tab.active = state.active ? !tab.active : true
+                tab.active = state.active ? !tab.active : true;
               } else {
-                tab.active = false
+                tab.active = false;
               }
             }
 
             if (tab.active) {
-              active = true
+              active = true;
             }
-          })
-        })
+          });
+        });
 
         if (!state.active) {
-          active = true
+          active = true;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error('[sidebar reducer] TOGGLE_TAB', e);
+      }
 
       return update(state, {
-        panels: {$set: [...state.panels]},
-        active: {$set: active}
-      })
+        panels: { $set: [...state.panels] },
+        active: { $set: active }
+      });
+    }
     case MATERIAL_SET:
       return {
         ...state,
         activeObject: action.payload.object
-      }
+      };
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default options
+export default options;

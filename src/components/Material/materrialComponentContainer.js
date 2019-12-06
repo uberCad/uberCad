@@ -1,6 +1,6 @@
-import { connect } from 'react-redux'
-import MaterialComponent from './materialComponent'
-import { loadMaterials, setMaterial } from '../../actions/materials'
+import { connect } from 'react-redux';
+import MaterialComponent from './materialComponent';
+import { loadMaterials, setMaterial } from '../../actions/materials';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -9,18 +9,18 @@ const mapStateToProps = (state, ownProps) => {
     materials: state.materials,
     scene: state.cad.scene,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    loadMaterials: function () {
-      loadMaterials()(dispatch)
+    loadMaterials: function() {
+      loadMaterials()(dispatch);
     },
-    setMaterial: function (material, object) {
-      setMaterial(material, object)(dispatch)
+    setMaterial: function(material, object) {
+      setMaterial(material, object)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(MaterialComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(MaterialComponent);

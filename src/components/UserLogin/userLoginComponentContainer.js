@@ -1,26 +1,26 @@
-import { connect } from 'react-redux'
-import UserLoginComponent from './userLoginComponent'
-import { authorize, logout, setUserName } from '../../actions/userLogin'
+import { connect } from 'react-redux';
+import UserLoginComponent from './userLoginComponent';
+import { authorize, logout, setUserName } from '../../actions/userLogin';
 
 const mapStateToProps = (state, ownProps) => {
   return {
     lang: state.locale.lang,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    setUserName: function (userName) {
-      setUserName(userName)(dispatch)
+    setUserName: function(userName) {
+      setUserName(userName)(dispatch);
     },
-    authorize: function (login, password, history) {
-      return authorize(login, password, history)(dispatch)
+    authorize: function(login, password, history) {
+      return authorize(login, password, history)(dispatch);
     },
-    logout: function (history) {
-      logout(history)(dispatch)
+    logout: function(history) {
+      logout(history)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserLoginComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(UserLoginComponent);

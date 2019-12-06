@@ -1,10 +1,10 @@
-import { connect } from 'react-redux'
-import ProjectsComponent from './projectsComponent'
-import { fetchProjects } from '../../actions/projects'
-import { selectFilter } from '../../actions/projects_filter'
+import { connect } from 'react-redux';
+import ProjectsComponent from './projectsComponent';
+import { fetchProjects } from '../../actions/projects';
+import { selectFilter } from '../../actions/projects_filter';
 
 const mapStateToProps = (state, ownProps) => {
-  const { projectsFilter, projectsByFilter } = state
+  const { projectsFilter, projectsByFilter } = state;
   const {
     loading,
     lastUpdated,
@@ -14,7 +14,7 @@ const mapStateToProps = (state, ownProps) => {
   } = projectsByFilter[projectsFilter] || {
     loading: true,
     items: []
-  }
+  };
 
   return {
     lang: state.locale.lang,
@@ -25,20 +25,20 @@ const mapStateToProps = (state, ownProps) => {
     sortUp,
     sortFieldName,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    fetchProjects: function (filter) {
-      fetchProjects(filter)(dispatch)
+    fetchProjects: function(filter) {
+      fetchProjects(filter)(dispatch);
     },
-    selectFilter: function (nextFilter) {
+    selectFilter: function(nextFilter) {
       // call of action in custom func
-      selectFilter(nextFilter)(dispatch)
-      fetchProjects(nextFilter)(dispatch)
+      selectFilter(nextFilter)(dispatch);
+      fetchProjects(nextFilter)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProjectsComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectsComponent);

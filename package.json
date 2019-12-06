@@ -44,7 +44,7 @@
     "fix": "standard --verbose --fix | snazzy",
     "eject": "react-scripts eject",
     "jest": "react-scripts test --env=jsdom",
-    "lint": "eslint --fix . && echo 'Lint complete.'"
+    "lint": "eslint --fix src && echo 'Lint complete.'"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -63,6 +63,7 @@
     ]
   },
   "devDependencies": {
+    "babel-eslint": "^10.0.3",
     "eslint": "^6.7.2",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-prettier": "^3.1.1",

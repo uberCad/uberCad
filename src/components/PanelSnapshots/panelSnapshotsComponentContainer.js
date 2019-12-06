@@ -1,6 +1,10 @@
-import { connect } from 'react-redux'
-import PanelSnapshotsComponent from './panelSnapshotsComponent'
-import { addSnapshot, deleteSnapshot, loadSnapshot } from '../../actions/panelSnapshots'
+import { connect } from 'react-redux';
+import PanelSnapshotsComponent from './panelSnapshotsComponent';
+import {
+  addSnapshot,
+  deleteSnapshot,
+  loadSnapshot
+} from '../../actions/panelSnapshots';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -10,21 +14,24 @@ const mapStateToProps = (state, ownProps) => {
     cadCanvas: state.cad.cadCanvas,
     isChanged: state.cad.isChanged,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    addSnapshot: function (snapshot, projectKey) {
-      addSnapshot(snapshot, projectKey)(dispatch)
+    addSnapshot: function(snapshot, projectKey) {
+      addSnapshot(snapshot, projectKey)(dispatch);
     },
-    deleteSnapshot: function (snapshotKey) {
-      deleteSnapshot(snapshotKey)(dispatch)
+    deleteSnapshot: function(snapshotKey) {
+      deleteSnapshot(snapshotKey)(dispatch);
     },
-    loadSnapshot: function (snapshotKey, cadCanvas) {
-      loadSnapshot(snapshotKey, cadCanvas)(dispatch)
+    loadSnapshot: function(snapshotKey, cadCanvas) {
+      loadSnapshot(snapshotKey, cadCanvas)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(PanelSnapshotsComponent)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PanelSnapshotsComponent);

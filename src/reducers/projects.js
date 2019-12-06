@@ -6,7 +6,7 @@ import {
   PROJECTS_FETCH_SUCCESS,
   PROJECTS_FETCH_FAILURE,
   PROJECTS_SORT_FIELD
-} from '../actions/projects'
+} from '../actions/projects';
 
 let initialState = {
   loading: false,
@@ -16,7 +16,7 @@ let initialState = {
   lastUpdated: null,
   sortUp: true,
   sortFieldName: ''
-}
+};
 
 const projects = (state = initialState, action) => {
   switch (action.type) {
@@ -24,13 +24,13 @@ const projects = (state = initialState, action) => {
       return {
         ...state,
         didInvalidate: true
-      }
+      };
     case PROJECTS_FETCH_BEGIN:
       return {
         ...state,
         loading: true,
         didInvalidate: false
-      }
+      };
     case PROJECTS_FETCH_SUCCESS:
       return {
         ...state,
@@ -38,14 +38,14 @@ const projects = (state = initialState, action) => {
         didInvalidate: false,
         items: action.payload.items,
         lastUpdated: action.payload.receivedAt
-      }
+      };
     case PROJECTS_FETCH_FAILURE:
       return {
         ...state,
         loading: false,
         items: [],
         error: action.payload.error
-      }
+      };
     case PROJECTS_SORT_FIELD:
       return {
         ...state,
@@ -53,11 +53,11 @@ const projects = (state = initialState, action) => {
         items: action.payload.projects,
         sortUp: action.payload.sortUp,
         sortFieldName: action.payload.field
-      }
+      };
     default:
-      return state
+      return state;
   }
-}
+};
 
 const projectsByFilter = (state = {}, action) => {
   switch (action.type) {
@@ -69,13 +69,13 @@ const projectsByFilter = (state = {}, action) => {
       return {
         ...state,
         [action.payload.filter]: projects(state[action.payload.filter], action)
-      }
+      };
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default projectsByFilter
+export default projectsByFilter;
 
 // let initialState = {
 //   items: [],

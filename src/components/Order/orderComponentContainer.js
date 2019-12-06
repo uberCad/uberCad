@@ -1,6 +1,6 @@
-import { connect } from 'react-redux'
-import OrderComponent from './orderComponent'
-import { getOrder } from '../../actions/order'
+import { connect } from 'react-redux';
+import OrderComponent from './orderComponent';
+import { getOrder } from '../../actions/order';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -10,15 +10,15 @@ const mapStateToProps = (state, ownProps) => {
     orderObjects: state.order.orderObjects,
     createdAt: state.order.createdAt,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    getOrder: function (key, hash) {
-      getOrder(key, hash)(dispatch)
+    getOrder: function(key, hash) {
+      getOrder(key, hash)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrderComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(OrderComponent);
