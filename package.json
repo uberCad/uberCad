@@ -43,7 +43,8 @@
     "test": "standard --verbose && babel-node ./node_modules/.bin/tape ./test/**/*.js --require ignore-styles --require ./test/setup.js | faucet",
     "fix": "standard --verbose --fix | snazzy",
     "eject": "react-scripts eject",
-    "jest": "react-scripts test --env=jsdom"
+    "jest": "react-scripts test --env=jsdom",
+    "lint": "eslint --fix . && echo 'Lint complete.'"
   },
   "eslintConfig": {
     "extends": "react-app"
