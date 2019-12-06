@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  portainer:
+    container_name: "portainer"
+    restart: always
+    image: "portainer/portainer"
+    command: --templates http://templates/templates.json
+    ports:
+     - "9000:9000"
+     - "8000:8000"
+    # admin:9qg8FWsMHUJpZQFY
+    command: --admin-password '$$2y$$05$$Jo63mh4u322.C846jDGLke/FqYquyTzvBQlwjrgSU/fzo3FUAl2CS'
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+    #  - portainer_data:/data
+
+  arangodb:
+    container_name: "arangodb"
+    restart: always
+    image: arangodb
+    environment:
+      - ARANGO_ROOT_PASSWORD=somepasswordatata
+    ports:
+      - 8529:8529
+#    volumes:
+#      - ./db/arangodb:/var/lib/arangodb3
+#      - ./db/arangodb-apps:/var/lib/arangodb3-apps
+
+  ubercad_front:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "ubercad_front"
+    container_name: "ubercad_front"
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - REACT_APP_ARANGODB_HOST=https://db.foxydev.pp.ua/_db/cad/
+    ports:
+      - "80:80"
+#    volumes:
+#      - ./tmp/volume/build:/usr/share/nginx/html
+#      - node_modules:/home/node/app/node_modules
+
+
