@@ -5,11 +5,11 @@
   "repository": "git@gitlab.com:Potter/uberCad.git",
   "author": "Gary <netzver@gmail.com>",
   "dependencies": {
-    "antd": "^3.1.4",
+    "antd": "^3.26.2",
     "axios": "^0.19.0",
     "body-parser": "^1.18.3",
     "bootstrap": "^3.3.7",
-    "dxf-parser": "^1.0.0-alpha.2",
+    "dxf-parser": "0.5.1",
     "immutability-helper": "^3.0.1",
     "kmeans-js": "^0.1.2",
     "lodash": "^4.17.5",
@@ -28,7 +28,7 @@
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
-    "socket.io-client": "^2.0.4",
+    "socket.io-client": "^2.3.0",
     "three": "^0.110.0",
     "three-dxf": "^0.3.1",
     "three-orbit-controls": "^82.1.0"

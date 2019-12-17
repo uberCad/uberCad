@@ -8,28 +8,37 @@ export function parseDxf(dxf) {
   return parser.parseSync(dxf);
 }
 
-export function Viewer(data = null, container, snapshot = null) {
-  let scene;
+/**
+ * Viewer class for a dxf object.
+ * @param {Object} data - the dxf object
+ * @param {Object} container - the parent element to which we attach the rendering canvas
+ * @param {Object} snapshot - prepared data
+ * @param {Object} font - a font loaded with THREE.FontLoader
+ * @constructor
+ */
+export function Viewer(data = null, container, snapshot = null, font) {
+  let scene = new THREE.Scene();
+
+  let layersEntity = addContainer('Layers');
+  let objectsEntity = addContainer('Objects');
+  let helpLayer = addContainer('HelpLayer');
+
   if (data) {
     createLineTypeShaders(data);
-    scene = new THREE.Scene();
 
     let layers = {};
     Object.keys(data.tables.layer.layers).forEach(layerName => {
       layers[layerName] = new THREE.Object3D();
-
       layers[layerName].name = layerName;
       layers[layerName].userData['container'] = true;
     });
 
-    // Create scene from dxf object (data)
-    let i;
-    let entity;
-    let obj;
+    let i, entity, obj;
     for (i = 0; i < data.entities.length; i++) {
       entity = data.entities[i];
 
       if (entity.type === 'DIMENSION') {
+        //todo review block build. disassemble to primitives
         if (entity.block) {
           let block = data.blocks[entity.block];
           if (!block) {
@@ -38,6 +47,7 @@ export function Viewer(data = null, container, snapshot = null) {
           }
           for (let j = 0; j < block.entities.length; j++) {
             obj = drawEntity(block.entities[j], data);
+            //todo maybe add here if (obj) statement
           }
         } else {
           console.log('WARNING: No block for DIMENSION entity');
@@ -60,54 +70,28 @@ export function Viewer(data = null, container, snapshot = null) {
       obj = null;
     }
 
-    let layersEntity = new THREE.Object3D();
-    layersEntity.name = 'Layers';
-    layersEntity.userData['container'] = true;
-    scene.add(layersEntity);
-
-    let objectsEntity = new THREE.Object3D();
-    objectsEntity.name = 'Objects';
-    objectsEntity.userData['container'] = true;
-    scene.add(objectsEntity);
-
-    let helpLayer = new THREE.Object3D();
-    helpLayer.name = 'HelpLayer';
-    helpLayer.userData['container'] = true;
-    scene.add(helpLayer);
-
     Object.keys(data.tables.layer.layers).forEach(layerName => {
       layersEntity.add(layers[layerName]);
     });
   }
 
   if (snapshot) {
-    scene = new THREE.Scene();
+    scene.remove(layersEntity); //empty layers container
     let loader = new THREE.ObjectLoader();
+    layersEntity = loader.parse(JSON.parse(snapshot.layers));
+    sceneService.fixSceneAfterImport(layersEntity);
+    scene.add(layersEntity);
 
-    const layers = loader.parse(JSON.parse(snapshot.layers));
-    sceneService.fixSceneAfterImport(layers);
-    scene.add(layers);
-
-    let objectsEntity = new THREE.Object3D();
-    objectsEntity.name = 'Objects';
-    objectsEntity.userData['container'] = true;
-    scene.add(objectsEntity);
-
-    let helpLayer = new THREE.Object3D();
-    helpLayer.name = 'HelpLayer';
-    helpLayer.userData['container'] = true;
-    scene.add(helpLayer);
-
-    let objects = scene.getObjectByName('Objects');
     snapshot.objects.forEach(item => {
       const object = loader.parse(JSON.parse(item.parameters));
       sceneService.fixSceneAfterImport(object);
-      objects.add(object);
+      objectsEntity.add(object);
     });
 
     GeometryUtils.fixObjectsPaths(scene);
   }
 
+  // Create scene from dxf object (data)
   let dims = {
     min: { x: false, y: false, z: false },
     max: { x: false, y: false, z: false }
@@ -176,8 +160,10 @@ export function Viewer(data = null, container, snapshot = null) {
   renderer.setSize(width, height);
   renderer.setClearColor(0xfffffff, 1);
 
-  // $parent.append(renderer.domElement);
-  // $parent.show();
+  // parent.appendChild(renderer.domElement);
+  // parent.style.display = 'block';
+
+  //TODO: Need to make this an option somehow so others can roll their own controls.
 
   let controls = new THREE.OrbitControls(camera, container);
   controls.target.x = camera.position.x;
@@ -185,35 +171,15 @@ export function Viewer(data = null, container, snapshot = null) {
   controls.target.z = 0;
   controls.zoomSpeed = 3;
 
-  // Uncommend this to disable rotation (does not make much sense with 2D drawings).
+  //Uncomment this to disable rotation (does not make much sense with 2D drawings).
   controls.enableRotate = false;
 
   this.render = function() {
     renderer.render(scene, camera);
   };
-
   controls.addEventListener('change', this.render);
   this.render();
   controls.update();
-
-  /// /TODO uncomment
-  // $parent.on('click', function(event) {
-  //   var $el = $(renderer.domElement);
-  //
-  //   var vector = new THREE.Vector3(
-  //     ( (event.pageX - $el.offset().left) / $el.innerWidth() ) * 2 - 1,
-  //     -( (event.pageY - $el.offset().top) / $el.innerHeight() ) * 2 + 1,
-  //     0.5);
-  //   vector.unproject(camera);
-  //
-  //   var dir = vector.sub(camera.position).normalize();
-  //
-  //   var distance = -camera.position.z / dir.z;
-  //
-  //   var pos = camera.position.clone().add(dir.multiplyScalar(distance));
-  //
-  //   console.log(pos.x, pos.y); // Position in cad that is clicked
-  // });
 
   this.getControls = () => controls;
 
@@ -235,32 +201,58 @@ export function Viewer(data = null, container, snapshot = null) {
     this.render();
   };
 
+  function addContainer(name) {
+    let container = new THREE.Object3D();
+    container.name = name;
+    container.userData['container'] = true;
+    scene.add(container);
+    return container;
+  }
+
   function drawEntity(entity, data) {
     let mesh;
     if (entity.type === 'CIRCLE' || entity.type === 'ARC') {
-      mesh = drawCircle(entity, data);
+      mesh = drawCircle(entity, data, true);
     } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
       mesh = drawPolyLine(entity, data);
-      // mesh = drawLine(entity, data)
     } else if (entity.type === 'LINE') {
       mesh = drawLine(entity, data);
-    } else if (entity.type === 'TEXT') {
+    }
+
+    // else if (
+    //   entity.type === 'LWPOLYLINE' ||
+    //   entity.type === 'LINE' ||
+    //   entity.type === 'POLYLINE'
+    // ) {
+    //   mesh = drawLine(entity, data);
+    // }
+    else if (entity.type === 'TEXT') {
       mesh = drawText(entity, data);
     } else if (entity.type === 'SOLID') {
       mesh = drawSolid(entity, data);
     } else if (entity.type === 'POINT') {
       mesh = drawPoint(entity, data);
     } else if (entity.type === 'INSERT') {
-      // mesh = drawBlock(entity, data)
       mesh = drawBlock(entity, data, true);
     } else if (entity.type === 'SPLINE') {
       mesh = drawSpline(entity, data);
-      // } else if (entity.type === 'MTEXT') {
-      // mesh = drawMtext(entity, data)
+    } else if (entity.type === 'MTEXT') {
+      mesh = drawMtext(entity, data);
     } else if (entity.type === 'ELLIPSE') {
       mesh = drawEllipse(entity, data);
-    } else {
-      console.error('Unsupported Entity Type: ' + entity.type, entity);
+    }
+
+    // todo REVIEW IT
+    // else if (entity.type === 'DIMENSION') {
+    //   var dimTypeEnum = entity.dimensionType & 7;
+    //   if (dimTypeEnum === 0) {
+    //     mesh = drawDimension(entity, data);
+    //   } else {
+    //     console.log('Unsupported Dimension type: ' + dimTypeEnum);
+    //   }
+    // }
+    else {
+      console.log('Unsupported Entity Type: ' + entity.type);
     }
     return mesh;
   }
@@ -294,8 +286,88 @@ export function Viewer(data = null, container, snapshot = null) {
     let material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
 
     // Create the final object to add to the scene
-    // ellipse
     return new THREE.Line(geometry, material);
+  }
+
+  function drawMtext(entity, data) {
+    let color = getColor(entity, data);
+
+    let geometry = new THREE.TextGeometry(entity.text, {
+      font: font,
+      size: entity.height * (4 / 5),
+      height: 1
+    });
+    let material = new THREE.MeshBasicMaterial({ color: color });
+    let text = new THREE.Mesh(geometry, material);
+
+    // Measure what we rendered.
+    let measure = new THREE.Box3();
+    measure.setFromObject(text);
+
+    let textWidth = measure.max.x - measure.min.x;
+
+    // If the text ends up being wider than the box, it's supposed
+    // to be multiline. Doing that in threeJS is overkill.
+    if (textWidth > entity.width) {
+      console.log("Can't render this multipline MTEXT entity, sorry.", entity);
+      return undefined;
+    }
+
+    text.position.z = 0;
+    switch (entity.attachmentPoint) {
+      case 1:
+        // Top Left
+        text.position.x = entity.position.x;
+        text.position.y = entity.position.y - entity.height;
+        break;
+      case 2:
+        // Top Center
+        text.position.x = entity.position.x - textWidth / 2;
+        text.position.y = entity.position.y - entity.height;
+        break;
+      case 3:
+        // Top Right
+        text.position.x = entity.position.x - textWidth;
+        text.position.y = entity.position.y - entity.height;
+        break;
+
+      case 4:
+        // Middle Left
+        text.position.x = entity.position.x;
+        text.position.y = entity.position.y - entity.height / 2;
+        break;
+      case 5:
+        // Middle Center
+        text.position.x = entity.position.x - textWidth / 2;
+        text.position.y = entity.position.y - entity.height / 2;
+        break;
+      case 6:
+        // Middle Right
+        text.position.x = entity.position.x - textWidth;
+        text.position.y = entity.position.y - entity.height / 2;
+        break;
+
+      case 7:
+        // Bottom Left
+        text.position.x = entity.position.x;
+        text.position.y = entity.position.y;
+        break;
+      case 8:
+        // Bottom Center
+        text.position.x = entity.position.x - textWidth / 2;
+        text.position.y = entity.position.y;
+        break;
+      case 9:
+        // Bottom Right
+        text.position.x = entity.position.x - textWidth;
+        text.position.y = entity.position.y;
+        break;
+
+      default:
+        return undefined;
+    }
+
+    return text;
   }
 
   function drawSpline(entity, data) {
@@ -306,23 +378,31 @@ export function Viewer(data = null, container, snapshot = null) {
     });
 
     let interpolatedPoints = [];
-    if (entity.degreeOfSplineCurve === 2) {
+    let curve;
+    if (entity.degreeOfSplineCurve === 2 || entity.degreeOfSplineCurve === 3) {
       for (let i = 0; i + 2 < points.length; i = i + 2) {
-        let curve = new THREE.QuadraticBezierCurve(
-          points[i],
-          points[i + 1],
-          points[i + 2]
-        );
+        if (entity.degreeOfSplineCurve === 2) {
+          curve = new THREE.QuadraticBezierCurve(
+            points[i],
+            points[i + 1],
+            points[i + 2]
+          );
+        } else {
+          curve = new THREE.QuadraticBezierCurve3(
+            points[i],
+            points[i + 1],
+            points[i + 2]
+          );
+        }
         interpolatedPoints.push.apply(interpolatedPoints, curve.getPoints(50));
       }
     } else {
-      let curve = new THREE.SplineCurve(points);
+      curve = new THREE.SplineCurve(points);
       interpolatedPoints = curve.getPoints(100);
     }
 
     let geometry = new THREE.BufferGeometry().setFromPoints(interpolatedPoints);
     let material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
-    // splineObject
     return new THREE.Line(geometry, material);
   }
 
@@ -422,20 +502,21 @@ export function Viewer(data = null, container, snapshot = null) {
       material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
     }
 
-    // if (lineType && lineType.pattern && lineType.pattern.length !== 0) {
-    //   geometry.computeLineDistances()
-    //
-    //   // Ugly hack to add diffuse to this. Maybe copy the uniforms object so we
-    //   // don't add diffuse to a material.
-    //   lineType.material.uniforms.diffuse = {type: 'c', value: new THREE.Color(color)}
-    //   //
-    //   material = new THREE.ShaderMaterial({
-    //     uniforms: lineType.material.uniforms,
-    //     vertexShader: lineType.material.vertexShader,
-    //     fragmentShader: lineType.material.fragmentShader
-    //   })
-    // } else {
-    //   material = new THREE.LineBasicMaterial({linewidth: 1, color: color})
+    // if(lineType && lineType.pattern && lineType.pattern.length !== 0) {
+
+    //           geometry.computeLineDistances();
+
+    //           // Ugly hack to add diffuse to this. Maybe copy the uniforms object so we
+    //           // don't add diffuse to a material.
+    //           lineType.material.uniforms.diffuse = { type: 'c', value: new THREE.Color(color) };
+
+    // 	material = new THREE.ShaderMaterial({
+    // 		uniforms: lineType.material.uniforms,
+    // 		vertexShader: lineType.material.vertexShader,
+    // 		fragmentShader: lineType.material.fragmentShader
+    // 	});
+    // }else {
+    // 	material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
     // }
 
     line = new THREE.Line(geometry, material);
@@ -462,6 +543,34 @@ export function Viewer(data = null, container, snapshot = null) {
 
     return circle;
   }
+
+  //TODO Review if we have some caveats using non CircleGeometry
+  // function drawArc(entity, data) {
+  //   var startAngle, endAngle;
+  //   if (entity.type === 'CIRCLE') {
+  //     startAngle = entity.startAngle || 0;
+  //     endAngle = startAngle + 2 * Math.PI;
+  //   } else {
+  //     startAngle = entity.startAngle;
+  //     endAngle = entity.endAngle;
+  //   }
+  //
+  //   var curve = new THREE.ArcCurve(0, 0, entity.radius, startAngle, endAngle);
+  //
+  //   var points = curve.getPoints(32);
+  //   var geometry = new THREE.BufferGeometry().setFromPoints(points);
+  //
+  //   var material = new THREE.LineBasicMaterial({
+  //     color: getColor(entity, data)
+  //   });
+  //
+  //   var arc = new THREE.Line(geometry, material);
+  //   arc.position.x = entity.center.x;
+  //   arc.position.y = entity.center.y;
+  //   arc.position.z = entity.center.z;
+  //
+  //   return arc;
+  // }
 
   function drawSolid(entity, data) {
     let geometry = new THREE.Geometry();
@@ -518,25 +627,33 @@ export function Viewer(data = null, container, snapshot = null) {
     return new THREE.Mesh(geometry, material);
   }
 
-  function drawText() {
-    return false;
+  function drawText(entity, data) {
+    let geometry, material, text;
 
-    // TODO uncomment
-    // let geometry, material, text;
+    if (!font)
+      return console.warn(
+        'Text is not supported without a Three.js font loaded with THREE.FontLoader! Load a font of your choice and pass this into the constructor. See the sample for this repository or Three.js examples at http://threejs.org/examples/?q=text#webgl_geometry_text for more details.'
+      );
 
-    // if(!font)
-    //   return console.warn('Text is not supported without a THREE.js font loaded with THREE.FontLoader! Load a font of your choice and pass this into the constructor. See the sample for this repository or THREE.js examples at http://threejs.org/examples/?q=text#webgl_geometry_text for more details.');
+    geometry = new THREE.TextGeometry(entity.text, {
+      font: font,
+      height: 0,
+      size: entity.textHeight || 12
+    });
 
-    // geometry = new THREE.TextGeometry(entity.text, { font: font, height: 0, size: entity.textHeight || 12 });
-    //
-    // material = new THREE.MeshBasicMaterial({ color: getColor(entity, data) });
-    //
-    // text = new THREE.Mesh(geometry, material);
-    // text.position.x = entity.startPoint.x;
-    // text.position.y = entity.startPoint.y;
-    // text.position.z = entity.startPoint.z;
-    //
-    // return text;
+    if (entity.rotation) {
+      let zRotation = (entity.rotation * Math.PI) / 180;
+      geometry.rotateZ(zRotation);
+    }
+
+    material = new THREE.MeshBasicMaterial({ color: getColor(entity, data) });
+
+    text = new THREE.Mesh(geometry, material);
+    text.position.x = entity.startPoint.x;
+    text.position.y = entity.startPoint.y;
+    text.position.z = entity.startPoint.z;
+
+    return text;
   }
 
   function drawPoint(entity, data) {
@@ -568,6 +685,27 @@ export function Viewer(data = null, container, snapshot = null) {
     point = new THREE.Points(geometry, material);
     scene.add(point);
   }
+
+  //todo review WTF is this function?
+  // function drawDimension(entity, data) {
+  //   var block = data.blocks[entity.block];
+  //
+  //   if (!block || !block.entities) return null;
+  //
+  //   var group = new THREE.Object3D();
+  //   // if(entity.anchorPoint) {
+  //   //     group.position.x = entity.anchorPoint.x;
+  //   //     group.position.y = entity.anchorPoint.y;
+  //   //     group.position.z = entity.anchorPoint.z;
+  //   // }
+  //
+  //   for (var i = 0; i < block.entities.length; i++) {
+  //     var childEntity = drawEntity(block.entities[i], data, group);
+  //     if (childEntity) group.add(childEntity);
+  //   }
+  //
+  //   return group;
+  // }
 
   function drawBlock(entity, data, returnArray = false) {
     let block = data.blocks[entity.name];
@@ -763,4 +901,7 @@ export function Viewer(data = null, container, snapshot = null) {
   };
   this.getCamera = () => camera;
   this.getRenderer = () => renderer;
+  this.getLayers = () => layersEntity;
+  this.getObjects = () => objectsEntity;
+  this.getHelpLayer = () => helpLayer;
 }

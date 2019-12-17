@@ -150,6 +150,6 @@ export default class ToolbarComponent extends Component {
   static propTypes = {
     lang: PropTypes.string.isRequired,
     chooseTool: PropTypes.func,
-    tool: PropTypes.object
+    tool: PropTypes.string
   };
 }

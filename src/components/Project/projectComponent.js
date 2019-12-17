@@ -32,15 +32,12 @@ export default class ProjectComponent extends Component {
     this.props.fetchProject(id, preloadedProject);
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (this._input) this._input.focus();
-  }
 
-  //todo rewrite it
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.id !== this.props.match.params.id) {
-      const { id } = nextProps.match.params;
-      const { preloadedProject } = nextProps;
+    if (prevProps.match.params.id !== this.props.match.params.id) {
+      const { id } = this.props.match.params;
+      const { preloadedProject } = this.props;
       this.props.fetchProject(id, preloadedProject);
     }
   }
@@ -121,7 +118,7 @@ export default class ProjectComponent extends Component {
                 if (e.key === 'Enter') this.saveProjectTitle();
               }}
               disabled={!this.state.renameProject}
-              autoFocus="true"
+              autoFocus={true}
               ref={c => (this._input = c)}
             />
             <FormattedMessage
@@ -245,7 +242,7 @@ export default class ProjectComponent extends Component {
                           if (e.key === 'Enter') this.saveSnapshotTitle(e);
                         }}
                         data-idx={i}
-                        autoFocus="true"
+                        autoFocus={true}
                         ref={c => (this._input = c)}
                         className="rename-snapshot"
                       />
