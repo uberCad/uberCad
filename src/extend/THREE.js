@@ -1,7 +1,5 @@
 import * as THREE from 'three';
-import OrbitControlsLib from 'three-orbit-controls';
-
-let OrbitControls = OrbitControlsLib(THREE);
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 /**
  * Returns the angle in radians of the vector (p1,p2). In other words, imagine
