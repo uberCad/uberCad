@@ -18,27 +18,27 @@ import {
 } from '../actions/line';
 
 let canvasClick = (event, camera) => {
-    let canvas = event.target.tagName === 'CANVAS' && event.target;
-    let canvasOffset = getOffset(canvas);
+  let canvas = event.target.tagName === 'CANVAS' && event.target;
+  let canvasOffset = getOffset(canvas);
 
-    let mouse = new THREE.Vector3(
-        ((event.pageX - canvasOffset.left) / (canvas.clientWidth - 1)) * 2 - 1,
-        -((event.pageY - canvasOffset.top) / (canvas.clientHeight - 1)) * 2 + 1,
-        0
-    );
+  let mouse = new THREE.Vector3(
+    ((event.pageX - canvasOffset.left) / (canvas.clientWidth - 1)) * 2 - 1,
+    -((event.pageY - canvasOffset.top) / (canvas.clientHeight - 1)) * 2 + 1,
+    0
+  );
 
-    let canvasCenter = new THREE.Vector3(0, 0, 0);
+  let canvasCenter = new THREE.Vector3(0, 0, 0);
 
-    // get canvas center coordinates
-    canvasCenter.unproject(camera);
+  // get canvas center coordinates
+  canvasCenter.unproject(camera);
 
-    // get mouse coordinates
-    mouse.unproject(camera);
+  // get mouse coordinates
+  mouse.unproject(camera);
 
-    return {
-      mouse,
-      canvasCenter
-    };
+  return {
+    mouse,
+    canvasCenter
+  };
 };
 
 let onClick = (event, scene, camera, renderer) => {

@@ -79,6 +79,10 @@ export function Viewer(data = null, container, snapshot = null, font) {
   if (snapshot) {
     scene.remove(layersEntity); //empty layers container
     let loader = new THREE.ObjectLoader();
+
+    //hack for LegacyJSONLoader
+    //todo rewrite import/export, and make internal format specification
+    window.THREE = THREE;
     layersEntity = loader.parse(JSON.parse(snapshot.layers));
     sceneService.fixSceneAfterImport(layersEntity);
     scene.add(layersEntity);
@@ -191,11 +195,11 @@ export function Viewer(data = null, container, snapshot = null, font) {
     };
   }
 
-  container.addEventListener('wheel', (event) => {
+  container.addEventListener('wheel', event => {
     if (!controls.enableZoom) {
       return;
     }
-    let {mouse, canvasCenter} = sceneService.canvasClick(event, camera);
+    let { mouse, canvasCenter } = sceneService.canvasClick(event, camera);
     let dollyScale = 0.95;
 
     let k = 1 - dollyScale;
