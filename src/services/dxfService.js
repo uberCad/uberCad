@@ -190,17 +190,17 @@ export function Viewer(data = null, container, snapshot = null, font) {
       stats.end();
     };
   }
-  
+
   container.addEventListener('wheel', (event) => {
     if (!controls.enableZoom) {
       return;
     }
     let {mouse, canvasCenter} = sceneService.canvasClick(event, camera);
-    let zoomScale = 0.95;
+    let dollyScale = 0.95;
 
-    let k = 1 - zoomScale;
+    let k = 1 - dollyScale;
     if (event.deltaY < 0) {
-      k = 1 - 1 / zoomScale;
+      k = 1 - 1 / dollyScale;
     }
     controls.target.x += (canvasCenter.x - mouse.x) * k;
     controls.target.y += (canvasCenter.y - mouse.y) * k;
