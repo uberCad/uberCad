@@ -1,5 +1,5 @@
 export default {
-  'en': {
+  en: {
     btn: {
       cancel: 'Cancel',
       order: 'Order',
@@ -128,7 +128,7 @@ export default {
       btnSignIn: 'Sign in ...'
     }
   },
-  'ru': {
+  ru: {
     btn: {
       cancel: 'Отмена',
       order: 'Заказать',
@@ -257,4 +257,4 @@ export default {
       btnSignIn: 'Войти ...'
     }
   }
-}
+};

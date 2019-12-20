@@ -4,7 +4,7 @@ import {
   SELECTION_BEGIN,
   SELECTION_UPDATE,
   SELECTION_END
-} from '../actions/selection'
+} from '../actions/selection';
 
 let initialState = {
   active: false,
@@ -27,7 +27,7 @@ let initialState = {
     x: 0,
     y: 0
   }
-}
+};
 
 const selection = (state = initialState, action) => {
   switch (action.type) {
@@ -47,7 +47,7 @@ const selection = (state = initialState, action) => {
           y: action.payload.y
         },
         drawStartPos: action.payload.drawStartPos
-      }
+      };
     case SELECTION_UPDATE:
       return {
         ...state,
@@ -58,7 +58,7 @@ const selection = (state = initialState, action) => {
           height: Math.abs(state.selectionStartPos.y - action.payload.y),
           display: state.style.display
         }
-      }
+      };
     case SELECTION_END:
       return {
         ...state,
@@ -71,10 +71,10 @@ const selection = (state = initialState, action) => {
           display: action.payload.active ? 'block' : 'none'
         },
         drawEndPos: action.payload.drawEndPos
-      }
+      };
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default selection
+export default selection;

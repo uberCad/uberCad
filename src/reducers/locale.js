@@ -1,8 +1,8 @@
-import { LOCALE_SET } from '../actions/locale'
+import { LOCALE_SET } from '../actions/locale';
 
 let initialState = {
   lang: 'en'
-}
+};
 
 const locale = (state = initialState, action) => {
   switch (action.type) {
@@ -10,11 +10,11 @@ const locale = (state = initialState, action) => {
       return {
         ...state,
         lang: action.payload.lang
-      }
+      };
 
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default locale
+export default locale;

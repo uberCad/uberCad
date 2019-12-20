@@ -1,5 +1,5 @@
-export const SIDEBAR_TOGGLE = 'SIDEBAR_TOGGLE'
-export const TOGGLE_TAB = 'TOGGLE_TAB'
+export const SIDEBAR_TOGGLE = 'SIDEBAR_TOGGLE';
+export const TOGGLE_TAB = 'TOGGLE_TAB';
 
 export const toggleSidebar = (active, editor) => {
   return dispatch => {
@@ -8,20 +8,22 @@ export const toggleSidebar = (active, editor) => {
       payload: {
         active
       }
-    })
+    });
 
     if (editor) {
       setTimeout(() => {
         try {
-          let container = editor.renderer.domElement.parentNode
-          let width = container.clientWidth
-          let height = container.clientHeight
-          editor.cadCanvas.resize(width, height)
-        } catch (e) {}
-      })
+          let container = editor.renderer.domElement.parentNode;
+          let width = container.clientWidth;
+          let height = container.clientHeight;
+          editor.cadCanvas.resize(width, height);
+        } catch (e) {
+          console.error('toggleSidebar', e);
+        }
+      });
     }
-  }
-}
+  };
+};
 
 export const toggleTab = (panelIdx, tabIdx) => {
   return dispatch => {
@@ -31,6 +33,6 @@ export const toggleTab = (panelIdx, tabIdx) => {
         panelIdx,
         tabIdx
       }
-    })
-  }
-}
+    });
+  };
+};

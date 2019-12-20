@@ -1,9 +1,6 @@
-import { connect } from 'react-redux'
-import SidebarComponent from './sidebarComponent'
-import {
-  toggleSidebar,
-  toggleTab
-} from '../../actions/sidebar'
+import { connect } from 'react-redux';
+import SidebarComponent from './sidebarComponent';
+import { toggleSidebar, toggleTab } from '../../actions/sidebar';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -14,19 +11,19 @@ const mapStateToProps = (state, ownProps) => {
       cadCanvas: state.cad.cadCanvas
     },
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    toggleSidebar: function (active, editor) {
-      toggleSidebar(active, editor)(dispatch)
+    toggleSidebar: function(active, editor) {
+      toggleSidebar(active, editor)(dispatch);
     },
 
-    toggleTab: function (panelIdx, tabIdx) {
-      toggleTab(panelIdx, tabIdx)(dispatch)
+    toggleTab: function(panelIdx, tabIdx) {
+      toggleTab(panelIdx, tabIdx)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(SidebarComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(SidebarComponent);

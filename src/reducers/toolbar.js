@@ -1,13 +1,11 @@
 // import update from 'immutability-helper'
 
-import {
-  TOOLBAR_CHOOSE_TOOL
-} from '../actions/toolbar'
-import { TOOL_POINT } from '../components/Toolbar/toolbarComponent'
+import { TOOLBAR_CHOOSE_TOOL } from '../actions/toolbar';
+import { TOOL_POINT } from '../components/Toolbar/toolbarComponent';
 
 let initialState = {
   tool: TOOL_POINT
-}
+};
 
 const toolbar = (state = initialState, action) => {
   switch (action.type) {
@@ -15,10 +13,10 @@ const toolbar = (state = initialState, action) => {
       return {
         ...state,
         tool: action.payload.tool
-      }
+      };
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default toolbar
+export default toolbar;

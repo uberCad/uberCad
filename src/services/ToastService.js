@@ -1,7 +1,7 @@
-let msg = (msg) => {
-  window.alert(msg)
-}
+let msg = msg => {
+  window.alert(msg);
+};
 
 export default {
   msg
-}
+};

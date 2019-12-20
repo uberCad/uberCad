@@ -1,6 +1,6 @@
-import { connect } from 'react-redux'
-import ModalComponent from './modalComponent'
-import { modalHide } from '../../actions/modal'
+import { connect } from 'react-redux';
+import ModalComponent from './modalComponent';
+import { modalHide } from '../../actions/modal';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -10,15 +10,15 @@ const mapStateToProps = (state, ownProps) => {
     title: state.modal.title,
     link: state.modal.link,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    modalHide: function () {
-      modalHide()(dispatch)
+    modalHide: function() {
+      modalHide()(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(ModalComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(ModalComponent);

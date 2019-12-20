@@ -1,13 +1,13 @@
 // import update from 'immutability-helper'
 
-import { MODAL_HIDE, MODAL_SHOW } from '../actions/modal'
+import { MODAL_HIDE, MODAL_SHOW } from '../actions/modal';
 
 let initialState = {
   show: false,
   message: '',
   title: '',
   link: ''
-}
+};
 
 const modal = (state = initialState, action) => {
   switch (action.type) {
@@ -18,7 +18,7 @@ const modal = (state = initialState, action) => {
         message: action.payload.message,
         title: action.payload.title,
         link: action.payload.link
-      }
+      };
 
     case MODAL_SHOW:
       return {
@@ -27,11 +27,11 @@ const modal = (state = initialState, action) => {
         message: action.payload.message,
         title: action.payload.title,
         link: action.payload.link
-      }
+      };
 
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default modal
+export default modal;

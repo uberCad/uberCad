@@ -1,8 +1,6 @@
 // import update from 'immutability-helper'
 
-import {
-  CALCULATE, CALCULATE_HIDE
-} from '../actions/calculate'
+import { CALCULATE, CALCULATE_HIDE } from '../actions/calculate';
 
 let initialState = {
   prices: [],
@@ -10,7 +8,7 @@ let initialState = {
   info: [],
   show: false,
   error: null
-}
+};
 
 const price = (state = initialState, action) => {
   switch (action.type) {
@@ -22,17 +20,17 @@ const price = (state = initialState, action) => {
         polyamideObjects: action.payload.polyamideObjects,
         info: action.payload.info,
         show: true
-      }
+      };
 
     case CALCULATE_HIDE:
       return {
         ...state,
         show: false
-      }
+      };
 
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default price
+export default price;

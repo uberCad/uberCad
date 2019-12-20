@@ -1,18 +1,19 @@
-import { connect } from 'react-redux'
-import CadComponent from './cadComponent'
-import { fetchProject } from '../../actions/project'
+import { connect } from 'react-redux';
+import CadComponent from './cadComponent';
+import { fetchProject } from '../../actions/project';
 import {
   drawDxf,
   cadClick,
-  cadDoubleClick, CAD_DO_SELECTION,
+  cadDoubleClick,
+  CAD_DO_SELECTION,
   toggleChanged
-} from '../../actions/cad'
+} from '../../actions/cad';
 import {
   selectionBegin,
   selectionUpdate,
   selectionEnd
-} from '../../actions/selection'
-import { spinnerShow, spinnerHide } from '../../actions/spinner'
+} from '../../actions/selection';
+import { spinnerShow, spinnerHide } from '../../actions/spinner';
 
 import {
   TOOL_LINE,
@@ -20,32 +21,53 @@ import {
   TOOL_NEW_CURVE,
   TOOL_POINT,
   TOOL_SELECT
-} from '../Toolbar/toolbarComponent'
-import sceneService from '../../services/sceneService'
+} from '../Toolbar/toolbarComponent';
+import sceneService from '../../services/sceneService';
 import {
   centerCurve,
-  centerPoint, cloneObject, clonePoint, disableMovePoint,
+  centerPoint,
+  cloneObject,
+  clonePoint,
+  disableMovePoint,
   drawLine,
-  firstPoint, moveObject, moveObjectPoint,
-  movePoint, radius, saveClone, saveNewCurve,
+  firstPoint,
+  moveObject,
+  moveObjectPoint,
+  movePoint,
+  radius,
+  saveClone,
+  saveNewCurve,
   saveNewLine,
-  savePoint, selectClonePoint, selectMovePoint,
-  selectPoint, setClone,
+  savePoint,
+  selectClonePoint,
+  selectMovePoint,
+  selectPoint,
+  setClone,
   startNewLine,
   thetaLength,
   thetaStart
-} from '../../actions/edit'
-import { PANEL_LAYERS_TOGGLE } from '../../actions/panelLayers'
+} from '../../actions/edit';
+import { PANEL_LAYERS_TOGGLE } from '../../actions/panelLayers';
 import {
-  angleFirstInfo, angleSecondInfo, angleSelectFirstLine, angleSelectSecondLine, eraseAngle,
+  angleFirstInfo,
+  angleSecondInfo,
+  angleSelectFirstLine,
+  angleSelectSecondLine,
+  eraseAngle,
   eraseLine,
-  lineFirstInfo, lineFirstPoint, lineSecondInfo, lineSecondPoint,
+  lineFirstInfo,
+  lineFirstPoint,
+  lineSecondInfo,
+  lineSecondPoint,
   MEASUREMENT_ANGLE,
   MEASUREMENT_LINE,
   MEASUREMENT_POINT,
   MEASUREMENT_RADIAL,
-  pointInfo, pointSelect, radialInfo, radialSelectLine
-} from '../../actions/measurement'
+  pointInfo,
+  pointSelect,
+  radialInfo,
+  radialSelectLine
+} from '../../actions/measurement';
 import {
   LINE_PARALLEL,
   LINE_PERPENDICULAR,
@@ -67,7 +89,7 @@ import {
   tangentBaseArcSelect,
   tangentLineDraw,
   tangentLineEnd
-} from '../../actions/line'
+} from '../../actions/line';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -97,24 +119,24 @@ const mapStateToProps = (state, ownProps) => {
     project: state.project.project,
     isChanged: state.cad.isChanged,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    fetchProject: function (id) {
-      fetchProject(id)(dispatch)
+    fetchProject: function(id) {
+      fetchProject(id)(dispatch);
     },
     // fetchDxf: function (url) {
     //   fetchDxf(url)(dispatch)
     // },
 
-    spinnerShow: function () {
-      spinnerShow()(dispatch)
+    spinnerShow: function() {
+      spinnerShow()(dispatch);
     },
 
-    spinnerHide: function () {
-      spinnerHide()(dispatch)
+    spinnerHide: function() {
+      spinnerHide()(dispatch);
     },
 
     // parseDxf: function (dxf) {
@@ -122,15 +144,15 @@ const mapDispatchToProps = (dispatch) => {
     // }
 
     drawDxf: (data = null, container, snapshot = null) => {
-      drawDxf(data, container, snapshot)(dispatch)
+      drawDxf(data, container, snapshot)(dispatch);
     },
 
     onClick: (event, editor) => {
-      cadClick(event, editor)(dispatch)
+      cadClick(event, editor)(dispatch);
     },
 
     onDoubleClick: (event, editor) => {
-      cadDoubleClick(event, editor)(dispatch)
+      cadDoubleClick(event, editor)(dispatch);
     },
 
     onMouseDown: (event, editor) => {
@@ -140,64 +162,79 @@ const mapDispatchToProps = (dispatch) => {
           if (editor.editMode.isEdit) {
             // do edit here
             if (editor.editMode.activeLine.id) {
-              selectPoint(editor.editMode.activeLine, event, editor)(dispatch)
+              selectPoint(editor.editMode.activeLine, event, editor)(dispatch);
             }
           }
         }
         //new line
         if (editor.editMode.isNewLine) {
-          !editor.editMode.newLineFirst ? firstPoint(event, editor)(dispatch) : saveNewLine(editor)(dispatch)
+          !editor.editMode.newLineFirst
+            ? firstPoint(event, editor)(dispatch)
+            : saveNewLine(editor)(dispatch);
         }
         //new curve
         if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
           if (!editor.editMode.newCurveCenter) {
-            centerPoint(event, editor)(dispatch)
+            centerPoint(event, editor)(dispatch);
           } else if (!editor.editMode.thetaStart) {
-            thetaStart(editor)(dispatch)
+            thetaStart(editor)(dispatch);
           } else if (!editor.editMode.thetaLength) {
-            saveNewCurve(editor)(dispatch)
+            saveNewCurve(editor)(dispatch);
           }
         }
         //clone object
         if (editor.editMode.clone.active) {
           if (!editor.editMode.clone.point) {
-            clonePoint(event, editor)(dispatch)
-            cloneObject(editor, editor.editMode.editObject)(dispatch)
+            clonePoint(event, editor)(dispatch);
+            cloneObject(editor, editor.editMode.editObject)(dispatch);
           } else if (editor.editMode.clone.cloneObject) {
-            saveClone(editor.editMode.clone.cloneObject)(dispatch)
+            saveClone(editor.editMode.clone.cloneObject)(dispatch);
           }
         }
 
         //move object
         if (editor.editMode.move.active && !editor.editMode.move.point) {
-          moveObjectPoint(event, editor)(dispatch)
+          moveObjectPoint(event, editor)(dispatch);
         }
 
         if (editor.tool === TOOL_SELECT) {
-          selectionBegin(event, editor)(dispatch)
+          selectionBegin(event, editor)(dispatch);
         }
 
         //mouse down
         if (editor.tool === TOOL_MEASUREMENT) {
           if (editor.options.selectMode === MEASUREMENT_POINT) {
-            pointSelect(event, editor)(dispatch)
+            pointSelect(event, editor)(dispatch);
           } else if (editor.options.selectMode === MEASUREMENT_LINE) {
-            if (editor.measurement.line.first && editor.measurement.line.second) {
-              eraseLine()(dispatch)
+            if (
+              editor.measurement.line.first &&
+              editor.measurement.line.second
+            ) {
+              eraseLine()(dispatch);
             } else {
-              !editor.measurement.line.first ?
-                lineFirstPoint(event, editor)(dispatch)
-                : lineSecondPoint(event, editor, editor.measurement.line.first)(dispatch)
+              !editor.measurement.line.first
+                ? lineFirstPoint(event, editor)(dispatch)
+                : lineSecondPoint(
+                    event,
+                    editor,
+                    editor.measurement.line.first
+                  )(dispatch);
             }
           } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
-            radialSelectLine(editor.activeEntities[0])(dispatch)
+            radialSelectLine(editor.activeEntities[0])(dispatch);
           } else if (editor.options.selectMode === MEASUREMENT_ANGLE) {
-            if (editor.measurement.angle.firstLine && editor.measurement.angle.secondLine) {
-              eraseAngle()(dispatch)
+            if (
+              editor.measurement.angle.firstLine &&
+              editor.measurement.angle.secondLine
+            ) {
+              eraseAngle()(dispatch);
             } else {
-              !editor.measurement.angle.firstLine ?
-                angleSelectFirstLine(editor.activeEntities[0])(dispatch)
-                : angleSelectSecondLine(editor.measurement.angle.firstLine, editor.activeEntities[0])(dispatch)
+              !editor.measurement.angle.firstLine
+                ? angleSelectFirstLine(editor.activeEntities[0])(dispatch)
+                : angleSelectSecondLine(
+                    editor.measurement.angle.firstLine,
+                    editor.activeEntities[0]
+                  )(dispatch);
             }
           }
         }
@@ -205,29 +242,35 @@ const mapDispatchToProps = (dispatch) => {
         //mouse down
         if (editor.tool === TOOL_LINE) {
           if (editor.options.selectMode === LINE_TWO_POINT) {
-            console.log(LINE_TWO_POINT, 'mouse down')
-            !editor.editMode.newLineFirst ? firstPoint(event, editor)(dispatch) : saveNewLine(editor)(dispatch)
+            console.log(LINE_TWO_POINT, 'mouse down');
+            !editor.editMode.newLineFirst
+              ? firstPoint(event, editor)(dispatch)
+              : saveNewLine(editor)(dispatch);
           } else if (editor.options.selectMode === LINE_PARALLEL) {
             if (!editor.line.parallel.baseLine) {
-              parallelLineSelect(editor.activeEntities[0])(dispatch)
+              parallelLineSelect(editor.activeEntities[0])(dispatch);
             } else if (!editor.line.parallel.firstPoint) {
-              parallelLineFirstPointSelect(event, editor, editor.line.parallel.baseLine)(dispatch)
+              parallelLineFirstPointSelect(
+                event,
+                editor,
+                editor.line.parallel.baseLine
+              )(dispatch);
             } else {
-              parallelLineSecondPointSelect(event, editor)(dispatch)
+              parallelLineSecondPointSelect(event, editor)(dispatch);
             }
           } else if (editor.options.selectMode === LINE_PERPENDICULAR) {
             if (!editor.line.perpendicular.baseLine) {
-              perpendicularLineSelect(editor.activeEntities[0])(dispatch)
+              perpendicularLineSelect(editor.activeEntities[0])(dispatch);
             } else if (!editor.line.perpendicular.firstPoint) {
-              perpendicularFirstPointSelect(event, editor)(dispatch)
+              perpendicularFirstPointSelect(event, editor)(dispatch);
             } else {
-              perpendicularSecondPointSelect(event, editor)(dispatch)
+              perpendicularSecondPointSelect(event, editor)(dispatch);
             }
           } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
             if (!editor.line.tangent.baseArc) {
-              tangentBaseArcSelect(editor.activeEntities[0])(dispatch)
+              tangentBaseArcSelect(editor.activeEntities[0])(dispatch);
             } else {
-              tangentLineEnd(event, editor)(dispatch)
+              tangentLineEnd(event, editor)(dispatch);
             }
           }
         }
@@ -239,174 +282,226 @@ const mapDispatchToProps = (dispatch) => {
 
       if (editor.tool === TOOL_SELECT) {
         if (editor.selection.active) {
-          selectionUpdate(event, editor)(dispatch)
+          selectionUpdate(event, editor)(dispatch);
         }
       }
 
-      if (event.button === 0
-        && editor.tool === TOOL_POINT
-        && editor.editMode.isEdit
-        && editor.editMode.activeLine.id
-        && (editor.editMode.selectPointIndex || editor.editMode.selectPointIndex === 0)
+      if (
+        event.button === 0 &&
+        editor.tool === TOOL_POINT &&
+        editor.editMode.isEdit &&
+        editor.editMode.activeLine.id &&
+        (editor.editMode.selectPointIndex ||
+          editor.editMode.selectPointIndex === 0)
       ) {
         // do edit here
         movePoint(
           editor.editMode.activeLine,
           editor.editMode.selectPointIndex,
           event,
-          editor)(dispatch)
+          editor
+        )(dispatch);
       }
 
       //new Line
       if (editor.editMode.isNewLine) {
-        let parent = editor.editMode.editObject
+        let parent = editor.editMode.editObject;
         if (!parent || parent.metadata) {
-          parent = editor.scene.getObjectByName('Layers').children[0]
+          parent = editor.scene.getObjectByName('Layers').children[0];
           dispatch({
             type: PANEL_LAYERS_TOGGLE,
             payload: {
               activeLayer: parent
             }
-          })
+          });
         }
-        !editor.editMode.newLineFirst ? startNewLine(event, editor)(dispatch) : drawLine(event, editor, parent)(dispatch)
+        !editor.editMode.newLineFirst
+          ? startNewLine(event, editor)(dispatch)
+          : drawLine(event, editor, parent)(dispatch);
       }
 
       //new Curve
       if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
-        let parent = editor.tool === TOOL_NEW_CURVE ? editor.activeLayer : editor.editMode.editObject
+        let parent =
+          editor.tool === TOOL_NEW_CURVE
+            ? editor.activeLayer
+            : editor.editMode.editObject;
         if (!parent || parent.metadata) {
-          parent = editor.scene.getObjectByName('Layers').children[0]
+          parent = editor.scene.getObjectByName('Layers').children[0];
           dispatch({
             type: PANEL_LAYERS_TOGGLE,
             payload: {
               activeLayer: parent
             }
-          })
+          });
         }
 
         if (!editor.editMode.newCurveCenter) {
-          centerCurve(event, editor)(dispatch)
+          centerCurve(event, editor)(dispatch);
         } else if (!editor.editMode.thetaStart) {
-          radius(event, editor)(dispatch)
+          radius(event, editor)(dispatch);
         } else if (!editor.editMode.thetaLength) {
-          thetaLength(event, editor, parent)(dispatch)
+          thetaLength(event, editor, parent)(dispatch);
         }
       }
       //clone object
       if (editor.editMode.clone.active) {
-        selectClonePoint(event, editor)(dispatch)
+        selectClonePoint(event, editor)(dispatch);
         if (editor.editMode.clone.point && editor.editMode.clone.cloneObject) {
-          setClone(event, editor)(dispatch)
+          setClone(event, editor)(dispatch);
         }
       }
       //move object
       if (editor.editMode.move.active) {
-        selectMovePoint(event, editor)(dispatch)
+        selectMovePoint(event, editor)(dispatch);
         if (editor.editMode.move.point && editor.editMode.move.moveObject) {
-          moveObject(event, editor)(dispatch)
+          moveObject(event, editor)(dispatch);
         }
       }
 
       //mouse move event
       if (editor.tool === TOOL_MEASUREMENT) {
         if (editor.options.selectMode === MEASUREMENT_POINT) {
-          pointInfo(event, editor)(dispatch)
+          pointInfo(event, editor)(dispatch);
         } else if (editor.options.selectMode === MEASUREMENT_LINE) {
           if (!editor.measurement.line.first) {
-            lineFirstInfo(event, editor)(dispatch)
+            lineFirstInfo(event, editor)(dispatch);
           } else if (!editor.measurement.line.second) {
-            lineSecondInfo(event, editor)(dispatch)
+            lineSecondInfo(event, editor)(dispatch);
           }
         } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
-          radialInfo(event, editor)(dispatch)
+          radialInfo(event, editor)(dispatch);
         } else if (editor.options.selectMode === MEASUREMENT_ANGLE) {
           if (!editor.measurement.angle.firstLine) {
-            angleFirstInfo(event, editor)(dispatch)
+            angleFirstInfo(event, editor)(dispatch);
           } else if (!editor.measurement.angle.secondLine) {
-            angleSecondInfo(event, editor, editor.measurement.angle.firstLine)(dispatch)
+            angleSecondInfo(
+              event,
+              editor,
+              editor.measurement.angle.firstLine
+            )(dispatch);
           }
         }
       }
 
       //mouse move event
       if (editor.tool === TOOL_LINE) {
-        if (editor.options.selectMode === LINE_TWO_POINT) {
-          let parent = editor.tool === TOOL_LINE ? editor.activeLayer : editor.editMode.editObject
-          if (!parent || parent.metadata) {
-            parent = editor.scene.getObjectByName('Layers').children[0]
-            dispatch({
-              type: PANEL_LAYERS_TOGGLE,
-              payload: {
-                activeLayer: parent
+        switch (editor.options.selectMode) {
+          case LINE_TWO_POINT:
+            {
+              let parent =
+                editor.tool === TOOL_LINE
+                  ? editor.activeLayer
+                  : editor.editMode.editObject;
+              if (!parent || parent.metadata) {
+                parent = editor.scene.getObjectByName('Layers').children[0];
+                dispatch({
+                  type: PANEL_LAYERS_TOGGLE,
+                  payload: {
+                    activeLayer: parent
+                  }
+                });
               }
-            })
-          }
-          !editor.editMode.newLineFirst ? startNewLine(event, editor)(dispatch) : drawLine(event, editor, parent)(dispatch)
-        } else if (editor.options.selectMode === LINE_PARALLEL) {
-          if (!editor.line.parallel.baseLine) {
-            parallelLine(event, editor)(dispatch)
-          } else if (!editor.line.parallel.firstPoint) {
-            parallelLineFirstPoint(event, editor)(dispatch)
-          } else {
-            parallelLineSecondPoint(event, editor, editor.line.parallel.baseLine, editor.line.parallel.firstPoint, editor.line.parallel.distance)(dispatch)
-          }
-        } else if (editor.options.selectMode === LINE_PERPENDICULAR) {
-          if (!editor.line.perpendicular.baseLine) {
-            perpendicularBaseLine(event, editor)(dispatch)
-          } else if (!editor.line.perpendicular.firstPoint) {
-            perpendicularFirstPoint(event, editor)(dispatch)
-          } else {
-            perpendicularDraw(event, editor, editor.line.perpendicular.baseLine, editor.line.perpendicular.firstPoint)(dispatch)
-          }
-        } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
-          if (!editor.line.tangent.baseArc) {
-            tangentBaseArc(event, editor)(dispatch)
-          } else {
-            tangentLineDraw(event, editor, editor.line.tangent.baseArc)(dispatch)
+              !editor.editMode.newLineFirst
+                ? startNewLine(event, editor)(dispatch)
+                : drawLine(event, editor, parent)(dispatch);
+            }
+            break;
+          case LINE_PARALLEL:
+            if (!editor.line.parallel.baseLine) {
+              parallelLine(event, editor)(dispatch);
+            } else if (!editor.line.parallel.firstPoint) {
+              parallelLineFirstPoint(event, editor)(dispatch);
+            } else {
+              parallelLineSecondPoint(
+                event,
+                editor,
+                editor.line.parallel.baseLine,
+                editor.line.parallel.firstPoint,
+                editor.line.parallel.distance
+              )(dispatch);
+            }
+
+            break;
+          case LINE_PERPENDICULAR:
+            if (!editor.line.perpendicular.baseLine) {
+              perpendicularBaseLine(event, editor)(dispatch);
+            } else if (!editor.line.perpendicular.firstPoint) {
+              perpendicularFirstPoint(event, editor)(dispatch);
+            } else {
+              perpendicularDraw(
+                event,
+                editor,
+                editor.line.perpendicular.baseLine,
+                editor.line.perpendicular.firstPoint
+              )(dispatch);
+            }
+
+            break;
+          case LINE_TANGENT_TO_ARC:
+            if (!editor.line.tangent.baseArc) {
+              tangentBaseArc(event, editor)(dispatch);
+            } else {
+              tangentLineDraw(
+                event,
+                editor,
+                editor.line.tangent.baseArc
+              )(dispatch);
+            }
+
+            break;
+          default: {
+            console.error(
+              `Unknown editor.options.selectMode = ${editor.options.selectMode}`
+            );
           }
         }
       }
     },
 
-    onMouseUp:
-      (event, editor) => {
-        // console.log('onMouseUp', event, editor)
+    onMouseUp: (event, editor) => {
+      // console.log('onMouseUp', event, editor)
 
-        if (editor.tool === TOOL_SELECT) {
-          // end select
-          if (editor.selection.active) {
-            let drawRectangle = selectionEnd(event, editor)(dispatch)
-            let selectResult = sceneService.selectInFrustum(drawRectangle, editor.scene)
-            let activeEntities = sceneService.doSelection(selectResult, editor)
-            dispatch({
-              type: CAD_DO_SELECTION,
-              payload: {
-                activeEntities
-              }
-            })
-          }
-          // console.warn('selectResult', selectResult)
+      if (editor.tool === TOOL_SELECT) {
+        // end select
+        if (editor.selection.active) {
+          let drawRectangle = selectionEnd(event, editor)(dispatch);
+          let selectResult = sceneService.selectInFrustum(
+            drawRectangle,
+            editor.scene
+          );
+          let activeEntities = sceneService.doSelection(selectResult, editor);
+          dispatch({
+            type: CAD_DO_SELECTION,
+            payload: {
+              activeEntities
+            }
+          });
         }
-
-        // do edit here
-        if (event.button === 0 && editor.tool === TOOL_POINT && editor.editMode.isEdit && editor.editMode.activeLine.id) {
-          // do edit here
-          savePoint(editor.editMode.selectPointIndex)(dispatch)
-        }
-
-        //move object
-        if (editor.editMode.move.active && editor.editMode.move.point) {
-          disableMovePoint(editor.editMode.move.moveObject)(dispatch)
-        }
-      },
-
-    toggleChanged:
-      (isChanged) => {
-        toggleChanged(isChanged)(dispatch)
+        // console.warn('selectResult', selectResult)
       }
 
-  }
-}
+      // do edit here
+      if (
+        event.button === 0 &&
+        editor.tool === TOOL_POINT &&
+        editor.editMode.isEdit &&
+        editor.editMode.activeLine.id
+      ) {
+        // do edit here
+        savePoint(editor.editMode.selectPointIndex)(dispatch);
+      }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CadComponent)
+      //move object
+      if (editor.editMode.move.active && editor.editMode.move.point) {
+        disableMovePoint(editor.editMode.move.moveObject)(dispatch);
+      }
+    },
+
+    toggleChanged: isChanged => {
+      toggleChanged(isChanged)(dispatch);
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CadComponent);

@@ -1,23 +1,18 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import './Selection.css'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import './Selection.css';
 
 export default class SelectionComponent extends Component {
-  onMouseMove = (event) => {
+  onMouseMove = event => {
     if (this.props.active) {
-      this.props.onMouseMove(event, this.props.editor)
+      this.props.onMouseMove(event, this.props.editor);
     }
-  }
+  };
 
-  render () {
-    let {style} = this.props
+  render() {
+    let { style } = this.props;
 
-    return (
-      <div id='selection'
-        onMouseMove={this.onMouseMove}
-        style={style}
-      />
-    )
+    return <div id="selection" onMouseMove={this.onMouseMove} style={style} />;
   }
 
   static propTypes = {
@@ -28,7 +23,8 @@ export default class SelectionComponent extends Component {
       width: PropTypes.number.isRequired,
       height: PropTypes.number.isRequired,
       display: PropTypes.string.isRequired
-    })
-
-  }
+    }),
+    onMouseMove: PropTypes.func,
+    editor: PropTypes.object
+  };
 }

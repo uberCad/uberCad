@@ -1,37 +1,52 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import ProjectsList from '../ProjectsList/projectsListComponentContainer'
-import AddProject from '../AddProject/addProjectComponentContainer'
-import './Projects.css'
-import { Row, Col } from 'react-bootstrap'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import ProjectsList from '../ProjectsList/projectsListComponentContainer';
+import AddProject from '../AddProject/addProjectComponentContainer';
+import './Projects.css';
+import { Row, Col } from 'react-bootstrap';
 
 export default class ProjectsComponent extends Component {
-  componentDidMount () {
-    const {projectsFilter} = this.props
-    this.props.fetchProjects(projectsFilter)
+  componentDidMount() {
+    const { projectsFilter } = this.props;
+    this.props.fetchProjects(projectsFilter);
   }
 
-  handleChange = ({currentTarget: {dataset: {option}}}) => {
-    this.props.selectFilter(option)
-  }
+  handleChange = ({
+    currentTarget: {
+      dataset: { option }
+    }
+  }) => {
+    this.props.selectFilter(option);
+  };
 
-  render () {
-    const {projectsFilter, items, loading, sortUp, sortFieldName} = this.props
+  render() {
+    const {
+      projectsFilter,
+      items,
+      loading,
+      sortUp,
+      sortFieldName
+    } = this.props;
 
-    const isEmpty = 0 && items.length === 0
+    const isEmpty = 0 && items.length === 0;
     return (
-      <div className='Projects'>
-        <ul className='ProjectsFilter'>
-          {
-            ['all', 'active', 'shared', 'archive', '[some bad filter...]'].map(option =>
-              <li className={projectsFilter === option ? 'active' : ''} key={option} data-option={option} onClick={this.handleChange}>
+      <div className="Projects">
+        <ul className="ProjectsFilter">
+          {['all', 'active', 'shared', 'archive', '[some bad filter...]'].map(
+            option => (
+              <li
+                className={projectsFilter === option ? 'active' : ''}
+                key={option}
+                data-option={option}
+                onClick={this.handleChange}
+              >
                 {option}
               </li>
             )
-          }
+          )}
         </ul>
 
-        <Row className='component-head'>
+        <Row className="component-head">
           <Col xs={12} sm={6}>
             <h3>Projects list</h3>
           </Col>
@@ -40,18 +55,24 @@ export default class ProjectsComponent extends Component {
           </Col>
         </Row>
 
-        {isEmpty
-          ? (loading ? <h2>Loading...</h2> : <h2>Empty.</h2>)
-          : <div style={{opacity: loading ? 0.5 : 1}}>
-            <ProjectsList projects={items}
-                          projectsFilter={projectsFilter}
-                          sortUp={sortUp}
-                          sortFieldName={sortFieldName}
+        {isEmpty ? (
+          loading ? (
+            <h2>Loading...</h2>
+          ) : (
+            <h2>Empty.</h2>
+          )
+        ) : (
+          <div style={{ opacity: loading ? 0.5 : 1 }}>
+            <ProjectsList
+              projects={items}
+              projectsFilter={projectsFilter}
+              sortUp={sortUp}
+              sortFieldName={sortFieldName}
             />
           </div>
-        }
+        )}
       </div>
-    )
+    );
   }
 
   static propTypes = {
@@ -59,6 +80,10 @@ export default class ProjectsComponent extends Component {
     loading: PropTypes.bool.isRequired,
     error: PropTypes.object,
     projectsFilter: PropTypes.string.isRequired,
-    lastUpdated: PropTypes.number
-  }
+    lastUpdated: PropTypes.number,
+    fetchProjects: PropTypes.func.isRequired,
+    selectFilter: PropTypes.func.isRequired,
+    sortUp: PropTypes.bool.isRequired,
+    sortFieldName: PropTypes.string.isRequired
+  };
 }

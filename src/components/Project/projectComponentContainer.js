@@ -1,6 +1,6 @@
-import { connect } from 'react-redux'
-import { createSelector } from 'reselect'
-import ProjectComponent from './projectComponent'
+import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
+import ProjectComponent from './projectComponent';
 import {
   archive,
   delProject,
@@ -9,7 +9,7 @@ import {
   renameSnapshot,
   saveProjectTitle,
   saveSnapshotTitle
-} from '../../actions/project'
+} from '../../actions/project';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -20,67 +20,69 @@ const mapStateToProps = (state, ownProps) => {
     lastUpdated: state.project.lastUpdated,
     preloadedProject: getPreloadedProject(state, ownProps),
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    fetchProject: function (id, preloadedProject) {
-      fetchProject(id, preloadedProject)(dispatch)
+    fetchProject: function(id, preloadedProject) {
+      fetchProject(id, preloadedProject)(dispatch);
     },
-    delProject: function (key) {
-      delProject(key)(dispatch)
+    delProject: function(key) {
+      delProject(key)(dispatch);
     },
-    renameProject: function (title) {
-      renameProject(title)(dispatch)
+    renameProject: function(title) {
+      renameProject(title)(dispatch);
     },
-    saveProjectTitle: function (key, title) {
-      saveProjectTitle(key, title)(dispatch)
+    saveProjectTitle: function(key, title) {
+      saveProjectTitle(key, title)(dispatch);
     },
-    renameSnapshot: function (snapshot) {
-      renameSnapshot(snapshot)(dispatch)
+    renameSnapshot: function(snapshot) {
+      renameSnapshot(snapshot)(dispatch);
     },
-    saveSnapshotTitle: function (snapshot) {
-      saveSnapshotTitle(snapshot)(dispatch)
+    saveSnapshotTitle: function(snapshot) {
+      saveSnapshotTitle(snapshot)(dispatch);
     },
-    archive: function (project) {
-      archive(project)(dispatch)
+    archive: function(project) {
+      archive(project)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProjectComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectComponent);
 
 export const getPreloadedProject = createSelector(
-  function getId (state, props) {
-    return props.match.params.id
+  function getId(state, props) {
+    return props.match.params.id;
   },
-  function getList (state) {
-    return state.projectsByFilter
+  function getList(state) {
+    return state.projectsByFilter;
   },
   (id, projectsByFilter) => {
-    console.log('calculate preloaded project')
+    console.log('calculate preloaded project');
 
     // try to find basic info about project in storage
     try {
-      let keys = Object.keys(projectsByFilter)
+      let keys = Object.keys(projectsByFilter);
 
       for (let key of keys) {
-        let projects = projectsByFilter[key].items
+        let projects = projectsByFilter[key].items;
         if (Array.isArray(projects)) {
-          let project = projects.find(project => parseInt(project.id, 10) === parseInt(id, 10))
+          let project = projects.find(
+            project => parseInt(project.id, 10) === parseInt(id, 10)
+          );
           if (project) {
             let projectToThrow = {
               ...project,
               title: project.title + ' LOADING!!!'
-            }
-            throw projectToThrow
+            };
+            throw projectToThrow;
           }
         }
       }
     } catch (project) {
-      return project
+      return project;
     }
-    return null
+    return null;
   }
-)
+);

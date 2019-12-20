@@ -1,10 +1,10 @@
-import { connect } from 'react-redux'
-import OptionsComponent from './optionsComponent'
+import { connect } from 'react-redux';
+import OptionsComponent from './optionsComponent';
 import {
   setSelectMode,
   setSingleLayerSelect,
   setThreshold
-} from '../../actions/options'
+} from '../../actions/options';
 
 import {
   cancelEdit,
@@ -16,7 +16,7 @@ import {
   saveNewLine,
   scaleChange,
   setScale
-} from '../../actions/edit'
+} from '../../actions/edit';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -34,50 +34,50 @@ const mapStateToProps = (state, ownProps) => {
     threshold: state.options.threshold,
     rotationObject: state.cad.editMode.rotation.rotationObject,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    setSelectMode: function (mode) {
-      setSelectMode(mode)(dispatch)
+    setSelectMode: function(mode) {
+      setSelectMode(mode)(dispatch);
     },
 
-    setSingleLayerSelect: function (value) {
-      setSingleLayerSelect(value)(dispatch)
+    setSingleLayerSelect: function(value) {
+      setSingleLayerSelect(value)(dispatch);
     },
 
-    setThreshold: function (value) {
-      setThreshold(value)(dispatch)
+    setThreshold: function(value) {
+      setThreshold(value)(dispatch);
     },
-    cancelEdit: function (editor, editObject, backup) {
-      cancelEdit(editor, editObject, backup)(dispatch)
+    cancelEdit: function(editor, editObject, backup) {
+      cancelEdit(editor, editObject, backup)(dispatch);
     },
-    saveEdit: function (editor) {
-      saveEdit(editor)(dispatch)
+    saveEdit: function(editor) {
+      saveEdit(editor)(dispatch);
     },
-    cancelNewLine: function (editor) {
-      cancelNewLine(editor)(dispatch)
+    cancelNewLine: function(editor) {
+      cancelNewLine(editor)(dispatch);
     },
-    saveNewLine: function (editor) {
-      saveNewLine(editor)(dispatch)
+    saveNewLine: function(editor) {
+      saveNewLine(editor)(dispatch);
     },
-    cancelNewCurve: function (editor) {
-      cancelNewCurve(editor)(dispatch)
+    cancelNewCurve: function(editor) {
+      cancelNewCurve(editor)(dispatch);
     },
-    saveNewCurve: function (editor) {
-      saveNewCurve(editor)(dispatch)
+    saveNewCurve: function(editor) {
+      saveNewCurve(editor)(dispatch);
     },
-    rotationAngle: function (angle, rotationObject, editor) {
-      rotationAngle(angle, rotationObject, editor)(dispatch)
+    rotationAngle: function(angle, rotationObject, editor) {
+      rotationAngle(angle, rotationObject, editor)(dispatch);
     },
-    scaleChange: function (scale) {
-      scaleChange(scale)(dispatch)
+    scaleChange: function(scale) {
+      scaleChange(scale)(dispatch);
     },
-    setScale: function (scale, scaleObject, editor) {
-      setScale(scale, scaleObject, editor)(dispatch)
+    setScale: function(scale, scaleObject, editor) {
+      setScale(scale, scaleObject, editor)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(OptionsComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(OptionsComponent);

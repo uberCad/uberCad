@@ -6,5 +6,5 @@ export const changeStateProps = (prop, value) => {
       prop,
       value
     }
-  }
-}
+  };
+};

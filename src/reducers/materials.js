@@ -1,16 +1,14 @@
-import {
-  MATERIALS_LOAD
-} from '../actions/materials'
+import { MATERIALS_LOAD } from '../actions/materials';
 
-let initialState = []
+let initialState = [];
 
 const materials = (state = initialState, action) => {
   switch (action.type) {
     case MATERIALS_LOAD:
-      return action.payload.materials
+      return action.payload.materials;
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default materials
+export default materials;

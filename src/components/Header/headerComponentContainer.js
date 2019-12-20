@@ -1,8 +1,8 @@
-import {connect} from 'react-redux'
-import {changeStateProps} from '../../actions'
-import HeaderComponent from './headerComponent'
-import { logout } from '../../actions/userLogin'
-import { setLocale } from '../../actions/locale'
+import { connect } from 'react-redux';
+import { changeStateProps } from '../../actions';
+import HeaderComponent from './headerComponent';
+import { logout } from '../../actions/userLogin';
+import { setLocale } from '../../actions/locale';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -10,21 +10,21 @@ const mapStateToProps = (state, ownProps) => {
     userName: state.userLogin.userName,
     pictureUrl: state.userLogin.pictureUrl,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     changeStateProps: (prop, value) => {
-      dispatch(changeStateProps(prop, value))
+      dispatch(changeStateProps(prop, value));
     },
-    logout: function (history) {
-      logout(history)(dispatch)
+    logout: function(history) {
+      logout(history)(dispatch);
     },
-    setLocale: function (lang) {
-      setLocale(lang)(dispatch)
+    setLocale: function(lang) {
+      setLocale(lang)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(HeaderComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(HeaderComponent);

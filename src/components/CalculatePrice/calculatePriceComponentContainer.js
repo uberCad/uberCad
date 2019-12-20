@@ -1,10 +1,6 @@
-import { connect } from 'react-redux'
-import CalculatePriceComponent from './calculatePriceComponent'
-import {
-  calculate,
-  calculateHide,
-  order
-} from '../../actions/calculate'
+import { connect } from 'react-redux';
+import CalculatePriceComponent from './calculatePriceComponent';
+import { calculate, calculateHide, order } from '../../actions/calculate';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -16,21 +12,24 @@ const mapStateToProps = (state, ownProps) => {
     forceRender: {},
     form: state.form,
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    calculate: function (scene) {
-      calculate(scene)(dispatch)
+    calculate: function(scene) {
+      calculate(scene)(dispatch);
     },
-    calculateHide: function () {
-      calculateHide()(dispatch)
+    calculateHide: function() {
+      calculateHide()(dispatch);
     },
-    order: function (orderObjects, contactInformation) {
-      order(orderObjects, contactInformation)(dispatch)
+    order: function(orderObjects, contactInformation) {
+      order(orderObjects, contactInformation)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(CalculatePriceComponent)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CalculatePriceComponent);

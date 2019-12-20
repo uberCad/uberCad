@@ -1,76 +1,80 @@
-import axios from 'axios'
-import { API_HOST } from '../config'
-import UserService from './UserService'
+import axios from 'axios';
+import { API_HOST } from '../config';
+import UserService from './UserService';
 
-axios.defaults.baseURL = API_HOST
+axios.defaults.baseURL = API_HOST;
 if (window && window.localStorage.sid) {
-  axios.defaults.headers.common['X-Session-Id'] = window.localStorage.sid
+  axios.defaults.headers.common['X-Session-Id'] = window.localStorage.sid;
 }
 
 export default class ApiService {
-  static post (url, options) {
-    options = options || {}
-    options.headers = options.headers || {}
-    options.data = options.data || {}
+  static post(url, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+    options.data = options.data || {};
 
     return new Promise((resolve, reject) => {
-      axios.post(`${url}`, options.data, { headers: options.headers })
+      axios
+        .post(`${url}`, options.data, { headers: options.headers })
         .then(response => {
-          resolve(response.data)
+          resolve(response.data);
         })
-        .catch((error) => {
+        .catch(error => {
           if (error.response && error.response.status === 401) {
-            UserService.logout()
+            UserService.logout();
           }
-          reject(error)
-        })
-    })
+          reject(error);
+        });
+    });
   }
 
-  static get (url) {
+  static get(url) {
     return new Promise((resolve, reject) => {
-      axios.get(`${url}`)
+      axios
+        .get(`${url}`)
         .then(response => {
-          resolve(response.data)
+          resolve(response.data);
         })
-        .catch((error) => {
+        .catch(error => {
           if (error.response && error.response.status === 401) {
-            UserService.logout()
+            UserService.logout();
           }
-          reject(error)
-        })
-    })
+          reject(error);
+        });
+    });
   }
 
-  static put (url, options) {
-    options = options || {}
-    options.data = options.data || {}
+  static put(url, options) {
+    options = options || {};
+    options.data = options.data || {};
     return new Promise((resolve, reject) => {
-      axios.put(`${url}`, options.data)
+      axios
+        .put(`${url}`, options.data)
         .then(response => {
-          resolve(response.data)
+          resolve(response.data);
         })
-        .catch((error) => {
+        .catch(error => {
           if (error.response && error.response.status === 401) {
-            UserService.logout()
+            UserService.logout();
           }
-          reject(error)
-        })
-    })
+          reject(error);
+        });
+    });
   }
 
-  static delete (url) {
+  static delete(url) {
     return new Promise((resolve, reject) => {
-      axios.delete(`${url}`)
+      axios
+        .delete(`${url}`)
         .then(response => {
-          resolve(response.data)
+          resolve(response.data);
         })
-        .catch((error) => {
+        .catch(error => {
           if (error.response && error.response.status === 401) {
-            UserService.logout()
+            UserService.logout();
           }
-          reject(error)
-        })
-    })
+          reject(error);
+        });
+    });
   }
 }

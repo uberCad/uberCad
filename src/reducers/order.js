@@ -1,13 +1,13 @@
 // import update from 'immutability-helper'
 
-import { ORDER_GET } from '../actions/order'
+import { ORDER_GET } from '../actions/order';
 
 let initialState = {
   contactInformation: null,
   order: [],
   orderObjects: [],
   createdAt: null
-}
+};
 
 const order = (state = initialState, action) => {
   switch (action.type) {
@@ -18,11 +18,11 @@ const order = (state = initialState, action) => {
         order: action.payload.order,
         orderObjects: action.payload.orderObjects,
         createdAt: action.payload.createdAt
-      }
+      };
 
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default order
+export default order;

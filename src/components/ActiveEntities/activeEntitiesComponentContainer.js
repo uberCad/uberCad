@@ -1,13 +1,13 @@
-import { connect } from 'react-redux'
-import ActiveEntitiesComponent from './activeEntitiesComponent'
+import { connect } from 'react-redux';
+import ActiveEntitiesComponent from './activeEntitiesComponent';
 import {
   toggleVisible,
   unSelect,
   selectEntity,
   showAll,
   groupEntities
-} from '../../actions/activeEntities'
-import { isEdit } from '../../actions/edit'
+} from '../../actions/activeEntities';
+import { isEdit } from '../../actions/edit';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -23,30 +23,33 @@ const mapStateToProps = (state, ownProps) => {
       activeLine: state.cad.activeLine
     },
     ...ownProps
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    toggleVisible: function (entity, visible, editor) {
-      toggleVisible(entity, visible, editor)(dispatch)
+    toggleVisible: function(entity, visible, editor) {
+      toggleVisible(entity, visible, editor)(dispatch);
     },
-    unSelect: function (idx, activeEntities, editor) {
-      unSelect(idx, activeEntities, editor)(dispatch)
+    unSelect: function(idx, activeEntities, editor) {
+      unSelect(idx, activeEntities, editor)(dispatch);
     },
-    selectEntity: function (idx, activeEntities, editor) {
-      selectEntity(idx, activeEntities, editor)(dispatch)
+    selectEntity: function(idx, activeEntities, editor) {
+      selectEntity(idx, activeEntities, editor)(dispatch);
     },
-    showAll: function (editor) {
-      showAll(editor)(dispatch)
+    showAll: function(editor) {
+      showAll(editor)(dispatch);
     },
-    groupEntities: function (editor) {
-      groupEntities(editor)(dispatch)
+    groupEntities: function(editor) {
+      groupEntities(editor)(dispatch);
     },
-    isEdit: function (option, editor, object) {
-      isEdit(option, editor, object)(dispatch)
+    isEdit: function(option, editor, object) {
+      isEdit(option, editor, object)(dispatch);
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActiveEntitiesComponent)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ActiveEntitiesComponent);
