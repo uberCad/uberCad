@@ -20,7 +20,7 @@ let previewInConsole = (url, ...text) => {
       // Set image URL
       'background: url(' + url + ');'
     ].join(' ');
-    console.log('%c', style, ...text);
+    console.log('%c ', style, ...text);
   };
   // Actually loads the image
   image.src = url;

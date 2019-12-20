@@ -212,7 +212,7 @@ export function Viewer(data = null, container, snapshot = null, font) {
     camera.position.y += (canvasCenter.y - mouse.y) * k;
 
     this.render();
-  });
+  }, {passive: true});
 
   controls.addEventListener('change', this.render);
   this.render();
