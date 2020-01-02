@@ -43,7 +43,7 @@ export const combineEdgeModels = editor => {
   return dispatch => {
     let { svg } = sceneService.combineEdgeModels(editor, true);
     try {
-      sceneService.sendToFlixo(svg);
+      // sceneService.sendToFlixo(svg);
     } catch (e) {
       console.error(e);
     }
