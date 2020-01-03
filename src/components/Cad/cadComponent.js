@@ -24,8 +24,8 @@ export default class CadComponent extends Component {
 
     Api.get(
       snapshotId
-        ? `/api/snapshot/${snapshotId}`
-        : `/api/project-file/${projectId}`
+        ? `/project/snapshot/${snapshotId}`
+        : `/project/file/${projectId}`
     )
       .then(data => {
         if (snapshotId) {
