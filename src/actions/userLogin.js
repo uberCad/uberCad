@@ -10,13 +10,13 @@ export const REGISTER_USER = 'REGISTER_USER';
 export const authorize = (username, password, history) => {
   return dispatch => {
     return userService.login(username, password).then(res => {
-      if (res.sid) {
+      if (res.token) {
         history.push(`${process.env.PUBLIC_URL}/`);
         dispatch({
           type: LOGIN_ACTION,
           payload: {
-            sid: res.sid,
-            userName: res.userName
+            token: res.token,
+            username: res.username
           }
         });
       } else {
@@ -33,15 +33,15 @@ export const logout = history => {
       dispatch({
         type: LOGOUT_ACTION,
         payload: {
-          sid: '',
-          userName: ''
+          token: '',
+          username: ''
         }
       });
     });
   };
 };
 
-export const setUserName = userName => {
+export const setUsername = username => {
   return dispatch => {
     dispatch(spinnerShow());
     Api.get('/api/picture-url').then(pictureUrl => {
@@ -49,7 +49,7 @@ export const setUserName = userName => {
       dispatch({
         type: SET_USER_NAME,
         payload: {
-          userName,
+          username,
           pictureUrl
         }
       });
@@ -60,13 +60,13 @@ export const setUserName = userName => {
 export const register = (user, history) => {
   return dispatch => {
     return userService.createUser(user).then(res => {
-      if (res && res.sid) {
+      if (res && res.token) {
         history.push(`${process.env.PUBLIC_URL}/`);
         dispatch({
           type: REGISTER_USER,
           payload: {
-            sid: res.sid,
-            userName: res.userName
+            token: res.token,
+            username: res.username
           }
         });
       } else {

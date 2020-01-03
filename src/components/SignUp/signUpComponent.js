@@ -52,7 +52,7 @@ export default class SignUpComponent extends Component {
               >
                 <div className="input-group-login">
                   <FormattedMessage
-                    id="signUp.labelUserName"
+                    id="signUp.labelUsername"
                     defaultMessage="Username"
                   >
                     {value => (
@@ -60,7 +60,7 @@ export default class SignUpComponent extends Component {
                     )}
                   </FormattedMessage>
                   <FormattedMessage
-                    id="signUp.userNamePlaceholder"
+                    id="signUp.usernamePlaceholder"
                     defaultMessage="Enter your username"
                   >
                     {value => (
@@ -146,7 +146,7 @@ export default class SignUpComponent extends Component {
   static propTypes = {
     lang: PropTypes.string.isRequired,
     register: PropTypes.func.isRequired,
-    setUserName: PropTypes.func.isRequired,
+    setUsername: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     history: PropTypes.object
   };

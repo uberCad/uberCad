@@ -47,7 +47,7 @@ class App extends Component {
                   component={Cad}
                 />
                 <Route
-                  path={`${process.env.PUBLIC_URL}/login/:sid?/:userName?`}
+                  path={`${process.env.PUBLIC_URL}/login/:sid?/:username?`}
                   component={UserLogin}
                 />
                 <Route

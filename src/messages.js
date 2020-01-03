@@ -106,8 +106,8 @@ export default {
     },
     signUp: {
       title: 'Registration new user',
-      labelUserName: 'Username',
-      userNamePlaceholder: 'Enter your username',
+      labelUsername: 'Username',
+      usernamePlaceholder: 'Enter your username',
       labelPassword: 'Password',
       passwordPlaceholder: 'Enter your password',
       btnSignUp: 'Sign Up ...'
@@ -121,8 +121,8 @@ export default {
     userLogin: {
       title: 'Log In',
       description: 'Register Username & Password',
-      labelUserName: 'Username',
-      userNamePlaceholder: 'Enter your username',
+      labelUsername: 'Username',
+      usernamePlaceholder: 'Enter your username',
       labelPassword: 'Password',
       passwordPlaceholder: 'Enter your password',
       btnSignIn: 'Sign in ...'
@@ -235,8 +235,8 @@ export default {
     },
     signUp: {
       title: 'Регистрация нового пользователя',
-      labelUserName: 'Имя пользователя',
-      userNamePlaceholder: 'Введите ваше имя',
+      labelUsername: 'Имя пользователя',
+      usernamePlaceholder: 'Введите ваше имя',
       labelPassword: 'Пароль',
       passwordPlaceholder: 'Введите ваш пароль',
       btnSignUp: 'Зарегистрироваться ...'
@@ -250,8 +250,8 @@ export default {
     userLogin: {
       title: 'Вход',
       description: 'Зарегистрированное имя пользователя и пароль',
-      labelUserName: 'Имя пользователя',
-      userNamePlaceholder: 'Введите ваше имя',
+      labelUsername: 'Имя пользователя',
+      usernamePlaceholder: 'Введите ваше имя',
       labelPassword: 'Пароль',
       passwordPlaceholder: 'Введите ваш пароль',
       btnSignIn: 'Войти ...'

@@ -35,8 +35,7 @@ export const fetchProjects = filter => dispatch => {
   spinnerShow()(dispatch);
   dispatch(requestProjects(filter));
 
-  // return Api.get(`/api/projects-list`)
-  return Api.get(`/api/projects-list/${filter}`)
+  return Api.get(`/projects/list/${filter}`) //done
     .then(res => {
       spinnerHide()(dispatch);
       if (!res[0].error) {
