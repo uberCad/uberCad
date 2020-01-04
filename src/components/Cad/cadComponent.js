@@ -22,7 +22,7 @@ export default class CadComponent extends Component {
     const { projectId, snapshotId } = this.props.match.params;
     this.props.spinnerShow();
 
-    Api.get(
+    Api.get( //done
       snapshotId
         ? `/project/snapshot/${snapshotId}`
         : `/project/file/${projectId}`

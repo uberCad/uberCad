@@ -10,7 +10,7 @@ export const addProject = project => {
         'content-type': 'multipart/form-data'
       }
     };
-    Api.post('/api/add-project', { data: project }, config).then(res => {
+    Api.post('/project/add', { data: project }, config).then(res => { //done
       history.push(`/project/${res._key}`);
       dispatch({
         type: ADD_PROJECT,
