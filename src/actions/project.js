@@ -72,12 +72,12 @@ export const renameProject = title => {
 export const saveProjectTitle = (key, title) => {
   return dispatch => {
     dispatch(spinnerShow());
-    Api.post('/api/project-rename', { data: { key, title } }).then(res => {
+    Api.post('/project/rename', { data: { key, title } }).then(res => { //done
       dispatch(spinnerHide());
       dispatch({
         type: PROJECT_RENAME_SAVE,
         payload: {
-          title: res
+          title: res.title
         }
       });
     });
@@ -115,14 +115,14 @@ export const saveSnapshotTitle = snapshot => {
 export const archive = project => {
   return dispatch => {
     dispatch(spinnerShow());
-    Api.post('/api/project-archive', {
+    Api.post('/project/archive', { //done
       data: { key: project._key, status: 'archive' }
     }).then(res => {
       dispatch(spinnerHide());
       dispatch({
         type: PROJECT_ARCHIVE,
         payload: {
-          project: res
+          status: res.status
         }
       });
     });
