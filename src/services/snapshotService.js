@@ -25,9 +25,7 @@ export default class snapshotService {
         layers
       }
     };
-    return api.post(`/api/add-snapshot/${projectKey}`, options).then(res => {
-      return res;
-    });
+    return api.post(`/snapshot/add/${projectKey}`, options);
   }
 
   static getSnapshots(projectKey) {
@@ -37,7 +35,7 @@ export default class snapshotService {
   }
 
   static getSnapshotScene(snapshotKey) {
-    return api.get(`/api/snapshot/${snapshotKey}`).then(res => {
+    return api.get(`/snapshot/${snapshotKey}`).then(res => {
       return res;
     });
   }
