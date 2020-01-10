@@ -8,8 +8,8 @@ import {
 } from '../actions/userLogin';
 
 let initialState = {
-  sid: '',
-  userName: '',
+  token: '',
+  username: '',
   pictureUrl: ''
 };
 
@@ -18,26 +18,27 @@ const userLogin = (state = initialState, action) => {
     case LOGIN_ACTION:
       return {
         ...state,
-        sid: action.payload.sid,
-        userName: action.payload.userName
+        token: action.payload.token,
+        username: action.payload.username,
+        pictureUrl: action.payload.pictureUrl
       };
     case SET_USER_NAME:
       return {
         ...state,
-        userName: action.payload.userName,
+        username: action.payload.username,
         pictureUrl: action.payload.pictureUrl
       };
     case LOGOUT_ACTION:
       return {
         ...state,
-        sid: action.payload.sid,
-        userName: action.payload.userName
+          token: action.payload.token,
+        username: action.payload.username
       };
     case REGISTER_USER:
       return {
         ...state,
-        sid: action.payload.sid,
-        userName: action.payload.userName
+        token: action.payload.token,
+        username: action.payload.username
       };
 
     default:

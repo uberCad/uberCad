@@ -47,7 +47,7 @@ export default class HeaderComponent extends Component {
             </NavItem>
           </Nav>
           <Nav className="nav-group-right" pullRight>
-            {this.props.userName && (
+            {this.props.username && (
               <NavDropdown
                 title={
                   <div className="pull-left">
@@ -56,7 +56,7 @@ export default class HeaderComponent extends Component {
                       src={this.props.pictureUrl || userPic}
                       alt="user pic"
                     />
-                    {this.props.userName}
+                    {this.props.username}
                   </div>
                 }
                 id="basic-nav-dropdown"
@@ -82,12 +82,12 @@ export default class HeaderComponent extends Component {
                 </MenuItem>
               </NavDropdown>
             )}
-            {!this.props.userName && (
+            {!this.props.username && (
               <NavItem href={`${process.env.PUBLIC_URL}/login`}>
                 <FormattedMessage id="header.login" defaultMessage="Login" />
               </NavItem>
             )}
-            {!this.props.userName && (
+            {!this.props.username && (
               <NavItem href={`${process.env.PUBLIC_URL}/sign-up`}>
                 <FormattedMessage id="header.signUp" defaultMessage="Sign Up" />
               </NavItem>
@@ -110,7 +110,7 @@ export default class HeaderComponent extends Component {
     changeStateProps: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     lang: PropTypes.string.isRequired,
-    userName: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
     pictureUrl: PropTypes.string
   };
 }

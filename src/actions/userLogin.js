@@ -10,13 +10,14 @@ export const REGISTER_USER = 'REGISTER_USER';
 export const authorize = (username, password, history) => {
   return dispatch => {
     return userService.login(username, password).then(res => {
-      if (res.sid) {
+      if (res.token) {
         history.push(`${process.env.PUBLIC_URL}/`);
         dispatch({
           type: LOGIN_ACTION,
           payload: {
-            sid: res.sid,
-            userName: res.userName
+            token: res.token,
+            username: res.username,
+            pictureUrl: res.pictureUrl
           }
         });
       } else {
@@ -33,24 +34,24 @@ export const logout = history => {
       dispatch({
         type: LOGOUT_ACTION,
         payload: {
-          sid: '',
-          userName: ''
+          token: '',
+          username: ''
         }
       });
     });
   };
 };
 
-export const setUserName = userName => {
+export const getProfile = () => {
   return dispatch => {
     dispatch(spinnerShow());
-    Api.get('/api/picture-url').then(pictureUrl => {
+    Api.get('/user/profile').then(user => {
       dispatch(spinnerHide());
       dispatch({
         type: SET_USER_NAME,
         payload: {
-          userName,
-          pictureUrl
+          username: user.username,
+          pictureUrl: user.pictureUrl
         }
       });
     });
@@ -60,13 +61,13 @@ export const setUserName = userName => {
 export const register = (user, history) => {
   return dispatch => {
     return userService.createUser(user).then(res => {
-      if (res && res.sid) {
+      if (res && res.token) {
         history.push(`${process.env.PUBLIC_URL}/`);
         dispatch({
           type: REGISTER_USER,
           payload: {
-            sid: res.sid,
-            userName: res.userName
+            token: res.token,
+            username: res.username
           }
         });
       } else {

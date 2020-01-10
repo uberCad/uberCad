@@ -38,7 +38,7 @@ export const receiveProjectError = (id, error) => ({
 export const fetchProject = (id, preloadedProject) => dispatch => {
   dispatch(spinnerShow());
   dispatch(requestProject(id, preloadedProject));
-  return Api.get(`/api/project/${id}`)
+  return Api.get(`/projects/${id}`) //done
     .then(res => {
       dispatch(spinnerHide());
       return dispatch(receiveProject(id, res[0]));
@@ -51,7 +51,7 @@ export const fetchProject = (id, preloadedProject) => dispatch => {
 
 export const delProject = key => dispatch => {
   dispatch(spinnerShow());
-  return Api.delete(`/api/project/${key}`).then(res => {
+  return Api.delete(`/project/${key}`).then(res => {
     console.log(res);
     history.push(`/projects`);
     dispatch(spinnerHide());
@@ -72,12 +72,12 @@ export const renameProject = title => {
 export const saveProjectTitle = (key, title) => {
   return dispatch => {
     dispatch(spinnerShow());
-    Api.post('/api/project-rename', { data: { key, title } }).then(res => {
+    Api.post('/project/rename', { data: { key, title } }).then(res => { //done
       dispatch(spinnerHide());
       dispatch({
         type: PROJECT_RENAME_SAVE,
         payload: {
-          title: res
+          title: res.title
         }
       });
     });
@@ -98,7 +98,7 @@ export const renameSnapshot = snapshot => {
 export const saveSnapshotTitle = snapshot => {
   return dispatch => {
     dispatch(spinnerShow());
-    Api.post('/api/snapshot-rename', {
+    Api.post('/snapshot/rename', {
       data: { key: snapshot._key, title: snapshot.title }
     }).then(res => {
       dispatch(spinnerHide());
@@ -115,14 +115,14 @@ export const saveSnapshotTitle = snapshot => {
 export const archive = project => {
   return dispatch => {
     dispatch(spinnerShow());
-    Api.post('/api/project-archive', {
+    Api.post('/project/archive', { //done
       data: { key: project._key, status: 'archive' }
     }).then(res => {
       dispatch(spinnerHide());
       dispatch({
         type: PROJECT_ARCHIVE,
         payload: {
-          project: res
+          status: res.status
         }
       });
     });

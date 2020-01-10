@@ -23,11 +23,11 @@ export default class UserLoginComponent extends Component {
   }
 
   componentDidMount() {
-    const sid = this.props.match.params.sid;
-    const userName = this.props.match.params.userName;
-    if (sid && userName) {
-      UserService.updateSid(sid);
-      this.props.setUserName(userName);
+    const token = this.props.match.params.token;
+    const username = this.props.match.params.username;
+    if (token && username) {
+      UserService.updateToken(token);
+      this.props.getProfile();
       this.props.history.push(`${process.env.PUBLIC_URL}/`);
     }
   }
@@ -115,7 +115,7 @@ export default class UserLoginComponent extends Component {
               >
                 <div className="input-group-login">
                   <FormattedMessage
-                    id="userLogin.labelUserName"
+                    id="userLogin.labelUsername"
                     defaultMessage="Username"
                   >
                     {value => (
@@ -123,7 +123,7 @@ export default class UserLoginComponent extends Component {
                     )}
                   </FormattedMessage>
                   <FormattedMessage
-                    id="userLogin.userNamePlaceholder"
+                    id="userLogin.usernamePlaceholder"
                     defaultMessage="Enter your username"
                   >
                     {value => (
@@ -202,13 +202,13 @@ export default class UserLoginComponent extends Component {
 
   static propTypes = {
     lang: PropTypes.string.isRequired,
-    setUserName: PropTypes.func.isRequired,
+    getProfile: PropTypes.func.isRequired,
     authorize: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     match: PropTypes.shape({
       params: PropTypes.shape({
-        sid: PropTypes.string,
-        userName: PropTypes.string
+        token: PropTypes.string,
+        username: PropTypes.string
       })
     }),
     history: PropTypes.object

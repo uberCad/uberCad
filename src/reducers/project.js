@@ -24,10 +24,11 @@ let initialState = {
 const project = (state = initialState, action) => {
   switch (action.type) {
     case PROJECT_ARCHIVE:
-      return {
-        ...state,
-        project: action.payload.project
-      };
+      return update(state, {
+        project: {
+          status: { $set: action.payload.status }
+        }
+      });
     case PROJECT_SNAPSHOT_RENAME_SAVE:
       return update(state, {
         project: {
@@ -63,7 +64,7 @@ const project = (state = initialState, action) => {
     case SNAPSHOT_DELETE: {
       let index;
       state.project.snapshots.forEach((item, i) => {
-        if (item._key === action.payload.snapshot._key) {
+        if (item._key === action.payload.snapshotKey) {
           index = i;
         }
       });

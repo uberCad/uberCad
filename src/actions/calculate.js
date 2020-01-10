@@ -44,7 +44,7 @@ export const calculate = scene => {
     });
     return dispatch => {
       dispatch(spinnerShow());
-      Api.post('https://ubercad-api.bitstack.tech/api/calculate', { data: infoPrice }).then(res => {
+      Api.post('/calculate', { data: infoPrice }).then(res => {  //done
         res.forEach((item, i) => {
           polyamideObjects[i].userData.price = item.price;
           polyamideObjects[i].userData.minOrderQty = Number(

@@ -20,6 +20,15 @@ export const addSnapshot = (snapshot, projectKey) => {
           isChanged: false
         }
       });
+    }).catch(res => {
+      let msg;
+      try {
+          msg = res.response.data.msg;
+      } catch (e) {
+          msg = 'Snapshot with same title already exists';
+      }
+      alert(msg);
+      dispatch(spinnerHide());
     });
   };
 };
@@ -72,7 +81,7 @@ export const deleteSnapshot = snapshotKey => {
       dispatch({
         type: SNAPSHOT_DELETE,
         payload: {
-          snapshot: res
+          snapshotKey
         }
       });
     });

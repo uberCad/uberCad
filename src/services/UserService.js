@@ -4,11 +4,11 @@ import history from '../config/history';
 
 export default class UserService {
   static isAuthenticated() {
-    return !!window.localStorage.sid;
+    return !!window.localStorage.token;
   }
-  static updateSid(sid) {
-    axios.defaults.headers.common['X-Session-Id'] = sid;
-    window.localStorage.setItem('sid', sid);
+  static updateToken(token) {
+    axios.defaults.headers.Authorization = "bearer " + token;
+    window.localStorage.setItem('token', token);
   }
 
   static login(username, password) {
@@ -17,7 +17,7 @@ export default class UserService {
         data: { username, password }
       })
       .then(res => {
-        this.updateSid(res.sid);
+        this.updateToken(res.token);
         return res;
       })
       .catch(error => {
@@ -76,8 +76,8 @@ export default class UserService {
       })
       .then(res => {
         console.log('register res = ', res);
-        window.localStorage.setItem('sid', res.sid);
-        axios.defaults.headers.common['X-Session-Id'] = res.sid;
+        window.localStorage.setItem('token', res.token);
+        axios.defaults.headers.Authorization = "bearer " + res.token;
         return res;
       })
       .catch(error => {
