@@ -64,7 +64,7 @@ const project = (state = initialState, action) => {
     case SNAPSHOT_DELETE: {
       let index;
       state.project.snapshots.forEach((item, i) => {
-        if (item._key === action.payload.snapshot._key) {
+        if (item._key === action.payload.snapshotKey) {
           index = i;
         }
       });

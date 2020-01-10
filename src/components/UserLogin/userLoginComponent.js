@@ -27,7 +27,7 @@ export default class UserLoginComponent extends Component {
     const username = this.props.match.params.username;
     if (token && username) {
       UserService.updateToken(token);
-      this.props.setUsername(username);
+      this.props.getProfile();
       this.props.history.push(`${process.env.PUBLIC_URL}/`);
     }
   }
@@ -202,7 +202,7 @@ export default class UserLoginComponent extends Component {
 
   static propTypes = {
     lang: PropTypes.string.isRequired,
-    setUsername: PropTypes.func.isRequired,
+    getProfile: PropTypes.func.isRequired,
     authorize: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     match: PropTypes.shape({

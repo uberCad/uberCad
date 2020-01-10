@@ -146,7 +146,6 @@ export default class SignUpComponent extends Component {
   static propTypes = {
     lang: PropTypes.string.isRequired,
     register: PropTypes.func.isRequired,
-    setUsername: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     history: PropTypes.object
   };

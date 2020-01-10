@@ -80,7 +80,9 @@ export default class PanelSnapshotsComponent extends Component {
         dataset: { key }
       }
     } = event;
-    this.props.deleteSnapshot(key);
+    if (window.confirm('Are you sure?')) {
+        this.props.deleteSnapshot(key);
+    }
   };
 
   render() {

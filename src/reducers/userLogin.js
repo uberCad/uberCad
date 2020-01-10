@@ -19,7 +19,8 @@ const userLogin = (state = initialState, action) => {
       return {
         ...state,
         token: action.payload.token,
-        username: action.payload.username
+        username: action.payload.username,
+        pictureUrl: action.payload.pictureUrl
       };
     case SET_USER_NAME:
       return {

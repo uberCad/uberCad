@@ -51,7 +51,7 @@ export const fetchProject = (id, preloadedProject) => dispatch => {
 
 export const delProject = key => dispatch => {
   dispatch(spinnerShow());
-  return Api.delete(`/api/project/${key}`).then(res => {
+  return Api.delete(`/project/${key}`).then(res => {
     console.log(res);
     history.push(`/projects`);
     dispatch(spinnerHide());
@@ -98,7 +98,7 @@ export const renameSnapshot = snapshot => {
 export const saveSnapshotTitle = snapshot => {
   return dispatch => {
     dispatch(spinnerShow());
-    Api.post('/api/snapshot-rename', {
+    Api.post('/snapshot/rename', {
       data: { key: snapshot._key, title: snapshot.title }
     }).then(res => {
       dispatch(spinnerHide());

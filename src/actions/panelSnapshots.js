@@ -81,7 +81,7 @@ export const deleteSnapshot = snapshotKey => {
       dispatch({
         type: SNAPSHOT_DELETE,
         payload: {
-          snapshot: res
+          snapshotKey
         }
       });
     });

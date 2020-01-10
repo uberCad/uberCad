@@ -28,12 +28,6 @@ export default class snapshotService {
     return api.post(`/snapshot/add/${projectKey}`, options);
   }
 
-  static getSnapshots(projectKey) {
-    return api.get(`/api/get-snapshots/${projectKey}`).then(res => {
-      return res;
-    });
-  }
-
   static getSnapshotScene(snapshotKey) {
     return api.get(`/snapshot/${snapshotKey}`).then(res => {
       return res;
@@ -41,13 +35,13 @@ export default class snapshotService {
   }
 
   static getObjectSnapshot(key) {
-    return api.get(`/api/object-snapshot/${key}`).then(res => {
+    return api.get(`/snapshot/object/${key}`).then(res => {
       return res;
     });
   }
 
   static delSnapshot(snapshotKey) {
-    return api.delete(`/api/snapshot/${snapshotKey}`).then(res => {
+    return api.delete(`/snapshot/${snapshotKey}`).then(res => {
       return res;
     });
   }

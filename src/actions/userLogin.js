@@ -16,7 +16,8 @@ export const authorize = (username, password, history) => {
           type: LOGIN_ACTION,
           payload: {
             token: res.token,
-            username: res.username
+            username: res.username,
+            pictureUrl: res.pictureUrl
           }
         });
       } else {
@@ -41,16 +42,16 @@ export const logout = history => {
   };
 };
 
-export const setUsername = username => {
+export const getProfile = () => {
   return dispatch => {
     dispatch(spinnerShow());
-    Api.get('/api/picture-url').then(pictureUrl => {
+    Api.get('/user/profile').then(user => {
       dispatch(spinnerHide());
       dispatch({
         type: SET_USER_NAME,
         payload: {
-          username,
-          pictureUrl
+          username: user.username,
+          pictureUrl: user.pictureUrl
         }
       });
     });

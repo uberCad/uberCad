@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import SignUpComponent from './signUpComponent';
 
-import { register, logout, setUsername } from '../../actions/userLogin';
+import { register, logout } from '../../actions/userLogin';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -14,9 +14,6 @@ const mapDispatchToProps = dispatch => {
   return {
     register: function(user, history) {
       return register(user, history)(dispatch);
-    },
-    setUsername: function(username) {
-      setUsername(username)(dispatch);
     },
     logout: function(history) {
       logout(history)(dispatch);
