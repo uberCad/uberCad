@@ -384,8 +384,6 @@ let setPointOfInterest = (editor, object) => {
   let stepsCount = 25;
   let { camera } = editor;
 
-  let controls = editor.cadCanvas.getControls();
-
   let pointOfInterests;
   if (object.geometry instanceof THREE.CircleGeometry) {
     pointOfInterests = object.position;
@@ -418,7 +416,6 @@ let setPointOfInterest = (editor, object) => {
     }
 
     step.z = 0;
-    controls.target.add(step);
     camera.position.add(step);
 
     camera.left *= factor;
@@ -428,7 +425,7 @@ let setPointOfInterest = (editor, object) => {
     camera.updateProjectionMatrix();
 
     camera.needUpdate = true;
-    controls.update();
+    editor.cadCanvas.render();
   }
 
   animateCameraMove();
