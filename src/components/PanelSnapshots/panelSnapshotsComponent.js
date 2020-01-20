@@ -81,7 +81,7 @@ export default class PanelSnapshotsComponent extends Component {
       }
     } = event;
     if (window.confirm('Are you sure?')) {
-        this.props.deleteSnapshot(key);
+      this.props.deleteSnapshot(key);
     }
   };
 

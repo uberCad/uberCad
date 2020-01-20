@@ -4,7 +4,7 @@ import UserService from './UserService';
 
 axios.defaults.baseURL = API_HOST;
 if (window && window.localStorage.token) {
-  axios.defaults.headers.Authorization = "bearer " + window.localStorage.token;
+  axios.defaults.headers.Authorization = 'bearer ' + window.localStorage.token;
 }
 
 export default class ApiService {

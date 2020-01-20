@@ -5,7 +5,8 @@ export const MATERIAL_SET = 'MATERIAL_SET';
 
 export const loadMaterials = () => {
   return dispatch => {
-    Api.get('/materials').then(materials => { //done
+    Api.get('/materials').then(materials => {
+      //done
       dispatch({
         type: MATERIALS_LOAD,
         payload: { materials }
