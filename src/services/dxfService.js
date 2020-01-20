@@ -3,6 +3,8 @@ import * as THREE from '../extend/THREE';
 import sceneService from './sceneService';
 import GeometryUtils from './GeometryUtils';
 import Stats from 'stats.js';
+import {OrthographicControls} from "../classes/OrthographicControls";
+import throttle from "lodash/throttle";
 
 export function parseDxf(dxf) {
   let parser = new DxfParser();
@@ -165,19 +167,7 @@ export function Viewer(data = null, container, snapshot = null, font) {
   renderer.setSize(width, height);
   renderer.setClearColor(0xfffffff, 1);
 
-  let controls = new THREE.OrbitControls(camera, container);
-  controls.target.x = camera.position.x;
-  controls.target.y = camera.position.y;
-
-  // controls.mouseButtons.LEFT = undefined; //THREE.MOUSE.PAN;
-  controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
-  controls.screenSpacePanning = true;
-
-  controls.touches.ONE = THREE.TOUCH.PAN;
-  controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
-
-  //Uncomment this to disable rotation (does not make much sense with 2D drawings).
-  controls.enableRotate = false;
+  let controls = new OrthographicControls(camera, container);
 
   this.render = function() {
     renderer.render(scene, camera);
@@ -195,28 +185,10 @@ export function Viewer(data = null, container, snapshot = null, font) {
     };
   }
 
-  container.addEventListener('wheel', event => {
-    if (!controls.enableZoom) {
-      return;
-    }
-    let { mouse, canvasCenter } = sceneService.canvasClick(event, camera);
-    let dollyScale = 0.95;
-
-    let k = 1 - dollyScale;
-    if (event.deltaY < 0) {
-      k = 1 - 1 / dollyScale;
-    }
-    controls.target.x += (canvasCenter.x - mouse.x) * k;
-    controls.target.y += (canvasCenter.y - mouse.y) * k;
-    camera.position.x += (canvasCenter.x - mouse.x) * k;
-    camera.position.y += (canvasCenter.y - mouse.y) * k;
-
-    this.render();
-  }, {passive: true});
+  this.render = throttle(this.render, 16); // 1000ms / 60frames = 16.6666667 ms
 
   controls.addEventListener('change', this.render);
   this.render();
-  controls.update();
 
   this.getControls = () => controls;
 
