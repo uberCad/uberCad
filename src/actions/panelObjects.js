@@ -4,6 +4,7 @@ import { spinnerHide, spinnerShow } from './spinner';
 import snapshotService from '../services/snapshotService';
 import * as THREE from '../extend/THREE';
 import GeometryUtils from '../services/GeometryUtils';
+import consoleUtils from '../services/consoleUtils';
 
 export const PANEL_OBJECTS_TOGGLE = 'PANEL_OBJECTS_TOGGLE';
 
@@ -43,6 +44,7 @@ export const combineEdgeModels = editor => {
   return dispatch => {
     let { svg } = sceneService.combineEdgeModels(editor, true);
     try {
+      consoleUtils.previewObjectInConsole(svg);
       // sceneService.sendToFlixo(svg);
     } catch (e) {
       console.error(e);

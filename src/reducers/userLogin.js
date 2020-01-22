@@ -31,7 +31,7 @@ const userLogin = (state = initialState, action) => {
     case LOGOUT_ACTION:
       return {
         ...state,
-          token: action.payload.token,
+        token: action.payload.token,
         username: action.payload.username
       };
     case REGISTER_USER:

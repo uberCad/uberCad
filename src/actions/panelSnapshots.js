@@ -11,25 +11,28 @@ export const SNAPSHOT_DELETE = 'SNAPSHOT_DELETE';
 export const addSnapshot = (snapshot, projectKey) => {
   return dispatch => {
     dispatch(spinnerShow());
-    snapshotService.createSnapshot(snapshot, projectKey).then(res => {
-      dispatch(spinnerHide());
-      dispatch({
-        type: SNAPSHOT_ADD,
-        payload: {
-          snapshot: res,
-          isChanged: false
-        }
-      });
-    }).catch(res => {
-      let msg;
-      try {
+    snapshotService
+      .createSnapshot(snapshot, projectKey)
+      .then(res => {
+        dispatch(spinnerHide());
+        dispatch({
+          type: SNAPSHOT_ADD,
+          payload: {
+            snapshot: res,
+            isChanged: false
+          }
+        });
+      })
+      .catch(res => {
+        let msg;
+        try {
           msg = res.response.data.msg;
-      } catch (e) {
+        } catch (e) {
           msg = 'Snapshot with same title already exists';
-      }
-      alert(msg);
-      dispatch(spinnerHide());
-    });
+        }
+        alert(msg);
+        dispatch(spinnerHide());
+      });
   };
 };
 
@@ -76,7 +79,7 @@ export const loadSnapshot = (snapshotKey, cadCanvas) => {
 export const deleteSnapshot = snapshotKey => {
   return dispatch => {
     dispatch(spinnerShow());
-    snapshotService.delSnapshot(snapshotKey).then(res => {
+    snapshotService.delSnapshot(snapshotKey).then(() => {
       dispatch(spinnerHide());
       dispatch({
         type: SNAPSHOT_DELETE,

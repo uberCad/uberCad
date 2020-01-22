@@ -7,7 +7,7 @@ export default class UserService {
     return !!window.localStorage.token;
   }
   static updateToken(token) {
-    axios.defaults.headers.Authorization = "bearer " + token;
+    axios.defaults.headers.Authorization = 'bearer ' + token;
     window.localStorage.setItem('token', token);
   }
 
@@ -77,7 +77,7 @@ export default class UserService {
       .then(res => {
         console.log('register res = ', res);
         window.localStorage.setItem('token', res.token);
-        axios.defaults.headers.Authorization = "bearer " + res.token;
+        axios.defaults.headers.Authorization = 'bearer ' + res.token;
         return res;
       })
       .catch(error => {

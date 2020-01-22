@@ -8,6 +8,11 @@ const mapStateToProps = (state, ownProps) => {
     activeObject: state.sidebar.activeObject,
     materials: state.materials,
     scene: state.cad.scene,
+    editor: {
+      scene: state.cad.scene,
+      camera: state.cad.camera,
+      renderer: state.cad.renderer,
+    },
     ...ownProps
   };
 };
@@ -17,8 +22,8 @@ const mapDispatchToProps = dispatch => {
     loadMaterials: function() {
       loadMaterials()(dispatch);
     },
-    setMaterial: function(material, object) {
-      setMaterial(material, object)(dispatch);
+    setMaterial: function(material, object, editor) {
+      setMaterial(material, object, editor)(dispatch);
     }
   };
 };

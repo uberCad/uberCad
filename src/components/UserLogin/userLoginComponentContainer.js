@@ -12,7 +12,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = dispatch => {
   return {
     getProfile: function() {
-        getProfile()(dispatch);
+      getProfile()(dispatch);
     },
     authorize: function(login, password, history) {
       return authorize(login, password, history)(dispatch);
