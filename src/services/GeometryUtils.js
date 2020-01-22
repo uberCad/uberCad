@@ -1416,7 +1416,7 @@ function circleIntersectionAngle(vertex, circle, radius) {
  * @param threshold number
  * @return []
  */
-function skipZeroLines(entities, threshold) {
+function skipZeroLines(entities, threshold = 0.000001) {
   // filter and remove zero lines like that:
   // entity.geometry.vertices = [
   //     THREE.Vector3 {x: -323.9003129597497, y: -131.8572032025505, z: 0},
@@ -3197,5 +3197,7 @@ export default {
   distanceToEntity,
   distanseToLinePoint,
   pointIntersect,
-  arcsIntersect
+  arcsIntersect,
+  getVertices,
+  getSerialVertices
 };

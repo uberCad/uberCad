@@ -29,11 +29,15 @@ export default class PanelLayersComponent extends Component {
   // }
 
   toggleLayer = event => {
-    let {
-      currentTarget: {
-        dataset: { id }
-      }
-    } = event;
+    let { target, currentTarget } = event;
+    const {
+      dataset: { id }
+    } = currentTarget;
+
+    if (target !== currentTarget) {
+      return;
+    }
+
     const { scene } = this.props.editor;
     let layer = scene.getObjectById(parseInt(id, 10));
     console.log(layer);

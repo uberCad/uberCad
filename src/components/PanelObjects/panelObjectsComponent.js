@@ -66,11 +66,15 @@ export default class PanelObjectsComponent extends Component {
   };
 
   toggleObject = event => {
-    let {
-      currentTarget: {
-        dataset: { id }
-      }
-    } = event;
+    const { target, currentTarget } = event;
+    const {
+      dataset: { id }
+    } = currentTarget;
+
+    if (target !== currentTarget) {
+      return;
+    }
+
     const { scene } = this.props.editor;
     let object = scene.getObjectById(parseInt(id, 10));
     this.props.toggleObject(

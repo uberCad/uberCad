@@ -3,8 +3,8 @@ import * as THREE from '../extend/THREE';
 import sceneService from './sceneService';
 import GeometryUtils from './GeometryUtils';
 import Stats from 'stats.js';
-import {OrthographicControls} from "../classes/OrthographicControls";
-import throttle from "lodash/throttle";
+import { OrthographicControls } from '../classes/OrthographicControls';
+import throttle from 'lodash/throttle';
 
 export function parseDxf(dxf) {
   let parser = new DxfParser();

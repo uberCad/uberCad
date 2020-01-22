@@ -45,7 +45,7 @@ export default class MaterialComponent extends Component {
       }
     } = event;
     const material = this.props.materials.find(item => item._key === dbKey);
-    this.props.setMaterial(material, this.props.activeObject);
+    this.props.setMaterial(material, this.props.activeObject, this.props.editor);
     this.handleClose();
   };
 

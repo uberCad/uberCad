@@ -73,9 +73,4 @@ let BulgeGeometry = function(startPoint, endPoint, bulge, segments) {
 };
 
 export * from 'three';
-export {
-  BulgeGeometry,
-  PLYExporter,
-  GLTFExporter,
-  LegacyJSONLoader
-};
+export { BulgeGeometry, PLYExporter, GLTFExporter, LegacyJSONLoader };
