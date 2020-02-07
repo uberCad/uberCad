@@ -2,6 +2,7 @@ import * as THREE from '../extend/THREE';
 import ArrayUtils from './arrayUtils';
 import GeometryUtils from './GeometryUtils';
 import ConsoleUtils from './consoleUtils';
+import HelpLayerService from './helpLayerService';
 import ToastService from './ToastService';
 import {
   SELECT_MODE_NEW,
@@ -171,7 +172,7 @@ let highlightEntities = (
         delete entity.userData.originalColor;
       }
     } else {
-      if (!entity.userData.originalColor) {
+      if (!entity.userData || !entity.userData.originalColor) {
         entity.userData.originalColor = entity.material.color.clone();
       }
       entity.material.color.set(new THREE.Color(color));
@@ -184,29 +185,115 @@ let highlightEntities = (
   }
 };
 
-function shotPoints(vertex, distance = 0.1) {
-  let vertices = [];
+function getEntityNeighbours(entity, editor, usedEntities = [], startPoint) {
+  // entity on layer: find only on same layer. otherwise only on Layers
+  // if entity belongs to object - find only in object entities
 
-  let tmp = vertex.clone();
-  tmp.x += distance;
-  vertices.push(tmp);
+  let { cadCanvas } = editor;
+  usedEntities = [...usedEntities, entity];
 
-  tmp = vertex.clone();
-  tmp.x -= distance;
-  vertices.push(tmp);
+  let result = {
+    entity,
+    next: []
+  };
 
-  tmp = vertex.clone();
-  tmp.y += distance;
-  vertices.push(tmp);
+  let vertex;
+  if (!startPoint) {
+    vertex = GeometryUtils.getFirstVertex(entity);
+  } else {
+    vertex = GeometryUtils.getAnotherVertex(entity, startPoint);
+  }
 
-  tmp = vertex.clone();
-  tmp.y -= distance;
-  vertices.push(tmp);
+  // intersection on same layer
+  let objects = cadCanvas.getLayers().children;
 
-  return vertices;
+  if (editor.options.singleLayerSelect) {
+    let layerName = entity.parent.name;
+    cadCanvas.getLayers().children.forEach(layer => {
+      if (layer.name === layerName) {
+        objects = layer.children;
+      }
+    });
+  }
+
+  let intersections = getIntersections(
+    vertex,
+    objects,
+    usedEntities,
+    editor.options.threshold
+  );
+  if (!intersections.length) {
+    vertex = GeometryUtils.getAnotherVertex(entity, vertex);
+    intersections = getIntersections(
+      vertex,
+      objects,
+      usedEntities,
+      editor.options.threshold
+    );
+  }
+
+  intersections.forEach(intersect => {
+    result.next.push(
+      getEntityNeighbours(
+        intersect.object,
+        editor,
+        usedEntities,
+        intersect.vertex
+      )
+    );
+  });
+
+  return result;
 }
 
-function getNeighbours(entity, editor, entities = []) {
+function getIntersections(vertex, objects, usedEntities, threshold = 0.000001) {
+  let rayCaster = new THREE.Raycaster(vertex, new THREE.Vector3(0, 0, 1));
+  //lower intersections count
+  rayCaster.linePrecision = 0.0001;
+
+  let intersections = rayCaster.intersectObjects(objects, true);
+
+  // check if we at start point again
+  try {
+    intersections = intersections.filter(function(intersect) {
+      if (usedEntities.length > 2 && usedEntities[0] === intersect.object) {
+        throw 'first loop detected';
+      }
+
+      if (usedEntities.includes(intersect.object)) {
+        return false;
+      }
+
+      let vertices = GeometryUtils.getVertices(intersect.object);
+      for (let i = 0; i < vertices.length; i++) {
+        if (GeometryUtils.getDistance(vertex, vertices[i]) < threshold) {
+          intersect.vertex = vertices[i];
+          intersect.id = intersect.object.id;
+          return true;
+        }
+      }
+
+      return false;
+    });
+  } catch (e) {
+    if (e === 'first loop detected') {
+      intersections = [];
+    } else {
+      throw e;
+    }
+  }
+
+  return intersections;
+}
+
+/**
+ * @deprecated
+ * @param entity
+ * @param editor
+ * @param entities
+ * @returns {Array}
+ */
+function getNeighbours_old(entity, editor, entities = []) {
   let { scene } = editor;
 
   let vertices = [];
@@ -232,13 +319,15 @@ function getNeighbours(entity, editor, entities = []) {
   }
 
   vertices.forEach(vertex => {
-    let tmpVertices = [vertex].concat(shotPoints(vertex, 0.1));
+    let tmpVertices = [vertex];
 
     tmpVertices.forEach(tmpVertex => {
       let rayCaster = new THREE.Raycaster(
         tmpVertex,
         new THREE.Vector3(0, 0, 1)
       );
+      //lower intersections count
+      rayCaster.linePrecision = 0.0001;
 
       // TODO: intersection on same layer
 
@@ -288,7 +377,7 @@ function getNeighbours(entity, editor, entities = []) {
           checkVertices.forEach(checkVertex => {
             if (checkVertex.distanceTo(vertex) < editor.options.threshold) {
               entities.push(intersect.object);
-              getNeighbours(intersect.object, editor, entities);
+              getNeighbours_old(intersect.object, editor, entities);
             }
           });
         }
@@ -300,13 +389,42 @@ function getNeighbours(entity, editor, entities = []) {
 }
 
 let recursiveSelect = (object, editor) => {
-  let entities = getNeighbours(object, editor);
-  entities.push(object);
+  let entities = [];
 
-  // unique entities
-  entities = [...new Set(entities)];
+  let neighbours = getEntityNeighbours(object, editor);
+  let pathVariants = GeometryUtils.getPathVariants(neighbours);
+  pathVariants = GeometryUtils.filterSelfIntersectingPaths(pathVariants);
 
-  entities = GeometryUtils.skipZeroLines(entities, editor.options.threshold);
+  if (pathVariants.length) {
+    let minArea = Infinity;
+    let variantWithSmallestArea = [];
+    pathVariants.forEach(variant => {
+      let vertices = GeometryUtils.getSerialVerticesFromOrderedEntities(
+        variant
+      );
+      let area = GeometryUtils.pathArea(vertices);
+
+      if (area < minArea) {
+        variantWithSmallestArea = variant;
+        minArea = area;
+      }
+    });
+
+    entities = variantWithSmallestArea;
+  } else {
+    alert('Finding path with deprecated method');
+    // debugger;
+    entities = getNeighbours_old(object, editor);
+    entities.push(object);
+
+    // unique entities
+    entities = [...new Set(entities)];
+
+    entities = GeometryUtils.skipZeroLines(entities, editor.options.threshold);
+  }
+
+  // ConsoleUtils.previewPathInConsole(GeometryUtils.getSerialVertices(entities));
+  //try to build looped mesh
 
   return entities;
 };
@@ -377,58 +495,86 @@ function* entityIterator(container, iterateContainers = false) {
   }
 }
 
-let setPointOfInterest = (editor, object) => {
-  if (object.type !== 'Line') {
-    object = new THREE.BoxHelper(object, 0xffff00);
-  }
-  let stepsCount = 25;
-  let { camera } = editor;
+let setPointOfInterest = (editor, objects) => {
+  let stepsCount = 25,
+    { camera } = editor,
+    pointOfInterests,
+    boundingBox,
+    dollyScale;
 
-  let pointOfInterests;
-  if (object.geometry instanceof THREE.CircleGeometry) {
-    pointOfInterests = object.position;
+  if (Array.isArray(objects) && objects.length) {
+    //type of items
+
+    boundingBox = GeometryUtils.getBoundingBox(objects);
+
+    dollyScale =
+      camera.right / camera.top > boundingBox.aspectRatio
+        ? boundingBox.height / camera.top
+        : boundingBox.width / camera.right;
+
+    if (objects[0] instanceof THREE.Vector3) {
+      let radius = (camera.top * dollyScale) / 50;
+      HelpLayerService.highlightVertex(objects, editor, 3000, radius);
+    }
+
+    // TODO show points on helperLayer for 3 seconds
+    //vertexes
+    //lines
+    //arcs
+    //objects
   } else {
-    object.geometry.computeBoundingSphere();
-    pointOfInterests = object.geometry.boundingSphere.center;
+    //single line/arc/object
+    if (objects.type !== 'Line') {
+      //line, arc
+      objects = new THREE.BoxHelper(objects, 0xffff00);
+    }
+
+    if (objects.geometry instanceof THREE.CircleGeometry) {
+      boundingBox = GeometryUtils.getArcBoundingBox(objects);
+    } else {
+      objects.geometry.computeBoundingBox();
+      GeometryUtils.computeBoundingBoxAdditionalInfo(
+        objects.geometry.boundingBox
+      );
+      boundingBox = objects.geometry.boundingBox;
+    }
+
+    dollyScale =
+      camera.right / camera.top > boundingBox.aspectRatio
+        ? boundingBox.height / camera.top
+        : boundingBox.width / camera.right;
   }
+  pointOfInterests = boundingBox.center;
+
   let step = new THREE.Vector3(0, 0, 0)
     .subVectors(pointOfInterests, camera.position)
     .divideScalar(stepsCount);
 
-  let radius =
-    object.type === 'LineSegments'
-      ? object.geometry.boundingSphere.radius / 2
-      : object.geometry.boundingSphere.radius;
-  let canvasDimension;
-  if (camera.right > camera.top) {
-    canvasDimension = camera.top;
-  } else {
-    canvasDimension = camera.right;
-  }
-  let factor = Math.pow((radius / canvasDimension) * 2, 1 / stepsCount);
+  let dollyFactor = Math.pow(dollyScale / 1.8, 1 / stepsCount);
 
-  let stepsLeft = stepsCount;
+  animateCameraMove(editor, step, dollyFactor, stepsCount - 1);
+};
 
-  function animateCameraMove() {
-    stepsLeft--;
-    if (stepsLeft > 0) {
-      window.requestAnimationFrame(animateCameraMove);
-    }
+let animateCameraMove = (editor, step, dollyFactor, stepsLeft) => {
+  let { camera, cadCanvas } = editor;
 
-    step.z = 0;
-    camera.position.add(step);
-
-    camera.left *= factor;
-    camera.right *= factor;
-    camera.top *= factor;
-    camera.bottom *= factor;
-    camera.updateProjectionMatrix();
-
-    camera.needUpdate = true;
-    editor.cadCanvas.render();
+  if (stepsLeft > 0) {
+    window.requestAnimationFrame(
+      animateCameraMove.bind(null, editor, step, dollyFactor, stepsLeft - 1)
+    );
   }
 
-  animateCameraMove();
+  step.z = 0;
+  camera.position.add(step);
+
+  camera.left *= dollyFactor;
+  camera.right *= dollyFactor;
+  camera.top *= dollyFactor;
+  camera.bottom *= dollyFactor;
+  camera.updateProjectionMatrix();
+
+  camera.needUpdate = true;
+  cadCanvas.render();
 };
 
 let showAll = editor => {
@@ -556,10 +702,13 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
               // cadCanvas.highlightEntities($scope.editor.activeEntities, true);
 
               // e.userData.data.entity.userData.showInTop = true
-              highlightEntities(editor, [e.userData.data.userData.entity]);
-              setPointOfInterest(editor, e.userData.data.userData.entity);
+              highlightEntities(editor, e.userData.data.userData.entities);
+              // setPointOfInterest(editor, e.userData.data.userData.entity);
+              setPointOfInterest(editor, e.userData.data.userData.vertices);
 
-              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg);
+              ToastService.msg(
+                e.userData.msg + '\n' + e.userData.data.userData.msg
+              );
 
               break;
 
@@ -575,21 +724,21 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
               setPointOfInterest(editor, e.userData.data.entities[0]);
 
               // this.render();
-              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg);
+              ToastService.msg(e.userData.msg + '\n' + e.userData.data.msg);
 
               break;
 
             case 'unused entities':
               // show unused entity
               console.error('show unused entity', e);
-              ToastService.msg(e.userData.msg + '<br />' + e.userData.data.msg);
+              ToastService.msg(e.userData.msg + '\n' + e.userData.data.msg);
 
               break;
             default:
               {
                 let text = e.userData.msg;
                 if (e.userData.data && e.userData.data.msg) {
-                  text += `<br />${e.userData.data.msg}`;
+                  text += `\n${e.userData.data.msg}`;
                 }
                 // alert(text);
                 ToastService.msg(text);
@@ -599,7 +748,7 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
         } else {
           let text = e.userData.msg;
           if (e.userData.data && e.userData.data.msg) {
-            text += `<br />${e.userData.data.msg}`;
+            text += `\n${e.userData.data.msg}`;
           }
           // alert(text);
           ToastService.msg(text);
@@ -1227,7 +1376,8 @@ export default {
   fixSceneAfterImport,
   sendToFlixo,
   someSvg,
-  removeLineByName
+  removeLineByName,
+  getEntityNeighbours
 };
 
 function getOffset(elem) {
