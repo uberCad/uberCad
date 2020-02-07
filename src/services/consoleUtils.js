@@ -9,7 +9,8 @@ let previewInConsole = (url, ...text) => {
     let style = [
       // Hacky way of forcing image's viewport using `font-size` and `line-height`
       'font-size: 1px;',
-      'line-height: ' + this.height + 'px;',
+      // test
+      // 'line-height: ' + this.height * 0.5 + 'px;',
 
       // Hacky way of forcing a middle/center anchor point for the image
       'padding: ' + this.height * 0.5 + 'px ' + this.width * 0.5 + 'px;',
