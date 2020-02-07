@@ -1,8 +1,5 @@
 import Api from '../services/apiService';
-import * as THREE from "../extend/THREE";
-import {addMaterialBackgroundShape, createLine, crossingPoint, helpArc} from "../services/editObject";
-import sceneService from "../services/sceneService";
-import GeometryUtils from "../services/GeometryUtils";
+import { addMaterialBackgroundShape } from '../services/editObject';
 
 export const MATERIALS_LOAD = 'MATERIALS_LOAD';
 export const MATERIAL_SET = 'MATERIAL_SET';

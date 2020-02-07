@@ -683,11 +683,11 @@ let rotationPoint = (vertex, center, angle) => {
   return vertex;
 };
 
-let addMaterialBackgroundShape = (object) => {
+let addMaterialBackgroundShape = object => {
   let oldMeshes = [];
   object.traverse(child => {
     if (child instanceof THREE.Mesh) {
-        oldMeshes.push(child);
+      oldMeshes.push(child);
     }
   });
 
@@ -695,24 +695,24 @@ let addMaterialBackgroundShape = (object) => {
     object.remove(mesh);
   });
 
-    object.userData.edgeModel.regions.forEach((region, idx) => {
-        let shape = region.path.map(
-            vertex => new THREE.Vector2(vertex.x, vertex.y)
-        );
-        shape = new THREE.Shape(shape);
+  object.userData.edgeModel.regions.forEach((region, idx) => {
+    let shape = region.path.map(
+      vertex => new THREE.Vector2(vertex.x, vertex.y)
+    );
+    shape = new THREE.Shape(shape);
 
-        var geometry = new THREE.ShapeBufferGeometry(shape);
-        var color = idx
-            ? new THREE.Color(0xffffff)
-            : new THREE.Color(object.userData.material.color);
-        var material = new THREE.MeshLambertMaterial({
-            color: color,
-            emissive: color
-        });
-        var mesh = new THREE.Mesh(geometry, material);
-        mesh.translateZ(-10);
-        object.add(mesh);
+    var geometry = new THREE.ShapeBufferGeometry(shape);
+    var color = idx
+      ? new THREE.Color(0xffffff)
+      : new THREE.Color(object.userData.material.color);
+    var material = new THREE.MeshLambertMaterial({
+      color: color,
+      emissive: color
     });
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.translateZ(-10);
+    object.add(mesh);
+  });
 };
 
 export {

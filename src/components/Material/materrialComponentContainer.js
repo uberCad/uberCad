@@ -11,7 +11,7 @@ const mapStateToProps = (state, ownProps) => {
     editor: {
       scene: state.cad.scene,
       camera: state.cad.camera,
-      renderer: state.cad.renderer,
+      renderer: state.cad.renderer
     },
     ...ownProps
   };
