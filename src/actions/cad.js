@@ -189,7 +189,12 @@ export const cadClick = (event, editor) => {
                 activeEntities
               }
             });
-          } else {
+
+
+          } else { //todo є резон перемістити в scene service окремою функцією doSelection_EditMod, починаючи звідси
+            console.log("Start the party");
+            console.log(editor.editMode);
+            console.log(selectResult);
             if (
               selectResult.length &&
               selectResult[0].parent.name === editor.editMode.editObject.name &&
@@ -199,23 +204,49 @@ export const cadClick = (event, editor) => {
               !editor.editMode.move.active
             ) {
               if (selectResult[0].id !== editor.editMode.activeLine.id) {
-                if (editor.editMode.activeLine.id) {
-                  unselectLine(editor.editMode.activeLine, scene);
-                }
+                // if (editor.editMode.activeLine.id) {
+                //   unselectLine(editor.editMode.activeLine, scene);
+                // }
+                // console.log(editor.editMode.activeLine);
+
                 let activeEntities = sceneService.doSelection(
                   selectResult,
                   editor
                 );
+                dispatch({
+                  type: CAD_DO_SELECTION,
+                  payload: {
+                    activeEntities
+                  }
+                });
+
+                // console.log("we need more console.log or cad active entities");
+                // console.log(activeEntities);
+                // console.log(editor);
+                // debugger;
+
                 const rPoint = getScale(camera);
-                activeEntities[0].name = 'ActiveLine';
-                addHelpPoints(activeEntities[0], scene, rPoint);
-                renderer.render(scene, camera);
+                // activeEntities.forEach(element => {
+                //   element.name = 'ActiveLine';
+                  addHelpPoints(editor, scene, rPoint);
+
+                // });
                 dispatch({
                   type: CAD_EDITMODE_SET_ACTIVE_LINE,
                   payload: {
-                    activeLine: activeEntities[0]
+                    activeLine: editor.activeEntities[0]
                   }
                 });
+                // console.log(activeEntities);
+                // debugger;
+
+                renderer.render(scene, camera);
+                // dispatch({
+                //   type: CAD_EDITMODE_SET_ACTIVE_LINE,
+                //   payload: {
+                //     activeLine: activeEntities[0]
+                //   }
+                // });
               }
             } else {
               //unselect activeLine line
@@ -233,6 +264,7 @@ export const cadClick = (event, editor) => {
                 });
               }
             }
+            //todo закінчуючи туточки
           }
           // else {
           //   if (clickResult.activeEntities.length > 0 &&
@@ -256,6 +288,8 @@ export const cadClick = (event, editor) => {
           });
         }
         break;
+
+      //todo не булоб логічно сюди перенести і інструмент TOOL_SELECT?
 
       case TOOL_MEASUREMENT:
         {
@@ -281,6 +315,7 @@ export const cadClick = (event, editor) => {
         break;
 
       default:
+        //todo p.s. TOOL_SELECT сюди всерівно потрапляє
         console.log(`cadClick not handled for tool: ${tool}`);
         break;
     }

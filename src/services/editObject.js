@@ -41,57 +41,98 @@ let setOriginalColor = entity => {
   });
 };
 
-let addHelpPoints = (object, scene, radiusPoint) => {
+let addHelpPoints = (editor, scene, radiusPoint) => {
+  // debugger;
+
   let helpLayer = scene.getObjectByName('HelpLayer');
   let pointGeometry = new THREE.CircleGeometry(radiusPoint, 32, 0, 2 * Math.PI);
   pointGeometry.vertices.shift();
-  let pointMaterial = new THREE.LineBasicMaterial({
-    color: 0xcccccc,
-    opacity: 0.8,
-    transparent: true
-  });
+  helpLayer.children=[];
+  editor.activeEntities.forEach(object => {
+    if (object.children.length===0){
+    object.name = 'ActiveLine';
+    let pointMaterial = new THREE.LineBasicMaterial({
+      color: 0xcccccc,
+      opacity: 0.8,
+      transparent: true
+    });
 
-  if (object.geometry.type === 'Geometry') {
-    let point1 = new THREE.Line(pointGeometry, pointMaterial);
-    point1.position.x = object.geometry.vertices[0].x;
-    point1.position.y = object.geometry.vertices[0].y;
-    point1.name = 'point1';
+    if (object.geometry.type === 'Geometry') {
 
-    let point2 = new THREE.Line(pointGeometry, pointMaterial);
-    point2.position.x = object.geometry.vertices[1].x;
-    point2.position.y = object.geometry.vertices[1].y;
-    point2.name = 'point2';
+      // console.log(object.geometry);
+      // console.log(helpLayer.children.length);
 
-    helpLayer.add(point1, point2);
-  } else if (object.geometry.type === 'CircleGeometry') {
-    let pointCenter = new THREE.Line(pointGeometry, pointMaterial);
-    let pointStart = new THREE.Line(pointGeometry, pointMaterial);
-    let pointEnd = new THREE.Line(pointGeometry, pointMaterial);
-    let pointRadius = new THREE.Line(pointGeometry, pointMaterial);
-    pointCenter.name = 'Center';
-    pointStart.name = 'Start';
-    pointEnd.name = 'End';
-    pointRadius.name = 'Radius';
 
-    pointStart.position.x = object.position.x + object.geometry.vertices[0].x;
-    pointStart.position.y = object.position.y + object.geometry.vertices[0].y;
-    pointEnd.position.x =
-      object.position.x +
-      object.geometry.vertices[object.geometry.vertices.length - 1].x;
-    pointEnd.position.y =
-      object.position.y +
-      object.geometry.vertices[object.geometry.vertices.length - 1].y;
-    pointCenter.position.x = object.position.x;
-    pointCenter.position.y = object.position.y;
-    pointRadius.position.x =
-      object.position.x +
-      object.geometry.vertices[(object.geometry.vertices.length - 1) / 2].x;
-    pointRadius.position.y =
-      object.position.y +
-      object.geometry.vertices[(object.geometry.vertices.length - 1) / 2].y;
+      let point1 = new THREE.Line(pointGeometry, pointMaterial);
+      point1.position.x = object.geometry.vertices[0].x;
+      point1.position.y = object.geometry.vertices[0].y;
+      // point1.name = 'point' + (helpLayer.children.length + 1);
+      point1.name = 'point1';
 
-    helpLayer.add(pointCenter, pointStart, pointEnd, pointRadius);
-  }
+      let point2 = new THREE.Line(pointGeometry, pointMaterial);
+      point2.position.x = object.geometry.vertices[1].x;
+      point2.position.y = object.geometry.vertices[1].y;
+      // point2.name = 'point' + (helpLayer.children.length + 2);
+      point2.name = 'point2';
+
+      let pointCenter = new THREE.Line(pointGeometry, pointMaterial);
+      pointCenter.position.x = (object.geometry.vertices[0].x + object.geometry.vertices[1].x) / 2;
+      pointCenter.position.y = (object.geometry.vertices[0].y + object.geometry.vertices[1].y) / 2;
+      // point_center.name = 'point' + (helpLayer.children.length + 3);
+      pointCenter.name = 'pointCenter';
+
+      // console.log( helpLayer.children.length);
+      // debugger;
+      helpLayer.add(point1, point2, pointCenter);
+      // console.log(helpLayer.children.length);
+      object.userData.helpPoints = {
+        point1,
+        point2,
+        pointCenter
+      };
+
+
+      console.log(object);
+      // console.log(helpLayer);
+
+      console.log('helppoint');
+      // debugger;
+    } else if (object.geometry.type === 'CircleGeometry') {
+      let pointCenter = new THREE.Line(pointGeometry, pointMaterial);
+      let pointStart = new THREE.Line(pointGeometry, pointMaterial);
+      let pointEnd = new THREE.Line(pointGeometry, pointMaterial);
+      let pointRadius = new THREE.Line(pointGeometry, pointMaterial);
+      pointCenter.name = 'Center';
+      pointStart.name = 'Start';
+      pointEnd.name = 'End';
+      pointRadius.name = 'Radius';
+
+      pointStart.position.x = object.position.x + object.geometry.vertices[0].x;
+      pointStart.position.y = object.position.y + object.geometry.vertices[0].y;
+      pointEnd.position.x =
+        object.position.x +
+        object.geometry.vertices[object.geometry.vertices.length - 1].x;
+      pointEnd.position.y =
+        object.position.y +
+        object.geometry.vertices[object.geometry.vertices.length - 1].y;
+      pointCenter.position.x = object.position.x;
+      pointCenter.position.y = object.position.y;
+      pointRadius.position.x =
+        object.position.x +
+        object.geometry.vertices[(object.geometry.vertices.length - 1) / 2].x;
+      pointRadius.position.y =
+        object.position.y +
+        object.geometry.vertices[(object.geometry.vertices.length - 1) / 2].y;
+
+      helpLayer.add(pointCenter, pointStart, pointEnd, pointRadius);
+      console.log(helpLayer);
+      console.log(object)
+      debugger;
+      console.log('helppoint');
+
+    }
+    // debugger;
+  }});
 };
 
 let getScale = camera => {
@@ -138,9 +179,17 @@ let isPoint = (a, r, rCenter) => {
 
 let startPointIndex = (line, mousePoint, scale = 1) => {
   if (line.geometry.type === 'Geometry') {
-    let index = closestPoint(line.geometry.vertices, mousePoint);
+    //todo переробити helpPointsPosition для всих helpPoints в автоматичному режимі
+    let helpPointsPosition=[
+      line.userData.helpPoints.point1.position,
+      line.userData.helpPoints.point2.position,
+      line.userData.helpPoints.pointCenter.position
+    ];
+    let index = closestPoint(helpPointsPosition, mousePoint);
+    console.log(index);
+    debugger;
     const isSelectPoint = isPoint(
-      line.geometry.vertices[index],
+      helpPointsPosition[index],
       scale,
       mousePoint
     );
@@ -193,13 +242,20 @@ let changeGeometry = (line, index, point, scene) => {
     line.geometry.computeBoundingSphere();
 
     // change circle point
-    let point1 = scene.getObjectByName('point1');
-    let point2 = scene.getObjectByName('point2');
+    // let point1 = scene.getObjectByName('point1');
+    // let point2 = scene.getObjectByName('point2');
+    // let point3 = line.children[3];
+    let point1 = line.userData.helpPoints.point1;
+    let point2 = line.userData.helpPoints.point2;
+    let point3 = line.userData.helpPoints.pointCenter;
+    debugger;
     if (point1 && point2) {
       point1.position.x = line.geometry.vertices[0].x;
       point1.position.y = line.geometry.vertices[0].y;
       point2.position.x = line.geometry.vertices[1].x;
       point2.position.y = line.geometry.vertices[1].y;
+      point3.position.x = (line.geometry.vertices[1].x + line.geometry.vertices[0].x)/2;
+      point3.position.y = (line.geometry.vertices[1].y + line.geometry.vertices[0].y)/2;
     }
   } else {
     if (line.geometry.type === 'CircleGeometry') {
@@ -484,6 +540,7 @@ let crossingPoint = (pointMouse, activeEntities, entrainment = 0.05) => {
           entity.name !== 'ActiveLine' &&
           entity.name !== 'point1' &&
           entity.name !== 'point2' &&
+          entity.name !== 'pointCenter' &&
           entity.name !== 'Center' &&
           entity.name !== 'Start' &&
           entity.name !== 'End' &&
