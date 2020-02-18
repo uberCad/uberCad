@@ -186,8 +186,6 @@ let startPointIndex = (line, mousePoint, scale = 1) => {
       line.userData.helpPoints.pointCenter.position
     ];
     let index = closestPoint(helpPointsPosition, mousePoint);
-    console.log(index);
-    debugger;
     const isSelectPoint = isPoint(
       helpPointsPosition[index],
       scale,
@@ -235,27 +233,30 @@ let startPointIndex = (line, mousePoint, scale = 1) => {
 
 let changeGeometry = (line, index, point, scene) => {
   if (line.geometry.type === 'Geometry') {
-    line.geometry.vertices[index].x = point.x;
-    line.geometry.vertices[index].y = point.y;
     line.geometry.verticesNeedUpdate = true;
-    line.computeLineDistances();
-    line.geometry.computeBoundingSphere();
-
-    // change circle point
-    // let point1 = scene.getObjectByName('point1');
-    // let point2 = scene.getObjectByName('point2');
-    // let point3 = line.children[3];
     let point1 = line.userData.helpPoints.point1;
     let point2 = line.userData.helpPoints.point2;
     let point3 = line.userData.helpPoints.pointCenter;
-    debugger;
+    if (index === 2) {
+      let changeX = point.x - point3.position.x;
+      let changeY = point.y - point3.position.y;
+        line.geometry.vertices[0].x += changeX;
+        line.geometry.vertices[0].y += changeY;
+        line.geometry.vertices[1].x += changeX;
+        line.geometry.vertices[1].y += changeY;
+    } else {
+      line.geometry.vertices[index].x = point.x;
+      line.geometry.vertices[index].y = point.y;
+    }
+    line.computeLineDistances();
+    line.geometry.computeBoundingSphere();
     if (point1 && point2) {
       point1.position.x = line.geometry.vertices[0].x;
       point1.position.y = line.geometry.vertices[0].y;
       point2.position.x = line.geometry.vertices[1].x;
       point2.position.y = line.geometry.vertices[1].y;
-      point3.position.x = (line.geometry.vertices[1].x + line.geometry.vertices[0].x)/2;
-      point3.position.y = (line.geometry.vertices[1].y + line.geometry.vertices[0].y)/2;
+      point3.position.x = (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
+      point3.position.y = (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
     }
   } else {
     if (line.geometry.type === 'CircleGeometry') {
