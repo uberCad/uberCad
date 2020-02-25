@@ -49,13 +49,14 @@ let addHelpPoints = (editor, scene, radiusPoint) => {
   pointGeometry.vertices.shift();
   helpLayer.children=[];
   editor.activeEntities.forEach(object => {
-    if (object.children.length===0){
-    object.name = 'ActiveLine';
-    let pointMaterial = new THREE.LineBasicMaterial({
-      color: 0xcccccc,
-      opacity: 0.8,
-      transparent: true
-    });
+    if ( object.name !== 'point1' && object.name !== 'point2' && object.name !== 'pointCenter'){
+      if (object.children.length === 0) {
+        object.name = 'ActiveLine';
+        let pointMaterial = new THREE.LineBasicMaterial({
+          color: 0xcccccc,
+          opacity: 0.8,
+          transparent: true
+        });
 
     if (object.geometry.type === 'Geometry') {
 
@@ -130,9 +131,11 @@ let addHelpPoints = (editor, scene, radiusPoint) => {
       debugger;
       console.log('helppoint');
 
+        }
+        // debugger;
+      }
     }
-    // debugger;
-  }});
+  });
 };
 
 let getScale = camera => {

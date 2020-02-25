@@ -165,14 +165,23 @@ let highlightEntities = (
   entities.forEach(entity => {
     // upd color
     if (restoreColor) {
-      delete entity.userData.showInTop;
+      // delete entity.userData.showInTop;
+      if (entity.userData.lastoriginalColor) {
+        entity.material.color = entity.userData.lastoriginalColor.clone();
+        delete entity.userData.lastoriginalColor;
+        // entity.userData.helpPoints.forEach(helpPoint=>delete helpPoint);
+        // editor.scene.children[1].children=[];
+      }else{
       if (entity.userData.originalColor) {
-        entity.material.color.set(entity.userData.originalColor);
+        // entity.material.color.set(entity.userData.originalColor);
+        entity.material.color = entity.userData.originalColor.clone();
         delete entity.userData.originalColor;
-      }
+      }}
     } else {
       if (!entity.userData.originalColor) {
         entity.userData.originalColor = entity.material.color.clone();
+      } else{
+        entity.userData.lastoriginalColor = entity.material.color.clone();
       }
       entity.material.color.set(new THREE.Color(color));
     }

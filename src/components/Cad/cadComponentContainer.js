@@ -6,7 +6,7 @@ import {
   cadClick,
   cadDoubleClick,
   CAD_DO_SELECTION,
-  toggleChanged
+  toggleChanged, CAD_EDITMODE_SET_ACTIVE_LINE, cadonMouseUp, cadonMouseMove, cadonMouseDown
 } from '../../actions/cad';
 import {
   selectionBegin,
@@ -156,346 +156,371 @@ const mapDispatchToProps = dispatch => {
     },
 
     onMouseDown: (event, editor) => {
+
+      cadonMouseDown(event, editor)(dispatch);
+
       // on left button
-      if (event.button === 0) {
-        if (editor.tool === TOOL_POINT) {
-          if (editor.editMode.isEdit) {
-            // do edit here
-            if (editor.editMode.activeLine.id) {
-              selectPoint(editor.editMode.activeLine, event, editor)(dispatch);
-            }
-          }
-        }
+      // if (event.button === 0) {
+      //
+        // tool_point
+        // if (editor.tool === TOOL_POINT) {
+        //   if (editor.editMode.isEdit) {
+        //     // do edit here
+        //     if (editor.editMode.activeLine.id) {
+        //       selectPoint(editor.editMode.activeLine, event, editor)(dispatch);
+        //     }
+        //   }
+        // }
         //new line
-        if (editor.editMode.isNewLine) {
-          !editor.editMode.newLineFirst
-            ? firstPoint(event, editor)(dispatch)
-            : saveNewLine(editor)(dispatch);
-        }
+        // if (editor.editMode.isNewLine) {
+        //   !editor.editMode.newLineFirst
+        //     ? firstPoint(event, editor)(dispatch)
+        //     : saveNewLine(editor)(dispatch);
+        // }
         //new curve
-        if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
-          if (!editor.editMode.newCurveCenter) {
-            centerPoint(event, editor)(dispatch);
-          } else if (!editor.editMode.thetaStart) {
-            thetaStart(editor)(dispatch);
-          } else if (!editor.editMode.thetaLength) {
-            saveNewCurve(editor)(dispatch);
-          }
-        }
+        // if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
+        //   if (!editor.editMode.newCurveCenter) {
+        //     centerPoint(event, editor)(dispatch);
+        //   } else if (!editor.editMode.thetaStart) {
+        //     thetaStart(editor)(dispatch);
+        //   } else if (!editor.editMode.thetaLength) {
+        //     saveNewCurve(editor)(dispatch);
+        //   }
+        // }
         //clone object
-        if (editor.editMode.clone.active) {
-          if (!editor.editMode.clone.point) {
-            clonePoint(event, editor)(dispatch);
-            cloneObject(editor, editor.editMode.editObject)(dispatch);
-          } else if (editor.editMode.clone.cloneObject) {
-            saveClone(editor.editMode.clone.cloneObject)(dispatch);
-          }
-        }
-
+        // if (editor.editMode.clone.active) {
+        //   if (!editor.editMode.clone.point) {
+        //     clonePoint(event, editor)(dispatch);
+        //     cloneObject(editor, editor.editMode.editObject)(dispatch);
+        //   } else if (editor.editMode.clone.cloneObject) {
+        //     saveClone(editor.editMode.clone.cloneObject)(dispatch);
+        //   }
+        // }
+        //
         //move object
-        if (editor.editMode.move.active && !editor.editMode.move.point) {
-          moveObjectPoint(event, editor)(dispatch);
-        }
-
-        if (editor.tool === TOOL_SELECT) {
-          selectionBegin(event, editor)(dispatch);
-        }
-
+        // if (editor.editMode.move.active && !editor.editMode.move.point) {
+        //   moveObjectPoint(event, editor)(dispatch);
+        // }
+        //
+        // if (editor.tool === TOOL_SELECT) {
+        //   selectionBegin(event, editor)(dispatch);
+        // }
+        //
         //mouse down
-        if (editor.tool === TOOL_MEASUREMENT) {
-          if (editor.options.selectMode === MEASUREMENT_POINT) {
-            pointSelect(event, editor)(dispatch);
-          } else if (editor.options.selectMode === MEASUREMENT_LINE) {
-            if (
-              editor.measurement.line.first &&
-              editor.measurement.line.second
-            ) {
-              eraseLine()(dispatch);
-            } else {
-              !editor.measurement.line.first
-                ? lineFirstPoint(event, editor)(dispatch)
-                : lineSecondPoint(
-                    event,
-                    editor,
-                    editor.measurement.line.first
-                  )(dispatch);
-            }
-          } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
-            radialSelectLine(editor.activeEntities[0])(dispatch);
-          } else if (editor.options.selectMode === MEASUREMENT_ANGLE) {
-            if (
-              editor.measurement.angle.firstLine &&
-              editor.measurement.angle.secondLine
-            ) {
-              eraseAngle()(dispatch);
-            } else {
-              !editor.measurement.angle.firstLine
-                ? angleSelectFirstLine(editor.activeEntities[0])(dispatch)
-                : angleSelectSecondLine(
-                    editor.measurement.angle.firstLine,
-                    editor.activeEntities[0]
-                  )(dispatch);
-            }
-          }
-        }
-
+        // if (editor.tool === TOOL_MEASUREMENT) {
+        //   if (editor.options.selectMode === MEASUREMENT_POINT) {
+        //     pointSelect(event, editor)(dispatch);
+        //   } else if (editor.options.selectMode === MEASUREMENT_LINE) {
+        //     if (
+        //       editor.measurement.line.first &&
+        //       editor.measurement.line.second
+        //     ) {
+        //       eraseLine()(dispatch);
+        //     } else {
+        //       !editor.measurement.line.first
+        //         ? lineFirstPoint(event, editor)(dispatch)
+        //         : lineSecondPoint(
+        //             event,
+        //             editor,
+        //             editor.measurement.line.first
+        //           )(dispatch);
+        //     }
+        //   } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
+        //     radialSelectLine(editor.activeEntities[0])(dispatch);
+        //   } else if (editor.options.selectMode === MEASUREMENT_ANGLE) {
+        //     if (
+        //       editor.measurement.angle.firstLine &&
+        //       editor.measurement.angle.secondLine
+        //     ) {
+        //       eraseAngle()(dispatch);
+        //     } else {
+        //       !editor.measurement.angle.firstLine
+        //         ? angleSelectFirstLine(editor.activeEntities[0])(dispatch)
+        //         : angleSelectSecondLine(
+        //             editor.measurement.angle.firstLine,
+        //             editor.activeEntities[0]
+        //           )(dispatch);
+        //     }
+        //   }
+        // }
         //mouse down
-        if (editor.tool === TOOL_LINE) {
-          if (editor.options.selectMode === LINE_TWO_POINT) {
-            console.log(LINE_TWO_POINT, 'mouse down');
-            !editor.editMode.newLineFirst
-              ? firstPoint(event, editor)(dispatch)
-              : saveNewLine(editor)(dispatch);
-          } else if (editor.options.selectMode === LINE_PARALLEL) {
-            if (!editor.line.parallel.baseLine) {
-              parallelLineSelect(editor.activeEntities[0])(dispatch);
-            } else if (!editor.line.parallel.firstPoint) {
-              parallelLineFirstPointSelect(
-                event,
-                editor,
-                editor.line.parallel.baseLine
-              )(dispatch);
-            } else {
-              parallelLineSecondPointSelect(event, editor)(dispatch);
-            }
-          } else if (editor.options.selectMode === LINE_PERPENDICULAR) {
-            if (!editor.line.perpendicular.baseLine) {
-              perpendicularLineSelect(editor.activeEntities[0])(dispatch);
-            } else if (!editor.line.perpendicular.firstPoint) {
-              perpendicularFirstPointSelect(event, editor)(dispatch);
-            } else {
-              perpendicularSecondPointSelect(event, editor)(dispatch);
-            }
-          } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
-            if (!editor.line.tangent.baseArc) {
-              tangentBaseArcSelect(editor.activeEntities[0])(dispatch);
-            } else {
-              tangentLineEnd(event, editor)(dispatch);
-            }
-          }
-        }
-      }
+        // if (editor.tool === TOOL_LINE) {
+        //   if (editor.options.selectMode === LINE_TWO_POINT) {
+        //     console.log(LINE_TWO_POINT, 'mouse down');
+        //     !editor.editMode.newLineFirst
+        //       ? firstPoint(event, editor)(dispatch)
+        //       : saveNewLine(editor)(dispatch);
+        //   } else if (editor.options.selectMode === LINE_PARALLEL) {
+        //     if (!editor.line.parallel.baseLine) {
+        //       parallelLineSelect(editor.activeEntities[0])(dispatch);
+        //     } else if (!editor.line.parallel.firstPoint) {
+        //       parallelLineFirstPointSelect(
+        //         event,
+        //         editor,
+        //         editor.line.parallel.baseLine
+        //       )(dispatch);
+        //     } else {
+        //       parallelLineSecondPointSelect(event, editor)(dispatch);
+        //     }
+        //   } else if (editor.options.selectMode === LINE_PERPENDICULAR) {
+        //     if (!editor.line.perpendicular.baseLine) {
+        //       perpendicularLineSelect(editor.activeEntities[0])(dispatch);
+        //     } else if (!editor.line.perpendicular.firstPoint) {
+        //       perpendicularFirstPointSelect(event, editor)(dispatch);
+        //     } else {
+        //       perpendicularSecondPointSelect(event, editor)(dispatch);
+        //     }
+        //   } else if (editor.options.selectMode === LINE_TANGENT_TO_ARC) {
+        //     if (!editor.line.tangent.baseArc) {
+        //       tangentBaseArcSelect(editor.activeEntities[0])(dispatch);
+        //     } else {
+        //       tangentLineEnd(event, editor)(dispatch);
+        //     }
+        //   }
+        // }
+      // }
     },
 
     onMouseMove: (event, editor) => {
       // console.log('onMouseMove', event, editor)
 
-      if (editor.tool === TOOL_SELECT) {
-        if (editor.selection.active) {
-          selectionUpdate(event, editor)(dispatch);
-        }
-      }
+      cadonMouseMove(event, editor)(dispatch);
 
-      if (
-        event.button === 0 &&
-        editor.tool === TOOL_POINT &&
-        editor.editMode.isEdit &&
-        editor.editMode.activeLine.id &&
-        (editor.editMode.selectPointIndex ||
-          editor.editMode.selectPointIndex === 0)
-      ) {
-        // do edit here
-        movePoint(
-          editor.editMode.activeLine,
-          editor.editMode.selectPointIndex,
-          event,
-          editor
-        )(dispatch);
-      }
-
-      //new Line
-      if (editor.editMode.isNewLine) {
-        let parent = editor.editMode.editObject;
-        if (!parent || parent.metadata) {
-          parent = editor.scene.getObjectByName('Layers').children[0];
-          dispatch({
-            type: PANEL_LAYERS_TOGGLE,
-            payload: {
-              activeLayer: parent
-            }
-          });
-        }
-        !editor.editMode.newLineFirst
-          ? startNewLine(event, editor)(dispatch)
-          : drawLine(event, editor, parent)(dispatch);
-      }
-
-      //new Curve
-      if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
-        let parent =
-          editor.tool === TOOL_NEW_CURVE
-            ? editor.activeLayer
-            : editor.editMode.editObject;
-        if (!parent || parent.metadata) {
-          parent = editor.scene.getObjectByName('Layers').children[0];
-          dispatch({
-            type: PANEL_LAYERS_TOGGLE,
-            payload: {
-              activeLayer: parent
-            }
-          });
-        }
-
-        if (!editor.editMode.newCurveCenter) {
-          centerCurve(event, editor)(dispatch);
-        } else if (!editor.editMode.thetaStart) {
-          radius(event, editor)(dispatch);
-        } else if (!editor.editMode.thetaLength) {
-          thetaLength(event, editor, parent)(dispatch);
-        }
-      }
-      //clone object
-      if (editor.editMode.clone.active) {
-        selectClonePoint(event, editor)(dispatch);
-        if (editor.editMode.clone.point && editor.editMode.clone.cloneObject) {
-          setClone(event, editor)(dispatch);
-        }
-      }
-      //move object
-      if (editor.editMode.move.active) {
-        selectMovePoint(event, editor)(dispatch);
-        if (editor.editMode.move.point && editor.editMode.move.moveObject) {
-          moveObject(event, editor)(dispatch);
-        }
-      }
-
+      // if (editor.tool === TOOL_SELECT) {
+      //   // debugger;
+      //   if (editor.selection.active) {
+      //     selectionUpdate(event, editor)(dispatch);
+      //   }
+      // }
+      //
+      // if (
+      //   event.button === 0 &&
+      //   editor.tool === TOOL_POINT &&
+      //   editor.editMode.isEdit &&
+      //   editor.editMode.activeLine.id &&
+      //   (editor.editMode.selectPointIndex ||
+      //     editor.editMode.selectPointIndex === 0)
+      // ) {
+      //   // do edit here
+      //   console.log(editor.editMode);
+      //   console.log(event.button);
+      //   console.log(editor.editMode.selectPointIndex);
+      //
+      //   // debugger;
+      //   movePoint(
+      //     editor.editMode.activeLine,
+      //     editor.editMode.selectPointIndex,
+      //     event,
+      //     editor
+      //   )(dispatch);
+      // }
+      //
+      // //new Line
+      // if (editor.editMode.isNewLine) {
+      //   let parent = editor.editMode.editObject;
+      //   if (!parent || parent.metadata) {
+      //     parent = editor.scene.getObjectByName('Layers').children[0];
+      //     dispatch({
+      //       type: PANEL_LAYERS_TOGGLE,
+      //       payload: {
+      //         activeLayer: parent
+      //       }
+      //     });
+      //   }
+      //   !editor.editMode.newLineFirst
+      //     ? startNewLine(event, editor)(dispatch)
+      //     : drawLine(event, editor, parent)(dispatch);
+      // }
+      // //new Curve
+      // if (editor.tool === TOOL_NEW_CURVE || editor.editMode.isNewCurve) {
+      //   let parent =
+      //     editor.tool === TOOL_NEW_CURVE
+      //       ? editor.activeLayer
+      //       : editor.editMode.editObject;
+      //   if (!parent || parent.metadata) {
+      //     parent = editor.scene.getObjectByName('Layers').children[0];
+      //     dispatch({
+      //       type: PANEL_LAYERS_TOGGLE,
+      //       payload: {
+      //         activeLayer: parent
+      //       }
+      //     });
+      //   }
+      //
+      //   if (!editor.editMode.newCurveCenter) {
+      //     centerCurve(event, editor)(dispatch);
+      //   } else if (!editor.editMode.thetaStart) {
+      //     radius(event, editor)(dispatch);
+      //   } else if (!editor.editMode.thetaLength) {
+      //     thetaLength(event, editor, parent)(dispatch);
+      //   }
+      // }
+      // //clone object
+      // if (editor.editMode.clone.active) {
+      //   selectClonePoint(event, editor)(dispatch);
+      //   if (editor.editMode.clone.point && editor.editMode.clone.cloneObject) {
+      //     setClone(event, editor)(dispatch);
+      //   }
+      // }
+      // //move object
+      // if (editor.editMode.move.active) {
+      //   selectMovePoint(event, editor)(dispatch);
+      //   if (editor.editMode.move.point && editor.editMode.move.moveObject) {
+      //     moveObject(event, editor)(dispatch);
+      //   }
+      // }
+      //
       //mouse move event
-      if (editor.tool === TOOL_MEASUREMENT) {
-        if (editor.options.selectMode === MEASUREMENT_POINT) {
-          pointInfo(event, editor)(dispatch);
-        } else if (editor.options.selectMode === MEASUREMENT_LINE) {
-          if (!editor.measurement.line.first) {
-            lineFirstInfo(event, editor)(dispatch);
-          } else if (!editor.measurement.line.second) {
-            lineSecondInfo(event, editor)(dispatch);
-          }
-        } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
-          radialInfo(event, editor)(dispatch);
-        } else if (editor.options.selectMode === MEASUREMENT_ANGLE) {
-          if (!editor.measurement.angle.firstLine) {
-            angleFirstInfo(event, editor)(dispatch);
-          } else if (!editor.measurement.angle.secondLine) {
-            angleSecondInfo(
-              event,
-              editor,
-              editor.measurement.angle.firstLine
-            )(dispatch);
-          }
-        }
-      }
-
+      // if (editor.tool === TOOL_MEASUREMENT) {
+      //   if (editor.options.selectMode === MEASUREMENT_POINT) {
+      //     pointInfo(event, editor)(dispatch);
+      //   } else if (editor.options.selectMode === MEASUREMENT_LINE) {
+      //     if (!editor.measurement.line.first) {
+      //       lineFirstInfo(event, editor)(dispatch);
+      //     } else if (!editor.measurement.line.second) {
+      //       lineSecondInfo(event, editor)(dispatch);
+      //     }
+      //   } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
+      //     radialInfo(event, editor)(dispatch);
+      //   } else if (editor.options.selectMode === MEASUREMENT_ANGLE) {
+      //     if (!editor.measurement.angle.firstLine) {
+      //       angleFirstInfo(event, editor)(dispatch);
+      //     } else if (!editor.measurement.angle.secondLine) {
+      //       angleSecondInfo(
+      //         event,
+      //         editor,
+      //         editor.measurement.angle.firstLine
+      //       )(dispatch);
+      //     }
+      //   }
+      // }
+      //
       //mouse move event
-      if (editor.tool === TOOL_LINE) {
-        switch (editor.options.selectMode) {
-          case LINE_TWO_POINT:
-            {
-              let parent =
-                editor.tool === TOOL_LINE
-                  ? editor.activeLayer
-                  : editor.editMode.editObject;
-              if (!parent || parent.metadata) {
-                parent = editor.scene.getObjectByName('Layers').children[0];
-                dispatch({
-                  type: PANEL_LAYERS_TOGGLE,
-                  payload: {
-                    activeLayer: parent
-                  }
-                });
-              }
-              !editor.editMode.newLineFirst
-                ? startNewLine(event, editor)(dispatch)
-                : drawLine(event, editor, parent)(dispatch);
-            }
-            break;
-          case LINE_PARALLEL:
-            if (!editor.line.parallel.baseLine) {
-              parallelLine(event, editor)(dispatch);
-            } else if (!editor.line.parallel.firstPoint) {
-              parallelLineFirstPoint(event, editor)(dispatch);
-            } else {
-              parallelLineSecondPoint(
-                event,
-                editor,
-                editor.line.parallel.baseLine,
-                editor.line.parallel.firstPoint,
-                editor.line.parallel.distance
-              )(dispatch);
-            }
-
-            break;
-          case LINE_PERPENDICULAR:
-            if (!editor.line.perpendicular.baseLine) {
-              perpendicularBaseLine(event, editor)(dispatch);
-            } else if (!editor.line.perpendicular.firstPoint) {
-              perpendicularFirstPoint(event, editor)(dispatch);
-            } else {
-              perpendicularDraw(
-                event,
-                editor,
-                editor.line.perpendicular.baseLine,
-                editor.line.perpendicular.firstPoint
-              )(dispatch);
-            }
-
-            break;
-          case LINE_TANGENT_TO_ARC:
-            if (!editor.line.tangent.baseArc) {
-              tangentBaseArc(event, editor)(dispatch);
-            } else {
-              tangentLineDraw(
-                event,
-                editor,
-                editor.line.tangent.baseArc
-              )(dispatch);
-            }
-
-            break;
-          default: {
-            console.error(
-              `Unknown editor.options.selectMode = ${editor.options.selectMode}`
-            );
-          }
-        }
-      }
+      // if (editor.tool === TOOL_LINE) {
+      //   switch (editor.options.selectMode) {
+      //     case LINE_TWO_POINT:
+      //       {
+      //         let parent =
+      //           editor.tool === TOOL_LINE
+      //             ? editor.activeLayer
+      //             : editor.editMode.editObject;
+      //         if (!parent || parent.metadata) {
+      //           parent = editor.scene.getObjectByName('Layers').children[0];
+      //           dispatch({
+      //             type: PANEL_LAYERS_TOGGLE,
+      //             payload: {
+      //               activeLayer: parent
+      //             }
+      //           });
+      //         }
+      //         !editor.editMode.newLineFirst
+      //           ? startNewLine(event, editor)(dispatch)
+      //           : drawLine(event, editor, parent)(dispatch);
+      //       }
+      //       break;
+      //     case LINE_PARALLEL:
+      //       if (!editor.line.parallel.baseLine) {
+      //         parallelLine(event, editor)(dispatch);
+      //       } else if (!editor.line.parallel.firstPoint) {
+      //         parallelLineFirstPoint(event, editor)(dispatch);
+      //       } else {
+      //         parallelLineSecondPoint(
+      //           event,
+      //           editor,
+      //           editor.line.parallel.baseLine,
+      //           editor.line.parallel.firstPoint,
+      //           editor.line.parallel.distance
+      //         )(dispatch);
+      //       }
+      //
+      //       break;
+      //     case LINE_PERPENDICULAR:
+      //       if (!editor.line.perpendicular.baseLine) {
+      //         perpendicularBaseLine(event, editor)(dispatch);
+      //       } else if (!editor.line.perpendicular.firstPoint) {
+      //         perpendicularFirstPoint(event, editor)(dispatch);
+      //       } else {
+      //         perpendicularDraw(
+      //           event,
+      //           editor,
+      //           editor.line.perpendicular.baseLine,
+      //           editor.line.perpendicular.firstPoint
+      //         )(dispatch);
+      //       }
+      //
+      //       break;
+      //     case LINE_TANGENT_TO_ARC:
+      //       if (!editor.line.tangent.baseArc) {
+      //         tangentBaseArc(event, editor)(dispatch);
+      //       } else {
+      //         tangentLineDraw(
+      //           event,
+      //           editor,
+      //           editor.line.tangent.baseArc
+      //         )(dispatch);
+      //       }
+      //
+      //       break;
+      //     default: {
+      //       console.error(
+      //         `Unknown editor.options.selectMode = ${editor.options.selectMode}`
+      //       );
+      //     }
+      //   }
+      // }
     },
 
     onMouseUp: (event, editor) => {
       // console.log('onMouseUp', event, editor)
 
-      if (editor.tool === TOOL_SELECT) {
-        // end select
-        if (editor.selection.active) {
-          let drawRectangle = selectionEnd(event, editor)(dispatch);
-          let selectResult = sceneService.selectInFrustum(
-            drawRectangle,
-            editor.scene
-          );
-          let activeEntities = sceneService.doSelection(selectResult, editor);
-          dispatch({
-            type: CAD_DO_SELECTION,
-            payload: {
-              activeEntities
-            }
-          });
-        }
-        // console.warn('selectResult', selectResult)
-      }
-
+      cadonMouseUp(event, editor)(dispatch)
+      // if (editor.tool === TOOL_SELECT) {
+        // // end select
+        // if (editor.selection.active) {
+        //   let drawRectangle = selectionEnd(event, editor)(dispatch);
+        //   let selectResult = sceneService.selectInFrustum(
+        //     drawRectangle,
+        //     editor.scene
+        //   );
+        // //   // debugger;
+        //   let activeEntities = sceneService.doSelection(selectResult, editor);
+        //   dispatch({
+        //     type: CAD_DO_SELECTION,
+        //     payload: {
+        //       activeEntities
+        //     }
+        //   });
+        // //
+        // //   let { scene, camera, renderer } = editor;
+        // //
+        // //   const rPoint = getScale(camera);
+        // //   addHelpPoints(editor, scene, rPoint);
+        // //   dispatch({
+        // //     type: CAD_EDITMODE_SET_ACTIVE_LINE,
+        // //     payload: {
+        // //       activeLine: editor.activeEntities[0]
+        // //     }
+        // //   });
+        // //   renderer.render(scene, camera);
+        // }
+        // // console.warn('selectResult', selectResult)
+      // }
+      //
       // do edit here
-      if (
-        event.button === 0 &&
-        editor.tool === TOOL_POINT &&
-        editor.editMode.isEdit &&
-        editor.editMode.activeLine.id
-      ) {
-        // do edit here
-        savePoint(editor.editMode.selectPointIndex)(dispatch);
-      }
-
-      //move object
-      if (editor.editMode.move.active && editor.editMode.move.point) {
-        disableMovePoint(editor.editMode.move.moveObject)(dispatch);
-      }
+      // if (
+      //   event.button === 0 &&
+      //   editor.tool === TOOL_POINT &&
+      //   editor.editMode.isEdit &&
+      //   editor.editMode.activeLine.id
+      // ) {
+      //   // do edit here
+      //   savePoint(editor.editMode.selectPointIndex)(dispatch);
+      // }
+      //
+      // //move object
+      // if (editor.editMode.move.active && editor.editMode.move.point) {
+      //   disableMovePoint(editor.editMode.move.moveObject)(dispatch);
+      // }
     },
 
     toggleChanged: isChanged => {
