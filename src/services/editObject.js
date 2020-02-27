@@ -58,29 +58,29 @@ let addHelpPoints = (editor, scene, radiusPoint) => {
           transparent: true
         });
 
-    if (object.geometry.type === 'Geometry') {
+        if (object.geometry.type === 'Geometry') {
 
-      // console.log(object.geometry);
-      // console.log(helpLayer.children.length);
+          // console.log(object.geometry);
+          // console.log(helpLayer.children.length);
 
 
-      let point1 = new THREE.Line(pointGeometry, pointMaterial);
-      point1.position.x = object.geometry.vertices[0].x;
-      point1.position.y = object.geometry.vertices[0].y;
-      // point1.name = 'point' + (helpLayer.children.length + 1);
-      point1.name = 'point1';
+          let point1 = new THREE.Line(pointGeometry, pointMaterial);
+          point1.position.x = object.geometry.vertices[0].x;
+          point1.position.y = object.geometry.vertices[0].y;
+          // point1.name = 'point' + (helpLayer.children.length + 1);
+          point1.name = 'point1';
 
-      let point2 = new THREE.Line(pointGeometry, pointMaterial);
-      point2.position.x = object.geometry.vertices[1].x;
-      point2.position.y = object.geometry.vertices[1].y;
-      // point2.name = 'point' + (helpLayer.children.length + 2);
-      point2.name = 'point2';
+          let point2 = new THREE.Line(pointGeometry, pointMaterial);
+          point2.position.x = object.geometry.vertices[1].x;
+          point2.position.y = object.geometry.vertices[1].y;
+          // point2.name = 'point' + (helpLayer.children.length + 2);
+          point2.name = 'point2';
 
-      let pointCenter = new THREE.Line(pointGeometry, pointMaterial);
-      pointCenter.position.x = (object.geometry.vertices[0].x + object.geometry.vertices[1].x) / 2;
-      pointCenter.position.y = (object.geometry.vertices[0].y + object.geometry.vertices[1].y) / 2;
-      // point_center.name = 'point' + (helpLayer.children.length + 3);
-      pointCenter.name = 'pointCenter';
+          let pointCenter = new THREE.Line(pointGeometry, pointMaterial);
+          pointCenter.position.x = (object.geometry.vertices[0].x + object.geometry.vertices[1].x) / 2;
+          pointCenter.position.y = (object.geometry.vertices[0].y + object.geometry.vertices[1].y) / 2;
+          // point_center.name = 'point' + (helpLayer.children.length + 3);
+          pointCenter.name = 'pointCenter';
 
       // console.log( helpLayer.children.length);
       // debugger;
@@ -108,28 +108,28 @@ let addHelpPoints = (editor, scene, radiusPoint) => {
       pointEnd.name = 'End';
       pointRadius.name = 'Radius';
 
-      pointStart.position.x = object.position.x + object.geometry.vertices[0].x;
-      pointStart.position.y = object.position.y + object.geometry.vertices[0].y;
-      pointEnd.position.x =
-        object.position.x +
-        object.geometry.vertices[object.geometry.vertices.length - 1].x;
-      pointEnd.position.y =
-        object.position.y +
-        object.geometry.vertices[object.geometry.vertices.length - 1].y;
-      pointCenter.position.x = object.position.x;
-      pointCenter.position.y = object.position.y;
-      pointRadius.position.x =
-        object.position.x +
-        object.geometry.vertices[(object.geometry.vertices.length - 1) / 2].x;
-      pointRadius.position.y =
-        object.position.y +
-        object.geometry.vertices[(object.geometry.vertices.length - 1) / 2].y;
+          pointStart.position.x = object.position.x + object.geometry.vertices[0].x;
+          pointStart.position.y = object.position.y + object.geometry.vertices[0].y;
+          pointEnd.position.x =
+            object.position.x +
+            object.geometry.vertices[object.geometry.vertices.length - 1].x;
+          pointEnd.position.y =
+            object.position.y +
+            object.geometry.vertices[object.geometry.vertices.length - 1].y;
+          pointCenter.position.x = object.position.x;
+          pointCenter.position.y = object.position.y;
+          pointRadius.position.x =
+            object.position.x +
+            object.geometry.vertices[(object.geometry.vertices.length - 1) / 2].x;
+          pointRadius.position.y =
+            object.position.y +
+            object.geometry.vertices[(object.geometry.vertices.length - 1) / 2].y;
 
-      helpLayer.add(pointCenter, pointStart, pointEnd, pointRadius);
-      console.log(helpLayer);
-      console.log(object)
-      debugger;
-      console.log('helppoint');
+          helpLayer.add(pointCenter, pointStart, pointEnd, pointRadius);
+          console.log(helpLayer);
+          console.log(object);
+          debugger;
+          console.log('helppoint');
 
         }
         // debugger;
@@ -180,20 +180,47 @@ let isPoint = (a, r, rCenter) => {
   return rXy <= r;
 };
 
-let startPointIndex = (line, mousePoint, scale = 1) => {
+let startPointIndex = (line, mousePoint, editor, scale = 1) => {
+  // todo я зупинився тут 25.02.20
+  // todo тут буде кусок функції яка шукає найближчу точку і пряму
+
+// todo тимчасовий КОСТИЛЬ поки не буде реалізована спільна частина коду з рядків 199
+  if (!line.geometry){
+    // debugger;
+    editor.editMode.activeLine = editor.activeEntities[0];
+    line = editor.editMode.activeLine;
+  }
+// debugger;
   if (line.geometry.type === 'Geometry') {
     //todo переробити helpPointsPosition для всих helpPoints в автоматичному режимі
-    let helpPointsPosition=[
-      line.userData.helpPoints.point1.position,
-      line.userData.helpPoints.point2.position,
-      line.userData.helpPoints.pointCenter.position
-    ];
-    let index = closestPoint(helpPointsPosition, mousePoint);
-    const isSelectPoint = isPoint(
-      helpPointsPosition[index],
-      scale,
-      mousePoint
-    );
+
+// todo скоріше за все буде спільним куском і для кругів
+    let activeEntities = editor.activeEntities;
+    let helpPointsPosition=[ ];
+
+    let isSelectPoint = false;
+    let index;
+    activeEntities.forEach(line =>{
+      if(isSelectPoint == false){
+        console.log(line);
+        helpPointsPosition = [
+          line.userData.helpPoints.point1.position,
+          line.userData.helpPoints.point2.position,
+          line.userData.helpPoints.pointCenter.position
+        ];
+        index = closestPoint(helpPointsPosition, mousePoint);
+        isSelectPoint = isPoint(
+          helpPointsPosition[index],
+          scale,
+          mousePoint
+        );
+        if(isSelectPoint == true) {
+          editor.editMode.activeLine = line;
+          // debugger;
+        }
+      }
+    });
+    // todo я про цей кусок
     return isSelectPoint ? index : null;
   } else {
     if (line.geometry.type === 'CircleGeometry') {

@@ -97,7 +97,18 @@ let onClick = (event, scene, camera, renderer) => {
   return result;
 };
 
-let doSelection = (selectResult, editor) => {
+let doSelection = (selectResultAll, editor) => {
+  let selectResult = [];
+  if (editor.editMode.isEdit) {
+  selectResultAll.forEach(element => {
+    if (element.parent.name === editor.editMode.editObject.name) {
+      // debugger;
+      selectResult.push(element);
+    }
+  });
+  } else{
+    selectResult = selectResultAll;
+  }
   highlightEntities(editor, editor.activeEntities, true, undefined, false);
   switch (editor.options.selectMode) {
     case LINE_TANGENT_TO_ARC:

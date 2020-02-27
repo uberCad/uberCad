@@ -654,20 +654,20 @@ export const cadonMouseUp = (event, editor) => {
             editor.scene
           );
 
-          let selectResultInEditObject = [];
+          // let selectResultInEditObject = [];
 
-          if (!editor.editMode.isEdit) {
-            selectResultInEditObject = selectResult;
-          } else {
-            // todo елементи які відносоться тільки до редагуємого обєкту
-            selectResult.forEach( element => {
-              if (element.parent.name === editor.editMode.editObject.name) {
-                // debugger;
-                selectResultInEditObject.push(element);
-              }
-            });
+          // if (!editor.editMode.isEdit) {
+          //
+          // } else {
+          //   // todo елементи які відносоться тільки до редагуємого обєкту
+          //   // selectResult.forEach( element => {
+          //   //   if (element.parent.name === editor.editMode.editObject.name) {
+          //   //     // debugger;
+          //   //     selectResultInEditObject.push(element);
+          //   //   }
+          //   // });
 
-            let activeEntities = sceneService.doSelection(selectResultInEditObject, editor);
+            let activeEntities = sceneService.doSelection(selectResult, editor);
             dispatch({
               type: CAD_DO_SELECTION,
               payload: {
@@ -726,7 +726,7 @@ export const cadonMouseUp = (event, editor) => {
               }
             }
           }
-        }
+        // }
         // todo ТУТ ТВОРИТЬСЯ ЯКАСЬ МАГІЯ.... Не питай я сам в шоці. а якщо серйозно дублірується код з кейса TOOL_POINT тому можна подумати над виведенням свпільної функції даби не дублювати код
         // if (editor.editMode.isEdit) {
         //   if (
@@ -825,8 +825,6 @@ export const cadonMouseUp = (event, editor) => {
         //   // // }
         //
         // }
-
-
       }
         break;
       case TOOL_POINT: {
@@ -925,9 +923,8 @@ export const cadonMouseMove = (event, editor) => {
             editor.editMode.selectPointIndex === 0)
         ) {
           // do edit here
-          console.log(editor.editMode);
-          console.log(event.button);
-          console.log(editor.editMode.selectPointIndex);
+          console.log(editor);
+          console.log(editor.activeEntities);
           // debugger;
           movePoint(
             editor.editMode.activeLine,
