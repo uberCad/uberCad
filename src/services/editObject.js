@@ -222,6 +222,8 @@ let startPointIndex = (line, mousePoint, editor, scale = 1) => {
     activeEntities.forEach(line =>{
       // if(isSelectPoint == false){
       // console.log(line);
+      if (line.geometry.type === 'Geometry')
+      {
         helpPointsPosition = [
           line.userData.helpPoints.point1.position,
           line.userData.helpPoints.point2.position,
@@ -247,6 +249,7 @@ let startPointIndex = (line, mousePoint, editor, scale = 1) => {
           // debugger;
         }
       // }
+    }
     });
     // todo я про цей кусок
     return index.length ? index : null;
