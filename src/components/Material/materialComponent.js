@@ -45,7 +45,11 @@ export default class MaterialComponent extends Component {
       }
     } = event;
     const material = this.props.materials.find(item => item._key === dbKey);
-    this.props.setMaterial(material, this.props.activeObject, this.props.editor);
+    this.props.setMaterial(
+      material,
+      this.props.activeObject,
+      this.props.editor
+    );
     this.handleClose();
   };
 
@@ -156,6 +160,7 @@ export default class MaterialComponent extends Component {
   static propTypes = {
     lang: PropTypes.string.isRequired,
     scene: PropTypes.object,
+    editor: PropTypes.object,
     materials: PropTypes.array,
     activeObject: PropTypes.object,
     loadMaterials: PropTypes.func,

@@ -16,6 +16,7 @@ import {
   LINE_PERPENDICULAR,
   LINE_TANGENT_TO_ARC
 } from '../actions/line';
+import { unselectLine } from './editObject';
 
 let canvasClick = (event, camera) => {
   let canvas = event.target.tagName === 'CANVAS' && event.target;
@@ -97,7 +98,18 @@ let onClick = (event, scene, camera, renderer) => {
   return result;
 };
 
-let doSelection = (selectResult, editor) => {
+let doSelection = (selectResultAll, editor) => {
+  let selectResult = [];
+  if (editor.editMode.isEdit) {
+    selectResultAll.forEach(element => {
+      if (element.parent.name === editor.editMode.editObject.name) {
+        // debugger;
+        selectResult.push(element);
+      }
+    });
+  } else {
+    selectResult = selectResultAll;
+  }
   highlightEntities(editor, editor.activeEntities, true, undefined, false);
   switch (editor.options.selectMode) {
     case LINE_TANGENT_TO_ARC:
@@ -165,14 +177,26 @@ let highlightEntities = (
   entities.forEach(entity => {
     // upd color
     if (restoreColor) {
-      delete entity.userData.showInTop;
-      if (entity.userData.originalColor) {
-        entity.material.color.set(entity.userData.originalColor);
-        delete entity.userData.originalColor;
-      }
+      // todo частково повторюэ роботу функцыъ unselect
+      let { scene } = editor;
+      unselectLine([entity], scene);
+
+      // delete entity.userData.showInTop;
+      // if (entity.userData.lastoriginalColor) {
+      //   entity.material.color = entity.userData.lastoriginalColor.clone();
+      //   delete entity.userData.lastoriginalColor;
+      //   // entity.userData.helpPoints.forEach(helpPoint=>delete helpPoint);
+      //   // editor.scene.children[1].children=[];
+      // }else if (entity.userData.originalColor) {
+      //   // entity.material.color.set(entity.userData.originalColor);
+      //   entity.material.color = entity.userData.originalColor.clone();
+      //   delete entity.userData.originalColor;
+      // }
     } else {
       if (!entity.userData.originalColor) {
         entity.userData.originalColor = entity.material.color.clone();
+      } else {
+        entity.userData.lastoriginalColor = entity.material.color.clone();
       }
       entity.material.color.set(new THREE.Color(color));
     }
