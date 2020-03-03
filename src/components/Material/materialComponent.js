@@ -161,6 +161,7 @@ export default class MaterialComponent extends Component {
     lang: PropTypes.string.isRequired,
     editor: PropTypes.object,
     scene: PropTypes.object,
+    editor: PropTypes.object,
     materials: PropTypes.array,
     activeObject: PropTypes.object,
     loadMaterials: PropTypes.func,

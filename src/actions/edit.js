@@ -199,9 +199,12 @@ export const selectPoint = (line, event, editor) => {
     x: clickResult.point.x,
     y: clickResult.point.y
   };
-  const selectPointIndex = startPointIndex(line, mousePoint);
-  if (line.geometry.type === 'CircleGeometry') {
-    if (!line.userData.helpGeometry) {
+  const selectPointIndex = startPointIndex(line, mousePoint, editor);
+
+  // todo це тимчаасове рішення з змінною ліній в editor.editMode.activeLine
+  // debugger;
+  if (line[0].geometry.type === 'CircleGeometry') {
+    if (!line[0].userData.helpGeometry) {
       line.userData.helpGeometry = {};
     }
     line.userData.helpGeometry.helpLength =
