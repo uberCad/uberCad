@@ -78,6 +78,8 @@ import {
   tangentLineEnd
 } from './line';
 import { PANEL_LAYERS_TOGGLE } from './panelLayers';
+import { load, save } from "../services/loader";
+
 
 export const CAD_PARSE_DXF = 'CAD_PARSE_DXF';
 export const CAD_DRAW_DXF = 'CAD_DRAW_DXF';
