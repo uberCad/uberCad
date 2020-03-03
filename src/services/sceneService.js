@@ -101,13 +101,13 @@ let onClick = (event, scene, camera, renderer) => {
 let doSelection = (selectResultAll, editor) => {
   let selectResult = [];
   if (editor.editMode.isEdit) {
-  selectResultAll.forEach(element => {
-    if (element.parent.name === editor.editMode.editObject.name) {
-      // debugger;
-      selectResult.push(element);
-    }
-  });
-  } else{
+    selectResultAll.forEach(element => {
+      if (element.parent.name === editor.editMode.editObject.name) {
+        // debugger;
+        selectResult.push(element);
+      }
+    });
+  } else {
     selectResult = selectResultAll;
   }
   highlightEntities(editor, editor.activeEntities, true, undefined, false);
@@ -177,11 +177,9 @@ let highlightEntities = (
   entities.forEach(entity => {
     // upd color
     if (restoreColor) {
-
       // todo частково повторюэ роботу функцыъ unselect
-      let {scene} = editor;
-      unselectLine([entity],scene);
-
+      let { scene } = editor;
+      unselectLine([entity], scene);
 
       // delete entity.userData.showInTop;
       // if (entity.userData.lastoriginalColor) {
@@ -197,7 +195,7 @@ let highlightEntities = (
     } else {
       if (!entity.userData.originalColor) {
         entity.userData.originalColor = entity.material.color.clone();
-      } else{
+      } else {
         entity.userData.lastoriginalColor = entity.material.color.clone();
       }
       entity.material.color.set(new THREE.Color(color));

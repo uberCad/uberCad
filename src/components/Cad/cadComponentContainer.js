@@ -5,7 +5,10 @@ import {
   drawDxf,
   cadClick,
   onDoubleClick,
-  toggleChanged, onMouseUp, onMouseMove, onMouseDown
+  toggleChanged,
+  onMouseUp,
+  onMouseMove,
+  onMouseDown
 } from '../../actions/cad';
 import { spinnerShow, spinnerHide } from '../../actions/spinner';
 
@@ -75,8 +78,7 @@ const mapDispatchToProps = dispatch => {
     },
 
     onMouseUp: (event, editor) => {
-      onMouseUp(event, editor)(dispatch)
-
+      onMouseUp(event, editor)(dispatch);
     },
 
     toggleChanged: isChanged => {
