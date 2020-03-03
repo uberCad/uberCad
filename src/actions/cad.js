@@ -56,8 +56,7 @@ export const CAD_SHOW_ALL = 'CAD_SHOW_ALL';
 export const CAD_GROUP_ENTITIES = 'CAD_GROUP_ENTITIES';
 export const CAD_COMBINE_EDGE_MODELS = 'CAD_COMBINE_EDGE_MODELS';
 export const CAD_EDITMODE_SET_ACTIVE_LINE = 'CAD_EDITMODE_SET_ACTIVE_LINE';
-export const CAD_EDITMODE_UNSELECT_ACTIVE_LINE =
-  'CAD_EDITMODE_UNSELECT_ACTIVE_LINE';
+export const CAD_EDITMODE_UNSELECT_ACTIVE_LINE = 'CAD_EDITMODE_UNSELECT_ACTIVE_LINE';
 export const CAD_IS_CHANGED = 'CAD_IS_CHANGED';
 
 export const drawDxf = (data = null, container, snapshot = null) => {
@@ -191,8 +190,8 @@ export const cadClick = (event, editor) => {
   return dispatch => {
     let { scene, camera, tool, renderer } = editor;
   // todo в HelpLayerService
-    let ChangeZoom = editor.cadCanvas.getControls();
-    ChangeZoom.addEventListener("change", () => {
+    let controls = editor.cadCanvas.getControls();
+    controls.addEventListener("change", () => {
       let helpLayer = scene.getObjectByName('HelpLayer');
       if (helpLayer.children.length) {
         addHelpPoints(editor, scene, camera.top / 50);
@@ -219,116 +218,87 @@ export const cadClick = (event, editor) => {
           let selectResult = clickResult.activeEntities;
           // $scope.editor.lastClickResult.activeEntities = ArrayUtils.clone(clickResult.activeEntities);
 
-        if (selectResult.length) {
-          // check if entity belongs to object
-          if (selectResult[0].userData.belongsToObject) {
-            payload.object = selectResult[0].parent;
-          }
-        }
-        console.log(" tested in editor.editMode");
-        console.log(editor.editMode);
-        console.log(selectResult);
-        if (!editor.editMode.isEdit) {
-          let activeEntities = sceneService.doSelection(selectResult, editor);
-          dispatch({
-            type: CAD_DO_SELECTION,
-            payload: {
-              activeEntities
+          if (selectResult.length) {
+            // check if entity belongs to object
+            if (selectResult[0].userData.belongsToObject) {
+              payload.object = selectResult[0].parent;
             }
-          });
+          }
+
+          if (!editor.editMode.isEdit) {
+            let activeEntities = sceneService.doSelection(selectResult, editor);
+            dispatch({
+              type: CAD_DO_SELECTION,
+              payload: {
+                activeEntities
+              }
+            });
 
 
-        } else { //todo є резон перемістити в scene service окремою функцією doSelection_EditMod, починаючи звідси
-          console.log("Start the party");
-          console.log(editor.editMode);
-          console.log(selectResult);
-          if (
-            selectResult.length &&
-            selectResult[0].parent.name === editor.editMode.editObject.name &&
-            !editor.editMode.isNewLine &&
-            !editor.editMode.isNewCurve &&
-            !editor.editMode.clone.active &&
-            !editor.editMode.move.active
-          ) {
-            if (!editor.editMode.activeLine.length || selectResult[0].id !== editor.editMode.activeLine[0].id) {
-              // if (editor.editMode.activeLine.id) {
-              //   unselectLine(editor.editMode.activeLine, scene);
-              // }
-              // console.log(editor.editMode.activeLine);
+          } else { //todo є резон перемістити в scene service окремою функцією doSelection_EditMod, починаючи звідси
+            console.log("Start the party");
+            console.log(editor.editMode);
+            console.log(selectResult);
+            if (
+              selectResult.length &&
+              selectResult[0].parent.name === editor.editMode.editObject.name &&
+              !editor.editMode.isNewLine &&
+              !editor.editMode.isNewCurve &&
+              !editor.editMode.clone.active &&
+              !editor.editMode.move.active
+            ) {
+              if (!editor.editMode.activeLine.length || selectResult[0].id !== editor.editMode.activeLine[0].id) {
+                // if (editor.editMode.activeLine.id) {
+                //   unselectLine(editor.editMode.activeLine, scene);
+                // }
+                // console.log(editor.editMode.activeLine);
 
-              let activeEntities = sceneService.doSelection(
-                selectResult,
-                editor
-              );
-              dispatch({
-                type: CAD_DO_SELECTION,
-                payload: {
-                  activeEntities
-                }
-              });
-
-                // console.log("we need more console.log or cad active entities");
-                // console.log(activeEntities);
-                // console.log(editor);
-                // debugger;
-
-                const rPoint = getScale(camera);
-                // activeEntities.forEach(element => {
-                //   element.name = 'ActiveLine';
-                  addHelpPoints(editor, scene, rPoint);
-
-                // });
+                let activeEntities = sceneService.doSelection(
+                  selectResult,
+                  editor
+                );
                 dispatch({
-                  type: CAD_EDITMODE_SET_ACTIVE_LINE,
+                  type: CAD_DO_SELECTION,
                   payload: {
-                    activeLine: editor.activeEntities[0]
+                    activeEntities
                   }
                 });
-                // console.log(activeEntities);
-                // debugger;
 
-              renderer.render(scene, camera);
-              // dispatch({
-              //   type: CAD_EDITMODE_SET_ACTIVE_LINE,
-              //   payload: {
-              //     activeLine: activeEntities[0]
-              //   }
-              // });
+                  // console.log("we need more console.log or cad active entities");
+                  // console.log(activeEntities);
+                  // console.log(editor);
+                  // debugger;
+
+                  const rPoint = getScale(camera);
+                  addHelpPoints(editor, scene, rPoint);
+
+                  dispatch({
+                    type: CAD_EDITMODE_SET_ACTIVE_LINE,
+                    payload: {
+                      activeLine: editor.activeEntities[0]
+                    }
+                  });
+                renderer.render(scene, camera);
+              }
+            } else {
+              //unselect activeLine line
+              if (
+                editor.activeEntities.length
+              // &&
+              // editor.editMode.activeLine !== editor.editMode.editObject
+              ) {
+                unselectLine(editor.activeEntities, scene);
+                renderer.render(scene, camera);
+                dispatch({
+                  type: CAD_EDITMODE_UNSELECT_ACTIVE_LINE,
+                  payload: {
+                    activeLine: []
+                  }
+                });
+              }
             }
-          } else {
-            //unselect activeLine line
-            if (
-              editor.activeEntities.length
-            // &&
-            // editor.editMode.activeLine !== editor.editMode.editObject
-            ) {
-              unselectLine(editor.activeEntities, scene);
-              renderer.render(scene, camera);
-              dispatch({
-                type: CAD_EDITMODE_UNSELECT_ACTIVE_LINE,
-                payload: {
-                  activeLine: []
-                }
-              });
-            }
+            //todo закінчуючи туточки
           }
-          //todo закінчуючи туточки
-        }
-        // else {
-        //   if (clickResult.activeEntities.length > 0 &&
-        //     !$scope.editor.editMode.activeLine.hasOwnProperty('id') &&
-        //     !$scope.editor.editMode.newLine.active &&
-        //     !$scope.editor.editMode.newArc.active&&
-        //     (clickResult.activeEntities[0].parent.uuid === $scope.editor.editMode.uuid ||
-        //       clickResult.activeEntities[0].uuid === $scope.editor.editMode.uuid)
-        //   ) {
-        //     $scope.editGeometry(clickResult.activeEntities[0]);
-        //   } else {
-        //     //do nothing
-        //   }
-        // }
-
-          // console.log('Click RESULT', clickResult)
 
           dispatch({
             type: CAD_CLICK,
@@ -362,11 +332,6 @@ export const cadClick = (event, editor) => {
         }
         break;
 
-      case TOOL_SELECT:
-      {
-      }
-        break;
-
       default:
         //todo p.s. TOOL_SELECT сюди всерівно потрапляє
         console.log(`cadClick not handled for tool: ${tool}`);
@@ -375,7 +340,7 @@ export const cadClick = (event, editor) => {
   };
 };
 
-export const cadonMouseDown = (event, editor) => {
+export const onMouseDown = (event, editor) => {
   return dispatch => {
     let { scene, camera, tool, renderer } = editor;
     if (event.button === 0) {
@@ -519,7 +484,7 @@ export const cadonMouseDown = (event, editor) => {
   };
 };
 
-export const cadonMouseUp = (event, editor) => {
+export const onMouseUp = (event, editor) => {
   return dispatch => {
     let { scene, camera, tool, renderer } = editor;
 
@@ -634,7 +599,7 @@ export const cadonMouseUp = (event, editor) => {
   };
 };
 
-export const cadonMouseMove = (event, editor) => {
+export const onMouseMove = (event, editor) => {
   return dispatch => {
     let { scene, camera, tool, renderer } = editor;
 
@@ -852,7 +817,7 @@ export const cadonMouseMove = (event, editor) => {
   };
 };
 
-export const cadDoubleClick = (event, editor) => {
+export const onDoubleClick = (event, editor) => {
   return dispatch => {
     let { scene, camera, tool } = editor;
 
