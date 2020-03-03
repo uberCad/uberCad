@@ -8,6 +8,7 @@ import {
   TOOL_POINT,
   TOOL_SELECT
 } from '../components/Toolbar/toolbarComponent';
+import { SELECT_MODE_NEW } from '../components/Options/optionsComponent';
 import { addHelpPoints, getScale, unselectLine } from '../services/editObject';
 import { selectionBegin, selectionEnd, selectionUpdate } from './selection';
 import {
@@ -105,18 +106,18 @@ export const drawDxf = (data = null, container, snapshot = null) => {
    */
 
   try {
-    // let editor = {
-    //     scene,
-    //     camera,
-    //     renderer,
-    //     cadCanvas,
-    //     options: {
-    //         threshold: 0.01,
-    //         selectMode: SELECT_MODE_NEW,
-    //         singleLayerSelect: true
-    //     }
-    // };
-    // testExample(editor);
+    let editor = {
+        scene,
+        camera,
+        renderer,
+        cadCanvas,
+        options: {
+            threshold: 0.01,
+            selectMode: SELECT_MODE_NEW,
+            singleLayerSelect: true
+        }
+    };
+    testExample(editor);
   } catch (e) {
     console.error(e);
   }
@@ -133,67 +134,15 @@ export const drawDxf = (data = null, container, snapshot = null) => {
     });
 };
 
-// function testExample(editor) {
-//   // let objectsDraft = [];
-//   // // let idsToFind = [319];
-//   let idsToFind = [65];
-//   let result = {};
-//
-//   let iterator = sceneService.entityIterator(editor.scene);
-//   let entity = iterator.next();
-//   while (!entity.done) {
-//     if (idsToFind.indexOf(entity.value.id) >= 0) {
-//       result[entity.value.id] = entity.value;
-//     }
-//     entity = iterator.next();
-//   }
-//
-//   let neighbours = sceneService.getEntityNeighbours(
-//     result[idsToFind[0]],
-//     editor
-//   );
-//
-//   console.log('neighbours', neighbours);
-//
-//   let variants = GeometryUtils.getPathVariants(neighbours);
-//
-//   variants = GeometryUtils.filterSelfIntersectingPaths(variants);
-//
-//   console.log('variants', variants);
-//
-//   let minArea = Infinity;
-//   let variantWithSmallestArea = [];
-//   variants.forEach(variant => {
-//     let vertices = GeometryUtils.getSerialVerticesFromOrderedEntities(variant);
-//     let area = GeometryUtils.pathArea(vertices);
-//     // let vertices = GeometryUtils.getSerialVertices(variant);
-//     console.log('area', area, variant);
-//     consoleUtils.previewPathInConsole(vertices);
-//     if (area < minArea) {
-//       variantWithSmallestArea = variant;
-//       minArea = area;
-//     }
-//   });
-//   let object = sceneService.groupEntities(
-//     editor,
-//     variantWithSmallestArea,
-//     'test'
-//   );
-//
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   // // sceneService.highlightEntities(editor, Object.values(result));
-//   // sceneService.highlightEntities(editor, variantWithSmallestArea);
-// }
+function testExample(editor) {
+  console.log(save(editor.scene));
+
+  let controls = editor.cadCanvas.getControls();
+  controls.addEventListener("change", () => {
+    console.log("custom callback on wheel");
+  });
+
+}
 
 export const cadClick = (event, editor) => {
   return dispatch => {
