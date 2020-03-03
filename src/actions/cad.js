@@ -506,19 +506,6 @@ export const onMouseUp = (event, editor) => {
             editor.scene
           );
 
-          // let selectResultInEditObject = [];
-
-          // if (!editor.editMode.isEdit) {
-          //
-          // } else {
-          //   // todo елементи які відносоться тільки до редагуємого обєкту
-          //   // selectResult.forEach( element => {
-          //   //   if (element.parent.name === editor.editMode.editObject.name) {
-          //   //     // debugger;
-          //   //     selectResultInEditObject.push(element);
-          //   //   }
-          //   // });
-
             let activeEntities = sceneService.doSelection(selectResult, editor);
             dispatch({
               type: CAD_DO_SELECTION,
@@ -528,6 +515,8 @@ export const onMouseUp = (event, editor) => {
             });
 
             let { scene, camera, renderer } = editor;
+
+            //TODO викинути непотрібне, залишити важливе
             // console.log(selectResult);
             // debugger;
             // debugger;
