@@ -8,7 +8,7 @@ import {
   TOOL_POINT,
   TOOL_SELECT
 } from '../components/Toolbar/toolbarComponent';
-import { addHelpPoints, getScale, unselectLine } from '../services/editObject';
+import { addHelpPoints, getScale, unselectLine, isPoint } from '../services/editObject';
 import { selectionBegin, selectionEnd, selectionUpdate } from './selection';
 import {
   radius,
@@ -297,6 +297,26 @@ export const cadClick = (event, editor) => {
                 // &&
                 // editor.editMode.activeLine !== editor.editMode.editObject
               ) {
+
+                let point = {
+                  x: clickResult.point.x,
+                  y: clickResult.point.y
+                };
+
+                // todo перевірка для всих хелппоінтів
+                let isSelectPoint = false;
+                let helpLayer = scene.getObjectByName('HelpLayer');
+                if (helpLayer.children[helpLayer.children.length - 1] &&
+                  editor.activeEntities.length !== 1 &&
+                  helpLayer.children[helpLayer.children.length - 1].name == "pointGeometryCenter") {
+                  console.log(helpLayer.children[helpLayer.children.length - 1]);
+                  isSelectPoint = isPoint(
+                    helpLayer.children[helpLayer.children.length - 1].position,
+                    helpLayer.children[helpLayer.children.length - 1].geometry.parameters.radius,
+                    point
+                  );
+                }
+                if (!isSelectPoint){
                 unselectLine(editor.activeEntities, scene);
                 renderer.render(scene, camera);
                 dispatch({
@@ -305,6 +325,7 @@ export const cadClick = (event, editor) => {
                     activeLine: []
                   }
                 });
+                }
               }
             }
             //todo закінчуючи туточки

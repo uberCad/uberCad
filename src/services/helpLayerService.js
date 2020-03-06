@@ -33,6 +33,38 @@ let highlightVertex = (vertices, editor, timeout = 0, radius = 10) => {
   }
 };
 
+let checkGroupMove = (editor) => {
+  let { cadCanvas } = editor;
+
+  let helpLayer = cadCanvas.getHelpLayer();
+
+  helpLayer.children.forEach(point=> {
+    point.userData.groupMove = false;
+  });
+  let groupMove = false;
+  helpLayer.children.forEach((point, i)=>{
+    if (point.name === "pointCenter"){
+      point.userData.groupMove = true;
+    } else{
+      helpLayer.children.forEach((checkPoint, j)=>{
+        if(checkPoint.userData.groupMove === false &&
+          checkPoint.position.x === point.position.x &&
+          checkPoint.position.y === point.position.y && i !== j){
+          checkPoint.userData.groupMove = true;
+          groupMove = true;
+        }
+      });
+      if (point.name === "pointGeometryCenter" &&  groupMove === true){
+        point.userData.groupMove = true;
+      }
+    }
+  });
+  if (!groupMove && helpLayer.children[helpLayer.children.length-1].name === "pointGeometryCenter"){
+    helpLayer.children.pop()
+  }
+}
+
 export default {
-  highlightVertex
+  highlightVertex,
+  checkGroupMove
 };

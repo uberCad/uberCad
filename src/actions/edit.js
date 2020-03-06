@@ -222,7 +222,7 @@ export const selectPoint = (line, event, editor) => {
 };
 
 export const movePoint = (line, index, event, editor) => {
-  let { scene, camera, renderer } = editor;
+  let { scene, camera, renderer, cadCanvas } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   let point = {
     x: clickResult.point.x,
@@ -231,7 +231,9 @@ export const movePoint = (line, index, event, editor) => {
   const crossing = crossingPoint(point, clickResult.activeEntities);
   const pointCnange = crossing ? crossing : point;
   changeGeometry(line, index, pointCnange, scene);
-  renderer.render(scene, camera);
+
+  cadCanvas.render();
+  // renderer.render(scene, camera);
 
   return dispatch => {
     crossing

@@ -1,4 +1,6 @@
 import * as THREE from '../extend/THREE';
+import GeometryUtils from '../services/GeometryUtils';
+import helpLayerService from './helpLayerService';
 
 let setColor = function(entity, bgColor, objId, objColor) {
   entity.children.forEach(function(entity) {
@@ -44,6 +46,11 @@ let setOriginalColor = entity => {
 let addHelpPoints = (editor, scene) => {
   // debugger;
   let { camera } = editor;
+  let pointMaterial = new THREE.LineBasicMaterial({
+    color: 0xcccccc,
+    opacity: 0.8,
+    transparent: true
+  });
   // radiusPoint = camera.top / 50;
   let helpLayer = scene.getObjectByName('HelpLayer');
   let pointGeometry = new THREE.CircleGeometry(
@@ -56,17 +63,13 @@ let addHelpPoints = (editor, scene) => {
   helpLayer.children = [];
   editor.activeEntities.forEach(object => {
     if (
+      object.name !== 'pointGeometryCenter' &&
       object.name !== 'point1' &&
       object.name !== 'point2' &&
       object.name !== 'pointCenter'
     ) {
       // if (!object.userData.helpPoints) {
       object.name = 'ActiveLine';
-      let pointMaterial = new THREE.LineBasicMaterial({
-        color: 0xcccccc,
-        opacity: 0.8,
-        transparent: true
-      });
 
       if (object.geometry.type === 'Geometry') {
         // console.log(object.geometry);
@@ -142,6 +145,18 @@ let addHelpPoints = (editor, scene) => {
       // }
     }
   });
+  if (editor.activeEntities.length > 1){
+    let activeEntitiesBoundingBox = GeometryUtils.getBoundingBox (editor.activeEntities);
+
+    let pointGeometryCenter = new THREE.Line(pointGeometry, pointMaterial);
+    pointGeometryCenter.name = 'pointGeometryCenter';
+
+    pointGeometryCenter.position.x = activeEntitiesBoundingBox.center.x;
+    pointGeometryCenter.position.y = activeEntitiesBoundingBox.center.y;
+
+    helpLayer.add(pointGeometryCenter);
+    helpLayerService.checkGroupMove (editor);
+  }
 };
 
 let getScale = camera => {
@@ -200,7 +215,6 @@ let isPoint = (a, r, rCenter) => {
 };
 
 let startPointIndex = (line, mousePoint, editor, scale = 1) => {
-  // todo тут буде кусок функції яка шукає найближчу точку і пряму
 
   // todo тимчасовий КОСТИЛЬ поки не буде реалізована спільна частина коду з рядків 199
   //   console.log(line);
@@ -212,7 +226,6 @@ let startPointIndex = (line, mousePoint, editor, scale = 1) => {
   // todo це є костиль
   line = editor.activeEntities;
   // debugger;
-  if (line[0].geometry.type === 'Geometry') {
     //todo переробити helpPointsPosition для всих helpPoints в автоматичному режимі
 
     // todo скоріше за все буде спільним куском і для кругів
@@ -223,6 +236,26 @@ let startPointIndex = (line, mousePoint, editor, scale = 1) => {
     let index = [];
 
     editor.editMode.activeLine = [];
+
+    let {scene} = editor;
+    let helpLayer = scene.getObjectByName('HelpLayer');
+
+    if (helpLayer.children[helpLayer.children.length - 1] &&
+      editor.activeEntities.length !== 1 &&
+      helpLayer.children[helpLayer.children.length - 1].name == "pointGeometryCenter") {
+      isSelectPoint = isPoint(
+        helpLayer.children[helpLayer.children.length - 1].position,
+        helpLayer.children[helpLayer.children.length - 1].geometry.parameters.radius,
+        mousePoint
+      );
+      // debugger;
+    }
+    if (isSelectPoint == true) {
+      // console.log(index.length);
+      index[0] = helpLayer.children.length-1;
+      editor.editMode.activeLine = activeEntities;
+    } else if (line[0].geometry.type === 'Geometry') {
+
     activeEntities.forEach(line => {
       // if(isSelectPoint == false){
       // console.log(line);
@@ -255,7 +288,7 @@ let startPointIndex = (line, mousePoint, editor, scale = 1) => {
       }
     });
     // todo я про цей кусок
-    return index.length ? index : null;
+    // return index.length ? index : null;
   } else {
     if (line.geometry.type === 'CircleGeometry') {
       let rPosition = line.position;
@@ -293,10 +326,11 @@ let startPointIndex = (line, mousePoint, editor, scale = 1) => {
       // $scope.editor.editMode.circle.helpLength = $scope.editor.editMode.circle.thetaLength;
     }
   }
+  return index.length ? index : null;
 };
 
 let changeGeometry = (lines, index, point, scene) => {
-  if (lines.length) {
+  if (lines.length && lines.length === index.length) {
     lines.forEach((line, i) => {
       if (line.geometry.type === 'Geometry') {
         line.geometry.verticesNeedUpdate = true;
@@ -372,6 +406,52 @@ let changeGeometry = (lines, index, point, scene) => {
     });
     // } else{
     //   // todo  для декількох ліній
+  } else if (lines.length && index.length === 1){
+    let helpLayer = scene.getObjectByName('HelpLayer');
+    let pointGeometryCenter = helpLayer.children[helpLayer.children.length-1];
+    console.log(pointGeometryCenter);
+    if (pointGeometryCenter.userData.groupMove) {
+      lines.forEach((line) => {
+        let changeX = point.x - pointGeometryCenter.position.x;
+        let changeY = point.y - pointGeometryCenter.position.y;
+
+
+        // todo circle helpPoint group muve
+
+        if (line.geometry.type === 'Geometry') {
+
+          line.geometry.verticesNeedUpdate = true;
+          let point1 = line.userData.helpPoints.point1;
+          let point2 = line.userData.helpPoints.point2;
+          let point3 = line.userData.helpPoints.pointCenter;
+          if (point1.userData.groupMove) {
+            line.geometry.vertices[0].x += changeX;
+            line.geometry.vertices[0].y += changeY;
+            point1.position.x = line.geometry.vertices[0].x;
+            point1.position.y = line.geometry.vertices[0].y;
+          }
+          if (point2.userData.groupMove) {
+            line.geometry.vertices[1].x += changeX;
+            line.geometry.vertices[1].y += changeY;
+            point2.position.x = line.geometry.vertices[1].x;
+            point2.position.y = line.geometry.vertices[1].y;
+          }
+          point3.position.x =
+            (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
+          point3.position.y =
+            (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
+          line.computeLineDistances();
+          line.geometry.computeBoundingSphere();
+        } else if (line.geometry.type === 'CircleGeometry') {
+          line.position.x += changeX;
+          line.position.y += changeY;
+          circleHelpPoint(line, scene);
+        }
+      });
+      pointGeometryCenter.position.x = point.x;
+      pointGeometryCenter.position.y = point.y;
+      // debugger;
+    }
   }
 };
 
@@ -615,6 +695,7 @@ let crossingPoint = (pointMouse, activeEntities, entrainment = 0.05) => {
           entity.name !== 'point1' &&
           entity.name !== 'point2' &&
           entity.name !== 'pointCenter' &&
+          entity.name !== 'pointGeometryCenter' &&
           entity.name !== 'Center' &&
           entity.name !== 'Start' &&
           entity.name !== 'End' &&
@@ -847,6 +928,7 @@ let addMaterialBackgroundShape = object => {
 };
 
 export {
+  isPoint,
   setColor,
   setOriginalColor,
   addHelpPoints,
