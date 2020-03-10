@@ -192,26 +192,26 @@ export const saveEdit = editor => {
   };
 };
 
-export const selectPoint = (line, event, editor) => {
+export const selectPoint = (lines, event, editor) => {
   let { scene, camera } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
   };
-  const selectPointIndex = startPointIndex(line, mousePoint, editor);
+  const selectPointIndex = startPointIndex(lines, mousePoint, editor);
 
   // todo це тимчаасове рішення з змінною ліній в editor.editMode.activeLine
-  // debugger;
-  if (line[0].geometry.type === 'CircleGeometry') {
-    if (!line[0].userData.helpGeometry) {
-      line.userData.helpGeometry = {};
+  lines.forEach(line=> {
+    if (line.geometry.type === 'CircleGeometry') {
+      if (!line.userData.helpGeometry) {
+        line.userData.helpGeometry = {};
+      }
+      line.userData.helpGeometry.helpLength =
+        line.geometry.parameters.thetaLength;
+      line.userData.helpGeometry.helpStart = line.geometry.parameters.thetaStart;
     }
-    line.userData.helpGeometry.helpLength =
-      line.geometry.parameters.thetaLength;
-    line.userData.helpGeometry.helpStart = line.geometry.parameters.thetaStart;
-  }
-
+  });
   return dispatch => {
     activePoint()(dispatch);
     dispatch({
