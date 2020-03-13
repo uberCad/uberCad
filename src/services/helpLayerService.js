@@ -35,14 +35,13 @@ let highlightVertex = (vertices, editor, timeout = 0, radius = 10) => {
 
 let checkGroupMove = (editor) => {
   let { cadCanvas } = editor;
-
   let helpLayer = cadCanvas.getHelpLayer();
 
   helpLayer.children.forEach(point=> {
     point.userData.groupMove = false;
   });
   let groupMove = false;
-  let radius = helpLayer.children[0].geometry.parameters.radius/2;
+  let radius = 1e-3;
   helpLayer.children.forEach((point, i)=>{
     if (point.name === "pointCenter"){
       point.userData.groupMove = true;
@@ -55,8 +54,6 @@ let checkGroupMove = (editor) => {
           (checkPoint.position.y - point.position.y);
         if(checkPoint.userData.groupMove === false &&
           radius > checkerX && radius > checkerY && i !== j){
-          console.log(checkPoint.position.x - point.position.x);
-          console.log(checkPoint.position.y - point.position.y);
           checkPoint.userData.groupMove = true;
           groupMove = true;
         }

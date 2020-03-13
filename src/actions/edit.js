@@ -221,7 +221,7 @@ export const selectPoint = (lines, event, editor) => {
   };
 };
 
-export const movePoint = (line, index, event, editor) => {
+export const movePoint = (lines, index, event, editor) => {
   let { scene, camera, renderer, cadCanvas } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   let point = {
@@ -230,7 +230,7 @@ export const movePoint = (line, index, event, editor) => {
   };
   const crossing = crossingPoint(point, clickResult.activeEntities);
   const pointCnange = crossing ? crossing : point;
-  changeGeometry(line, index, pointCnange, scene);
+  changeGeometry(lines, index, pointCnange, scene, editor);
 
   cadCanvas.render();
   // renderer.render(scene, camera);
@@ -330,7 +330,7 @@ export const drawLine = (event, editor, parent) => {
 
   let changeLine = scene.getObjectByName('newLine');
   if (changeLine) {
-    changeGeometry(changeLine, 1, secondPoint, scene);
+    changeGeometry([changeLine], [1], secondPoint, scene, editor);
   } else {
     const line = createLine(editMode.newLineFirst, secondPoint);
     line.userData.originalColor = parent.children[0].userData.originalColor;

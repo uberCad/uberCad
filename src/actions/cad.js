@@ -242,7 +242,6 @@ export const cadClick = (event, editor) => {
               }
             });
           } else {
-            //todo є резон перемістити в scene service окремою функцією doSelection_EditMod, починаючи звідси
             console.log('Start the party');
             console.log(editor.editMode);
             console.log(selectResult);
@@ -292,12 +291,7 @@ export const cadClick = (event, editor) => {
               }
             } else {
               //unselect activeLine line
-              if (
-                editor.activeEntities.length
-                // &&
-                // editor.editMode.activeLine !== editor.editMode.editObject
-              ) {
-
+              if (editor.activeEntities.length) {
                 let point = {
                   x: clickResult.point.x,
                   y: clickResult.point.y
@@ -306,15 +300,18 @@ export const cadClick = (event, editor) => {
                 // todo перевірка для всих хелппоінтів
                 let isSelectPoint = false;
                 let helpLayer = scene.getObjectByName('HelpLayer');
-                if (helpLayer.children[helpLayer.children.length - 1] &&
-                  editor.activeEntities.length !== 1 &&
-                  helpLayer.children[helpLayer.children.length - 1].name == "pointGeometryCenter") {
-                  console.log(helpLayer.children[helpLayer.children.length - 1]);
-                  isSelectPoint = isPoint(
-                    helpLayer.children[helpLayer.children.length - 1].position,
-                    helpLayer.children[helpLayer.children.length - 1].geometry.parameters.radius,
-                    point
-                  );
+                if (helpLayer.children.length) {
+                  // console.log(helpLayer.children[helpLayer.children.length - 1]);
+                  helpLayer.children.forEach(testPoint=>{
+
+                    if (!isSelectPoint){
+                      isSelectPoint = isPoint(
+                        testPoint.position,
+                        testPoint.geometry.parameters.radius,
+                        point
+                      );
+                    }
+                  });
                 }
                 if (!isSelectPoint){
                 unselectLine(editor.activeEntities, scene);
@@ -592,9 +589,10 @@ export const onMouseUp = (event, editor) => {
               //   }
               // });
               // debugger;
-
-              const rPoint = getScale(camera);
-              addHelpPoints(editor, scene, rPoint);
+              if (editor.editMode.isEdit) {
+                const rPoint = getScale(camera);
+                addHelpPoints(editor, scene, rPoint);
+              }
               // dispatch({
               //   type: CAD_EDITMODE_SET_ACTIVE_LINE,
               //   payload: {
