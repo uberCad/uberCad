@@ -270,6 +270,12 @@ let startPointIndex = (line, mousePoint, editor) => {
       // if(isSelectPoint == false){
       // console.log(line);
       if (line.geometry.type === 'Geometry') {
+        if (!helpPoints){
+          // todo щоб прибрати цей костиль потрібно добавить скидання  activeEntities при зміні режиму роботи на isEdit
+          console.log('some thing gone wrong');
+          // debugger;
+          return null;
+        }
         helpPointsPosition = [
           helpPoints.point1.position,
           helpPoints.point2.position,
@@ -340,34 +346,66 @@ let startPointIndex = (line, mousePoint, editor) => {
 let changeGeometry = (lines, index, point, scene, editor) => {
   if (lines.length && lines.length === index.length) {
     lines.forEach((line, i) => {
+      let points = false;
       if (line.geometry.type === 'Geometry') {
         line.geometry.verticesNeedUpdate = true;
-        let point1 = line.userData.helpPoints.point1;
-        let point2 = line.userData.helpPoints.point2;
-        let point3 = line.userData.helpPoints.pointCenter;
-        if (index[i] === 2) {
-          let changeX = point.x - point3.position.x;
-          let changeY = point.y - point3.position.y;
-          line.geometry.vertices[0].x += changeX;
-          line.geometry.vertices[0].y += changeY;
-          line.geometry.vertices[1].x += changeX;
-          line.geometry.vertices[1].y += changeY;
-        } else {
-          line.geometry.vertices[index[i]].x = point.x;
-          line.geometry.vertices[index[i]].y = point.y;
+        if (line.userData.helpPoints){
+          points = true;
         }
+        if (points) {
+          let point1 = line.userData.helpPoints.point1;
+          let point2 = line.userData.helpPoints.point2;
+          let point3 = line.userData.helpPoints.pointCenter;
+          if (index[i] === 2) {
+            let changeX = point.x - point3.position.x;
+            let changeY = point.y - point3.position.y;
+            line.geometry.vertices[0].x += changeX;
+            line.geometry.vertices[0].y += changeY;
+            line.geometry.vertices[1].x += changeX;
+            line.geometry.vertices[1].y += changeY;
+          } else {
+            line.geometry.vertices[index[i]].x = point.x;
+            line.geometry.vertices[index[i]].y = point.y;
+          }
+          if (point1 && point2) {
+            point1.position.x = line.geometry.vertices[0].x;
+            point1.position.y = line.geometry.vertices[0].y;
+            point2.position.x = line.geometry.vertices[1].x;
+            point2.position.y = line.geometry.vertices[1].y;
+            point3.position.x =
+              (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
+            point3.position.y =
+              (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
+          }
+        } else {
+          if (index[i] !== 2) {
+            line.geometry.vertices[index[i]].x = point.x;
+            line.geometry.vertices[index[i]].y = point.y;
+          }
+        }
+        // if (index[i] === 2) {
+        //   let changeX = point.x - point3.position.x;
+        //   let changeY = point.y - point3.position.y;
+        //   line.geometry.vertices[0].x += changeX;
+        //   line.geometry.vertices[0].y += changeY;
+        //   line.geometry.vertices[1].x += changeX;
+        //   line.geometry.vertices[1].y += changeY;
+        // } else {
+        //   line.geometry.vertices[index[i]].x = point.x;
+        //   line.geometry.vertices[index[i]].y = point.y;
+        // }
         line.computeLineDistances();
         line.geometry.computeBoundingSphere();
-        if (point1 && point2) {
-          point1.position.x = line.geometry.vertices[0].x;
-          point1.position.y = line.geometry.vertices[0].y;
-          point2.position.x = line.geometry.vertices[1].x;
-          point2.position.y = line.geometry.vertices[1].y;
-          point3.position.x =
-            (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
-          point3.position.y =
-            (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
-        }
+        // if (point1 && point2) {
+        //   point1.position.x = line.geometry.vertices[0].x;
+        //   point1.position.y = line.geometry.vertices[0].y;
+        //   point2.position.x = line.geometry.vertices[1].x;
+        //   point2.position.y = line.geometry.vertices[1].y;
+        //   point3.position.x =
+        //     (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
+        //   point3.position.y =
+        //     (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
+        // }
       } else if (line.geometry.type === 'CircleGeometry') {
         let helpRad = 1e-3;
         let checkHelpPoint = line.userData.helpPoints;
@@ -509,7 +547,9 @@ let changeGeometry = (lines, index, point, scene, editor) => {
 };
 
 let changeArcGeometry = (arcGeometry, parameters) => {
-  arcGeometry.dispose();
+  if (arcGeometry[0] !== "copy") {
+    arcGeometry.dispose();
+  }
   let geometry = new THREE.CircleGeometry(
     parameters.radius,
     32,

@@ -6,7 +6,8 @@ import {
   TOOL_POINT,
   TOOL_SELECT,
   TOOL_MEASUREMENT,
-  TOOL_LINE
+  TOOL_LINE,
+  TOOL_COPY_PASTE
 } from '../Toolbar/toolbarComponent';
 import { FormattedMessage } from 'react-intl';
 
@@ -78,6 +79,14 @@ export default class OptionsComponent extends Component {
       this.props.editMode.scale.scaleObject,
       this.props.editor
     );
+  };
+
+  copy = () => {
+  this.props.setSelectMode("COPY");
+};
+
+  paste = () =>{
+    this.props.setSelectMode("PASTE");
   };
 
   render() {
@@ -287,6 +296,18 @@ export default class OptionsComponent extends Component {
             lineMode={selectMode}
             setSelectMode={this.props.setSelectMode}
           />
+        )}
+
+        {tool === TOOL_COPY_PASTE && (
+          <ul className="edit-group">
+            <label>Copy / Paste: </label>
+            <button className="Copy" onClick={this.copy} >
+              Copy
+            </button>
+            <button className="Paste" onClick={this.paste} >
+              Paste
+            </button>
+          </ul>
         )}
       </div>
     );

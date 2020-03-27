@@ -2,13 +2,14 @@ import DxfParser from 'dxf-parser';
 import { Viewer } from './../services/dxfService';
 import sceneService from './../services/sceneService';
 import {
+  TOOL_COPY_PASTE,
   TOOL_LINE,
   TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
-  TOOL_POINT,
-  TOOL_SELECT
+  TOOL_POINT, TOOL_REDO,
+  TOOL_SELECT, TOOL_UNDO
 } from '../components/Toolbar/toolbarComponent';
-import { addHelpPoints, getScale, unselectLine, isPoint } from '../services/editObject';
+import { addHelpPoints, getScale, unselectLine, isPoint, changeArcGeometry } from '../services/editObject';
 import { selectionBegin, selectionEnd, selectionUpdate } from './selection';
 import {
   radius,
@@ -77,6 +78,8 @@ import {
   tangentLineEnd
 } from './line';
 import { PANEL_LAYERS_TOGGLE } from './panelLayers';
+import GeometryUtils from '../services/GeometryUtils';
+import * as THREE from '../extend/THREE';
 
 export const CAD_PARSE_DXF = 'CAD_PARSE_DXF';
 export const CAD_DRAW_DXF = 'CAD_DRAW_DXF';
@@ -198,7 +201,7 @@ export const drawDxf = (data = null, container, snapshot = null) => {
 export const cadClick = (event, editor) => {
   return dispatch => {
     let { scene, camera, tool, renderer } = editor;
-    // todo в HelpLayerService
+    // todo в HelpLayerService і переробити з використанням changeArcGeometry
     let controls = editor.cadCanvas.getControls();
     controls.addEventListener('change', () => {
       let helpLayer = scene.getObjectByName('HelpLayer');
@@ -206,6 +209,29 @@ export const cadClick = (event, editor) => {
         addHelpPoints(editor, scene, camera.top / 50);
       }
     });
+
+    // todo тут мав би бути лісенер зміни  editor.options щоб реагувати на нажаття кнопки "копировать" і "вставить" з
+    // todo place - місце для зберігання copyEntities, треба подумати де зберігати
+    // let place = camera;
+    //
+    // if (!place.copyEntities) {
+    //   place.copyEntities = [];
+    // }
+    // // Object.observe ( editor.options,()=> {
+    // let controlsCopy = editor.options.getControls();
+    // controlsCopy.addEventListener('change', () => {
+    //
+    //   editor.options.selectMode.getControls().addEventListener('change', () => {
+    //     debugger;
+    //     if (editor.options.selectMode === "COPY" || editor.options.selectMode === "PASTE") {
+    //       debugger;
+    //       copyPaste(editor, place, event);
+    //     }
+    //   });
+    // });
+    // export const copyChecker = () => {
+    //   copyPaste(editor, place, event);
+    // };
 
     switch (tool) {
       case TOOL_POINT:
@@ -281,12 +307,15 @@ export const cadClick = (event, editor) => {
                 const rPoint = getScale(camera);
                 addHelpPoints(editor, scene, rPoint);
 
-                dispatch({
-                  type: CAD_EDITMODE_SET_ACTIVE_LINE,
-                  payload: {
-                    activeLine: editor.activeEntities[0]
-                  }
-                });
+                // todo костиль від 16.03.20
+                if (editor.activeEntities.length) {
+                  dispatch({
+                    type: CAD_EDITMODE_SET_ACTIVE_LINE,
+                    payload: {
+                      activeLine: editor.activeEntities[0]
+                    }
+                  });
+                };
                 renderer.render(scene, camera);
               }
             } else {
@@ -350,13 +379,13 @@ export const cadClick = (event, editor) => {
         break;
       case TOOL_LINE:
         {
-          let clickResult = sceneService.onClick(event, scene, camera);
-          console.log(
-            `Click position [${clickResult.point.x.toFixed(
-              4
-            )}, ${clickResult.point.y.toFixed(4)}]`,
-            clickResult
-          );
+          // let clickResult = sceneService.onClick(event, scene, camera);
+          // console.log(
+          //   `Click position [${clickResult.point.x.toFixed(
+          //     4
+          //   )}, ${clickResult.point.y.toFixed(4)}]`,
+          //   clickResult
+          // );
         }
         break;
 
@@ -370,24 +399,25 @@ export const cadClick = (event, editor) => {
 
 export const onMouseDown = (event, editor) => {
   return dispatch => {
-    let { tool } = editor;
+    let { tool, camera } = editor;
     if (event.button === 0) {
       //new line
-      if (editor.editMode.isNewLine) {
-        !editor.editMode.newLineFirst
-          ? firstPoint(event, editor)(dispatch)
-          : saveNewLine(editor)(dispatch);
-      }
+      // if (editor.editMode.isNewLine) {
+      //   !editor.editMode.newLineFirst
+      //     ? firstPoint(event, editor)(dispatch)
+      //     : saveNewLine(editor)(dispatch);
+      // }
       //new curve
-      if (editor.editMode.isNewCurve) {
-        if (!editor.editMode.newCurveCenter) {
-          centerPoint(event, editor)(dispatch);
-        } else if (!editor.editMode.thetaStart) {
-          thetaStart(editor)(dispatch);
-        } else if (!editor.editMode.thetaLength) {
-          saveNewCurve(editor)(dispatch);
-        }
-      }
+      // if (editor.editMode.isNewCurve) {
+      //   debugger;
+      //   if (!editor.editMode.newCurveCenter) {
+      //     centerPoint(event, editor)(dispatch);
+      //   } else if (!editor.editMode.thetaStart) {
+      //     thetaStart(editor)(dispatch);
+      //   } else if (!editor.editMode.thetaLength) {
+      //     saveNewCurve(editor)(dispatch);
+      //   }
+      // }
       //clone object
       if (editor.editMode.clone.active) {
         if (!editor.editMode.clone.point) {
@@ -403,15 +433,109 @@ export const onMouseDown = (event, editor) => {
         moveObjectPoint(event, editor)(dispatch);
       }
 
+      // copy paste
+
+      // todo place - місце для зберігання copyEntities, треба подумати де зберігати
+      let place = camera;
+
+      if (!place.copyEntities) {
+        place.copyEntities = [];
+      }
+
+      // todo тут мав би бути лісенер зміни  editor.options щоб реагувати на нажаття кнопки "копировать" і "вставить"
+      // console.log(editor.options.selectMode);
+      // debugger;
+      // Object.observe ( editor.options,()=>{
+      // // editor.options.selectMode.getControls().addEventListener('change', () => {
+      //   debugger;
+      //   if (editor.options.selectMode === "COPY" || editor.options.selectMode === "PASTE"){
+      //     debugger;
+      //     // copyPaste (editor, place, event);
+      //   }
+      // });
+
+      // if (tool === "TOOL_UNDO") {
+        // if (editor.activeEntities) {
+        //   place.copyEntities = editor.activeEntities.slice();
+        // } else {
+        //   place.copyEntities = [];
+        // }
+      //
+      // } else if (tool === "TOOL_REDO") {
+      //   console.log(place.copyEntities);
+        // if (place.copyEntities.length) {
+        //   let changeGeometry = {};
+        //   let copyEntitiesBoundingBox = GeometryUtils.getBoundingBox(place.copyEntities);
+        //   console.log(editor.camera);
+        //   changeGeometry = {
+        //     x: copyEntitiesBoundingBox.center.x - editor.camera.position.x,
+        //     y: copyEntitiesBoundingBox.center.y - editor.camera.position.y
+        //   };
+        //   let parent;
+        //   if (!editor.editMode.isEdit) {
+        //     parent = cadCanvas.getNewLineLayer();
+        //   } else {
+        //     // todo де зберігаються нові лінії якщо без режиму змін об'єкту
+        //     parent = editor.editMode.editObject;
+        //   }
+        //
+        //   place.copyEntities.forEach(line => {
+        //     if (line.geometry.type === "Geometry") {
+        //       let copyLines = {
+        //         0: {
+        //           x: line.geometry.vertices[0].x - changeGeometry.x,
+        //           y: line.geometry.vertices[0].y - changeGeometry.y
+        //         },
+        //         1: {
+        //           x: line.geometry.vertices[1].x - changeGeometry.x,
+        //           y: line.geometry.vertices[1].y - changeGeometry.y
+        //         }
+        //       };
+        //
+        //
+        //       startNewLine(event, editor, copyLines[0]);
+        //       drawLine(event, editor, parent, copyLines);
+        //       saveNewLine(editor)
+        //
+        //     } else if (line.geometry.type === "CircleGeometry") {
+        //       editor.editMode.isNewCurve = true;
+        //       let copyLines = {
+        //         0: {
+        //           x: line.position.x - changeGeometry.x,
+        //           y: line.position.y - changeGeometry.y
+        //         },
+        //         1: {
+        //           x: line.userData.helpPoints.pointStart.position.x - changeGeometry.x,
+        //           y: line.userData.helpPoints.pointStart.position.y - changeGeometry.y
+        //         },
+        //         2: {
+        //           x: line.userData.helpPoints.pointEnd.position.x - changeGeometry.x,
+        //           y: line.userData.helpPoints.pointEnd.position.y - changeGeometry.y
+        //         }
+        //       };
+        //       centerPoint(event, editor, copyLines[0])(dispatch);
+        //       radius(event, editor, copyLines[1])(dispatch);
+        //       thetaStart(editor)(dispatch);
+        //       thetaLength(event, editor, parent, copyLines[2])(dispatch);
+        //       saveNewCurve(editor)(dispatch);
+        //     }
+        //   });
+        //   renderer.render(scene, camera);
+        // }
+      // }
+
       switch (tool) {
         case TOOL_NEW_CURVE:
           {
-            if (!editor.editMode.newCurveCenter) {
-              centerPoint(event, editor)(dispatch);
-            } else if (!editor.editMode.thetaStart) {
-              thetaStart(editor)(dispatch);
-            } else if (!editor.editMode.thetaLength) {
-              saveNewCurve(editor)(dispatch);
+            editor.editMode.isNewCurve = true;
+            if (editor.editMode.isNewCurve) {
+              if (!editor.editMode.newCurveCenter) {
+                centerPoint(event, editor)(dispatch);
+              } else if (!editor.editMode.thetaStart) {
+                thetaStart(editor)(dispatch);
+              } else if (!editor.editMode.thetaLength) {
+                saveNewCurve(editor)(dispatch);
+              }
             }
           }
           break;
@@ -511,6 +635,11 @@ export const onMouseDown = (event, editor) => {
             }
           }
           break;
+        case TOOL_COPY_PASTE:
+          {
+            copyPaste (editor, place, event);
+        }
+        break;
         default:
           console.log(`cadonMouseDown not handled for tool: ${tool}`);
           break;
@@ -527,8 +656,8 @@ export const onMouseUp = (event, editor) => {
     if (editor.editMode.move.active && editor.editMode.move.point) {
       disableMovePoint(editor.editMode.move.moveObject)(dispatch);
     }
-
-    console.log(editor);
+    // console.log(event);
+    // console.log(editor);
     // debugger;
 
     switch (tool) {
@@ -646,29 +775,31 @@ export const onMouseMove = (event, editor) => {
         : drawLine(event, editor, parent)(dispatch);
     }
     //new Curve
-    if (editor.editMode.isNewCurve) {
-      let parent =
-        editor.tool === TOOL_NEW_CURVE
-          ? editor.activeLayer
-          : editor.editMode.editObject;
-      if (!parent || parent.metadata) {
-        parent = editor.scene.getObjectByName('Layers').children[0];
-        dispatch({
-          type: PANEL_LAYERS_TOGGLE,
-          payload: {
-            activeLayer: parent
-          }
-        });
-      }
 
-      if (!editor.editMode.newCurveCenter) {
-        centerCurve(event, editor)(dispatch);
-      } else if (!editor.editMode.thetaStart) {
-        radius(event, editor)(dispatch);
-      } else if (!editor.editMode.thetaLength) {
-        thetaLength(event, editor, parent)(dispatch);
-      }
-    }
+    // if (editor.editMode.isNewCurve) {
+    //   let parent =
+    //     editor.tool === TOOL_NEW_CURVE
+    //       ? editor.activeLayer
+    //       : editor.editMode.editObject;
+    //   if (!parent || parent.metadata) {
+    //     parent = editor.scene.getObjectByName('Layers').children[0];
+    //     dispatch({
+    //       type: PANEL_LAYERS_TOGGLE,
+    //       payload: {
+    //         activeLayer: parent
+    //       }
+    //     });
+    //   }
+    // // debugger;
+    // //   if (!editor.editMode.newCurveCenter) {
+    // //     centerCurve(event, editor)(dispatch);
+    // //   } else if (!editor.editMode.thetaStart) {
+    // //     radius(event, editor)(dispatch);
+    // //   } else if (!editor.editMode.thetaLength) {
+    // //     thetaLength(event, editor, parent)(dispatch);
+    // //   }
+    // }
+
     //clone object
     if (editor.editMode.clone.active) {
       selectClonePoint(event, editor)(dispatch);
@@ -823,10 +954,11 @@ export const onMouseMove = (event, editor) => {
 
       case TOOL_NEW_CURVE:
         {
+          // todo добавити слой parent у випадку isEdit - false
           let parent =
-            editor.tool === TOOL_NEW_CURVE
-              ? editor.activeLayer
-              : editor.editMode.editObject;
+            editor.editMode.isEdit
+              ? editor.editMode.editObject
+              : editor.activeLayer;
           if (!parent || parent.metadata) {
             parent = editor.scene.getObjectByName('Layers').children[0];
             dispatch({
@@ -836,6 +968,13 @@ export const onMouseMove = (event, editor) => {
               }
             });
           }
+            if (!editor.editMode.newCurveCenter) {
+              centerCurve(event, editor)(dispatch);
+            } else if (!editor.editMode.thetaStart) {
+              radius(event, editor)(dispatch);
+            } else if (!editor.editMode.thetaLength) {
+              thetaLength(event, editor, parent)(dispatch);
+            }
         }
         break;
 
@@ -916,3 +1055,318 @@ export const toggleChanged = isChanged => {
       }
     });
 };
+
+
+let copyPaste = (editor, place, event) => {
+  let { renderer, scene, cadCanvas, camera } = editor;
+  if (editor.options.selectMode === "COPY"){
+    place.copyEntities = [];
+
+    editor.activeEntities.forEach((line, i) => {
+      if (line.geometry.type === "Geometry") {
+        place.copyEntities[i] = {
+          geometry: {
+            type: line.geometry.type,
+            vertices: [new THREE.Vector3().copy(line.geometry.vertices[0]),
+              new THREE.Vector3().copy(line.geometry.vertices[1])]
+          }
+        };
+      } else if (line.geometry.type === "CircleGeometry") {
+        console.log(line.geometry);
+        place.copyEntities[i] = {
+          geometry: {
+            type: line.geometry.type,
+            parameters: {
+              radius: line.geometry.parameters.radius,
+              thetaStart: line.geometry.parameters.thetaStart,
+              thetaLength: line.geometry.parameters.thetaLength
+            }
+          },
+          position: new THREE.Vector3().copy(line.position)
+        };
+      }
+    });
+    place.copyEntities[place.copyEntities.length] = GeometryUtils.getBoundingBox(editor.activeEntities);
+  } else if (editor.options.selectMode === "PASTE"){
+    if (place.copyEntities.length) {
+      let copyEntitiesBoundingBox = place.copyEntities[place.copyEntities.length-1];
+      let changeGeometry = {
+        x: copyEntitiesBoundingBox.center.x - editor.camera.position.x,
+        y: copyEntitiesBoundingBox.center.y - editor.camera.position.y
+      };
+      let parent;
+      if (!editor.editMode.isEdit) {
+        parent = cadCanvas.getNewLineLayer();
+      } else {
+        // todo де зберігаються нові лінії якщо без режиму змін об'єкту
+        parent = editor.editMode.editObject;
+      }
+
+      place.copyEntities.forEach(line => {
+        if (line.geometry) {
+          if (line.geometry.type === "Geometry") {
+            let copyLines = {
+              0: {
+                x: line.geometry.vertices[0].x - changeGeometry.x,
+                y: line.geometry.vertices[0].y - changeGeometry.y
+              },
+              1: {
+                x: line.geometry.vertices[1].x - changeGeometry.x,
+                y: line.geometry.vertices[1].y - changeGeometry.y
+              }
+            };
+            startNewLine(event, editor, copyLines[0]);
+            drawLine(event, editor, parent, copyLines);
+            saveNewLine(editor)
+
+          } else if (line.geometry.type === "CircleGeometry") {
+            let changedGeometry = {
+              radius: line.geometry.parameters.radius,
+              thetaStart: line.geometry.parameters.thetaStart,
+              thetaLength: line.geometry.parameters.thetaLength
+            };
+            let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+            let copyCircleGeometry = changeArcGeometry({ 0: "copy" }, changedGeometry);
+            let copyCircle = new THREE.Line(copyCircleGeometry, materialLine);
+            copyCircle.position.x = line.position.x - changeGeometry.x;
+            copyCircle.position.y = line.position.y - changeGeometry.y;
+            if (parent.children.length) {
+              copyCircle.userData.originalColor = parent.children[0].userData.originalColor;
+            } else {
+              copyCircle.userData.originalColor = 0x808000;
+            }
+            parent.add(copyCircle);
+          }
+        }
+      });
+
+
+      renderer.render(scene, camera);
+    }
+  }
+};
+
+// todo у функцію нижче присобачити dispatch
+
+// let copyLine = (editor, event, lines, parent, changeGeometry) => {
+//   // debugger;
+//   if (!changeGeometry){
+//     changeGeometry = {
+//       x: 0,
+//       y: 0
+//     }
+//   }
+//   lines.forEach(line => {
+//     if (line.geometry) {
+//       if (line.geometry.type === "Geometry") {
+//         // debugger;
+//         let copyLines = {
+//           0: {
+//             x: line.geometry.vertices[0].x - changeGeometry.x,
+//             y: line.geometry.vertices[0].y - changeGeometry.y
+//           },
+//           1: {
+//             x: line.geometry.vertices[1].x - changeGeometry.x,
+//             y: line.geometry.vertices[1].y - changeGeometry.y
+//           }
+//         };
+//         startNewLine(event, editor, copyLines[0]);
+//         drawLine(event, editor, parent, copyLines);
+//         saveNewLine(editor)
+//
+//       } else if (line.geometry.type === "CircleGeometry") {
+//         let changedGeometry = {
+//           radius: line.geometry.parameters.radius,
+//           thetaStart: line.geometry.parameters.thetaStart,
+//           thetaLength: line.geometry.parameters.thetaLength
+//         };
+//         let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+//         let copyCircleGeometry = changeArcGeometry({ 0: "copy" }, changedGeometry);
+//         let copyCircle = new THREE.Line(copyCircleGeometry, materialLine);
+//         copyCircle.position.x = line.position.x - changeGeometry.x;
+//         copyCircle.position.y = line.position.y - changeGeometry.y;
+//         if (parent.children.length) {
+//           copyCircle.userData.originalColor = parent.children[0].userData.originalColor;
+//         } else {
+//           copyCircle.userData.originalColor = 0x808000;
+//         }
+//         parent.add(copyCircle);
+//       }
+//     }
+//   });
+//
+// };
+
+// let cadToolUndoRedoTest = (editor, event) => {
+//   let { tool, renderer, scene, cadCanvas, camera } = editor;
+//   let place = camera;
+//   if (!place.copyEntities) {
+//     place.copyEntities = [];
+//   }
+//   if (tool === "TOOL_UNDO") {
+//     // copy
+//     // debugger;
+//     // console.log (editor);
+//     // editor
+//     if (editor.activeEntities) {
+//       // copyEntities = [];
+//       place.copyEntities = editor.activeEntities.slice();
+//     } else {
+//       place.copyEntities = [];
+//     }
+//
+//   } else if (tool === "TOOL_REDO") {
+//     // paste
+//     console.log(place.copyEntities);
+//     // debugger;
+//
+//     if (place.copyEntities.length) {
+//       let changeGeometry = {};
+//       // if (place.copyEntities.length > 1) {
+//       let copyEntitiesBoundingBox = GeometryUtils.getBoundingBox(place.copyEntities);
+//       console.log(editor.camera);
+//       changeGeometry = {
+//         x: copyEntitiesBoundingBox.center.x - editor.camera.position.x,
+//         y: copyEntitiesBoundingBox.center.y - editor.camera.position.y
+//       };
+//       // debugger;
+//       // } else {
+//       //   debugger;
+//       //   if (place.copyEntities[0].geometry.type === "Geometry") {
+//       //     changeGeometry = {
+//       //       x: (place.copyEntities[0].geometry.vertices[0].x
+//       //       + place.copyEntities[0].geometry.vertices[1].x)/2
+//       // - editor.camera.position.x,
+//       //       y: (place.copyEntities[0].geometry.vertices[0].y
+//       //         + place.copyEntities[0].geometry.vertices[1].y)/2
+//       // - editor.camera.position.y
+//       //     }
+//       //   } else if (place.copyEntities[0].geometry.type === "circleGeometry"){
+//       //     changeGeometry = {
+//       //       // x: (place.copyEntities[0].geometry.vertices[0].x
+//       //       //   + place.copyEntities[0].geometry.vertices[1].x)/2,
+//       //       // y: (place.copyEntities[0].geometry.vertices[0].y
+//       //       //   + place.copyEntities[0].geometry.vertices[1].y)/2
+//       //     }
+//       //   }
+//       // }
+//       // let copyLines = [];
+//       let parent;
+//       if (!editor.editMode.isEdit) {
+//         parent = cadCanvas.getNewLineLayer();
+//       } else {
+//         // todo де зберігаються нові лінії якщо без режиму змін об'єкту
+//         parent = editor.editMode.editObject;
+//       }
+//
+//       place.copyEntities.forEach(line => {
+//         // debugger;
+//         if (line.geometry.type === "Geometry") {
+//           let copyLines = {
+//             0: {
+//               x: line.geometry.vertices[0].x - changeGeometry.x,
+//               y: line.geometry.vertices[0].y - changeGeometry.y
+//             },
+//             1: {
+//               x: line.geometry.vertices[1].x - changeGeometry.x,
+//               y: line.geometry.vertices[1].y - changeGeometry.y
+//             }
+//           };
+//
+//
+//           // debugger;
+//           startNewLine(event, editor, copyLines[0]);
+//           // debugger;
+//           drawLine(event, editor, parent, copyLines);
+//           saveNewLine(editor)
+//
+//           // copyLines[i] = line.clone();
+//           // copyLines[i].userData.helpPoints = {};
+//           // debugger;
+//           // copyLines[i].geometry.vertices[0].x = line.geometry.vertices[0].x - changeGeometry.x;
+//           // copyLines[i].geometry.vertices[1].x = line.geometry.vertices[1].x - changeGeometry.x;
+//           // copyLines[i].geometry.vertices[0].y = line.geometry.vertices[0].y - changeGeometry.y;
+//           // copyLines[i].geometry.vertices[1].y = line.geometry.vertices[1].y - changeGeometry.y;
+//           // console.log(copyLines[i].geometry.vertices);
+//           // console.log(line.geometry.vertices);
+//           // console.log(line);
+//           // debugger;
+//         } else if (line.geometry.type === "CircleGeometry") {
+//           // editor.editMode.newCurveCenter = true;
+//           editor.editMode.isNewCurve = true;
+//           // debugger;
+//           let copyLines = {
+//             0: {
+//               x: line.position.x - changeGeometry.x,
+//               y: line.position.y - changeGeometry.y
+//             },
+//             1: {
+//               x: line.userData.helpPoints.pointStart.position.x - changeGeometry.x,
+//               y: line.userData.helpPoints.pointStart.position.y - changeGeometry.y
+//             },
+//             2: {
+//               x: line.userData.helpPoints.pointEnd.position.x - changeGeometry.x,
+//               y: line.userData.helpPoints.pointEnd.position.y - changeGeometry.y
+//             }
+//           };
+//
+//           // console.log (line);
+//           // console.log (line.userData.helpPoints);
+//           // debugger;
+//
+//           // if (!editor.editMode.newCurveCenter) {
+//
+//           // debugger;
+//           // centerCurve(event, editor, copyLines[0]);
+//           // debugger;
+//           // console.log(editor.editMode.newCurveCenter);
+//           centerPoint(event, editor, copyLines[0]);
+//           // debugger;
+//           editor.editMode.newCurveCenter = {
+//             x: copyLines[0].x,
+//             y: copyLines[0].y
+//           };
+//           // console.log(editor.editMode.newCurveCenter);
+//
+//           // } else if (!editor.editMode.thetaStart) {
+//
+//           // debugger;
+//
+//
+//           // console.log(editor.editMode.newCurveCenter);
+//           radius(event, editor, copyLines[1]);
+//           // thetaStart(editor, copyLines[1]);
+//           // debugger;
+//           // editor.editMode.start = {
+//           //   x: copyLines[1].x,
+//           //   y: copyLines[1].y
+//           // };
+//           // editor.editMode.radius = line.geometry.parameters.radius;
+//
+//           thetaStart(editor);
+//           // editor.editMode.thetaStart = line.geometry.parameters.thetaStart;
+//
+//           // console.log(editor.editMode.thetaStart);
+//
+//           // } else if (!editor.editMode.thetaLength) {
+//
+//           // debugger;
+//           thetaLength(event, editor, parent, copyLines[2]);
+//           // editor.editMode.thetaLength = line.geometry.parameters.thetaLength;
+//           // editor.editMode.thetaLength = {
+//           //   x: copyLines[2].x,
+//           //   y: copyLines[2].y
+//           // };
+//           // debugger;
+//           // console.log(editor.editMode.thetaLength)(dispatch);
+//           saveNewCurve(editor);
+//           // saveNewCurve(editor, copyLines[2]);
+//           // }
+//           // debugger
+//
+//         }
+//       });
+//       renderer.render(scene, camera);
+//     }
+//   }
+// };

@@ -25,6 +25,8 @@ export function Viewer(data = null, container, snapshot = null, font) {
   let layersEntity = addContainer('Layers');
   let objectsEntity = addContainer('Objects');
   let helpLayer = addContainer('HelpLayer');
+  // todo питання під ким має бути newLineLayer
+  let newLineLayer = addContainer('newLineLayer');
 
   if (data) {
     createLineTypeShaders(data);
@@ -913,4 +915,5 @@ export function Viewer(data = null, container, snapshot = null, font) {
   this.getLayers = () => layersEntity;
   this.getObjects = () => objectsEntity;
   this.getHelpLayer = () => helpLayer;
+  this.getNewLineLayer = () => newLineLayer;
 }
