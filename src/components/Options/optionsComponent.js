@@ -81,12 +81,15 @@ export default class OptionsComponent extends Component {
     );
   };
 
-  copy = () => {
-  this.props.setSelectMode("COPY");
+  copy = event => {
+// todo розкомітити строку нижче якщо потрібний копіювати і через клік по сцені
+    // this.props.setSelectMode("COPY");
+    this.props.copyClick(this.props.editor, event);
 };
 
-  paste = () =>{
-    this.props.setSelectMode("PASTE");
+  paste = event =>{
+    // this.props.setSelectMode("PASTE");
+    this.props.pasteClick(this.props.editor, event);
   };
 
   render() {
@@ -335,6 +338,8 @@ export default class OptionsComponent extends Component {
     saveNewCurve: PropTypes.func,
     rotationAngle: PropTypes.func,
     scaleChange: PropTypes.func,
-    setScale: PropTypes.func
+    setScale: PropTypes.func,
+    copyClick: PropTypes.func,
+    pasteClick: PropTypes.func
   };
 }

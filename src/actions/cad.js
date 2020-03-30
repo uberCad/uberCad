@@ -9,7 +9,7 @@ import {
   TOOL_POINT, TOOL_REDO,
   TOOL_SELECT, TOOL_UNDO
 } from '../components/Toolbar/toolbarComponent';
-import { addHelpPoints, getScale, unselectLine, isPoint, changeArcGeometry } from '../services/editObject';
+import { addHelpPoints, getScale, unselectLine, isPoint, changeArcGeometry, createLine } from '../services/editObject';
 import { selectionBegin, selectionEnd, selectionUpdate } from './selection';
 import {
   radius,
@@ -137,65 +137,18 @@ export const drawDxf = (data = null, container, snapshot = null) => {
 };
 
 // function testExample(editor) {
-//   // let objectsDraft = [];
-//   // // let idsToFind = [319];
-//   let idsToFind = [65];
-//   let result = {};
-//
-//   let iterator = sceneService.entityIterator(editor.scene);
-//   let entity = iterator.next();
-//   while (!entity.done) {
-//     if (idsToFind.indexOf(entity.value.id) >= 0) {
-//       result[entity.value.id] = entity.value;
+//   let optionsCopy = document.getElementById("TOOL_COPY");
+//     let optionsPaste = document.getElementById("TOOL_PASTE");
+//     if (optionsCopy && optionsPaste) {
+//       optionsCopy.addEventListener('click', () => {
+//         editor.options.selectMode = "COPY";
+//         copyPaste(editor);
+//       });
+//       optionsPaste.addEventListener('click', () => {
+//         editor.options.selectMode = "Paste";
+//         copyPaste(editor);
+//       });
 //     }
-//     entity = iterator.next();
-//   }
-//
-//   let neighbours = sceneService.getEntityNeighbours(
-//     result[idsToFind[0]],
-//     editor
-//   );
-//
-//   console.log('neighbours', neighbours);
-//
-//   let variants = GeometryUtils.getPathVariants(neighbours);
-//
-//   variants = GeometryUtils.filterSelfIntersectingPaths(variants);
-//
-//   console.log('variants', variants);
-//
-//   let minArea = Infinity;
-//   let variantWithSmallestArea = [];
-//   variants.forEach(variant => {
-//     let vertices = GeometryUtils.getSerialVerticesFromOrderedEntities(variant);
-//     let area = GeometryUtils.pathArea(vertices);
-//     // let vertices = GeometryUtils.getSerialVertices(variant);
-//     console.log('area', area, variant);
-//     consoleUtils.previewPathInConsole(vertices);
-//     if (area < minArea) {
-//       variantWithSmallestArea = variant;
-//       minArea = area;
-//     }
-//   });
-//   let object = sceneService.groupEntities(
-//     editor,
-//     variantWithSmallestArea,
-//     'test'
-//   );
-//
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   //
-//   // // sceneService.highlightEntities(editor, Object.values(result));
-//   // sceneService.highlightEntities(editor, variantWithSmallestArea);
 // }
 
 export const cadClick = (event, editor) => {
@@ -209,29 +162,6 @@ export const cadClick = (event, editor) => {
         addHelpPoints(editor, scene, camera.top / 50);
       }
     });
-
-    // todo тут мав би бути лісенер зміни  editor.options щоб реагувати на нажаття кнопки "копировать" і "вставить" з
-    // todo place - місце для зберігання copyEntities, треба подумати де зберігати
-    // let place = camera;
-    //
-    // if (!place.copyEntities) {
-    //   place.copyEntities = [];
-    // }
-    // // Object.observe ( editor.options,()=> {
-    // let controlsCopy = editor.options.getControls();
-    // controlsCopy.addEventListener('change', () => {
-    //
-    //   editor.options.selectMode.getControls().addEventListener('change', () => {
-    //     debugger;
-    //     if (editor.options.selectMode === "COPY" || editor.options.selectMode === "PASTE") {
-    //       debugger;
-    //       copyPaste(editor, place, event);
-    //     }
-    //   });
-    // });
-    // export const copyChecker = () => {
-    //   copyPaste(editor, place, event);
-    // };
 
     switch (tool) {
       case TOOL_POINT:
@@ -435,94 +365,15 @@ export const onMouseDown = (event, editor) => {
 
       // copy paste
 
-      // todo place - місце для зберігання copyEntities, треба подумати де зберігати
-      let place = camera;
 
-      if (!place.copyEntities) {
-        place.copyEntities = [];
-      }
 
       // todo тут мав би бути лісенер зміни  editor.options щоб реагувати на нажаття кнопки "копировать" і "вставить"
       // console.log(editor.options.selectMode);
       // debugger;
       // Object.observe ( editor.options,()=>{
-      // // editor.options.selectMode.getControls().addEventListener('change', () => {
-      //   debugger;
-      //   if (editor.options.selectMode === "COPY" || editor.options.selectMode === "PASTE"){
-      //     debugger;
-      //     // copyPaste (editor, place, event);
-      //   }
-      // });
 
-      // if (tool === "TOOL_UNDO") {
-        // if (editor.activeEntities) {
-        //   place.copyEntities = editor.activeEntities.slice();
-        // } else {
-        //   place.copyEntities = [];
-        // }
-      //
-      // } else if (tool === "TOOL_REDO") {
-      //   console.log(place.copyEntities);
-        // if (place.copyEntities.length) {
-        //   let changeGeometry = {};
-        //   let copyEntitiesBoundingBox = GeometryUtils.getBoundingBox(place.copyEntities);
-        //   console.log(editor.camera);
-        //   changeGeometry = {
-        //     x: copyEntitiesBoundingBox.center.x - editor.camera.position.x,
-        //     y: copyEntitiesBoundingBox.center.y - editor.camera.position.y
-        //   };
-        //   let parent;
-        //   if (!editor.editMode.isEdit) {
-        //     parent = cadCanvas.getNewLineLayer();
-        //   } else {
-        //     // todo де зберігаються нові лінії якщо без режиму змін об'єкту
-        //     parent = editor.editMode.editObject;
-        //   }
-        //
-        //   place.copyEntities.forEach(line => {
-        //     if (line.geometry.type === "Geometry") {
-        //       let copyLines = {
-        //         0: {
-        //           x: line.geometry.vertices[0].x - changeGeometry.x,
-        //           y: line.geometry.vertices[0].y - changeGeometry.y
-        //         },
-        //         1: {
-        //           x: line.geometry.vertices[1].x - changeGeometry.x,
-        //           y: line.geometry.vertices[1].y - changeGeometry.y
-        //         }
-        //       };
-        //
-        //
-        //       startNewLine(event, editor, copyLines[0]);
-        //       drawLine(event, editor, parent, copyLines);
-        //       saveNewLine(editor)
-        //
-        //     } else if (line.geometry.type === "CircleGeometry") {
-        //       editor.editMode.isNewCurve = true;
-        //       let copyLines = {
-        //         0: {
-        //           x: line.position.x - changeGeometry.x,
-        //           y: line.position.y - changeGeometry.y
-        //         },
-        //         1: {
-        //           x: line.userData.helpPoints.pointStart.position.x - changeGeometry.x,
-        //           y: line.userData.helpPoints.pointStart.position.y - changeGeometry.y
-        //         },
-        //         2: {
-        //           x: line.userData.helpPoints.pointEnd.position.x - changeGeometry.x,
-        //           y: line.userData.helpPoints.pointEnd.position.y - changeGeometry.y
-        //         }
-        //       };
-        //       centerPoint(event, editor, copyLines[0])(dispatch);
-        //       radius(event, editor, copyLines[1])(dispatch);
-        //       thetaStart(editor)(dispatch);
-        //       thetaLength(event, editor, parent, copyLines[2])(dispatch);
-        //       saveNewCurve(editor)(dispatch);
-        //     }
-        //   });
-        //   renderer.render(scene, camera);
-        // }
-      // }
+      // let options = editor.cadCanvas.getOptions();
+
 
       switch (tool) {
         case TOOL_NEW_CURVE:
@@ -637,7 +488,7 @@ export const onMouseDown = (event, editor) => {
           break;
         case TOOL_COPY_PASTE:
           {
-            copyPaste (editor, place, event);
+            copyPaste (editor);
         }
         break;
         default:
@@ -1056,10 +907,26 @@ export const toggleChanged = isChanged => {
     });
 };
 
+export const copyClick = (editor) => {
+  // let lastMode = editor.options.selectMode;
+  // editor.options.selectMode = "COPY";
+  copyPaste(editor, "COPY");
+};
 
-let copyPaste = (editor, place, event) => {
+export const pasteClick = (editor) => {
+  // editor.options.selectMode = "PASTE";
+  copyPaste(editor, "PASTE");
+};
+
+let copyPaste = (editor, copyPasteMode) => {
+
   let { renderer, scene, cadCanvas, camera } = editor;
-  if (editor.options.selectMode === "COPY"){
+  // todo place - місце для зберігання copyEntities, треба подумати де зберігати
+  let place = camera;
+  if (!place.copyEntities) {
+    place.copyEntities = [];
+  }
+  if (copyPasteMode === "COPY"){
     place.copyEntities = [];
 
     editor.activeEntities.forEach((line, i) => {
@@ -1087,7 +954,7 @@ let copyPaste = (editor, place, event) => {
       }
     });
     place.copyEntities[place.copyEntities.length] = GeometryUtils.getBoundingBox(editor.activeEntities);
-  } else if (editor.options.selectMode === "PASTE"){
+  } else if (copyPasteMode === "PASTE"){
     if (place.copyEntities.length) {
       let copyEntitiesBoundingBox = place.copyEntities[place.copyEntities.length-1];
       let changeGeometry = {
@@ -1095,17 +962,17 @@ let copyPaste = (editor, place, event) => {
         y: copyEntitiesBoundingBox.center.y - editor.camera.position.y
       };
       let parent;
-      if (!editor.editMode.isEdit) {
-        parent = cadCanvas.getNewLineLayer();
-      } else {
-        // todo де зберігаються нові лінії якщо без режиму змін об'єкту
-        parent = editor.editMode.editObject;
-      }
-
+        if (!editor.editMode.isEdit) {
+          parent = cadCanvas.getNewLineLayer();
+        } else {
+          // todo де зберігаються нові лінії якщо без режиму змін об'єкту
+          parent = editor.editMode.editObject;
+        }
+      let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
       place.copyEntities.forEach(line => {
         if (line.geometry) {
           if (line.geometry.type === "Geometry") {
-            let copyLines = {
+            let changeLineParameters = {
               0: {
                 x: line.geometry.vertices[0].x - changeGeometry.x,
                 y: line.geometry.vertices[0].y - changeGeometry.y
@@ -1115,17 +982,20 @@ let copyPaste = (editor, place, event) => {
                 y: line.geometry.vertices[1].y - changeGeometry.y
               }
             };
-            startNewLine(event, editor, copyLines[0]);
-            drawLine(event, editor, parent, copyLines);
-            saveNewLine(editor)
-
+            const copyLine = createLine(changeLineParameters[0], changeLineParameters[1]);
+            if (parent.children.length) {
+              copyLine.userData.originalColor = parent.children[0].userData.originalColor;
+            } else {
+              copyLine.userData.originalColor = 0x808000;
+            }
+            parent.add(copyLine)
           } else if (line.geometry.type === "CircleGeometry") {
             let changedGeometry = {
               radius: line.geometry.parameters.radius,
               thetaStart: line.geometry.parameters.thetaStart,
               thetaLength: line.geometry.parameters.thetaLength
             };
-            let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+
             let copyCircleGeometry = changeArcGeometry({ 0: "copy" }, changedGeometry);
             let copyCircle = new THREE.Line(copyCircleGeometry, materialLine);
             copyCircle.position.x = line.position.x - changeGeometry.x;
@@ -1145,228 +1015,3 @@ let copyPaste = (editor, place, event) => {
     }
   }
 };
-
-// todo у функцію нижче присобачити dispatch
-
-// let copyLine = (editor, event, lines, parent, changeGeometry) => {
-//   // debugger;
-//   if (!changeGeometry){
-//     changeGeometry = {
-//       x: 0,
-//       y: 0
-//     }
-//   }
-//   lines.forEach(line => {
-//     if (line.geometry) {
-//       if (line.geometry.type === "Geometry") {
-//         // debugger;
-//         let copyLines = {
-//           0: {
-//             x: line.geometry.vertices[0].x - changeGeometry.x,
-//             y: line.geometry.vertices[0].y - changeGeometry.y
-//           },
-//           1: {
-//             x: line.geometry.vertices[1].x - changeGeometry.x,
-//             y: line.geometry.vertices[1].y - changeGeometry.y
-//           }
-//         };
-//         startNewLine(event, editor, copyLines[0]);
-//         drawLine(event, editor, parent, copyLines);
-//         saveNewLine(editor)
-//
-//       } else if (line.geometry.type === "CircleGeometry") {
-//         let changedGeometry = {
-//           radius: line.geometry.parameters.radius,
-//           thetaStart: line.geometry.parameters.thetaStart,
-//           thetaLength: line.geometry.parameters.thetaLength
-//         };
-//         let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-//         let copyCircleGeometry = changeArcGeometry({ 0: "copy" }, changedGeometry);
-//         let copyCircle = new THREE.Line(copyCircleGeometry, materialLine);
-//         copyCircle.position.x = line.position.x - changeGeometry.x;
-//         copyCircle.position.y = line.position.y - changeGeometry.y;
-//         if (parent.children.length) {
-//           copyCircle.userData.originalColor = parent.children[0].userData.originalColor;
-//         } else {
-//           copyCircle.userData.originalColor = 0x808000;
-//         }
-//         parent.add(copyCircle);
-//       }
-//     }
-//   });
-//
-// };
-
-// let cadToolUndoRedoTest = (editor, event) => {
-//   let { tool, renderer, scene, cadCanvas, camera } = editor;
-//   let place = camera;
-//   if (!place.copyEntities) {
-//     place.copyEntities = [];
-//   }
-//   if (tool === "TOOL_UNDO") {
-//     // copy
-//     // debugger;
-//     // console.log (editor);
-//     // editor
-//     if (editor.activeEntities) {
-//       // copyEntities = [];
-//       place.copyEntities = editor.activeEntities.slice();
-//     } else {
-//       place.copyEntities = [];
-//     }
-//
-//   } else if (tool === "TOOL_REDO") {
-//     // paste
-//     console.log(place.copyEntities);
-//     // debugger;
-//
-//     if (place.copyEntities.length) {
-//       let changeGeometry = {};
-//       // if (place.copyEntities.length > 1) {
-//       let copyEntitiesBoundingBox = GeometryUtils.getBoundingBox(place.copyEntities);
-//       console.log(editor.camera);
-//       changeGeometry = {
-//         x: copyEntitiesBoundingBox.center.x - editor.camera.position.x,
-//         y: copyEntitiesBoundingBox.center.y - editor.camera.position.y
-//       };
-//       // debugger;
-//       // } else {
-//       //   debugger;
-//       //   if (place.copyEntities[0].geometry.type === "Geometry") {
-//       //     changeGeometry = {
-//       //       x: (place.copyEntities[0].geometry.vertices[0].x
-//       //       + place.copyEntities[0].geometry.vertices[1].x)/2
-//       // - editor.camera.position.x,
-//       //       y: (place.copyEntities[0].geometry.vertices[0].y
-//       //         + place.copyEntities[0].geometry.vertices[1].y)/2
-//       // - editor.camera.position.y
-//       //     }
-//       //   } else if (place.copyEntities[0].geometry.type === "circleGeometry"){
-//       //     changeGeometry = {
-//       //       // x: (place.copyEntities[0].geometry.vertices[0].x
-//       //       //   + place.copyEntities[0].geometry.vertices[1].x)/2,
-//       //       // y: (place.copyEntities[0].geometry.vertices[0].y
-//       //       //   + place.copyEntities[0].geometry.vertices[1].y)/2
-//       //     }
-//       //   }
-//       // }
-//       // let copyLines = [];
-//       let parent;
-//       if (!editor.editMode.isEdit) {
-//         parent = cadCanvas.getNewLineLayer();
-//       } else {
-//         // todo де зберігаються нові лінії якщо без режиму змін об'єкту
-//         parent = editor.editMode.editObject;
-//       }
-//
-//       place.copyEntities.forEach(line => {
-//         // debugger;
-//         if (line.geometry.type === "Geometry") {
-//           let copyLines = {
-//             0: {
-//               x: line.geometry.vertices[0].x - changeGeometry.x,
-//               y: line.geometry.vertices[0].y - changeGeometry.y
-//             },
-//             1: {
-//               x: line.geometry.vertices[1].x - changeGeometry.x,
-//               y: line.geometry.vertices[1].y - changeGeometry.y
-//             }
-//           };
-//
-//
-//           // debugger;
-//           startNewLine(event, editor, copyLines[0]);
-//           // debugger;
-//           drawLine(event, editor, parent, copyLines);
-//           saveNewLine(editor)
-//
-//           // copyLines[i] = line.clone();
-//           // copyLines[i].userData.helpPoints = {};
-//           // debugger;
-//           // copyLines[i].geometry.vertices[0].x = line.geometry.vertices[0].x - changeGeometry.x;
-//           // copyLines[i].geometry.vertices[1].x = line.geometry.vertices[1].x - changeGeometry.x;
-//           // copyLines[i].geometry.vertices[0].y = line.geometry.vertices[0].y - changeGeometry.y;
-//           // copyLines[i].geometry.vertices[1].y = line.geometry.vertices[1].y - changeGeometry.y;
-//           // console.log(copyLines[i].geometry.vertices);
-//           // console.log(line.geometry.vertices);
-//           // console.log(line);
-//           // debugger;
-//         } else if (line.geometry.type === "CircleGeometry") {
-//           // editor.editMode.newCurveCenter = true;
-//           editor.editMode.isNewCurve = true;
-//           // debugger;
-//           let copyLines = {
-//             0: {
-//               x: line.position.x - changeGeometry.x,
-//               y: line.position.y - changeGeometry.y
-//             },
-//             1: {
-//               x: line.userData.helpPoints.pointStart.position.x - changeGeometry.x,
-//               y: line.userData.helpPoints.pointStart.position.y - changeGeometry.y
-//             },
-//             2: {
-//               x: line.userData.helpPoints.pointEnd.position.x - changeGeometry.x,
-//               y: line.userData.helpPoints.pointEnd.position.y - changeGeometry.y
-//             }
-//           };
-//
-//           // console.log (line);
-//           // console.log (line.userData.helpPoints);
-//           // debugger;
-//
-//           // if (!editor.editMode.newCurveCenter) {
-//
-//           // debugger;
-//           // centerCurve(event, editor, copyLines[0]);
-//           // debugger;
-//           // console.log(editor.editMode.newCurveCenter);
-//           centerPoint(event, editor, copyLines[0]);
-//           // debugger;
-//           editor.editMode.newCurveCenter = {
-//             x: copyLines[0].x,
-//             y: copyLines[0].y
-//           };
-//           // console.log(editor.editMode.newCurveCenter);
-//
-//           // } else if (!editor.editMode.thetaStart) {
-//
-//           // debugger;
-//
-//
-//           // console.log(editor.editMode.newCurveCenter);
-//           radius(event, editor, copyLines[1]);
-//           // thetaStart(editor, copyLines[1]);
-//           // debugger;
-//           // editor.editMode.start = {
-//           //   x: copyLines[1].x,
-//           //   y: copyLines[1].y
-//           // };
-//           // editor.editMode.radius = line.geometry.parameters.radius;
-//
-//           thetaStart(editor);
-//           // editor.editMode.thetaStart = line.geometry.parameters.thetaStart;
-//
-//           // console.log(editor.editMode.thetaStart);
-//
-//           // } else if (!editor.editMode.thetaLength) {
-//
-//           // debugger;
-//           thetaLength(event, editor, parent, copyLines[2]);
-//           // editor.editMode.thetaLength = line.geometry.parameters.thetaLength;
-//           // editor.editMode.thetaLength = {
-//           //   x: copyLines[2].x,
-//           //   y: copyLines[2].y
-//           // };
-//           // debugger;
-//           // console.log(editor.editMode.thetaLength)(dispatch);
-//           saveNewCurve(editor);
-//           // saveNewCurve(editor, copyLines[2]);
-//           // }
-//           // debugger
-//
-//         }
-//       });
-//       renderer.render(scene, camera);
-//     }
-//   }
-// };

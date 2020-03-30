@@ -73,7 +73,7 @@ let checkGroupMove = (editor) => {
   if (!groupMove && helpLayer.children[helpLayer.children.length-1].name === "pointGeometryCenter"){
     helpLayer.children.pop()
   }
-}
+};
 
 export default {
   highlightVertex,

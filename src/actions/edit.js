@@ -337,14 +337,7 @@ export const drawLine = (event, editor, parent, copyPoint) => {
   let { scene, camera, renderer, editMode, cadCanvas } = editor;
 
   if (!parent.uuid){
-
     parent = cadCanvas.getNewLineLayer();
-    // if (!newLineLayer){
-    //   console.log (newLineLayer);
-      // scene.children[this.length] = scene.children
-      // debugger;
-    // }
-    // parent = scene.children[2].children;
   }
   let clickResult = sceneService.onClick(event, scene, camera);
   let mousePoint;
