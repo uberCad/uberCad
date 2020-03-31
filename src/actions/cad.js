@@ -294,8 +294,6 @@ export const cadClick = (event, editor) => {
         }
         break;
 
-      //todo не булоб логічно сюди перенести і інструмент TOOL_SELECT?
-
       case TOOL_MEASUREMENT:
         {
           let clickResult = sceneService.onClick(event, scene, camera);
@@ -305,17 +303,6 @@ export const cadClick = (event, editor) => {
             )}, ${clickResult.point.y.toFixed(4)}]`,
             clickResult
           );
-        }
-        break;
-      case TOOL_LINE:
-        {
-          // let clickResult = sceneService.onClick(event, scene, camera);
-          // console.log(
-          //   `Click position [${clickResult.point.x.toFixed(
-          //     4
-          //   )}, ${clickResult.point.y.toFixed(4)}]`,
-          //   clickResult
-          // );
         }
         break;
 
@@ -329,7 +316,7 @@ export const cadClick = (event, editor) => {
 
 export const onMouseDown = (event, editor) => {
   return dispatch => {
-    let { tool, camera } = editor;
+    let { tool } = editor;
     if (event.button === 0) {
       //new line
       // if (editor.editMode.isNewLine) {
@@ -337,6 +324,7 @@ export const onMouseDown = (event, editor) => {
       //     ? firstPoint(event, editor)(dispatch)
       //     : saveNewLine(editor)(dispatch);
       // }
+
       //new curve
       // if (editor.editMode.isNewCurve) {
       //   debugger;
@@ -348,6 +336,7 @@ export const onMouseDown = (event, editor) => {
       //     saveNewCurve(editor)(dispatch);
       //   }
       // }
+
       //clone object
       if (editor.editMode.clone.active) {
         if (!editor.editMode.clone.point) {
@@ -362,18 +351,6 @@ export const onMouseDown = (event, editor) => {
       if (editor.editMode.move.active && !editor.editMode.move.point) {
         moveObjectPoint(event, editor)(dispatch);
       }
-
-      // copy paste
-
-
-
-      // todo тут мав би бути лісенер зміни  editor.options щоб реагувати на нажаття кнопки "копировать" і "вставить"
-      // console.log(editor.options.selectMode);
-      // debugger;
-      // Object.observe ( editor.options,()=>{
-
-      // let options = editor.cadCanvas.getOptions();
-
 
       switch (tool) {
         case TOOL_NEW_CURVE:
@@ -509,7 +486,6 @@ export const onMouseUp = (event, editor) => {
     }
     // console.log(event);
     // console.log(editor);
-    // debugger;
 
     switch (tool) {
       case TOOL_SELECT:
@@ -609,22 +585,6 @@ export const onMouseMove = (event, editor) => {
   return dispatch => {
     let { tool } = editor;
 
-    //new Line
-    if (editor.editMode.isNewLine) {
-      let parent = editor.editMode.editObject;
-      if (!parent || parent.metadata) {
-        parent = editor.scene.getObjectByName('Layers').children[0];
-        dispatch({
-          type: PANEL_LAYERS_TOGGLE,
-          payload: {
-            activeLayer: parent
-          }
-        });
-      }
-      !editor.editMode.newLineFirst
-        ? startNewLine(event, editor)(dispatch)
-        : drawLine(event, editor, parent)(dispatch);
-    }
     //new Curve
 
     // if (editor.editMode.isNewCurve) {
@@ -728,6 +688,23 @@ export const onMouseMove = (event, editor) => {
 
       case TOOL_LINE:
         {
+
+          if (editor.editMode.isNewLine) {
+            let parent = editor.editMode.editObject;
+            if (!parent || parent.metadata) {
+              parent = editor.scene.getObjectByName('Layers').children[0];
+              dispatch({
+                type: PANEL_LAYERS_TOGGLE,
+                payload: {
+                  activeLayer: parent
+                }
+              });
+            }
+            !editor.editMode.newLineFirst
+              ? startNewLine(event, editor)(dispatch)
+              : drawLine(event, editor, parent)(dispatch);
+          }
+// todo розібратись з куском кода вище і нище, розібратись з новими лініями які паралельні і перпендикулярні
           // if (editor.tool === TOOL_LINE) {
           switch (editor.options.selectMode) {
             case LINE_TWO_POINT:
