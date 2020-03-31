@@ -18,10 +18,7 @@ import {
   setScale
 } from '../../actions/edit';
 
-import {
-  copyClick,
-  pasteClick
-} from '../../actions/cad';
+import { copyClick, pasteClick } from '../../actions/cad';
 
 // todo mapStateToProps об'являється двічі тут і в .\src\components\ActiveEntities\activeEntitiesComponentContainer.js
 const mapStateToProps = (state, ownProps) => {
@@ -92,10 +89,10 @@ const mapDispatchToProps = dispatch => {
     },
 
     copyClick: function(editor, event) {
-      copyClick (editor, event);
+      copyClick(editor, event);
     },
     pasteClick: function(editor, event) {
-      pasteClick (editor, event);
+      pasteClick(editor, event);
     }
   };
 };

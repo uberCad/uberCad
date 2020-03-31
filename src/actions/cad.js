@@ -6,10 +6,19 @@ import {
   TOOL_LINE,
   TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
-  TOOL_POINT, TOOL_REDO,
-  TOOL_SELECT, TOOL_UNDO
+  TOOL_POINT,
+  TOOL_REDO,
+  TOOL_SELECT,
+  TOOL_UNDO
 } from '../components/Toolbar/toolbarComponent';
-import { addHelpPoints, getScale, unselectLine, isPoint, changeArcGeometry, createLine } from '../services/editObject';
+import {
+  addHelpPoints,
+  getScale,
+  unselectLine,
+  isPoint,
+  changeArcGeometry,
+  createLine
+} from '../services/editObject';
 import { selectionBegin, selectionEnd, selectionUpdate } from './selection';
 import {
   radius,
@@ -245,7 +254,7 @@ export const cadClick = (event, editor) => {
                       activeLine: editor.activeEntities[0]
                     }
                   });
-                };
+                }
                 renderer.render(scene, camera);
               }
             } else {
@@ -261,9 +270,8 @@ export const cadClick = (event, editor) => {
                 let helpLayer = scene.getObjectByName('HelpLayer');
                 if (helpLayer.children.length) {
                   // console.log(helpLayer.children[helpLayer.children.length - 1]);
-                  helpLayer.children.forEach(testPoint=>{
-
-                    if (!isSelectPoint){
+                  helpLayer.children.forEach(testPoint => {
+                    if (!isSelectPoint) {
                       isSelectPoint = isPoint(
                         testPoint.position,
                         testPoint.geometry.parameters.radius,
@@ -272,15 +280,15 @@ export const cadClick = (event, editor) => {
                     }
                   });
                 }
-                if (!isSelectPoint){
-                unselectLine(editor.activeEntities, scene);
-                renderer.render(scene, camera);
-                dispatch({
-                  type: CAD_EDITMODE_UNSELECT_ACTIVE_LINE,
-                  payload: {
-                    activeLine: []
-                  }
-                });
+                if (!isSelectPoint) {
+                  unselectLine(editor.activeEntities, scene);
+                  renderer.render(scene, camera);
+                  dispatch({
+                    type: CAD_EDITMODE_UNSELECT_ACTIVE_LINE,
+                    payload: {
+                      activeLine: []
+                    }
+                  });
                 }
               }
             }
@@ -465,9 +473,9 @@ export const onMouseDown = (event, editor) => {
           break;
         case TOOL_COPY_PASTE:
           {
-            copyPaste (editor);
-        }
-        break;
+            copyPaste(editor);
+          }
+          break;
         default:
           console.log(`cadonMouseDown not handled for tool: ${tool}`);
           break;
@@ -583,7 +591,7 @@ export const onMouseUp = (event, editor) => {
 
 export const onMouseMove = (event, editor) => {
   return dispatch => {
-    let { tool } = editor;
+    let { tool, cadCanvas } = editor;
 
     //new Curve
 
@@ -688,40 +696,41 @@ export const onMouseMove = (event, editor) => {
 
       case TOOL_LINE:
         {
-
-          if (editor.editMode.isNewLine) {
-            let parent = editor.editMode.editObject;
-            if (!parent || parent.metadata) {
-              parent = editor.scene.getObjectByName('Layers').children[0];
-              dispatch({
-                type: PANEL_LAYERS_TOGGLE,
-                payload: {
-                  activeLayer: parent
-                }
-              });
-            }
-            !editor.editMode.newLineFirst
-              ? startNewLine(event, editor)(dispatch)
-              : drawLine(event, editor, parent)(dispatch);
+          let parent =
+            editor.editMode.isEdit
+             // ? editor.activeLayer
+              ? editor.editMode.editObject
+              : cadCanvas.getNewLineLayer();
+          if (!parent || parent.metadata) {
+            parent = editor.scene.getObjectByName('Layers').children[0];
+            dispatch({
+              type: PANEL_LAYERS_TOGGLE,
+              payload: {
+                activeLayer: parent
+              }
+            });
           }
-// todo розібратись з куском кода вище і нище, розібратись з новими лініями які паралельні і перпендикулярні
+
+          // todo розібратись з куском кода вище і нище, розібратись з новими лініями які паралельні і перпендикулярні
           // if (editor.tool === TOOL_LINE) {
           switch (editor.options.selectMode) {
             case LINE_TWO_POINT:
               {
-                let parent =
-                  editor.tool === TOOL_LINE
-                    ? editor.activeLayer
-                    : editor.editMode.editObject;
-                if (!parent || parent.metadata) {
-                  parent = editor.scene.getObjectByName('Layers').children[0];
-                  dispatch({
-                    type: PANEL_LAYERS_TOGGLE,
-                    payload: {
-                      activeLayer: parent
-                    }
-                  });
-                }
+                // let parent =
+                //   editor.editMode.isEdit
+                //     // ? editor.activeLayer
+                //     ? editor.editMode.editObject
+                //     : cadCanvas.getNewLineLayer();
+                // if (!parent || parent.metadata) {
+                //   parent = editor.scene.getObjectByName('Layers').children[0];
+                //   dispatch({
+                //     type: PANEL_LAYERS_TOGGLE,
+                //     payload: {
+                //       activeLayer: parent
+                //     }
+                //   });
+                // }
+
                 !editor.editMode.newLineFirst
                   ? startNewLine(event, editor)(dispatch)
                   : drawLine(event, editor, parent)(dispatch);
@@ -738,7 +747,8 @@ export const onMouseMove = (event, editor) => {
                   editor,
                   editor.line.parallel.baseLine,
                   editor.line.parallel.firstPoint,
-                  editor.line.parallel.distance
+                  editor.line.parallel.distance,
+                  parent
                 )(dispatch);
               }
 
@@ -753,7 +763,8 @@ export const onMouseMove = (event, editor) => {
                   event,
                   editor,
                   editor.line.perpendicular.baseLine,
-                  editor.line.perpendicular.firstPoint
+                  editor.line.perpendicular.firstPoint,
+                  parent
                 )(dispatch);
               }
 
@@ -765,7 +776,8 @@ export const onMouseMove = (event, editor) => {
                 tangentLineDraw(
                   event,
                   editor,
-                  editor.line.tangent.baseArc
+                  editor.line.tangent.baseArc,
+                  parent
                 )(dispatch);
               }
 
@@ -796,13 +808,13 @@ export const onMouseMove = (event, editor) => {
               }
             });
           }
-            if (!editor.editMode.newCurveCenter) {
-              centerCurve(event, editor)(dispatch);
-            } else if (!editor.editMode.thetaStart) {
-              radius(event, editor)(dispatch);
-            } else if (!editor.editMode.thetaLength) {
-              thetaLength(event, editor, parent)(dispatch);
-            }
+          if (!editor.editMode.newCurveCenter) {
+            centerCurve(event, editor)(dispatch);
+          } else if (!editor.editMode.thetaStart) {
+            radius(event, editor)(dispatch);
+          } else if (!editor.editMode.thetaLength) {
+            thetaLength(event, editor, parent)(dispatch);
+          }
         }
         break;
 
@@ -884,19 +896,18 @@ export const toggleChanged = isChanged => {
     });
 };
 
-export const copyClick = (editor) => {
+export const copyClick = editor => {
   // let lastMode = editor.options.selectMode;
   // editor.options.selectMode = "COPY";
   copyPaste(editor, "COPY");
 };
 
-export const pasteClick = (editor) => {
+export const pasteClick = editor => {
   // editor.options.selectMode = "PASTE";
   copyPaste(editor, "PASTE");
 };
 
 let copyPaste = (editor, copyPasteMode) => {
-
   let { renderer, scene, cadCanvas, camera } = editor;
   // todo place - місце для зберігання copyEntities, треба подумати де зберігати
   let place = camera;
@@ -911,8 +922,10 @@ let copyPaste = (editor, copyPasteMode) => {
         place.copyEntities[i] = {
           geometry: {
             type: line.geometry.type,
-            vertices: [new THREE.Vector3().copy(line.geometry.vertices[0]),
-              new THREE.Vector3().copy(line.geometry.vertices[1])]
+            vertices: [
+              new THREE.Vector3().copy(line.geometry.vertices[0]),
+              new THREE.Vector3().copy(line.geometry.vertices[1])
+            ]
           }
         };
       } else if (line.geometry.type === "CircleGeometry") {
@@ -930,21 +943,21 @@ let copyPaste = (editor, copyPasteMode) => {
         };
       }
     });
-    place.copyEntities[place.copyEntities.length] = GeometryUtils.getBoundingBox(editor.activeEntities);
-  } else if (copyPasteMode === "PASTE"){
+    place.copyEntities[
+      place.copyEntities.length
+    ] = GeometryUtils.getBoundingBox(editor.activeEntities);
+  } else if (copyPasteMode === "PASTE") {
     if (place.copyEntities.length) {
-      let copyEntitiesBoundingBox = place.copyEntities[place.copyEntities.length-1];
+      let copyEntitiesBoundingBox =
+        place.copyEntities[place.copyEntities.length - 1];
       let changeGeometry = {
         x: copyEntitiesBoundingBox.center.x - editor.camera.position.x,
         y: copyEntitiesBoundingBox.center.y - editor.camera.position.y
       };
-      let parent;
-        if (!editor.editMode.isEdit) {
-          parent = cadCanvas.getNewLineLayer();
-        } else {
-          // todo де зберігаються нові лінії якщо без режиму змін об'єкту
-          parent = editor.editMode.editObject;
-        }
+      let parent = !editor.editMode.isEdit
+        ? cadCanvas.getNewLineLayer()
+         // todo де зберігаються нові лінії якщо без режиму змін об'єкту
+        : editor.editMode.editObject;
       let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
       place.copyEntities.forEach(line => {
         if (line.geometry) {
@@ -959,13 +972,17 @@ let copyPaste = (editor, copyPasteMode) => {
                 y: line.geometry.vertices[1].y - changeGeometry.y
               }
             };
-            const copyLine = createLine(changeLineParameters[0], changeLineParameters[1]);
+            const copyLine = createLine(
+              changeLineParameters[0],
+              changeLineParameters[1]
+            );
             if (parent.children.length) {
-              copyLine.userData.originalColor = parent.children[0].userData.originalColor;
+              copyLine.userData.originalColor =
+                parent.children[0].userData.originalColor;
             } else {
               copyLine.userData.originalColor = 0x808000;
             }
-            parent.add(copyLine)
+            parent.add(copyLine);
           } else if (line.geometry.type === "CircleGeometry") {
             let changedGeometry = {
               radius: line.geometry.parameters.radius,
@@ -973,12 +990,16 @@ let copyPaste = (editor, copyPasteMode) => {
               thetaLength: line.geometry.parameters.thetaLength
             };
 
-            let copyCircleGeometry = changeArcGeometry({ 0: "copy" }, changedGeometry);
+            let copyCircleGeometry = changeArcGeometry(
+              { 0: "copy" },
+              changedGeometry
+            );
             let copyCircle = new THREE.Line(copyCircleGeometry, materialLine);
             copyCircle.position.x = line.position.x - changeGeometry.x;
             copyCircle.position.y = line.position.y - changeGeometry.y;
             if (parent.children.length) {
-              copyCircle.userData.originalColor = parent.children[0].userData.originalColor;
+              copyCircle.userData.originalColor =
+                parent.children[0].userData.originalColor;
             } else {
               copyCircle.userData.originalColor = 0x808000;
             }
@@ -986,7 +1007,6 @@ let copyPaste = (editor, copyPasteMode) => {
           }
         }
       });
-
 
       renderer.render(scene, camera);
     }

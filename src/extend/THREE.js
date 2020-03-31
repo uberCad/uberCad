@@ -71,7 +71,4 @@ let BulgeGeometry = function(startPoint, endPoint, bulge, segments) {
 };
 
 export * from 'three';
-export {
-  BulgeGeometry,
-  LegacyJSONLoader
-};
+export { BulgeGeometry, LegacyJSONLoader };

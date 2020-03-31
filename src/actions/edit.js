@@ -202,14 +202,15 @@ export const selectPoint = (lines, event, editor) => {
   const selectPointIndex = startPointIndex(lines, mousePoint, editor);
 
   // todo це тимчаасове рішення з змінною ліній в editor.editMode.activeLine
-  lines.forEach(line=> {
+  lines.forEach(line => {
     if (line.geometry.type === 'CircleGeometry') {
       if (!line.userData.helpGeometry) {
         line.userData.helpGeometry = {};
       }
       line.userData.helpGeometry.helpLength =
         line.geometry.parameters.thetaLength;
-      line.userData.helpGeometry.helpStart = line.geometry.parameters.thetaStart;
+      line.userData.helpGeometry.helpStart =
+        line.geometry.parameters.thetaStart;
     }
   });
   return dispatch => {
@@ -222,7 +223,7 @@ export const selectPoint = (lines, event, editor) => {
 };
 
 export const movePoint = (lines, index, event, editor) => {
-  let { scene, camera, renderer, cadCanvas } = editor;
+  let { scene, camera, cadCanvas } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   let point = {
     x: clickResult.point.x,
@@ -336,7 +337,7 @@ export const drawLine = (event, editor, parent, copyPoint) => {
 
   let { scene, camera, renderer, editMode, cadCanvas } = editor;
 
-  if (!parent.uuid){
+  if (!parent.uuid) {
     parent = cadCanvas.getNewLineLayer();
   }
   let clickResult = sceneService.onClick(event, scene, camera);
@@ -354,7 +355,7 @@ export const drawLine = (event, editor, parent, copyPoint) => {
     editMode.newLineFirst = {
       x: copyPoint[0].x,
       y: copyPoint[0].y
-    } ;
+    };
   }
 
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);

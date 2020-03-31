@@ -82,12 +82,12 @@ export default class OptionsComponent extends Component {
   };
 
   copy = event => {
-// todo розкомітити строку нижче якщо потрібний копіювати і через клік по сцені
+    // todo розкомітити строку нижче якщо потрібний копіювати і через клік по сцені
     // this.props.setSelectMode("COPY");
     this.props.copyClick(this.props.editor, event);
-};
+  };
 
-  paste = event =>{
+  paste = event => {
     // this.props.setSelectMode("PASTE");
     this.props.pasteClick(this.props.editor, event);
   };
@@ -304,10 +304,10 @@ export default class OptionsComponent extends Component {
         {tool === TOOL_COPY_PASTE && (
           <ul className="edit-group">
             <label>Copy / Paste: </label>
-            <button className="Copy" onClick={this.copy} >
+            <button className="Copy" onClick={this.copy}>
               Copy
             </button>
-            <button className="Paste" onClick={this.paste} >
+            <button className="Paste" onClick={this.paste}>
               Paste
             </button>
           </ul>

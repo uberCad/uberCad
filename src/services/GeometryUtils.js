@@ -5,8 +5,8 @@ import Path from '../classes/Path';
 import arrayUtils from './arrayUtils';
 
 let buildEdgeModel = (object, threshold = 0.000001) => {
-    // skip zero length lines
-    let entities = skipZeroLines([...object.children], threshold);
+  // skip zero length lines
+  let entities = skipZeroLines([...object.children], threshold);
   let vertices = getVertices(entities);
   let regions = [];
 
@@ -3247,8 +3247,8 @@ let getBoundingBox = objects => {
   });
 
   if (boundingBoxes.length) {
-      // merge boundingBoxes
-      let finalBoundingBox = boundingBoxes[0];
+    // merge boundingBoxes
+    let finalBoundingBox = boundingBoxes[0];
 
     for (let i = 1; i < boundingBoxes.length; i++) {
       if (boundingBoxes[i].min.x < finalBoundingBox.min.x)
@@ -3281,7 +3281,6 @@ let getBoundingBox = objects => {
   }
 
   return false;
-
 };
 
 let getArcBoundingBox = arc => {
