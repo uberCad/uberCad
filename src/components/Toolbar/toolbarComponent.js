@@ -132,7 +132,6 @@ export default class ToolbarComponent extends Component {
           )}
         </FormattedMessage>
 
-
         {/* <button className="btn" id="back" type="submit" disabled="true" ng-click="back()" title="Back"><i */}
         {/* class="fa fa-rotate-left"></i></button> */}
         {/* <button className="btn" id="forward" type="submit" disabled="true" ng-click="forward()" title="Forward"><i */}

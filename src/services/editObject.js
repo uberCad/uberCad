@@ -75,7 +75,6 @@ let addHelpPoints = (editor, scene) => {
       object.name = 'ActiveLine';
 
       if (object.geometry.type === 'Geometry') {
-
         let point1 = new THREE.Line(pointGeometry, pointMaterial);
         point1.position.x = object.geometry.vertices[0].x;
         point1.position.y = object.geometry.vertices[0].y;
@@ -147,14 +146,15 @@ let addHelpPoints = (editor, scene) => {
       // }
     }
   });
-  if (editor.activeEntities.length > 1){
-    let activeEntitiesBoundingBox = GeometryUtils.getBoundingBox (editor.activeEntities);
-    pointMaterial =
-      new THREE.LineBasicMaterial({
-        color: 0xff0000,
-        opacity: 0.8,
-        transparent: true
-      });
+  if (editor.activeEntities.length > 1) {
+    let activeEntitiesBoundingBox = GeometryUtils.getBoundingBox(
+      editor.activeEntities
+    );
+    pointMaterial = new THREE.LineBasicMaterial({
+      color: 0xff0000,
+      opacity: 0.8,
+      transparent: true
+    });
     let pointGeometryCenter = new THREE.Line(pointGeometry, pointMaterial);
     pointGeometryCenter.name = 'pointGeometryCenter';
 
@@ -162,7 +162,7 @@ let addHelpPoints = (editor, scene) => {
     pointGeometryCenter.position.y = activeEntitiesBoundingBox.center.y;
 
     helpLayer.add(pointGeometryCenter);
-    helpLayerService.checkGroupMove (editor);
+    helpLayerService.checkGroupMove(editor);
   }
 };
 
@@ -222,7 +222,6 @@ let isPoint = (a, r, rCenter) => {
 };
 
 let startPointIndex = (line, mousePoint, editor) => {
-
   // todo тимчасовий КОСТИЛЬ поки не буде реалізована спільна частина коду з рядків 199
   //   console.log(line);
   //   if (!line.geometry){
@@ -248,9 +247,12 @@ let startPointIndex = (line, mousePoint, editor) => {
   let scale = camera.top / 50;
   let helpLayer = scene.getObjectByName('HelpLayer');
 
-  if (helpLayer.children[helpLayer.children.length - 1] &&
+  if (
+    helpLayer.children[helpLayer.children.length - 1] &&
     editor.activeEntities.length !== 1 &&
-    helpLayer.children[helpLayer.children.length - 1].name == "pointGeometryCenter") {
+    helpLayer.children[helpLayer.children.length - 1].name ==
+      'pointGeometryCenter'
+  ) {
     isSelectPoint = isPoint(
       helpLayer.children[helpLayer.children.length - 1].position,
       scale,
@@ -263,14 +265,12 @@ let startPointIndex = (line, mousePoint, editor) => {
     index[0] = helpLayer.children.length - 1;
     editor.editMode.activeLine = activeEntities;
   } else {
-
     activeEntities.forEach(line => {
-
       let helpPoints = line.userData.helpPoints;
       // if(isSelectPoint == false){
       // console.log(line);
       if (line.geometry.type === 'Geometry') {
-        if (!helpPoints){
+        if (!helpPoints) {
           // todo щоб прибрати цей костиль потрібно добавить скидання  activeEntities при зміні режиму роботи на isEdit
           console.log('some thing gone wrong');
           // debugger;
@@ -326,7 +326,11 @@ let startPointIndex = (line, mousePoint, editor) => {
 
         arrPoint.push(rPosition, thetaStart, thetaLength, radius);
         let temporaryIndex = closestPoint(arrPoint, mousePoint);
-        const isSelectPoint = isPoint(arrPoint[temporaryIndex], scale, mousePoint);
+        const isSelectPoint = isPoint(
+          arrPoint[temporaryIndex],
+          scale,
+          mousePoint
+        );
         if (isSelectPoint) {
           if (temporaryIndex !== 0 && temporaryIndex !== 3) {
             index[index.length] = temporaryIndex;
@@ -349,7 +353,7 @@ let changeGeometry = (lines, index, point, scene, editor) => {
       let points = false;
       if (line.geometry.type === 'Geometry') {
         line.geometry.verticesNeedUpdate = true;
-        if (line.userData.helpPoints){
+        if (line.userData.helpPoints) {
           points = true;
         }
         if (points) {
@@ -410,41 +414,89 @@ let changeGeometry = (lines, index, point, scene, editor) => {
         let helpRad = 1e-3;
         let checkHelpPoint = line.userData.helpPoints;
         let selectLines = [];
-        editor.activeEntities.forEach((checkLine, j) => {
-            if (checkLine.geometry.type === 'Geometry') {
-              if ((checkLine.geometry.vertices[0].x - checkHelpPoint.pointStart.position.x) *
-                (checkLine.geometry.vertices[0].x - checkHelpPoint.pointStart.position.x) < helpRad &&
-                (checkLine.geometry.vertices[0].y - checkHelpPoint.pointStart.position.y) *
-                (checkLine.geometry.vertices[0].y - checkHelpPoint.pointStart.position.y) < helpRad) {
-                // debugger;
-                selectLines[selectLines.length] = [[checkLine], [0], line.userData.helpPoints.pointStart.position];
-                // changeGeometry ([checkLine], [0], line.userData.helpPoints.pointStart.position, scene);
-              } else if ((checkLine.geometry.vertices[1].x - checkHelpPoint.pointStart.position.x) *
-                (checkLine.geometry.vertices[1].x - checkHelpPoint.pointStart.position.x) < helpRad &&
-                (checkLine.geometry.vertices[1].y - checkHelpPoint.pointStart.position.y) *
-                (checkLine.geometry.vertices[1].y - checkHelpPoint.pointStart.position.y) < helpRad) {
-                // debugger;
-                selectLines[selectLines.length] = [[checkLine], [1], line.userData.helpPoints.pointStart.position];
-                // changeGeometry ([checkLine], [1], line.userData.helpPoints.pointStart.position, scene);
-              } else if ((checkLine.geometry.vertices[0].x - checkHelpPoint.pointEnd.position.x) *
-                (checkLine.geometry.vertices[0].x - checkHelpPoint.pointEnd.position.x) < helpRad &&
-                (checkLine.geometry.vertices[0].y - checkHelpPoint.pointEnd.position.y) *
-                (checkLine.geometry.vertices[0].y - checkHelpPoint.pointEnd.position.y) < helpRad) {
-                // debugger;
-                selectLines[selectLines.length] = [[checkLine], [0], line.userData.helpPoints.pointEnd.position];
-                // changeGeometry ([checkLine], [0], line.userData.helpPoints.pointEnd.position, scene);
-              } else if ((checkLine.geometry.vertices[1].x - checkHelpPoint.pointEnd.position.x) *
-                (checkLine.geometry.vertices[1].x - checkHelpPoint.pointEnd.position.x) < helpRad &&
-                (checkLine.geometry.vertices[1].y - checkHelpPoint.pointEnd.position.y) *
-                (checkLine.geometry.vertices[1].y - checkHelpPoint.pointEnd.position.y) < helpRad) {
-                // debugger;
-                selectLines[selectLines.length] = [[checkLine], [1], line.userData.helpPoints.pointEnd.position];
-                // changeGeometry ([checkLine], [1], line.userData.helpPoints.pointEnd.position, scene);
-              }
-
-              // line.userData.helpPoints.pointStart.position;
-              // line.userData.helpPoints.pointEnd.position;
+        editor.activeEntities.forEach(checkLine => {
+          if (checkLine.geometry.type === 'Geometry') {
+            if (
+              (checkLine.geometry.vertices[0].x -
+                checkHelpPoint.pointStart.position.x) *
+                (checkLine.geometry.vertices[0].x -
+                  checkHelpPoint.pointStart.position.x) <
+                helpRad &&
+              (checkLine.geometry.vertices[0].y -
+                checkHelpPoint.pointStart.position.y) *
+                (checkLine.geometry.vertices[0].y -
+                  checkHelpPoint.pointStart.position.y) <
+                helpRad
+            ) {
+              // debugger;
+              selectLines[selectLines.length] = [
+                [checkLine],
+                [0],
+                line.userData.helpPoints.pointStart.position
+              ];
+              // changeGeometry ([checkLine], [0], line.userData.helpPoints.pointStart.position, scene);
+            } else if (
+              (checkLine.geometry.vertices[1].x -
+                checkHelpPoint.pointStart.position.x) *
+                (checkLine.geometry.vertices[1].x -
+                  checkHelpPoint.pointStart.position.x) <
+                helpRad &&
+              (checkLine.geometry.vertices[1].y -
+                checkHelpPoint.pointStart.position.y) *
+                (checkLine.geometry.vertices[1].y -
+                  checkHelpPoint.pointStart.position.y) <
+                helpRad
+            ) {
+              // debugger;
+              selectLines[selectLines.length] = [
+                [checkLine],
+                [1],
+                line.userData.helpPoints.pointStart.position
+              ];
+              // changeGeometry ([checkLine], [1], line.userData.helpPoints.pointStart.position, scene);
+            } else if (
+              (checkLine.geometry.vertices[0].x -
+                checkHelpPoint.pointEnd.position.x) *
+                (checkLine.geometry.vertices[0].x -
+                  checkHelpPoint.pointEnd.position.x) <
+                helpRad &&
+              (checkLine.geometry.vertices[0].y -
+                checkHelpPoint.pointEnd.position.y) *
+                (checkLine.geometry.vertices[0].y -
+                  checkHelpPoint.pointEnd.position.y) <
+                helpRad
+            ) {
+              // debugger;
+              selectLines[selectLines.length] = [
+                [checkLine],
+                [0],
+                line.userData.helpPoints.pointEnd.position
+              ];
+              // changeGeometry ([checkLine], [0], line.userData.helpPoints.pointEnd.position, scene);
+            } else if (
+              (checkLine.geometry.vertices[1].x -
+                checkHelpPoint.pointEnd.position.x) *
+                (checkLine.geometry.vertices[1].x -
+                  checkHelpPoint.pointEnd.position.x) <
+                helpRad &&
+              (checkLine.geometry.vertices[1].y -
+                checkHelpPoint.pointEnd.position.y) *
+                (checkLine.geometry.vertices[1].y -
+                  checkHelpPoint.pointEnd.position.y) <
+                helpRad
+            ) {
+              // debugger;
+              selectLines[selectLines.length] = [
+                [checkLine],
+                [1],
+                line.userData.helpPoints.pointEnd.position
+              ];
+              // changeGeometry ([checkLine], [1], line.userData.helpPoints.pointEnd.position, scene);
             }
+
+            // line.userData.helpPoints.pointStart.position;
+            // line.userData.helpPoints.pointEnd.position;
+          }
         });
 
         let changedGeometry = {
@@ -483,34 +535,32 @@ let changeGeometry = (lines, index, point, scene, editor) => {
             // *index === 3 change radius arc
             changedGeometry.radius = radiusArc(point, line);
             changedGeometry.thetaStart = line.geometry.parameters.thetaStart;
-            changedGeometry.thetaLength =
-              line.geometry.parameters.thetaLength;
+            changedGeometry.thetaLength = line.geometry.parameters.thetaLength;
           }
           line.geometry = changeArcGeometry(line.geometry, changedGeometry);
         }
         circleHelpPoint(line, scene);
-        if (selectLines){
-          selectLines.forEach((line)=>changeGeometry (line[0],line[1],line[2],scene, editor));
+        if (selectLines) {
+          selectLines.forEach(line =>
+            changeGeometry(line[0], line[1], line[2], scene, editor)
+          );
         }
-
       }
     });
     // } else{
     //   // todo  для декількох ліній
-  } else if (lines.length && index.length === 1){
+  } else if (lines.length && index.length === 1) {
     let helpLayer = scene.getObjectByName('HelpLayer');
-    let pointGeometryCenter = helpLayer.children[helpLayer.children.length-1];
+    let pointGeometryCenter = helpLayer.children[helpLayer.children.length - 1];
     console.log(pointGeometryCenter);
     if (pointGeometryCenter.userData.groupMove) {
-      lines.forEach((line) => {
+      lines.forEach(line => {
         let changeX = point.x - pointGeometryCenter.position.x;
         let changeY = point.y - pointGeometryCenter.position.y;
-
 
         // todo circle helpPoint group move
 
         if (line.geometry.type === 'Geometry') {
-
           line.geometry.verticesNeedUpdate = true;
           let point1 = line.userData.helpPoints.point1;
           let point2 = line.userData.helpPoints.point2;
@@ -547,7 +597,7 @@ let changeGeometry = (lines, index, point, scene, editor) => {
 };
 
 let changeArcGeometry = (arcGeometry, parameters) => {
-  if (arcGeometry[0] !== "copy") {
+  if (arcGeometry[0] !== 'copy') {
     arcGeometry.dispose();
   }
   let geometry = new THREE.CircleGeometry(

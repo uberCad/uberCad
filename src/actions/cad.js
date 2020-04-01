@@ -696,11 +696,9 @@ export const onMouseMove = (event, editor) => {
 
       case TOOL_LINE:
         {
-          let parent =
-            editor.editMode.isEdit
-             // ? editor.activeLayer
-              ? editor.editMode.editObject
-              : cadCanvas.getNewLineLayer();
+          let parent = editor.editMode.isEdit
+            ? editor.editMode.editObject
+            : cadCanvas.getNewLineLayer();
           if (!parent || parent.metadata) {
             parent = editor.scene.getObjectByName('Layers').children[0];
             dispatch({
@@ -795,10 +793,9 @@ export const onMouseMove = (event, editor) => {
       case TOOL_NEW_CURVE:
         {
           // todo добавити слой parent у випадку isEdit - false
-          let parent =
-            editor.editMode.isEdit
-              ? editor.editMode.editObject
-              : editor.activeLayer;
+          let parent = editor.editMode.isEdit
+            ? editor.editMode.editObject
+            : editor.activeLayer;
           if (!parent || parent.metadata) {
             parent = editor.scene.getObjectByName('Layers').children[0];
             dispatch({
@@ -899,12 +896,12 @@ export const toggleChanged = isChanged => {
 export const copyClick = editor => {
   // let lastMode = editor.options.selectMode;
   // editor.options.selectMode = "COPY";
-  copyPaste(editor, "COPY");
+  copyPaste(editor, 'COPY');
 };
 
 export const pasteClick = editor => {
   // editor.options.selectMode = "PASTE";
-  copyPaste(editor, "PASTE");
+  copyPaste(editor, 'PASTE');
 };
 
 let copyPaste = (editor, copyPasteMode) => {
@@ -914,11 +911,11 @@ let copyPaste = (editor, copyPasteMode) => {
   if (!place.copyEntities) {
     place.copyEntities = [];
   }
-  if (copyPasteMode === "COPY"){
+  if (copyPasteMode === 'COPY') {
     place.copyEntities = [];
 
     editor.activeEntities.forEach((line, i) => {
-      if (line.geometry.type === "Geometry") {
+      if (line.geometry.type === 'Geometry') {
         place.copyEntities[i] = {
           geometry: {
             type: line.geometry.type,
@@ -928,7 +925,7 @@ let copyPaste = (editor, copyPasteMode) => {
             ]
           }
         };
-      } else if (line.geometry.type === "CircleGeometry") {
+      } else if (line.geometry.type === 'CircleGeometry') {
         console.log(line.geometry);
         place.copyEntities[i] = {
           geometry: {
@@ -946,7 +943,7 @@ let copyPaste = (editor, copyPasteMode) => {
     place.copyEntities[
       place.copyEntities.length
     ] = GeometryUtils.getBoundingBox(editor.activeEntities);
-  } else if (copyPasteMode === "PASTE") {
+  } else if (copyPasteMode === 'PASTE') {
     if (place.copyEntities.length) {
       let copyEntitiesBoundingBox =
         place.copyEntities[place.copyEntities.length - 1];
@@ -956,12 +953,12 @@ let copyPaste = (editor, copyPasteMode) => {
       };
       let parent = !editor.editMode.isEdit
         ? cadCanvas.getNewLineLayer()
-         // todo де зберігаються нові лінії якщо без режиму змін об'єкту
         : editor.editMode.editObject;
+      // todo де зберігаються нові лінії якщо без режиму змін об'єкту
       let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
       place.copyEntities.forEach(line => {
         if (line.geometry) {
-          if (line.geometry.type === "Geometry") {
+          if (line.geometry.type === 'Geometry') {
             let changeLineParameters = {
               0: {
                 x: line.geometry.vertices[0].x - changeGeometry.x,
@@ -983,7 +980,7 @@ let copyPaste = (editor, copyPasteMode) => {
               copyLine.userData.originalColor = 0x808000;
             }
             parent.add(copyLine);
-          } else if (line.geometry.type === "CircleGeometry") {
+          } else if (line.geometry.type === 'CircleGeometry') {
             let changedGeometry = {
               radius: line.geometry.parameters.radius,
               thetaStart: line.geometry.parameters.thetaStart,
@@ -991,7 +988,7 @@ let copyPaste = (editor, copyPasteMode) => {
             };
 
             let copyCircleGeometry = changeArcGeometry(
-              { 0: "copy" },
+              { 0: 'copy' },
               changedGeometry
             );
             let copyCircle = new THREE.Line(copyCircleGeometry, materialLine);
