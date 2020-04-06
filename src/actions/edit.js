@@ -192,26 +192,27 @@ export const saveEdit = editor => {
   };
 };
 
-export const selectPoint = (line, event, editor) => {
+export const selectPoint = (lines, event, editor) => {
   let { scene, camera } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   let mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
   };
-  const selectPointIndex = startPointIndex(line, mousePoint, editor);
+  const selectPointIndex = startPointIndex(lines, mousePoint, editor);
 
   // todo це тимчаасове рішення з змінною ліній в editor.editMode.activeLine
-  // debugger;
-  if (line[0].geometry.type === 'CircleGeometry') {
-    if (!line[0].userData.helpGeometry) {
-      line.userData.helpGeometry = {};
+  lines.forEach(line => {
+    if (line.geometry.type === 'CircleGeometry') {
+      if (!line.userData.helpGeometry) {
+        line.userData.helpGeometry = {};
+      }
+      line.userData.helpGeometry.helpLength =
+        line.geometry.parameters.thetaLength;
+      line.userData.helpGeometry.helpStart =
+        line.geometry.parameters.thetaStart;
     }
-    line.userData.helpGeometry.helpLength =
-      line.geometry.parameters.thetaLength;
-    line.userData.helpGeometry.helpStart = line.geometry.parameters.thetaStart;
-  }
-
+  });
   return dispatch => {
     activePoint()(dispatch);
     dispatch({
@@ -221,8 +222,8 @@ export const selectPoint = (line, event, editor) => {
   };
 };
 
-export const movePoint = (line, index, event, editor) => {
-  let { scene, camera, renderer } = editor;
+export const movePoint = (lines, index, event, editor) => {
+  let { scene, camera, cadCanvas } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   let point = {
     x: clickResult.point.x,
@@ -230,8 +231,10 @@ export const movePoint = (line, index, event, editor) => {
   };
   const crossing = crossingPoint(point, clickResult.activeEntities);
   const pointCnange = crossing ? crossing : point;
-  changeGeometry(line, index, pointCnange, scene);
-  renderer.render(scene, camera);
+  changeGeometry(lines, index, pointCnange, scene, editor);
+
+  cadCanvas.render();
+  // renderer.render(scene, camera);
 
   return dispatch => {
     crossing
@@ -284,6 +287,8 @@ export const cancelNewLine = editor => {
 };
 
 export const firstPoint = (event, editor) => {
+  editor.editMode.isNewLine = true;
+  // debugger;
   let { scene, camera } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   let mousePoint = {
@@ -301,13 +306,21 @@ export const firstPoint = (event, editor) => {
   };
 };
 
-export const startNewLine = (event, editor) => {
+export const startNewLine = (event, editor, copyPoint) => {
   let { scene, camera } = editor;
+  let mousePoint;
   let clickResult = sceneService.onClick(event, scene, camera);
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  };
+  if (!copyPoint) {
+    mousePoint = {
+      x: clickResult.point.x,
+      y: clickResult.point.y
+    };
+  } else {
+    mousePoint = {
+      x: copyPoint.x,
+      y: copyPoint.y
+    };
+  }
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   return dispatch => {
     crossing
@@ -316,22 +329,48 @@ export const startNewLine = (event, editor) => {
   };
 };
 
-export const drawLine = (event, editor, parent) => {
-  let { scene, camera, renderer, editMode } = editor;
+export const drawLine = (event, editor, parent, copyPoint) => {
+  // debugger;
+  //16.03.20 що в радиелю зараз робота з созданием линии
+  // console.log(parent);
+  // debugger;
+
+  let { scene, camera, renderer, editMode, cadCanvas } = editor;
+
+  if (!parent.uuid) {
+    parent = cadCanvas.getNewLineLayer();
+  }
   let clickResult = sceneService.onClick(event, scene, camera);
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  };
+  let mousePoint;
+  if (!copyPoint) {
+    mousePoint = {
+      x: clickResult.point.x,
+      y: clickResult.point.y
+    };
+  } else {
+    mousePoint = {
+      x: copyPoint[1].x,
+      y: copyPoint[1].y
+    };
+    editMode.newLineFirst = {
+      x: copyPoint[0].x,
+      y: copyPoint[0].y
+    };
+  }
+
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   const secondPoint = crossing ? crossing : mousePoint;
 
   let changeLine = scene.getObjectByName('newLine');
   if (changeLine) {
-    changeGeometry(changeLine, 1, secondPoint, scene);
+    changeGeometry([changeLine], [1], secondPoint, scene, editor);
   } else {
     const line = createLine(editMode.newLineFirst, secondPoint);
-    line.userData.originalColor = parent.children[0].userData.originalColor;
+    if (parent.children.length) {
+      line.userData.originalColor = parent.children[0].userData.originalColor;
+    } else {
+      line.userData.originalColor = 0x808000;
+    }
     parent.add(line);
   }
   renderer.render(scene, camera);
@@ -343,6 +382,8 @@ export const drawLine = (event, editor, parent) => {
 };
 
 export const saveNewLine = editor => {
+  // debugger;
+  editor.editMode.isNewLine = false;
   const line = editor.scene.getObjectByName('newLine');
   if (line) {
     line.name = '';
@@ -393,13 +434,21 @@ export const cancelNewCurve = editor => {
   };
 };
 
-export const centerPoint = (event, editor) => {
+export const centerPoint = (event, editor, copyPoint) => {
   let { scene, camera } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  };
+  let mousePoint;
+  if (!copyPoint) {
+    mousePoint = {
+      x: clickResult.point.x,
+      y: clickResult.point.y
+    };
+  } else {
+    mousePoint = {
+      x: copyPoint.x,
+      y: copyPoint.y
+    };
+  }
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   const firstPoint = crossing ? crossing : mousePoint;
 
@@ -411,13 +460,21 @@ export const centerPoint = (event, editor) => {
   };
 };
 
-export const centerCurve = (event, editor) => {
+export const centerCurve = (event, editor, copyPoint) => {
   let { scene, camera } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  };
+  let mousePoint;
+  if (!copyPoint) {
+    mousePoint = {
+      x: clickResult.point.x,
+      y: clickResult.point.y
+    };
+  } else {
+    mousePoint = {
+      x: copyPoint.x,
+      y: copyPoint.y
+    };
+  }
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   return dispatch => {
     crossing
@@ -426,13 +483,21 @@ export const centerCurve = (event, editor) => {
   };
 };
 
-export const radius = (event, editor) => {
+export const radius = (event, editor, copyPoint) => {
   let { scene, camera, renderer, editMode } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  };
+  let mousePoint;
+  if (!copyPoint) {
+    mousePoint = {
+      x: clickResult.point.x,
+      y: clickResult.point.y
+    };
+  } else {
+    mousePoint = {
+      x: copyPoint.x,
+      y: copyPoint.y
+    };
+  }
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   const start = !crossing ? mousePoint : crossing;
   let radius = Math.sqrt(
@@ -468,7 +533,7 @@ export const thetaStart = editor => {
   };
 };
 
-export const thetaLength = (event, editor, parent) => {
+export const thetaLength = (event, editor, parent, copyPoint) => {
   let { scene, camera, renderer, editMode } = editor;
   const thetaStart = circleIntersectionAngle(
     editMode.thetaStart,
@@ -479,10 +544,18 @@ export const thetaLength = (event, editor, parent) => {
     newArc(editMode.radius, thetaStart, 0.1);
 
   let clickResult = sceneService.onClick(event, scene, camera);
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  };
+  let mousePoint;
+  if (!copyPoint) {
+    mousePoint = {
+      x: clickResult.point.x,
+      y: clickResult.point.y
+    };
+  } else {
+    mousePoint = {
+      x: copyPoint.x,
+      y: copyPoint.y
+    };
+  }
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   const length = !crossing ? mousePoint : crossing;
   const t = editThetaLenght(length, oldLine);

@@ -18,13 +18,23 @@ import {
   setScale
 } from '../../actions/edit';
 
+import { copyClick, pasteClick } from '../../actions/cad';
+
+// todo mapStateToProps об'являється двічі тут і в .\src\components\ActiveEntities\activeEntitiesComponentContainer.js
 const mapStateToProps = (state, ownProps) => {
   return {
     lang: state.locale.lang,
     editor: {
       scene: state.cad.scene,
       camera: state.cad.camera,
-      renderer: state.cad.renderer
+      renderer: state.cad.renderer,
+      cadCanvas: state.cad.cadCanvas,
+      activeEntities: state.cad.activeEntities,
+      copyEntities: state.cad.copyEntities, // todo тимчасове зберігання копіюємих об'єктів
+      options: state.options,
+      editMode: state.cad.editMode,
+      isEdit: state.cad.editMode.isEdit,
+      activeLine: state.cad.activeLine
     },
     scene: state.cad.scene,
     tool: state.toolbar.tool,
@@ -76,6 +86,13 @@ const mapDispatchToProps = dispatch => {
     },
     setScale: function(scale, scaleObject, editor) {
       setScale(scale, scaleObject, editor)(dispatch);
+    },
+
+    copyClick: function(editor, event) {
+      copyClick(editor, event);
+    },
+    pasteClick: function(editor, event) {
+      pasteClick(editor, event);
     }
   };
 };

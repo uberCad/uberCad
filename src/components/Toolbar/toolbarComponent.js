@@ -9,6 +9,7 @@ import toolRedo from './redo.svg';
 import toolLine from './line.svg';
 import toolCurve from './curve.svg';
 import toolMeasurement from './measurement.svg';
+import toolCopyPaste from './copy.svg';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
@@ -19,6 +20,7 @@ export const TOOL_REDO = 'TOOL_REDO';
 export const TOOL_NEW_CURVE = 'TOOL_NEW_CURVE';
 export const TOOL_MEASUREMENT = 'TOOL_MEASUREMENT';
 export const TOOL_LINE = 'TOOL_LINE';
+export const TOOL_COPY_PASTE = 'TOOL_COPY_PASTE';
 
 export default class ToolbarComponent extends Component {
   onClick = ({
@@ -113,6 +115,19 @@ export default class ToolbarComponent extends Component {
               title={value}
             >
               <img src={toolCurve} alt="New curve" />
+            </button>
+          )}
+        </FormattedMessage>
+
+        <FormattedMessage id="toolbar.copy" defaultMessage="Copy / Paste">
+          {value => (
+            <button
+              className={`btn ${tool === TOOL_COPY_PASTE ? 'btn-success' : ''}`}
+              data-tool={TOOL_COPY_PASTE}
+              onClick={this.onClick}
+              title={value}
+            >
+              <img src={toolCopyPaste} alt="Copy / Paste" />
             </button>
           )}
         </FormattedMessage>
