@@ -1381,6 +1381,21 @@ let removeLineByName = (name, scene) => {
   }
 };
 
+
+
+let getOffset = elem => {
+  let offset = null;
+  if (elem) {
+    offset = { left: 0, top: 0 };
+    do {
+      offset.top += elem.offsetTop;
+      offset.left += elem.offsetLeft;
+      elem = elem.offsetParent;
+    } while (elem);
+  }
+  return offset;
+};
+
 export default {
   canvasClick,
   onClick,
@@ -1403,17 +1418,4 @@ export default {
   removeLineByName,
   getEntityNeighbours,
   getOffset
-};
-
-let getOffset = (elem) => {
-  let offset = null;
-  if (elem) {
-    offset = { left: 0, top: 0 };
-    do {
-      offset.top += elem.offsetTop;
-      offset.left += elem.offsetLeft;
-      elem = elem.offsetParent;
-    } while (elem);
-  }
-  return offset;
 };

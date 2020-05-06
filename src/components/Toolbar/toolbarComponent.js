@@ -136,10 +136,15 @@ export default class ToolbarComponent extends Component {
           )}
         </FormattedMessage>
 
-        <FormattedMessage id="toolbar.toolBorderRadius" defaultMessage="Border Radius">
+        <FormattedMessage
+          id="toolbar.toolBorderRadius"
+          defaultMessage="Border Radius"
+        >
           {value => (
             <button
-              className={`btn ${tool === TOOL_BORDER_RADIUS ? 'btn-success' : ''}`}
+              className={`btn ${
+                tool === TOOL_BORDER_RADIUS ? 'btn-success' : ''
+              }`}
               data-tool={TOOL_BORDER_RADIUS}
               onClick={this.onClick}
               title={value}
