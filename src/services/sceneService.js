@@ -1401,10 +1401,11 @@ export default {
   sendToFlixo,
   someSvg,
   removeLineByName,
-  getEntityNeighbours
+  getEntityNeighbours,
+  getOffset
 };
 
-function getOffset(elem) {
+let getOffset = (elem) => {
   let offset = null;
   if (elem) {
     offset = { left: 0, top: 0 };
@@ -1415,4 +1416,4 @@ function getOffset(elem) {
     } while (elem);
   }
   return offset;
-}
+};

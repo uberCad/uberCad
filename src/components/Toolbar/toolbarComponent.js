@@ -10,6 +10,8 @@ import toolLine from './line.svg';
 import toolCurve from './curve.svg';
 import toolMeasurement from './measurement.svg';
 import toolCopyPaste from './copy.svg';
+import toolBorderRadius from './borderRadius.svg';
+import toolFacet from './facet.svg';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
@@ -21,6 +23,8 @@ export const TOOL_NEW_CURVE = 'TOOL_NEW_CURVE';
 export const TOOL_MEASUREMENT = 'TOOL_MEASUREMENT';
 export const TOOL_LINE = 'TOOL_LINE';
 export const TOOL_COPY_PASTE = 'TOOL_COPY_PASTE';
+export const TOOL_BORDER_RADIUS = 'TOOL_BORDER_RADIUS';
+export const TOOL_FACET = 'TOOL_FACET';
 
 export default class ToolbarComponent extends Component {
   onClick = ({
@@ -128,6 +132,32 @@ export default class ToolbarComponent extends Component {
               title={value}
             >
               <img src={toolCopyPaste} alt="Copy / Paste" />
+            </button>
+          )}
+        </FormattedMessage>
+
+        <FormattedMessage id="toolbar.toolBorderRadius" defaultMessage="Border Radius">
+          {value => (
+            <button
+              className={`btn ${tool === TOOL_BORDER_RADIUS ? 'btn-success' : ''}`}
+              data-tool={TOOL_BORDER_RADIUS}
+              onClick={this.onClick}
+              title={value}
+            >
+              <img src={toolBorderRadius} alt="Border Radius" />
+            </button>
+          )}
+        </FormattedMessage>
+
+        <FormattedMessage id="toolbar.toolFacet" defaultMessage="Facet">
+          {value => (
+            <button
+              className={`btn ${tool === TOOL_FACET ? 'btn-success' : ''}`}
+              data-tool={TOOL_FACET}
+              onClick={this.onClick}
+              title={value}
+            >
+              <img src={toolFacet} alt="Facet" />
             </button>
           )}
         </FormattedMessage>
