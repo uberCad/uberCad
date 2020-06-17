@@ -95,6 +95,7 @@ import GeometryUtils from '../services/GeometryUtils';
 import * as THREE from '../extend/THREE';
 import { movePointInfo } from './pointInfo';
 import helpLayerService from '../services/helpLayerService';
+import { chooseTool } from './toolbar';
 
 export const CAD_PARSE_DXF = 'CAD_PARSE_DXF';
 export const CAD_DRAW_DXF = 'CAD_DRAW_DXF';
@@ -110,9 +111,10 @@ export const CAD_EDITMODE_SET_ACTIVE_LINE = 'CAD_EDITMODE_SET_ACTIVE_LINE';
 export const CAD_EDITMODE_UNSELECT_ACTIVE_LINE =
   'CAD_EDITMODE_UNSELECT_ACTIVE_LINE';
 export const CAD_IS_CHANGED = 'CAD_IS_CHANGED';
+export const MOVE_NEW_OBJECT = 'MOVE_NEW_OBJECT';
 
-export const drawDxf = (data = null, container, snapshot = null) => {
-  let cadCanvas = new Viewer(data, container, snapshot);
+export const drawDxf = (data = null, container, snapshot = null, editor = null) => {
+  let cadCanvas = new Viewer(data, container, snapshot, null ,editor);
   let scene = cadCanvas.getScene();
   let camera = cadCanvas.getCamera();
   let renderer = cadCanvas.getRenderer();
@@ -240,10 +242,6 @@ export const cadClick = (event, editor) => {
                 });
 
                 // console.log("we need more console.log or cad active entities");
-                // console.log(activeEntities);
-                // console.log(editor);
-                // debugger;
-
                 const rPoint = getScale(camera);
                 addHelpPoints(editor, scene, rPoint);
 
@@ -319,8 +317,15 @@ export const cadClick = (event, editor) => {
         }
         break;
 
+      case MOVE_NEW_OBJECT:
+      {
+        chooseTool(editor.options.oldMode? editor.options.selectMode:'TOOL_POINT')(dispatch);
+        editor.options.oldMode = "";
+        delete editor.editMode.activeLine.lines;
+      }
+        break;
+
       default:
-        //todo p.s. TOOL_SELECT сюди всерівно потрапляє
         console.log(`cadClick not handled for tool: ${tool}`);
         break;
     }
@@ -1207,6 +1212,20 @@ export const onMouseMove = (event, editor) => {
             movePointInfo(event, 'Сhoose a corner')(dispatch);
           }
         }
+        break;
+
+      case MOVE_NEW_OBJECT:
+      {
+        let newObjectLines = editor.editMode.activeLine.lines;
+        if (newObjectLines){
+          movePoint(
+            newObjectLines,
+            'MOVE_NEW_OBJECT',
+            event,
+            editor
+          )(dispatch);
+        }
+      }
         break;
 
       default:

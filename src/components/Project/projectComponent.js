@@ -33,6 +33,7 @@ export default class ProjectComponent extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    // обновлення списку об'єктів на сцені
     if (this._input) this._input.focus();
 
     if (prevProps.match.params.id !== this.props.match.params.id) {

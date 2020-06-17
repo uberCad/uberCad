@@ -53,6 +53,19 @@ export default {
       },
       save: 'Save'
     },
+    addElementToDB: {
+      newProgect: 'Add new element',
+      modal: {
+        title: 'Add new element',
+        inputLabel: 'Element name',
+        inputPlaceholder: 'Enter name',
+        inputType: 'Element type',
+        inputPlaceholderType: 'Enter type',
+        inputMaterial: 'Element material: ',
+        inputPlaceholderMaterial: ' Chose material'
+      },
+      save: 'Save'
+    },
     calculatePrice: {
       btnCalculateTitle: 'Calculate price',
       modal: {
@@ -181,6 +194,19 @@ export default {
         filePlaceholder: 'Выберите файл ...'
       },
       save: 'Создать'
+    },
+    addElementToDB: {
+      newProgect: 'Добавить новый элемент',
+      modal: {
+        title: 'Добавить новый элемент',
+        inputLabel: 'Название элемента',
+        inputPlaceholder: 'Введите название элемента',
+        inputType: 'Вид элемента',
+        inputPlaceholderType: 'Введите вид элемента',
+        inputMaterial: 'Материал элемента',
+        inputPlaceholderMaterial: 'Выберите материал элемента'
+      },
+      save: 'Save'
     },
     calculatePrice: {
       btnCalculateTitle: 'Посчитать цену',

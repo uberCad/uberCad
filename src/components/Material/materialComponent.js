@@ -16,12 +16,21 @@ export default class MaterialComponent extends Component {
     super(props);
     this.state = {
       show: false,
+      addDBShow: this.props.addElementToDB,
       searchQuery: ''
     };
   }
 
   handleClose = () => {
     this.setState({ show: false });
+
+    // todo КОСТИЛІЩЕ.... ну або подивись можливо можна упростити процес
+    if (!this.props.activeObject.userData.material.name) {
+      this.props.activeObject.userData.material.name = 'Chose material';
+    }
+    if (this.props.onClose) {
+      this.props.onClose();
+    }
   };
 
   handleShow = () => {
@@ -83,6 +92,7 @@ export default class MaterialComponent extends Component {
     return (
       <div className="material">
         <FormattedMessage
+          show={!this.state.addDBShow}
           id="material.btnMaterialTitle"
           defaultMessage="Set material"
         >
@@ -95,7 +105,8 @@ export default class MaterialComponent extends Component {
           )}
         </FormattedMessage>
 
-        <Modal show={this.state.show} onHide={this.handleClose}>
+        <Modal show={this.state.show || this.props.addElementToDB}
+               onHide={this.handleClose}>
           <Modal.Header closeButton>
             <FormattedMessage
               id="material.modal.title"
@@ -155,7 +166,7 @@ export default class MaterialComponent extends Component {
         </Modal>
       </div>
     );
-  }
+  };
 
   static propTypes = {
     lang: PropTypes.string.isRequired,
