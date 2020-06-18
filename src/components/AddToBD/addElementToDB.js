@@ -1,7 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, ControlLabel, Form, FormControl, FormGroup,
-  HelpBlock, Modal } from 'react-bootstrap';
+import {
+  Button,
+  ControlLabel,
+  Form,
+  FormControl,
+  FormGroup,
+  HelpBlock,
+  Modal
+} from 'react-bootstrap';
 import './addElementToDB.css';
 import { FormattedMessage } from 'react-intl';
 import Scene from '../../services/sceneService';
@@ -27,28 +34,27 @@ export default class addElementToDB extends Component {
   };
 
   handleShow = () => {
-
     let target = this.props.activeObject.userData;
     this.setState({ error: '' });
-    target.title = this.props.activeObject.name? this.props.activeObject.name : '';
+    target.title = this.props.activeObject.name
+      ? this.props.activeObject.name : '';
 
-    if (!target.material){
+    if (!target.material) {
       target.material = {};
       target.material.name = '';
     }
 
     // todo той самий костиліще
-    if (target.material.name === 'Chose material'){
+    if (target.material.name === 'Chose material') {
       target.material.name = '';
     }
 
     this.setState({
       show: true,
-      type: target.type? target.type : '',
+      type: target.type ? target.type : '',
       title: target.title,
       material: target.material.name
     });
-
   };
 
   changeName = event => {
@@ -87,27 +93,30 @@ export default class addElementToDB extends Component {
     }
     if (file) {
       let fileReader = new FileReader();
-      let container = document.getElementById("sceneID");
+      let container = document.getElementById('sceneID');
       let editor = this.props.editor;
-      console.log (this.props.editor);
+      // console.log(this.props.editor);
       fileReader.onload = function() {
         let fileText = fileReader.result;
         drawDxf(parseDxf(fileText), container, null, editor);
-        let {scene, camera, renderer} = editor;
+        let { scene, camera, renderer } = editor;
         renderer.render(scene, camera);
       };
       fileReader.readAsText(file);
-      this.handleClose();}
+      this.handleClose();
+    }
   };
 
   sendObject = () => {
     let target = this.props.activeObject.userData;
-    if (!target.title){
+    if (!target.title) {
       this.setState({ error: 'Missing element Name' });
-    } else if (!target.type){
+    } else if (!target.type) {
       this.setState({ error: 'Missing element Type' });
-    } else if (!target.material || target.material.name === 'Chose material'){
-      this.setState({ error: 'Missing element Material. Please choice material' });
+    } else if (!target.material || target.material.name === 'Chose material') {
+      this.setState({
+        error: 'Missing element Material. Please choice material'
+      });
     } else {
       this.setState({ error: '' });
     }
@@ -140,11 +149,17 @@ export default class addElementToDB extends Component {
         </FormattedMessage>
 
         <Modal show={this.state.show} onHide={this.handleClose}>
-
           {/*// todo КОСТИЛІЩЕ.... ну або подивись можливо можна упростити процес з onClose*/}
-          {(<MaterialComponent addElementToDB={!this.state.material} onClose={() => {
-            this.setState({ material: this.props.activeObject.userData.material.name })}}
-            />)}
+          {
+            <MaterialComponent
+              addElementToDB={!this.state.material}
+              onClose={() => {
+                this.setState({
+                  material: this.props.activeObject.userData.material.name
+                });
+              }}
+            />
+          }
 
           <Modal.Header closeButton>
             <FormattedMessage
@@ -225,9 +240,9 @@ export default class addElementToDB extends Component {
                     />
                   )}
                 </FormattedMessage>
-                <MaterialComponent/>
+                <MaterialComponent />
 
-                <FormControl.Feedback/>
+                <FormControl.Feedback />
               </FormGroup>
             </Form>
           </Modal.Body>

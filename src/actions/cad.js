@@ -113,8 +113,13 @@ export const CAD_EDITMODE_UNSELECT_ACTIVE_LINE =
 export const CAD_IS_CHANGED = 'CAD_IS_CHANGED';
 export const MOVE_NEW_OBJECT = 'MOVE_NEW_OBJECT';
 
-export const drawDxf = (data = null, container, snapshot = null, editor = null) => {
-  let cadCanvas = new Viewer(data, container, snapshot, null ,editor);
+export const drawDxf = (
+  data = null,
+  container,
+  snapshot = null,
+  editor = null
+) => {
+  let cadCanvas = new Viewer(data, container, snapshot, null, editor);
   let scene = cadCanvas.getScene();
   let camera = cadCanvas.getCamera();
   let renderer = cadCanvas.getRenderer();
@@ -318,11 +323,13 @@ export const cadClick = (event, editor) => {
         break;
 
       case MOVE_NEW_OBJECT:
-      {
-        chooseTool(editor.options.oldMode? editor.options.selectMode:'TOOL_POINT')(dispatch);
-        editor.options.oldMode = "";
-        delete editor.editMode.activeLine.lines;
-      }
+        {
+          chooseTool(
+            editor.options.oldMode ? editor.options.selectMode : 'TOOL_POINT'
+          )(dispatch);
+          editor.options.oldMode = '';
+          delete editor.editMode.activeLine.lines;
+        }
         break;
 
       default:
@@ -1215,17 +1222,17 @@ export const onMouseMove = (event, editor) => {
         break;
 
       case MOVE_NEW_OBJECT:
-      {
-        let newObjectLines = editor.editMode.activeLine.lines;
-        if (newObjectLines){
-          movePoint(
-            newObjectLines,
-            'MOVE_NEW_OBJECT',
-            event,
-            editor
-          )(dispatch);
+        {
+          let newObjectLines = editor.editMode.activeLine.lines;
+          if (newObjectLines) {
+            movePoint(
+              newObjectLines,
+              'MOVE_NEW_OBJECT',
+              event,
+              editor
+            )(dispatch);
+          }
         }
-      }
         break;
 
       default:

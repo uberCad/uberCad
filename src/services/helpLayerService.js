@@ -1,5 +1,5 @@
 import * as THREE from '../extend/THREE';
-import { changeGeometry/*, createLine*/ } from './editObject';
+import { changeGeometry /*, createLine*/ } from './editObject';
 import sceneService from './sceneService';
 
 let highlightVertex = (vertices, editor, timeout = 0, radius = 10) => {

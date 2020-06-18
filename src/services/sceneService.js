@@ -1381,8 +1381,6 @@ let removeLineByName = (name, scene) => {
   }
 };
 
-
-
 let getOffset = elem => {
   let offset = null;
   if (elem) {

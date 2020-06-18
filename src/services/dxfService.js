@@ -21,20 +21,22 @@ export function parseDxf(dxf) {
  */
 export function Viewer(data = null, container, snapshot = null, font, editor) {
   let scene = editor ? editor.scene : new THREE.Scene();
-  let check = (name) => {
-      for (let i = 0; i <= editor.scene.children.length; i++) {
-        if (editor.scene.children[i].name == name) {
-          return editor.scene.children[i];
-        }
+  let check = name => {
+    for (let i = 0; i <= editor.scene.children.length; i++) {
+      if (editor.scene.children[i].name == name) {
+        return editor.scene.children[i];
       }
+    }
   };
   let layersEntity = editor ? check('Layers') : addContainer('Layers');
   let objectsEntity = editor ? check('Objects') : addContainer('Objects');
   let helpLayer = editor ? check('HelpLayer') : addContainer('HelpLayer');
   // todo питання під ким має бути newLineLayer
-  let newLineLayer = editor ? check('newLineLayer') : addContainer('newLineLayer');
-  if (editor){
-    editor.activeEntities.forEach((line)=>{
+  let newLineLayer = editor
+    ? check('newLineLayer')
+    : addContainer('newLineLayer');
+  if (editor) {
+    editor.activeEntities.forEach(line => {
       line.material.color = line.userData.originalColor;
     });
     editor.editMode.activeLine.lines = [];
@@ -86,15 +88,15 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
       }
       obj = null;
     }
-      let activeLine = editor? editor.editMode.activeLine.lines:[];
-      Object.keys(data.tables.layer.layers).forEach((layerName) => {
-        let layer = layers[layerName];
-        layersEntity.add(layer);
-        console.log(layer);
-        layer.children.forEach(line => {
-          activeLine[activeLine.length] = line;
-        });
+    let activeLine = editor ? editor.editMode.activeLine.lines : [];
+    Object.keys(data.tables.layer.layers).forEach(layerName => {
+      let layer = layers[layerName];
+      layersEntity.add(layer);
+      console.log(layer);
+      layer.children.forEach(line => {
+        activeLine[activeLine.length] = line;
       });
+    });
   }
 
   if (snapshot) {

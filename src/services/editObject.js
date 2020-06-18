@@ -419,14 +419,14 @@ let changeGeometry = (lines, index, point, scene, editor) => {
             if (
               (checkLine.geometry.vertices[0].x -
                 checkHelpPoint.pointStart.position.x) *
-              (checkLine.geometry.vertices[0].x -
-                checkHelpPoint.pointStart.position.x) <
-              helpRad &&
+                (checkLine.geometry.vertices[0].x -
+                  checkHelpPoint.pointStart.position.x) <
+                helpRad &&
               (checkLine.geometry.vertices[0].y -
                 checkHelpPoint.pointStart.position.y) *
-              (checkLine.geometry.vertices[0].y -
-                checkHelpPoint.pointStart.position.y) <
-              helpRad
+                (checkLine.geometry.vertices[0].y -
+                  checkHelpPoint.pointStart.position.y) <
+                helpRad
             ) {
               // debugger;
               selectLines[selectLines.length] = [
@@ -438,14 +438,14 @@ let changeGeometry = (lines, index, point, scene, editor) => {
             } else if (
               (checkLine.geometry.vertices[1].x -
                 checkHelpPoint.pointStart.position.x) *
-              (checkLine.geometry.vertices[1].x -
-                checkHelpPoint.pointStart.position.x) <
-              helpRad &&
+                (checkLine.geometry.vertices[1].x -
+                  checkHelpPoint.pointStart.position.x) <
+                helpRad &&
               (checkLine.geometry.vertices[1].y -
                 checkHelpPoint.pointStart.position.y) *
-              (checkLine.geometry.vertices[1].y -
-                checkHelpPoint.pointStart.position.y) <
-              helpRad
+                (checkLine.geometry.vertices[1].y -
+                  checkHelpPoint.pointStart.position.y) <
+                helpRad
             ) {
               // debugger;
               selectLines[selectLines.length] = [
@@ -457,14 +457,14 @@ let changeGeometry = (lines, index, point, scene, editor) => {
             } else if (
               (checkLine.geometry.vertices[0].x -
                 checkHelpPoint.pointEnd.position.x) *
-              (checkLine.geometry.vertices[0].x -
-                checkHelpPoint.pointEnd.position.x) <
-              helpRad &&
+                (checkLine.geometry.vertices[0].x -
+                  checkHelpPoint.pointEnd.position.x) <
+                helpRad &&
               (checkLine.geometry.vertices[0].y -
                 checkHelpPoint.pointEnd.position.y) *
-              (checkLine.geometry.vertices[0].y -
-                checkHelpPoint.pointEnd.position.y) <
-              helpRad
+                (checkLine.geometry.vertices[0].y -
+                  checkHelpPoint.pointEnd.position.y) <
+                helpRad
             ) {
               // debugger;
               selectLines[selectLines.length] = [
@@ -476,14 +476,14 @@ let changeGeometry = (lines, index, point, scene, editor) => {
             } else if (
               (checkLine.geometry.vertices[1].x -
                 checkHelpPoint.pointEnd.position.x) *
-              (checkLine.geometry.vertices[1].x -
-                checkHelpPoint.pointEnd.position.x) <
-              helpRad &&
+                (checkLine.geometry.vertices[1].x -
+                  checkHelpPoint.pointEnd.position.x) <
+                helpRad &&
               (checkLine.geometry.vertices[1].y -
                 checkHelpPoint.pointEnd.position.y) *
-              (checkLine.geometry.vertices[1].y -
-                checkHelpPoint.pointEnd.position.y) <
-              helpRad
+                (checkLine.geometry.vertices[1].y -
+                  checkHelpPoint.pointEnd.position.y) <
+                helpRad
             ) {
               // debugger;
               selectLines[selectLines.length] = [
@@ -549,7 +549,10 @@ let changeGeometry = (lines, index, point, scene, editor) => {
     });
     // } else{
     //   // todo  для декількох ліній
-  } else if (lines.length && (index.length === 1 || index == 'MOVE_NEW_OBJECT')) {
+  } else if (
+    lines.length &&
+    (index.length === 1 || index == 'MOVE_NEW_OBJECT')
+  ) {
     let helpLayer = scene.getObjectByName('HelpLayer');
     let pointGeometryCenter = helpLayer.children[helpLayer.children.length - 1];
     if (index == 'MOVE_NEW_OBJECT') {
@@ -569,7 +572,7 @@ let changeGeometry = (lines, index, point, scene, editor) => {
 
         if (line.geometry.type === 'Geometry') {
           line.geometry.verticesNeedUpdate = true;
-          if (index == 'MOVE_NEW_OBJECT' ) {
+          if (index == 'MOVE_NEW_OBJECT') {
             line.geometry.vertices[0].x += changeX;
             line.geometry.vertices[0].y += changeY;
             line.geometry.vertices[1].x += changeX;
@@ -600,8 +603,7 @@ let changeGeometry = (lines, index, point, scene, editor) => {
         } else if (line.geometry.type === 'CircleGeometry') {
           line.position.x += changeX;
           line.position.y += changeY;
-          if (index !== 'MOVE_NEW_OBJECT' )
-            circleHelpPoint(line, scene);
+          if (index !== 'MOVE_NEW_OBJECT') circleHelpPoint(line, scene);
         }
       });
       pointGeometryCenter.position.x = point.x;

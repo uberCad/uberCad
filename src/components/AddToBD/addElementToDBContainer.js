@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import addElementToDB from './addElementToDB';
-import { addObjectToDB} from '../../actions/addObjectToDB';
+import { addObjectToDB } from '../../actions/addObjectToDB';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -22,7 +22,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(addElementToDB);
+export default connect(mapStateToProps, mapDispatchToProps)(addElementToDB);

@@ -77,7 +77,6 @@ export const ADD_ELEMENT_TO_DB = 'ADD_ELEMENT_TO_DB';
 export const addObjectToDB = scene => {
   const object = scene.getObjectByName('Objects').children;
   let error = null;
-  debugger;
   if (!error) {
     return dispatch => {
       dispatch(spinnerShow());
@@ -88,9 +87,7 @@ export const addObjectToDB = scene => {
         dispatch(spinnerHide());
         dispatch({
           type: ADD_ELEMENT_TO_DB,
-          payload: {
-
-          }
+          payload: {}
         });
       });
     };
@@ -105,4 +102,3 @@ export const addObjectToDB = scene => {
     };
   }
 };
-

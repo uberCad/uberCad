@@ -105,8 +105,10 @@ export default class MaterialComponent extends Component {
           )}
         </FormattedMessage>
 
-        <Modal show={this.state.show || this.props.addElementToDB}
-               onHide={this.handleClose}>
+        <Modal
+          show={this.state.show || this.props.addElementToDB}
+          onHide={this.handleClose}
+        >
           <Modal.Header closeButton>
             <FormattedMessage
               id="material.modal.title"
@@ -166,7 +168,7 @@ export default class MaterialComponent extends Component {
         </Modal>
       </div>
     );
-  };
+  }
 
   static propTypes = {
     lang: PropTypes.string.isRequired,

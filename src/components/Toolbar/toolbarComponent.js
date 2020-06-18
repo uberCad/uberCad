@@ -14,13 +14,19 @@ import toolBorderRadius from './borderRadius.svg';
 import toolFacet from './facet.svg';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Button, ControlLabel, Form, FormControl,
-  FormGroup, HelpBlock, Modal } from 'react-bootstrap';
+import {
+  Button,
+  ControlLabel,
+  Form,
+  FormControl,
+  FormGroup,
+  HelpBlock,
+  Modal
+} from 'react-bootstrap';
 
-import {  drawDxf } from '../../actions/cad';
+import { drawDxf } from '../../actions/cad';
 import { parseDxf } from '../../services/dxfService';
 import '../AddProject/AddProject.css';
-
 
 export const TOOL_POINT = 'TOOL_POINT';
 export const TOOL_SELECT = 'TOOL_SELECT';
@@ -62,11 +68,10 @@ export default class ToolbarComponent extends Component {
   handleShow = () => {
     // debugger;
 
-    console.log (this.props.editor);
+    // console.log(this.props.editor);
     // debugger;
     this.setState({ show: true });
   };
-
 
   handleChange = event => {
     const name = event.target.name;
@@ -91,24 +96,21 @@ export default class ToolbarComponent extends Component {
       this.setState({ error: '' });
     }
 
-
-
     if (file) {
       let fileReader = new FileReader();
-      let container = document.getElementById("sceneID");
+      let container = document.getElementById('sceneID');
       let editor = this.props.editor;
-      console.log (this.props.editor);
+      console.log(this.props.editor);
       fileReader.onload = function() {
         let fileText = fileReader.result;
         drawDxf(parseDxf(fileText), container, null, editor);
-        let {scene, camera, renderer} = editor;
+        let { scene, camera, renderer } = editor;
         renderer.render(scene, camera);
       };
       fileReader.readAsText(file);
-      this.handleClose();}
+      this.handleClose();
+    }
   };
-
-
 
   render() {
     const { tool } = this.props;

@@ -7,8 +7,20 @@ import { appName } from './../../config';
 import './Header.css';
 import history from '../../config/history';
 import addElement from '../Toolbar/addElement.svg';
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem, Modal, Form, Table,
-  FormGroup, ControlLabel, FormControl, HelpBlock, Button
+import {
+  Navbar,
+  Nav,
+  NavItem,
+  NavDropdown,
+  MenuItem,
+  Modal,
+  Form,
+  Table,
+  FormGroup,
+  ControlLabel,
+  FormControl,
+  HelpBlock,
+  Button
 } from 'react-bootstrap';
 import { drawDxf } from '../../actions/cad';
 import { parseDxf } from '../../services/dxfService';
@@ -33,7 +45,7 @@ export default class HeaderComponent extends Component {
   };
 
   handleShow = () => {
-      this.setState({ show: true });
+    this.setState({ show: true });
   };
 
   handleChange = event => {
@@ -60,48 +72,48 @@ export default class HeaderComponent extends Component {
     }
     if (file) {
       let fileReader = new FileReader();
-      let container = document.getElementById("sceneID");
+      let container = document.getElementById('sceneID');
       let editor = this.props.editor;
-      console.log (this.props.editor);
+      console.log(this.props.editor);
       fileReader.onload = function() {
         let fileText = fileReader.result;
         drawDxf(parseDxf(fileText), container, null, editor);
-        let {scene, camera, renderer} = editor;
+        let { scene, camera, renderer } = editor;
         renderer.render(scene, camera);
       };
       fileReader.readAsText(file);
       this.props.editor.options.oldMode = this.props.editor.options.selectMode;
       this.props.chooseTool('MOVE_NEW_OBJECT');
-      this.handleClose();}
+      this.handleClose();
+    }
   };
 
-  test = (event) => {
+  test = event => {
     console.log(event.currentTarget.id);
-    debugger;
   };
 
-  tester =()=> {
-    let testArr =[];
-    for (let id = 0; id<5;id++){
-      testArr[id] = <tr id = {'object_table_' + id} onClick={this.test}>
-
-        <td><img src={addElement} alt="addElement" />
-        </td>
-        <td>test</td>
-        <th>Date</th>
-        <td>
-          information about object
-        </td>
-      </tr>;
+  tester = () => {
+    let testArr = [];
+    for (let id = 0; id < 5; id++) {
+      testArr[id] = (
+        <tr id={'object_table_' + id} onClick={this.test}>
+          <td>
+            <img src={addElement} alt="addElement" />
+          </td>
+          <td>test</td>
+          <th>Date</th>
+          <td>information about object</td>
+        </tr>
+      );
     }
     return testArr;
   };
 
-  oppenButton =()=> {
+  oppenButton = () => {
     if (!this.props.editor.scene) {
-      return value => <Button href = "/cad/editObjectElement">{value}</Button>
+      return value => <Button href="/cad/editObjectElement">{value}</Button>;
     } else {
-      return value => <Button onClick={this.addObject}>{value}</Button>
+      return value => <Button onClick={this.addObject}>{value}</Button>;
     }
   };
 
@@ -207,18 +219,14 @@ export default class HeaderComponent extends Component {
             <Form>
               <Table>
                 <thead>
-                <tr>
-                  <th>Pic</th>
-                  <th>Name</th>
-                  <th>Date</th>
-                  <th>Inform</th>
-                </tr>
+                  <tr>
+                    <th>Pic</th>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Inform</th>
+                  </tr>
                 </thead>
-                <tbody>
-
-                {this.tester()};
-
-                </tbody>
+                <tbody>{this.tester()};</tbody>
               </Table>
             </Form>
             <Form

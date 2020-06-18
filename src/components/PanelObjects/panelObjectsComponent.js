@@ -244,7 +244,6 @@ export default class PanelObjectsComponent extends Component {
           )}
 
           {this.props.activeObject && <AddToBD />}
-
         </div>
       </div>
     );

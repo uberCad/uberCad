@@ -26,7 +26,7 @@ export default class CadComponent extends Component {
     // console.log(projectId);
     // console.log(snapshotId);
     // console.log(this.props);
-    if (projectId === 'editObjectElement'){
+    if (projectId === 'editObjectElement') {
       // this.props.drawDxf(null, this.container, null);
       // в this.props.drawDxf(null, this.container, null); треба подавати або елемент з БД
       // або загружаємий файл з ПК для створеннм нової сцени і редагування об'єкта
@@ -38,7 +38,7 @@ export default class CadComponent extends Component {
       snapshotId ? `/snapshot/${snapshotId}` : `/project/file/${projectId}`
     )
       .then(data => {
-        this.container.id = "sceneID"; // todo тут костиль
+        this.container.id = 'sceneID'; // todo тут костиль
         if (snapshotId) {
           this.props.drawDxf(null, this.container, data);
         } else {
