@@ -16,8 +16,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    sendToDB: function(scene) {
-      addObjectToDB(scene)(dispatch);
+    sendToDB: function(target,boundingBox) {
+      addObjectToDB(target,boundingBox)(dispatch);
     }
   };
 };

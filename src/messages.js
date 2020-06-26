@@ -53,6 +53,14 @@ export default {
       },
       save: 'Save'
     },
+    addObject: {
+      newObject: 'Add new object',
+      modal: {
+        fileLabel: 'File',
+        filePlaceholder: 'Chose file ...'
+      },
+      save: 'Open'
+    },
     addElementToDB: {
       newProgect: 'Add new element',
       modal: {
@@ -194,6 +202,14 @@ export default {
         filePlaceholder: 'Выберите файл ...'
       },
       save: 'Создать'
+    },
+    addObject: {
+      newObject: 'Вставить обект',
+      modal: {
+        fileLabel: 'Файл .dxf',
+        filePlaceholder: 'Выберите файл ...'
+      },
+      save: 'Открыть'
     },
     addElementToDB: {
       newProgect: 'Добавить новый элемент',

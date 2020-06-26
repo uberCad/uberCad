@@ -7,6 +7,7 @@ import { appName } from './../../config';
 import './Header.css';
 import history from '../../config/history';
 import addElement from '../Toolbar/addElement.svg';
+import DBObjectList from '../ObjectFromDBList/DBObjectListContainer';
 import {
   Navbar,
   Nav,
@@ -45,7 +46,9 @@ export default class HeaderComponent extends Component {
   };
 
   handleShow = () => {
-    this.setState({ show: true });
+    this.setState({
+      show: true
+    });
   };
 
   handleChange = event => {
@@ -64,6 +67,9 @@ export default class HeaderComponent extends Component {
   };
 
   addObject = () => {
+    if (!this.props.editor.scene) {
+      return value => <div href="/cad/editObjectElement">{value}</div>;
+    } else {
     const file = this.state.file;
     if (!file) {
       this.setState({ error: 'Missing project file' });
@@ -86,28 +92,36 @@ export default class HeaderComponent extends Component {
       this.props.chooseTool('MOVE_NEW_OBJECT');
       this.handleClose();
     }
-  };
-
-  test = event => {
-    console.log(event.currentTarget.id);
-  };
-
-  tester = () => {
-    let testArr = [];
-    for (let id = 0; id < 5; id++) {
-      testArr[id] = (
-        <tr id={'object_table_' + id} onClick={this.test}>
-          <td>
-            <img src={addElement} alt="addElement" />
-          </td>
-          <td>test</td>
-          <th>Date</th>
-          <td>information about object</td>
-        </tr>
-      );
     }
-    return testArr;
   };
+
+  // test = event => {
+  //   let id = event.currentTarget.id;
+  //   if (id != 'type') {
+  //     this.props.getObjectFromDB(id);
+  //     this.handleClose();
+  //   } else {
+  //     console.log (document.getObjectById('DB_object_list'));
+  //   }
+  // };
+
+  // getObject = (id) => {
+  //   let objects = this.props.getObjectFromDB('all', 'test_list');
+  //   let testArr = [];
+  //   for (let id = 0; id < 5; id++) {
+  //     testArr[id] = (
+  //       <tr id={'object_table_' + id} onClick={this.test}>
+  //         <td>
+  //           <img src={addElement} alt="addElement"/>
+  //         </td>
+  //         <td>test</td>
+  //         <th>Date</th>
+  //         <td>information about object</td>
+  //       </tr>
+  //     );
+  //   }
+  //   return testArr;
+  // };
 
   oppenButton = () => {
     if (!this.props.editor.scene) {
@@ -117,7 +131,13 @@ export default class HeaderComponent extends Component {
     }
   };
 
+  // tester = (event) => {
+  //   console.log(event);
+  //   debugger;
+  // };
+
   render() {
+    const { objects } = this.props;
     return (
       <Navbar className="nav-head header" collapseOnSelect fluid>
         <Navbar.Header>
@@ -140,9 +160,16 @@ export default class HeaderComponent extends Component {
                 defaultMessage="Projects!"
               />
             </NavItem>
-            <NavItem onClick={this.handleShow}>
-              <FormattedMessage id="header.store" defaultMessage="Store" />
+
+            {/*<NavItem onClick={this.handleShow}>*/}
+              {/*<FormattedMessage id="header.store" defaultMessage="Store" />*/}
+
+              <NavItem>
+                <DBObjectList/>
             </NavItem>
+
+
+
             <NavItem href={`${process.env.PUBLIC_URL}/demo`}>
               <FormattedMessage
                 id="header.creators"
@@ -226,7 +253,9 @@ export default class HeaderComponent extends Component {
                     <th>Inform</th>
                   </tr>
                 </thead>
-                <tbody>{this.tester()};</tbody>
+                <tbody id = 'DB_object_list'>
+
+                </tbody>
               </Table>
             </Form>
             <Form
@@ -266,8 +295,8 @@ export default class HeaderComponent extends Component {
               <HelpBlock className="warning">{this.state.error}</HelpBlock>
             )}
             <FormattedMessage id="addObject.open" defaultMessage="Open">
-              {this.oppenButton()}
-              {/*{value => <Button onClick={this.addObject}>{value}</Button>}*/}
+              {/*{this.oppenButton()}*/}
+              {value => <Button href = {!this.props.editor.scene? "/cad/editObjectElement":""} onClick= {this.addObject}>{value}</Button>}
             </FormattedMessage>
             <FormattedMessage id="btn.cancel" defaultMessage="Close">
               {/*{this.oppenButton()}*/}

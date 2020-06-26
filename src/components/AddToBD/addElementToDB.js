@@ -15,6 +15,8 @@ import Scene from '../../services/sceneService';
 import { drawDxf } from '../../actions/cad';
 import { parseDxf } from '../../services/dxfService';
 import MaterialComponent from '../Material/materrialComponentContainer';
+import GeometryUtils from '../../services/GeometryUtils'
+import Api from '../../services/apiService';
 
 export default class addElementToDB extends Component {
   constructor(props) {
@@ -25,12 +27,16 @@ export default class addElementToDB extends Component {
       show: false,
       error: '',
       type: '',
-      material: ''
+      material: '',
+      category: ''
     };
   }
 
   handleClose = () => {
-    this.setState({ show: false });
+    this.setState({
+      show: false,
+      category: ''
+    });
   };
 
   handleShow = () => {
@@ -55,6 +61,55 @@ export default class addElementToDB extends Component {
       title: target.title,
       material: target.material.name
     });
+    if (!this.state.category) {
+      Api.get(`/store/category/all`) //done
+        .then(categoryFromDB => {
+          this.categoryСonstructor(categoryFromDB);
+        });
+    }
+  };
+
+
+  categoryСonstructor = (categoryFromDB) =>{
+    let allCategories = [];
+    let parent_keys =[];
+    categoryFromDB.forEach((category,numOfCategory)=>{
+      for(let i = 0; i< parent_keys.length; i++){
+        if (parent_keys[i] === category.parent_key){
+          return;
+        }
+      }
+      parent_keys[parent_keys.length] = category.parent_key;
+    });
+
+    this.recursiveStructuring (categoryFromDB,allCategories,parent_keys,0,0);
+
+    console.log(allCategories);
+    for (let i = 0; i< allCategories.length; i ++ ){
+      console.log(allCategories[i].title);
+    }
+    this.setState({
+      category: allCategories
+    });
+  };
+
+
+  recursiveStructuring = (categoryFromDB, allCategories, parent_keys, thisParentKey, ind) => {
+    categoryFromDB.forEach((category)=>{
+      // only '==' not '===' - different value types
+      if (thisParentKey == category.parent_key) {
+        for (let j = 0; j<ind; j ++) {
+          category.title = '-' + category.title;
+        }
+        allCategories.push(category);
+        for (let i = 0; i < parent_keys.length; i++) {
+          if (parent_keys[i] == category._key) {
+            this.recursiveStructuring (categoryFromDB, allCategories, parent_keys, category._key, ind + 1);
+          }
+        }
+      }
+    });
+    ind -=1;
   };
 
   changeName = event => {
@@ -77,50 +132,50 @@ export default class addElementToDB extends Component {
 
     if (parameter === 'title') {
       this.setState({ title: text });
-      target.name = text;
+      target.title = text;
     } else if (parameter === 'type') {
-      this.setState({ type: text });
+      this.setState({ type: + event.target.selectedOptions.value });
       target.type = text;
     }
   };
 
-  addObject = () => {
-    const file = this.state.file;
-    if (!file) {
-      this.setState({ error: 'Missing project file' });
-    } else {
-      this.setState({ error: '' });
-    }
-    if (file) {
-      let fileReader = new FileReader();
-      let container = document.getElementById('sceneID');
-      let editor = this.props.editor;
-      // console.log(this.props.editor);
-      fileReader.onload = function() {
-        let fileText = fileReader.result;
-        drawDxf(parseDxf(fileText), container, null, editor);
-        let { scene, camera, renderer } = editor;
-        renderer.render(scene, camera);
-      };
-      fileReader.readAsText(file);
-      this.handleClose();
-    }
-  };
+  // addObject = () => {
+  //   const file = this.state.file;
+  //   if (!file) {
+  //     this.setState({ error: 'Missing project file' });
+  //   } else {
+  //     this.setState({ error: '' });
+  //   }
+  //   if (file) {
+  //     let fileReader = new FileReader();
+  //     let container = document.getElementById('sceneID');
+  //     let editor = this.props.editor;
+  //     // console.log(this.props.editor);
+  //     fileReader.onload = function() {
+  //       let fileText = fileReader.result;
+  //       drawDxf(parseDxf(fileText), container, null, editor);
+  //       let { scene, camera, renderer } = editor;
+  //       renderer.render(scene, camera);
+  //     };
+  //     fileReader.readAsText(file);
+  //     this.handleClose();
+  //   }
+  // };
 
   sendObject = () => {
-    let target = this.props.activeObject.userData;
-    if (!target.title) {
+    let target = this.props.activeObject;
+    if (!target.userData.title) {
       this.setState({ error: 'Missing element Name' });
-    } else if (!target.type) {
-      this.setState({ error: 'Missing element Type' });
-    } else if (!target.material || target.material.name === 'Chose material') {
+    } else if (!target.userData.material || target.userData.material.name === 'Chose material') {
       this.setState({
         error: 'Missing element Material. Please choice material'
       });
     } else {
+      let boundingBox = GeometryUtils.getBoundingBox(target);
       this.setState({ error: '' });
+      this.props.sendToDB(target, boundingBox);
+      this.handleClose();
     }
-    console.log(target.material.name);
   };
 
   render() {
@@ -205,21 +260,21 @@ export default class addElementToDB extends Component {
                 >
                   {value => <ControlLabel>{value}</ControlLabel>}
                 </FormattedMessage>
-                <FormattedMessage
-                  id="addElementToDB.modal.inputPlaceholderType"
-                  defaultMessage="Enter information"
-                >
-                  {placeholder => (
-                    <FormControl
-                      type="text"
-                      name="Object Type"
-                      value={this.state.type}
-                      placeholder={placeholder}
-                      onChange={this.changeType}
-                    />
-                  )}
-                </FormattedMessage>
-
+                <FormGroup controlId="exampleForm.ControlSelect1">
+                  <FormGroup controlId="group">
+                    <ControlLabel>Group</ControlLabel>
+                    <FormControl componentClass="select" placeholder="Group"
+                                 // inputRef={(ref) => { this.state.groupSelect = ref }}
+                                 onChange={this.changeType}
+                    >
+                    <option></option>
+                      {
+                        this.state.category ? this.state.category.map(category => (
+                          <option key ={category._key} value={category._key}>{category.title}</option>)) : null
+                      }
+                    </FormControl>
+                  </FormGroup>
+                </FormGroup>
                 <FormattedMessage
                   id="addElementToDB.modal.inputMaterial"
                   defaultMessage="Element title"
@@ -237,6 +292,7 @@ export default class addElementToDB extends Component {
                       value={this.props.activeObject.userData.material.name}
                       placeholder={placeholder}
                       onClick={this.changeMaterial}
+                      onChange={this.changeMaterial}
                     />
                   )}
                 </FormattedMessage>

@@ -1349,16 +1349,16 @@ let facetBorderRadiusClick = (editor, event) => {
 let copyPaste = (editor, copyPasteMode) => {
   let { renderer, scene, cadCanvas, camera } = editor;
   // todo place - місце для зберігання copyEntities, треба подумати де зберігати
-  let place = camera;
-  if (!place.copyEntities) {
-    place.copyEntities = [];
+  let place = camera.copyEntities;
+  if (!place) {
+    place = [];
   }
   if (copyPasteMode === 'COPY') {
-    place.copyEntities = [];
+    place = [];
 
     editor.activeEntities.forEach((line, i) => {
       if (line.geometry.type === 'Geometry') {
-        place.copyEntities[i] = {
+        place[i] = {
           geometry: {
             type: line.geometry.type,
             vertices: [
@@ -1369,7 +1369,7 @@ let copyPaste = (editor, copyPasteMode) => {
         };
       } else if (line.geometry.type === 'CircleGeometry') {
         console.log(line.geometry);
-        place.copyEntities[i] = {
+        place[i] = {
           geometry: {
             type: line.geometry.type,
             parameters: {
@@ -1382,13 +1382,13 @@ let copyPaste = (editor, copyPasteMode) => {
         };
       }
     });
-    place.copyEntities[
-      place.copyEntities.length
+    place[
+      place.length
     ] = GeometryUtils.getBoundingBox(editor.activeEntities);
   } else if (copyPasteMode === 'PASTE') {
-    if (place.copyEntities.length) {
+    if (place.length) {
       let copyEntitiesBoundingBox =
-        place.copyEntities[place.copyEntities.length - 1];
+        place[place.length - 1];
       let changeGeometry = {
         x: copyEntitiesBoundingBox.center.x - editor.camera.position.x,
         y: copyEntitiesBoundingBox.center.y - editor.camera.position.y
@@ -1398,7 +1398,7 @@ let copyPaste = (editor, copyPasteMode) => {
         : editor.editMode.editObject;
       // todo де зберігаються нові лінії якщо без режиму змін об'єкту
       let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-      place.copyEntities.forEach(line => {
+      place.forEach(line => {
         if (line.geometry) {
           if (line.geometry.type === 'Geometry') {
             let changeLineParameters = {

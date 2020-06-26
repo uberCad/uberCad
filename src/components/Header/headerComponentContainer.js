@@ -4,6 +4,7 @@ import HeaderComponent from './headerComponent';
 import { logout } from '../../actions/userLogin';
 import { setLocale } from '../../actions/locale';
 import { chooseTool } from '../../actions/toolbar';
+import { getObjectFromDB } from '../../actions/getObjectFromDB';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -36,6 +37,9 @@ const mapDispatchToProps = dispatch => {
     },
     setLocale: function(lang) {
       setLocale(lang)(dispatch);
+    },
+    getObjectFromDB: function(id) {
+      getObjectFromDB(id)(dispatch);
     },
     chooseTool: function(tool) {
       chooseTool(tool)(dispatch);

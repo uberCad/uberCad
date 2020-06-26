@@ -25,7 +25,8 @@ export default class MaterialComponent extends Component {
     this.setState({ show: false });
 
     // todo КОСТИЛІЩЕ.... ну або подивись можливо можна упростити процес
-    if (!this.props.activeObject.userData.material.name) {
+    if (this.props.activeObject.userData.material &&
+      !this.props.activeObject.userData.material.name) {
       this.props.activeObject.userData.material.name = 'Chose material';
     }
     if (this.props.onClose) {
@@ -35,9 +36,7 @@ export default class MaterialComponent extends Component {
 
   handleShow = () => {
     this.setState({ show: true });
-    if (this.props.materials.length === 0) {
-      this.props.loadMaterials();
-    }
+    this.props.loadMaterials();
   };
 
   handleSearch = event => {
