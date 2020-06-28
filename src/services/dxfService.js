@@ -19,14 +19,28 @@ export function parseDxf(dxf) {
  * @param {Object} font - a font loaded with THREE.FontLoader
  * @constructor
  */
-export function Viewer(data = null, container, snapshot = null, font) {
-  let scene = new THREE.Scene();
-
-  let layersEntity = addContainer('Layers');
-  let objectsEntity = addContainer('Objects');
-  let helpLayer = addContainer('HelpLayer');
+export function Viewer(data = null, container, snapshot = null, font, editor) {
+  let scene = editor ? editor.scene : new THREE.Scene();
+  let check = name => {
+    for (let i = 0; i <= editor.scene.children.length; i++) {
+      if (editor.scene.children[i].name == name) {
+        return editor.scene.children[i];
+      }
+    }
+  };
+  let layersEntity = editor ? check('Layers') : addContainer('Layers');
+  let objectsEntity = editor ? check('Objects') : addContainer('Objects');
+  let helpLayer = editor ? check('HelpLayer') : addContainer('HelpLayer');
   // todo питання під ким має бути newLineLayer
-  let newLineLayer = addContainer('newLineLayer');
+  let newLineLayer = editor
+    ? check('newLineLayer')
+    : addContainer('newLineLayer');
+  if (editor) {
+    editor.activeEntities.forEach(line => {
+      line.material.color = line.userData.originalColor;
+    });
+    editor.editMode.activeLine.lines = [];
+  }
 
   if (data) {
     createLineTypeShaders(data);
@@ -74,9 +88,14 @@ export function Viewer(data = null, container, snapshot = null, font) {
       }
       obj = null;
     }
-
+    let activeLine = editor ? editor.editMode.activeLine.lines : [];
     Object.keys(data.tables.layer.layers).forEach(layerName => {
-      layersEntity.add(layers[layerName]);
+      let layer = layers[layerName];
+      layersEntity.add(layer);
+      console.log(layer);
+      layer.children.forEach(line => {
+        activeLine[activeLine.length] = line;
+      });
     });
   }
 

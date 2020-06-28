@@ -13,6 +13,8 @@ const mapStateToProps = (state, ownProps) => {
       camera: state.cad.camera,
       renderer: state.cad.renderer
     },
+    addElementToDB: false,
+    onClose: false,
     ...ownProps
   };
 };

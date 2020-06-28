@@ -533,37 +533,41 @@ export const thetaStart = editor => {
   };
 };
 
-export const thetaLength = (event, editor, parent, copyPoint) => {
+export const thetaLength = (event, editor, parent, curveParam) => {
   let { scene, camera, renderer, editMode } = editor;
-  const thetaStart = circleIntersectionAngle(
-    editMode.thetaStart,
-    editMode.newCurveCenter
-  );
+
+  // todo curveParam - параметри для круга по координатам
+  const thetaStart = curveParam
+    ? curveParam.thetaStart
+    : circleIntersectionAngle(editMode.thetaStart, editMode.newCurveCenter);
   const oldLine =
     scene.getObjectByName('newLine') ||
-    newArc(editMode.radius, thetaStart, 0.1);
+    newArc(curveParam ? curveParam.radius : editMode.radius, thetaStart, 0.1); // editMode.radius =>   curveParam.radius
+  // debugger;
 
   let clickResult = sceneService.onClick(event, scene, camera);
-  let mousePoint;
-  if (!copyPoint) {
-    mousePoint = {
-      x: clickResult.point.x,
-      y: clickResult.point.y
-    };
-  } else {
-    mousePoint = {
-      x: copyPoint.x,
-      y: copyPoint.y
-    };
-  }
+  let mousePoint = curveParam
+    ? {
+        x: curveParam.thetaLength.x,
+        y: curveParam.thetaLength.y
+      }
+    : {
+        x: clickResult.point.x,
+        y: clickResult.point.y
+      };
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   const length = !crossing ? mousePoint : crossing;
   const t = editThetaLenght(length, oldLine);
 
   let line = newArc(editMode.radius, t.thetaStart, t.thetaLength);
   line.userData.helpGeometry = t;
-  line.position.x = editMode.newCurveCenter.x;
-  line.position.y = editMode.newCurveCenter.y;
+
+  line.position.x = curveParam
+    ? curveParam.newCurveCenter.x
+    : editMode.newCurveCenter.x;
+  line.position.y = curveParam
+    ? curveParam.newCurveCenter.y
+    : editMode.newCurveCenter.y;
 
   if (oldLine && oldLine.parent) oldLine.parent.remove(oldLine);
   line.userData.originalColor = parent.children[0].userData.originalColor;

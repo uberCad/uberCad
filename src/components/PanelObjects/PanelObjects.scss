@@ -110,6 +110,10 @@
         background: url("ungroup.svg") no-repeat center transparent;
         background-size: $sidebar-toolbar-size - 8px;
       }
+      &.btn-addToDB {
+        background: url("addElement.svg") no-repeat center transparent;
+        background-size: $sidebar-toolbar-size - 8px;
+      }
     }
   }
 }
