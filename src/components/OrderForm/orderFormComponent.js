@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import consoleUtils from '../../services/consoleUtils';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
+import {CALCULATION_REGION} from './../../config';
 import './OrderForm.css';
 
 const validate = values => {
@@ -86,7 +87,8 @@ renderField.propTypes = {
   className: PropTypes.string,
   minOrderQty: PropTypes.number,
   defaultVal: PropTypes.string,
-  meta: PropTypes.object
+  meta: PropTypes.object,
+  onChange: PropTypes.func
 };
 
 const renderContactField = ({
@@ -229,20 +231,72 @@ const RenderObjects = ({ objects, checkObjects }) => {
                   )}
                 </FormattedMessage>
               )}
+                { object.userData.price10000 && (
+                    <FormattedMessage
+                        id="calculatePrice.modal.price10000"
+                        defaultMessage="Price (order <10000m)"
+                    >
+                        {value => (
+                            <span className={object.userData.orderQty < 10000 ? 'strong-text' : ''}>
+                        {value}: {object.userData.price10000.toFixed(4)}€ / m
+                    </span>
+                        )}
+                    </FormattedMessage>
+                )}
+                { object.userData.price30000 && (
+                    <FormattedMessage
+                        id="calculatePrice.modal.price30000"
+                        defaultMessage="Price (order <30000m)"
+                    >
+                        {value => (
+                            <span className={object.userData.orderQty >= 10000 && object.userData.orderQty < 30000 ? 'strong-text' : ''}>
+
+                        {value}: {object.userData.price30000.toFixed(4)}€ / m
+
+                    </span>
+                        )}
+                    </FormattedMessage>
+                )}
+                { object.userData.price50000 && (
+                    <FormattedMessage
+                        id="calculatePrice.modal.price50000"
+                        defaultMessage="Price (order <50000m)"
+                    >
+                        {value => (
+                            <span className={object.userData.orderQty >= 30000 && object.userData.orderQty < 50000 ? 'strong-text' : ''}>
+                        {value}: {object.userData.price50000.toFixed(4)}€ / m
+                    </span>
+                        )}
+                    </FormattedMessage>
+                )}
+                { object.userData.price50000 && (
+                    <FormattedMessage
+                        id="calculatePrice.modal.price50001"
+                        defaultMessage="Price (order >50000m)"
+                    >
+                        {value => {
+                            return (
+                            <span className={object.userData.orderQty >= 50000 ? 'strong-text' : ''}>
+                        {value}: Please contact us, to get a price estimate
+                    </span>
+                        )}
+                        }
+                    </FormattedMessage>
+                )}
               <span className="profile col-sm-4 .col-md-4 .col-xs-4">
                 {consoleUtils.getSvg(object)}
               </span>
 
               {checkObjects && checkObjects[i] && checkObjects[i].checked && (
                 <div className="panel panel-default panel-options">
-                  <Field
+                  {CALCULATION_REGION === 'eu' && (
+                    <Field
                     name={`objects[${i}].laserMarking`}
                     type="checkbox"
                     component={renderField}
                     label="Laser marking"
-                  />
-
-                  {checkObjects[i] && checkObjects[i].laserMarking && (
+                  />)}
+                  {CALCULATION_REGION === 'eu' && checkObjects[i] && checkObjects[i].laserMarking && (
                     <div>
                       <div className="form-group">
                         <label className="col-md-4 control-label">Type</label>
@@ -275,14 +329,14 @@ const RenderObjects = ({ objects, checkObjects }) => {
                       </div>
                     </div>
                   )}
-
-                  <Field
+                  {CALCULATION_REGION === 'eu' && (<Field
                     name={`objects[${i}].length`}
                     type="number"
                     component={renderField}
                     label="Length"
                     defaultVal={6}
                   />
+                  )}
 
                   <Field
                     name={`objects[${i}].orderQty`}
@@ -291,6 +345,9 @@ const RenderObjects = ({ objects, checkObjects }) => {
                     label="Order quantity"
                     minOrderQty={object.userData.minOrderQty}
                     defaultVal={object.userData.minOrderQty}
+                    onChange={(event, value) => {
+                        object.userData.orderQty = parseInt(value);
+                    }}
                   />
                 </div>
               )}

@@ -40,7 +40,7 @@ export const fetchProject = (id, preloadedProject) => dispatch => {
   dispatch(requestProject(id, preloadedProject));
   return Api.get(`/projects/${id}`) //done
     .then(res => {
-      debugger;
+      // debugger;
       dispatch(spinnerHide());
       return dispatch(receiveProject(id, res[0]));
     })
