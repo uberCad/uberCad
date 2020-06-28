@@ -39,7 +39,7 @@ class App extends Component {
                   component={Project}
                 />
                 <Route
-                  path={`${process.env.PUBLIC_URL}/order/:key/:hash`}
+                  path={`${process.env.PUBLIC_URL}/order/:key/:hash+`}
                   component={Order}
                 />
                 <Route
