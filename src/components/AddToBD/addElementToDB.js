@@ -51,7 +51,7 @@ export default class addElementToDB extends Component {
     }
 
     // todo той самий костиліще
-    if (target.material.name === 'Chose material') {
+    if (target.material.name === 'Choose material') {
       target.material.name = '';
     }
 
@@ -166,7 +166,7 @@ export default class addElementToDB extends Component {
     let target = this.props.activeObject;
     if (!target.userData.title) {
       this.setState({ error: 'Missing element Name' });
-    } else if (!target.userData.material || target.userData.material.name === 'Chose material') {
+    } else if (!target.userData.material || target.userData.material.name === 'Choose material') {
       this.setState({
         error: 'Missing element Material. Please choice material'
       });
@@ -283,7 +283,7 @@ export default class addElementToDB extends Component {
                 </FormattedMessage>
                 <FormattedMessage
                   id="addElementToDB.modal.inputPlaceholderMaterial"
-                  defaultMessage=" Chose material"
+                  defaultMessage=" Choose material"
                 >
                   {placeholder => (
                     <FormControl

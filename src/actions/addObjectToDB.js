@@ -3,6 +3,7 @@ import GeometryUtils from '../services/GeometryUtils';
 // import sceneService from '../services/sceneService'
 
 import { spinnerShow, spinnerHide } from './spinner';
+import * as THREE from '../extend/THREE';
 import { modalShow } from './modal';
 
 export const ADD_ELEMENT_TO_DB = 'ADD_ELEMENT_TO_DB';
@@ -15,13 +16,16 @@ export const addObjectToDB = (target,boundingBox) => {
     return dispatch => {
       dispatch(spinnerShow());
 
+      let objectCopy = new THREE.Object3D();
+      objectCopy.copy(target, true);
+      objectCopy.children = objectCopy.children.filter(item => !(item instanceof THREE.Mesh));
       let sendingObj = {
         title: target.userData.title,
         categoryKey: target.userData.type? target.userData.type:0,
         width: boundingBox.width,
         height: boundingBox.height,
         materialKey: +target.userData.material._key,
-        object: target
+        object: objectCopy
 
       };
       Api.post('/store/part', {data:sendingObj}).then(res => {
