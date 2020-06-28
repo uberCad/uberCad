@@ -30,5 +30,17 @@ export default {
    * @param source
    * @return []
    */
-  clone: source => source.filter(() => true)
+  clone: source => source.filter(() => true),
+  isEqual: (arr1 = [], arr2 = []) => {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+
+    for (var item1 of arr1) {
+      if (!arr2.includes(item1)) {
+        return false;
+      }
+    }
+    return true;
+  }
 };

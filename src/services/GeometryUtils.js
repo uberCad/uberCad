@@ -2,13 +2,13 @@ import * as THREE from '../extend/THREE';
 import * as KMeans from '../../node_modules/kmeans-js/kMeans';
 import sceneService from './sceneService';
 import Path from '../classes/Path';
+import arrayUtils from './arrayUtils';
 
 let buildEdgeModel = (object, threshold = 0.000001) => {
-  let vertices = getVertices(object.children);
-  let regions = [];
-
-  // get entities without vertices in paths
+  // skip zero length lines
   let entities = skipZeroLines([...object.children], threshold);
+  let vertices = getVertices(entities);
+  let regions = [];
 
   // check for intersections
   entities.forEach(entityToCheck => {
@@ -206,12 +206,6 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
         entities: entities
       };
       throw error;
-
-      // throw  {
-      //   error: 'unused entities',
-      //   msg: 'Not all entities in use!',
-      //   entities: entities
-      // }
     }
 
     if (entities.length) {
@@ -436,20 +430,17 @@ let buildChain = (
     let error = new Error('Interruption detected. Operation canceled');
     error.userData = {
       error: 'interruption',
+      type: `interruption`,
       msg: 'Interruption detected. Operation canceled',
       entity: vertex.parent,
-      minDistance: minDistance
+      minDistance: minDistance,
+      entities: [vertex.parent, minDistance.vertex.parent],
+      // vertices: [minDistance.vertex, new THREE.Vector3(-200,-150,0)]
+      vertices: [vertex, minDistance.vertex]
     };
 
     console.error(error.userData);
     throw error;
-
-    // throw {
-    //   error: 'interruption',
-    //   msg: 'Interruption detected. Operation canceled',
-    //   entity: vertex.parent,
-    //   minDistance: minDistance
-    // };
   }
 
   nearestVertex = minDistance.vertex;
@@ -2497,16 +2488,11 @@ let isEnoughVertices = (cavity, threshold) => {
 let pathArea = path => {
   let sumX = 0;
   let sumY = 0;
-  let multipleIdx = 0;
-  for (let i = 0; i < path.length; i++) {
-    multipleIdx = i + 1;
-    if (multipleIdx >= path.length) {
-      multipleIdx = 0;
-    }
-    sumX += path[i].x * path[multipleIdx].y;
-    sumY += path[multipleIdx].x * path[i].y;
+  for (let i = 1; i < path.length; i++) {
+    sumX += path[i - 1].x * path[i].y;
+    sumY += path[i].x * path[i - 1].y;
   }
-  return Math.abs((sumY - sumX) / 2);
+  return Math.abs((sumX - sumY) / 2);
 };
 
 let calcArea = entities => {
@@ -2564,13 +2550,75 @@ function vertexInArea(vertex, area) {
   );
 }
 
-function getSerialVertices(entities) {
+function getSerialVerticesFromOrderedEntities(
+  orderedEntities = [],
+  threshold = 0.001
+) {
+  orderedEntities = skipZeroLines(orderedEntities, threshold);
+
+  let result = [];
+
+  if (orderedEntities.length < 2) {
+    return getVertices(orderedEntities);
+  }
+
+  // find vertex that closest to next entity
+  let minDistance = Infinity;
+  let vertex = null;
+  let verticesFirstEntity = getVertices(orderedEntities[0]);
+  getVertices(orderedEntities[1]).forEach(vertexNextEntity => {
+    verticesFirstEntity.forEach(vertexFirstEntity => {
+      let distance = getDistance(vertexFirstEntity, vertexNextEntity);
+      if (distance < minDistance) {
+        minDistance = distance;
+        vertex = vertexFirstEntity;
+      }
+    });
+  });
+  result.push(vertex);
+
+  // find vertex from entity that further from last vertex in result[]
+  for (let e = 1; e < orderedEntities.length; e++) {
+    let lastVertex = result[result.length - 1];
+    let vertex = null;
+
+    let vertices = getVertices(orderedEntities[e]);
+    let maxDistance = 0;
+    for (let v = 0; v < vertices.length; v++) {
+      let distance = getDistance(lastVertex, vertices[v]);
+      if (distance > maxDistance) {
+        maxDistance = distance;
+        vertex = vertices[v];
+      }
+    }
+
+    if (!vertex) {
+      let vertices = getVertices(orderedEntities[e]);
+      let maxDistance = 0;
+      for (let v = 0; v < vertices.length; v++) {
+        let distance = getDistance(lastVertex, vertices[v]);
+        if (distance > maxDistance) {
+          maxDistance = distance;
+          vertex = vertices[v];
+        }
+      }
+    }
+
+    result.push(vertex);
+  }
+  return result;
+}
+
+function getSerialVertices(entities, threshold = 0.001) {
   function buildChain(entities, vertices, currentEntity, vertex, stopVertex) {
     // console.log('buildChain. ENTITIES:', entities, 'VERTICES:', vertices, 'CURRENT_ENTITY', currentEntity, 'VERTEX', vertex, 'STOP_VERTEX', stopVertex);
     if (!currentEntity) {
       if (entities.length) {
         currentEntity = entities[0];
         stopVertex = getFirstVertex(currentEntity);
+
+        stopVertex.entity = currentEntity;
+
         vertex = stopVertex;
         vertices.push(stopVertex);
 
@@ -2584,9 +2632,10 @@ function getSerialVertices(entities) {
     }
 
     vertex = getAnotherVertex(currentEntity, vertex);
+    vertex.entity = currentEntity;
 
     // if current vertex is closely to stopVertex than finish
-    if (vertex.distanceTo(stopVertex) < 0.001) {
+    if (vertex.distanceTo(stopVertex) < threshold) {
       // console.log('FIRED STOP VERTEX');
       return vertices;
     }
@@ -2612,6 +2661,7 @@ function getSerialVertices(entities) {
     let minDistance = distances.pop();
     distances.forEach(distance => {
       if (distance.distance < minDistance.distance) {
+        // if (distance.distance < minDistance.distance) {
         minDistance = distance;
       }
     });
@@ -3161,6 +3211,199 @@ let pointIntersect = (a, b, c, d) => {
   return T;
 };
 
+let getBoundingBox = objects => {
+  if (!Array.isArray(objects)) {
+    objects = [objects];
+  }
+
+  let boundingBoxes = [];
+
+  objects.forEach(object => {
+    let boundingBox;
+    if (object instanceof THREE.Vector3) {
+      boundingBox = {
+        min: new THREE.Vector3().copy(object),
+        max: new THREE.Vector3().copy(object)
+      };
+    }
+
+    if (object instanceof THREE.Line) {
+      if (object.geometry instanceof THREE.CircleGeometry) {
+        //arc
+        boundingBox = getArcBoundingBox(object);
+      } else {
+        // line
+        object.geometry.computeBoundingBox();
+        boundingBox = object.geometry.boundingBox;
+      }
+    }
+    if (object instanceof THREE.Object3D) {
+      object = new THREE.BoxHelper(object, 0xffff00);
+
+      object.geometry.computeBoundingBox();
+      boundingBox = object.geometry.boundingBox;
+    }
+    boundingBoxes.push(boundingBox);
+  });
+
+  if (boundingBoxes.length) {
+    // merge boundingBoxes
+    let finalBoundingBox = boundingBoxes[0];
+
+    for (let i = 1; i < boundingBoxes.length; i++) {
+      if (boundingBoxes[i].min.x < finalBoundingBox.min.x)
+        finalBoundingBox.min.x = boundingBoxes[i].min.x;
+      if (boundingBoxes[i].min.y < finalBoundingBox.min.y)
+        finalBoundingBox.min.y = boundingBoxes[i].min.y;
+      if (boundingBoxes[i].max.x > finalBoundingBox.max.x)
+        finalBoundingBox.max.x = boundingBoxes[i].max.x;
+      if (boundingBoxes[i].max.y > finalBoundingBox.max.y)
+        finalBoundingBox.max.y = boundingBoxes[i].max.y;
+    }
+
+    let center = new THREE.Vector3(
+      (finalBoundingBox.min.x + finalBoundingBox.max.x) / 2,
+      (finalBoundingBox.min.y + finalBoundingBox.max.y) / 2,
+      0
+    );
+
+    let width = finalBoundingBox.max.x - finalBoundingBox.min.x,
+      height = finalBoundingBox.max.y - finalBoundingBox.min.y;
+
+    return {
+      min: boundingBoxes.min,
+      max: boundingBoxes.max,
+      center,
+      width,
+      height,
+      aspectRatio: width / height
+    };
+  }
+
+  return false;
+};
+
+let getArcBoundingBox = arc => {
+  // put up to 4 vertexes on pi/2 angle
+  // also add arcStart and arcFinish points
+  // calculate bounding box, based on vertices (from 2 up to 6)
+
+  let { x, y } = arc.position;
+  let { radius, thetaStart, thetaLength } = arc.geometry.parameters;
+
+  let arcStart = new THREE.Vector3(
+    x + radius * Math.cos(thetaStart),
+    y + radius * Math.sin(thetaStart),
+    0
+  );
+
+  let arcFinish = new THREE.Vector3(
+    x + radius * Math.cos(thetaStart + thetaLength),
+    y + radius * Math.sin(thetaStart + thetaLength),
+    0
+  );
+
+  let vertices = [arcStart, arcFinish];
+  //find closest start angle
+  let angle = Math.ceil(thetaStart / (Math.PI / 2)) * (Math.PI / 2);
+  while (angle < thetaStart + thetaLength) {
+    vertices.push(
+      new THREE.Vector3(
+        x + radius * Math.cos(angle),
+        y + radius * Math.sin(angle),
+        0
+      )
+    );
+    angle += Math.PI / 2;
+  }
+
+  //find the bounding box;
+  let min = new THREE.Vector3(vertices[0].x, vertices[0].y, 0),
+    max = new THREE.Vector3(vertices[0].x, vertices[0].y, 0);
+  vertices.forEach(vertex => {
+    if (vertex.x < min.x) min.x = vertex.x;
+    if (vertex.y < min.y) min.y = vertex.y;
+    if (vertex.x > max.x) max.x = vertex.x;
+    if (vertex.y > max.y) max.y = vertex.y;
+  });
+
+  let center = new THREE.Vector3((min.x + max.x) / 2, (min.y + max.y) / 2, 0);
+
+  let width = max.x - min.x,
+    height = max.y - min.y;
+
+  return {
+    min,
+    max,
+    center,
+    width,
+    height,
+    aspectRatio: width / height
+  };
+};
+
+let computeBoundingBoxAdditionalInfo = boundingBox => {
+  boundingBox.center = new THREE.Vector3(
+    (boundingBox.min.x + boundingBox.max.x) / 2,
+    (boundingBox.min.y + boundingBox.max.y) / 2,
+    0
+  );
+
+  boundingBox.width = boundingBox.max.x - boundingBox.min.x;
+  boundingBox.height = boundingBox.max.y - boundingBox.min.y;
+
+  boundingBox.center = new THREE.Vector3(
+    (boundingBox.min.x + boundingBox.max.x) / 2,
+    (boundingBox.min.y + boundingBox.max.y) / 2,
+    0
+  );
+
+  boundingBox.aspectRatio = boundingBox.width / boundingBox.height;
+};
+
+function getPathVariants(node) {
+  let result = [];
+
+  if (!node.next.length) {
+    result.push([node.entity]);
+  } else {
+    node.next.forEach(nextNode => {
+      getPathVariants(nextNode).forEach(path => {
+        result.push(path.concat(node.entity));
+      });
+    });
+  }
+  return result;
+}
+
+function filterSelfIntersectingPaths(paths = []) {
+  let result = [];
+
+  //get paths with similar vertices set
+  while (paths.length) {
+    let path = paths.pop();
+    let pairs = [];
+    paths.forEach(item => {
+      if (arrayUtils.isEqual(path, item)) {
+        pairs.push(item);
+        paths.splice(paths.indexOf(item), 1);
+      }
+    });
+    let maxPath = path;
+    let maxPathArea = pathArea(path);
+    pairs.forEach(item => {
+      let area = pathArea(item);
+      if (area > maxPathArea) {
+        maxPathArea = area;
+        maxPath = paths;
+      }
+    });
+    result.push(maxPath);
+  }
+
+  return result;
+}
+
 export default {
   distanceToLine,
   distanceToArc,
@@ -3199,5 +3442,11 @@ export default {
   pointIntersect,
   arcsIntersect,
   getVertices,
-  getSerialVertices
+  getSerialVertices,
+  getSerialVerticesFromOrderedEntities,
+  getArcBoundingBox,
+  getBoundingBox,
+  computeBoundingBoxAdditionalInfo,
+  getPathVariants,
+  filterSelfIntersectingPaths
 };

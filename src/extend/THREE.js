@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
-import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { LegacyJSONLoader } from 'three/examples/jsm/loaders/deprecated/LegacyJSONLoader';
 
 /**
@@ -73,4 +71,4 @@ let BulgeGeometry = function(startPoint, endPoint, bulge, segments) {
 };
 
 export * from 'three';
-export { BulgeGeometry, PLYExporter, GLTFExporter, LegacyJSONLoader };
+export { BulgeGeometry, LegacyJSONLoader };

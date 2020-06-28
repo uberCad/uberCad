@@ -4,6 +4,7 @@ import GeometryUtils from '../services/GeometryUtils';
 
 import { spinnerShow, spinnerHide } from './spinner';
 import { modalShow } from './modal';
+import { CALCULATION_REGION } from './../config';
 
 export const CALCULATE = 'CALCULATE';
 export const CALCULATE_HIDE = 'CALCULATE_HIDE';
@@ -31,7 +32,8 @@ export const calculate = scene => {
         weight:
           (object.userData.material.density * geometry[0].region.area) /
           1000000,
-        type: geometry.length > 1 ? 2 : 1
+        type: geometry.length > 1 ? 2 : 1,
+        name: object.name
       };
       object.userData.info = data;
 
@@ -44,10 +46,17 @@ export const calculate = scene => {
     });
     return dispatch => {
       dispatch(spinnerShow());
-      Api.post('/calculate', { data: infoPrice }).then(res => {
+      Api.post(`/calculate/${CALCULATION_REGION}`, { data: infoPrice }).then(res => {
         //done
         res.forEach((item, i) => {
-          polyamideObjects[i].userData.price = item.price;
+          if (item.price) {
+              polyamideObjects[i].userData.price = item.price;
+          }
+          if (item.price10000 && item.price30000 && item.price50000) {
+              polyamideObjects[i].userData.price10000 = item.price10000;
+              polyamideObjects[i].userData.price30000 = item.price30000;
+              polyamideObjects[i].userData.price50000 = item.price50000;
+          }
           polyamideObjects[i].userData.minOrderQty = Number(
             item.minOrderQty.replace(/\s+/g, '').replace(/,/g, '.')
           );
@@ -94,7 +103,7 @@ export const order = (orderObjects, contactInformation) => {
   });
   return dispatch => {
     dispatch(spinnerShow());
-    Api.post('/api/order', {
+    Api.post('/order', {
       data: { order, orderObjects, contactInformation }
     }).then(res => {
       dispatch(spinnerHide());
@@ -103,7 +112,7 @@ export const order = (orderObjects, contactInformation) => {
         modalShow(
           'Order',
           res.message,
-          `${process.env.PUBLIC_URL}/order/${res.link}`
+          `${process.env.PUBLIC_URL}/${res.link}`
         )
       );
       dispatch({

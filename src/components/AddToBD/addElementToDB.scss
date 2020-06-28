@@ -1,0 +1,80 @@
+@import "../../variables.scss";
+
+ul.polyamide-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 5px 0 20px 290px;
+    margin-top: 15px;
+    min-height: 250px;
+    transition: All 0.3s;
+    position: relative;
+    line-height: 1.5em;
+
+    h3 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 1.1;
+      color: inherit;
+    }
+
+    h4 {
+      text-align: left;
+      margin: 0 0 5px 0;
+      padding: 0;
+      font-size: 18px;
+      font-family: inherit;
+      font-weight: 500;
+      line-height: 1.1;
+      color: inherit;
+    }
+
+    label {
+      display: inline-block;
+
+      input {
+        margin: 0 20px;
+      }
+    }
+
+    .laser {
+      margin: 0;
+    }
+
+    span {
+      display: block;
+      color: gray;
+      font-style: italic;
+      font-size: 14px;
+      margin-right: 5px;
+
+      &.profile {
+        width: 200px;
+        display: block;
+        position: absolute;
+        left: 60px;
+        top: 5px;
+        box-shadow: 0 0 12px rgba(153, 153, 153, 0.4);
+        padding: 10px;
+
+        svg {
+          max-height: 180px;
+        }
+      }
+      &.warning {
+        color: red;
+      }
+    }
+  }
+}
+
+.error-material ul li{
+  margin-left: 30px;
+  list-style-type: circle;
+}
+

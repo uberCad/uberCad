@@ -1,11 +1,13 @@
 import { connect } from 'react-redux';
-import ToolbarComponent from './toolbarComponent';
+import DBObjectList from './DBObjectList';
+import { getObjectFromDB } from '../../actions/getObjectFromDB';
 import { chooseTool } from '../../actions/toolbar';
 
 const mapStateToProps = (state, ownProps) => {
   return {
     lang: state.locale.lang,
-    tool: state.toolbar.tool,
+    username: state.userLogin.username,
+    pictureUrl: state.userLogin.pictureUrl,
     editor: {
       editMode: state.cad.editMode,
       scene: state.cad.scene,
@@ -18,16 +20,23 @@ const mapStateToProps = (state, ownProps) => {
       isEdit: state.cad.editMode.isEdit,
       activeLine: state.cad.activeLine
     },
+    onClose: false,
+    ObjectFromDB: [],
     ...ownProps
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
+    loadObjectFromDB: function() {
+    },
+    getObjectFromDB: function(id) {
+      getObjectFromDB(id)(dispatch);
+    },
     chooseTool: function(tool) {
       chooseTool(tool)(dispatch);
     }
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ToolbarComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(DBObjectList);

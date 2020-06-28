@@ -75,7 +75,9 @@ export const parallelLineSecondPoint = (
   event,
   editor,
   baseLine,
-  firstPoint
+  firstPoint,
+  distance,
+  parent
   //distance = 0
 ) => {
   let { scene, camera, renderer } = editor;
@@ -86,12 +88,12 @@ export const parallelLineSecondPoint = (
   };
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
 
-  let newLayer = scene.getObjectByName('newLayer');
-  if (!newLayer) {
-    newLayer = new THREE.Object3D();
-    newLayer.name = 'newLayer';
-    scene.getObjectByName('Layers').add(newLayer);
-  }
+  // let newLayer = scene.getObjectByName('newLayer');
+  // if (!newLayer) {
+  //   newLayer = new THREE.Object3D();
+  //   newLayer.name = 'newLayer';
+  //   scene.getObjectByName('Layers').add(newLayer);
+  // }
 
   const parallelLine = scene.getObjectByName('parallelLine');
   const perpendicular = scene.getObjectByName('linePerpendicular');
@@ -155,7 +157,9 @@ export const parallelLineSecondPoint = (
 
   const lineParallel = createLine(firstPoint, parallelPoint);
   lineParallel.name = 'parallelLine';
-  newLayer.add(lineParallel);
+  // newLayer.add(lineParallel); // todo це треба?
+  // debugger;
+  parent.add(lineParallel);
 
   renderer.render(scene, camera);
   return dispatch => {
@@ -252,7 +256,13 @@ export const perpendicularFirstPointSelect = (event, editor /*, baseLine*/) => {
   };
 };
 
-export const perpendicularDraw = (event, editor, baseLine, firstPoint) => {
+export const perpendicularDraw = (
+  event,
+  editor,
+  baseLine,
+  firstPoint,
+  parent
+) => {
   let secondPoint;
   let { scene, camera, renderer } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
@@ -262,12 +272,12 @@ export const perpendicularDraw = (event, editor, baseLine, firstPoint) => {
   };
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
 
-  let newLayer = scene.getObjectByName('newLayer');
-  if (!newLayer) {
-    newLayer = new THREE.Object3D();
-    newLayer.name = 'newLayer';
-    scene.getObjectByName('Layers').add(newLayer);
-  }
+  // let newLayer = scene.getObjectByName('newLayer');
+  // if (!newLayer) {
+  //   newLayer = new THREE.Object3D();
+  //   newLayer.name = 'newLayer';
+  //   scene.getObjectByName('Layers').add(newLayer);
+  // }
 
   const perpendicular = scene.getObjectByName('linePerpendicular');
   if (perpendicular) {
@@ -316,7 +326,8 @@ export const perpendicularDraw = (event, editor, baseLine, firstPoint) => {
   }
   const linePerpendicular = createLine(firstPoint, secondPoint);
   linePerpendicular.name = 'linePerpendicular';
-  newLayer.add(linePerpendicular);
+  // newLayer.add(linePerpendicular); // todo це треба?
+  parent.add(linePerpendicular);
   renderer.render(scene, camera);
   return dispatch => {
     crossing
@@ -364,7 +375,7 @@ export const tangentBaseArcSelect = baseArc => {
   };
 };
 
-export const tangentLineDraw = (event, editor, baseArc) => {
+export const tangentLineDraw = (event, editor, baseArc, parent) => {
   let { scene, camera, renderer } = editor;
   sceneService.removeLineByName(tangentName, scene);
   let clickResult = sceneService.onClick(event, scene, camera);
@@ -373,12 +384,12 @@ export const tangentLineDraw = (event, editor, baseArc) => {
     y: clickResult.point.y
   };
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
-  let newLayer = scene.getObjectByName('newLayer');
-  if (!newLayer) {
-    newLayer = new THREE.Object3D();
-    newLayer.name = 'newLayer';
-    scene.getObjectByName('Layers').add(newLayer);
-  }
+  // let newLayer = scene.getObjectByName('newLayer');
+  // if (!newLayer) {
+  //   newLayer = new THREE.Object3D();
+  //   newLayer.name = 'newLayer';
+  //   scene.getObjectByName('Layers').add(newLayer);
+  // }
   const distance = GeometryUtils.getDistance(mousePoint, baseArc.position);
   const radius = baseArc.geometry.parameters.radius;
   const helpRadius = Math.sqrt(distance * distance - radius * radius);
@@ -389,7 +400,8 @@ export const tangentLineDraw = (event, editor, baseArc) => {
   if (intersect) {
     const tangentLine = createLine(mousePoint, intersect.intersectPoint);
     tangentLine.name = tangentName;
-    newLayer.add(tangentLine);
+    // newLayer.add(tangentLine); //todo це треба?
+    parent.add(tangentLine);
   }
   renderer.render(scene, camera);
   return dispatch => {

@@ -25,6 +25,7 @@
     "react-scripts": "3.2.0",
     "redux": "^4.0.4",
     "redux-form": "^8.2.6",
+    "redux-mock-store": "^1.5.4",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
@@ -50,6 +51,11 @@
   "eslintConfig": {
     "extends": "react-app"
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(three|react-redux)/)"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -64,6 +70,8 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
     "eslint": "^6.7.2",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-prettier": "^3.1.1",

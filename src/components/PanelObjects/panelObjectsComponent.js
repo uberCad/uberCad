@@ -4,6 +4,7 @@ import './PanelObjects.css';
 import sceneService from '../../services/sceneService';
 import MaterialComponent from '../Material/materrialComponentContainer';
 import Calculate from '../CalculatePrice/calculatePriceComponentContainer';
+import AddToBD from '../AddToBD/addElementToDBContainer';
 import { FormattedMessage } from 'react-intl';
 
 export default class PanelObjectsComponent extends Component {
@@ -241,6 +242,8 @@ export default class PanelObjectsComponent extends Component {
               className="btn-ungroup"
             />
           )}
+
+          {this.props.activeObject && <AddToBD />}
         </div>
       </div>
     );

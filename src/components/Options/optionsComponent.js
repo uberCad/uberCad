@@ -6,7 +6,8 @@ import {
   TOOL_POINT,
   TOOL_SELECT,
   TOOL_MEASUREMENT,
-  TOOL_LINE
+  TOOL_LINE,
+  TOOL_COPY_PASTE
 } from '../Toolbar/toolbarComponent';
 import { FormattedMessage } from 'react-intl';
 
@@ -78,6 +79,17 @@ export default class OptionsComponent extends Component {
       this.props.editMode.scale.scaleObject,
       this.props.editor
     );
+  };
+
+  copy = event => {
+    // todo розкомітити строку нижче якщо потрібний копіювати і через клік по сцені
+    // this.props.setSelectMode("COPY");
+    this.props.copyClick(this.props.editor, event);
+  };
+
+  paste = event => {
+    // this.props.setSelectMode("PASTE");
+    this.props.pasteClick(this.props.editor, event);
   };
 
   render() {
@@ -288,6 +300,18 @@ export default class OptionsComponent extends Component {
             setSelectMode={this.props.setSelectMode}
           />
         )}
+
+        {tool === TOOL_COPY_PASTE && (
+          <ul className="edit-group">
+            <label>Copy / Paste: </label>
+            <button className="Copy" onClick={this.copy}>
+              Copy
+            </button>
+            <button className="Paste" onClick={this.paste}>
+              Paste
+            </button>
+          </ul>
+        )}
       </div>
     );
   }
@@ -314,6 +338,8 @@ export default class OptionsComponent extends Component {
     saveNewCurve: PropTypes.func,
     rotationAngle: PropTypes.func,
     scaleChange: PropTypes.func,
-    setScale: PropTypes.func
+    setScale: PropTypes.func,
+    copyClick: PropTypes.func,
+    pasteClick: PropTypes.func
   };
 }

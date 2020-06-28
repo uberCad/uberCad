@@ -13,7 +13,9 @@ const mapStateToProps = (state, ownProps) => {
     sortFieldName
   } = projectsByFilter[projectsFilter] || {
     loading: true,
-    items: []
+    items: [],
+    sortUp: true,
+    sortFieldName: ''
   };
 
   return {

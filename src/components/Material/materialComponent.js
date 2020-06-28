@@ -16,19 +16,27 @@ export default class MaterialComponent extends Component {
     super(props);
     this.state = {
       show: false,
+      addDBShow: this.props.addElementToDB,
       searchQuery: ''
     };
   }
 
   handleClose = () => {
     this.setState({ show: false });
+
+    // todo КОСТИЛІЩЕ.... ну або подивись можливо можна упростити процес
+    if (this.props.activeObject.userData.material &&
+      !this.props.activeObject.userData.material.name) {
+      this.props.activeObject.userData.material.name = 'Chose material';
+    }
+    if (this.props.onClose) {
+      this.props.onClose();
+    }
   };
 
   handleShow = () => {
     this.setState({ show: true });
-    if (this.props.materials.length === 0) {
-      this.props.loadMaterials();
-    }
+    this.props.loadMaterials();
   };
 
   handleSearch = event => {
@@ -83,6 +91,7 @@ export default class MaterialComponent extends Component {
     return (
       <div className="material">
         <FormattedMessage
+          show={!this.state.addDBShow}
           id="material.btnMaterialTitle"
           defaultMessage="Set material"
         >
@@ -95,7 +104,10 @@ export default class MaterialComponent extends Component {
           )}
         </FormattedMessage>
 
-        <Modal show={this.state.show} onHide={this.handleClose}>
+        <Modal
+          show={this.state.show || this.props.addElementToDB}
+          onHide={this.handleClose}
+        >
           <Modal.Header closeButton>
             <FormattedMessage
               id="material.modal.title"
@@ -159,8 +171,9 @@ export default class MaterialComponent extends Component {
 
   static propTypes = {
     lang: PropTypes.string.isRequired,
-    scene: PropTypes.object,
     editor: PropTypes.object,
+    scene: PropTypes.object,
+    // editor: PropTypes.object,
     materials: PropTypes.array,
     activeObject: PropTypes.object,
     loadMaterials: PropTypes.func,

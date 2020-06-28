@@ -2,14 +2,27 @@ import DxfParser from 'dxf-parser';
 import { Viewer } from './../services/dxfService';
 import sceneService from './../services/sceneService';
 import {
+  TOOL_BORDER_RADIUS,
+  TOOL_COPY_PASTE,
   TOOL_LINE,
   TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
   TOOL_POINT,
-  TOOL_SELECT
+  // TOOL_REDO,
+  TOOL_SELECT,
+  // TOOL_UNDO,
+  TOOL_FACET
 } from '../components/Toolbar/toolbarComponent';
-import { SELECT_MODE_NEW } from '../components/Options/optionsComponent';
-import { addHelpPoints, getScale, unselectLine } from '../services/editObject';
+import {
+  addHelpPoints,
+  getScale,
+  unselectLine,
+  isPoint,
+  changeArcGeometry,
+  createLine,
+  circleIntersectionAngle,
+  changeGeometry
+} from '../services/editObject';
 import { selectionBegin, selectionEnd, selectionUpdate } from './selection';
 import {
   radius,
@@ -78,6 +91,11 @@ import {
   tangentLineEnd
 } from './line';
 import { PANEL_LAYERS_TOGGLE } from './panelLayers';
+import GeometryUtils from '../services/GeometryUtils';
+import * as THREE from '../extend/THREE';
+import { movePointInfo } from './pointInfo';
+import helpLayerService from '../services/helpLayerService';
+import { chooseTool } from './toolbar';
 
 export const CAD_PARSE_DXF = 'CAD_PARSE_DXF';
 export const CAD_DRAW_DXF = 'CAD_DRAW_DXF';
@@ -93,9 +111,15 @@ export const CAD_EDITMODE_SET_ACTIVE_LINE = 'CAD_EDITMODE_SET_ACTIVE_LINE';
 export const CAD_EDITMODE_UNSELECT_ACTIVE_LINE =
   'CAD_EDITMODE_UNSELECT_ACTIVE_LINE';
 export const CAD_IS_CHANGED = 'CAD_IS_CHANGED';
+export const MOVE_NEW_OBJECT = 'MOVE_NEW_OBJECT';
 
-export const drawDxf = (data = null, container, snapshot = null) => {
-  let cadCanvas = new Viewer(data, container, snapshot);
+export const drawDxf = (
+  data = null,
+  container,
+  snapshot = null,
+  editor = null
+) => {
+  let cadCanvas = new Viewer(data, container, snapshot, null, editor);
   let scene = cadCanvas.getScene();
   let camera = cadCanvas.getCamera();
   let renderer = cadCanvas.getRenderer();
@@ -105,20 +129,19 @@ export const drawDxf = (data = null, container, snapshot = null) => {
    * init
    */
 
-  let editor = {
-    scene,
-    camera,
-    renderer,
-    cadCanvas,
-    options: {
-      threshold: 0.01,
-      selectMode: SELECT_MODE_NEW,
-      singleLayerSelect: true
-    }
-  };
-
   try {
-    testExample(editor);
+    // let editor = {
+    //     scene,
+    //     camera,
+    //     renderer,
+    //     cadCanvas,
+    //     options: {
+    //         threshold: 0.01,
+    //         selectMode: SELECT_MODE_NEW,
+    //         singleLayerSelect: true
+    //     }
+    // };
+    // testExample(editor);
   } catch (e) {
     console.error(e);
   }
@@ -135,96 +158,25 @@ export const drawDxf = (data = null, container, snapshot = null) => {
     });
 };
 
-function testExample(editor) {
-  let objectsDraft = [
-    // // [191],
-    // // [239],
-    // [370, 429],
-    // // [650, 659],
-    // // [544],
-    // // [698],
-    // // [1154, 1134, 1139],
-    // [284],
-    // // [494],
-    // // [741],
-    // // [1025],
-    // // [773, 825],
-    // // [878, 960],
-    //
-    // // [97, 92, 87],
-    // // [1117, 1098, 1086],
-    // [316, 463, -1043, -1042, -1041, -1083, -1081, -1080, -1079, -1078, -1077, -1076, -1075, -1074, -1073, -1072, -1071, -1070, -1069, -1068, -1067, -1066, -1065, -1064, -1062, -1061, -1060, -1059, -1058, -1057, -1056, -1055, -1054, -1053, -1052, -1051, -1050, -1049, -1048, -1047, -1046, -1045, -1044, -1082, -1063],
-    // [1080],
-    // [138, 173, 163],
-    // [49, 46, 80, -1037, -1038, -1039, -1040],
-    // [1038]
-  ];
-  let idsToFind = [];
-  objectsDraft.forEach(entityContainer =>
-    idsToFind.push(...entityContainer.map(id => Math.abs(id)))
-  );
-  let result = {};
-
-  let iterator = sceneService.entityIterator(editor.scene);
-  let entity = iterator.next();
-  while (!entity.done) {
-    if (idsToFind.indexOf(entity.value.id) >= 0) {
-      result[entity.value.id] = entity.value;
-    }
-    entity = iterator.next();
-  }
-
-  let frames = [];
-
-  objectsDraft.forEach((frameData, frameId) => {
-    let entities = [];
-    editor.options.selectMode = SELECT_MODE_NEW;
-
-    frameData.forEach(entityId => {
-      if (entityId < 0) {
-        entities.splice(entities.indexOf(result[Math.abs(entityId)]), 1);
-      } else {
-        entities = [
-          ...entities,
-          ...sceneService.recursiveSelect(result[entityId], editor)
-        ];
-        // console.error(entities.map(e => e.id))
-      }
-    });
-
-    sceneService.highlightEntities(editor, entities);
-    frames.push(
-      sceneService.groupEntities(editor, entities, `Frame${frameId + 1}`)
-    );
-  });
-
-  if (frames.length) {
-    // let {svg} = sceneService.combineEdgeModels(editor)
-    // try {
-    //   sceneService.sendToFlixo(svg)
-    // } catch (e) {
-    //   console.error(e)
-    // }
-    // let svg = sceneService.someSvg
-    // try {
-    //   sceneService.sendToFlixo(svg)
-    // } catch (e) {
-    //   console.error(e)
-    // }
-  }
-
-  // let svg = sceneService.someSvg
-  // try {
-  //   sceneService.sendToFlixo(svg)
-  // } catch (e) {
-  //   console.error(e)
-  // }
-}
+// function testExample(editor) {
+//   let optionsCopy = document.getElementById("TOOL_COPY");
+//     let optionsPaste = document.getElementById("TOOL_PASTE");
+//     if (optionsCopy && optionsPaste) {
+//       optionsCopy.addEventListener('click', () => {
+//         editor.options.selectMode = "COPY";
+//         copyPaste(editor);
+//       });
+//       optionsPaste.addEventListener('click', () => {
+//         editor.options.selectMode = "Paste";
+//         copyPaste(editor);
+//       });
+//     }
+// }
 
 export const cadClick = (event, editor) => {
   return dispatch => {
     let { scene, camera, tool, renderer } = editor;
-    // todo в HelpLayerService
+    // todo в HelpLayerService і переробити з використанням changeArcGeometry
     let controls = editor.cadCanvas.getControls();
     controls.addEventListener('change', () => {
       let helpLayer = scene.getObjectByName('HelpLayer');
@@ -268,7 +220,6 @@ export const cadClick = (event, editor) => {
               }
             });
           } else {
-            //todo є резон перемістити в scene service окремою функцією doSelection_EditMod, починаючи звідси
             console.log('Start the party');
             console.log(editor.editMode);
             console.log(selectResult);
@@ -284,11 +235,6 @@ export const cadClick = (event, editor) => {
                 !editor.editMode.activeLine.length ||
                 selectResult[0].id !== editor.editMode.activeLine[0].id
               ) {
-                // if (editor.editMode.activeLine.id) {
-                //   unselectLine(editor.editMode.activeLine, scene);
-                // }
-                // console.log(editor.editMode.activeLine);
-
                 let activeEntities = sceneService.doSelection(
                   selectResult,
                   editor
@@ -301,36 +247,57 @@ export const cadClick = (event, editor) => {
                 });
 
                 // console.log("we need more console.log or cad active entities");
-                // console.log(activeEntities);
-                // console.log(editor);
-                // debugger;
-
                 const rPoint = getScale(camera);
                 addHelpPoints(editor, scene, rPoint);
 
-                dispatch({
-                  type: CAD_EDITMODE_SET_ACTIVE_LINE,
-                  payload: {
-                    activeLine: editor.activeEntities[0]
-                  }
-                });
+                // todo костиль від 16.03.20
+                if (editor.activeEntities.length) {
+                  dispatch({
+                    type: CAD_EDITMODE_SET_ACTIVE_LINE,
+                    payload: {
+                      activeLine: editor.activeEntities[0]
+                    }
+                  });
+                }
                 renderer.render(scene, camera);
               }
             } else {
               //unselect activeLine line
-              if (
-                editor.activeEntities.length
-                // &&
-                // editor.editMode.activeLine !== editor.editMode.editObject
-              ) {
-                unselectLine(editor.activeEntities, scene);
-                renderer.render(scene, camera);
-                dispatch({
-                  type: CAD_EDITMODE_UNSELECT_ACTIVE_LINE,
-                  payload: {
-                    activeLine: []
-                  }
-                });
+              if (editor.activeEntities.length) {
+                let point = {
+                  x: clickResult.point.x,
+                  y: clickResult.point.y
+                };
+
+                // todo перевірка для всих хелппоінтів
+                let isSelectPoint = false;
+                let helpLayer = scene.getObjectByName('HelpLayer');
+                if (helpLayer.children.length) {
+                  helpLayer.children.forEach(testPoint => {
+                    if (
+                      testPoint.name != 'pointCurveCenter' &&
+                      testPoint.name != 'helpCenterLine'
+                    ) {
+                      if (!isSelectPoint) {
+                        isSelectPoint = isPoint(
+                          testPoint.position,
+                          testPoint.geometry.parameters.radius,
+                          point
+                        );
+                      }
+                    }
+                  });
+                }
+                if (!isSelectPoint) {
+                  unselectLine(editor.activeEntities, scene);
+                  renderer.render(scene, camera);
+                  dispatch({
+                    type: CAD_EDITMODE_UNSELECT_ACTIVE_LINE,
+                    payload: {
+                      activeLine: []
+                    }
+                  });
+                }
               }
             }
             //todo закінчуючи туточки
@@ -343,8 +310,6 @@ export const cadClick = (event, editor) => {
         }
         break;
 
-      //todo не булоб логічно сюди перенести і інструмент TOOL_SELECT?
-
       case TOOL_MEASUREMENT:
         {
           let clickResult = sceneService.onClick(event, scene, camera);
@@ -356,20 +321,18 @@ export const cadClick = (event, editor) => {
           );
         }
         break;
-      case TOOL_LINE:
+
+      case MOVE_NEW_OBJECT:
         {
-          let clickResult = sceneService.onClick(event, scene, camera);
-          console.log(
-            `Click position [${clickResult.point.x.toFixed(
-              4
-            )}, ${clickResult.point.y.toFixed(4)}]`,
-            clickResult
-          );
+          chooseTool(
+            editor.options.oldMode ? editor.options.selectMode : 'TOOL_POINT'
+          )(dispatch);
+          editor.options.oldMode = '';
+          delete editor.editMode.activeLine.lines;
         }
         break;
 
       default:
-        //todo p.s. TOOL_SELECT сюди всерівно потрапляє
         console.log(`cadClick not handled for tool: ${tool}`);
         break;
     }
@@ -378,24 +341,8 @@ export const cadClick = (event, editor) => {
 
 export const onMouseDown = (event, editor) => {
   return dispatch => {
-    let { tool } = editor;
+    let { scene, camera, renderer, tool, cadCanvas } = editor;
     if (event.button === 0) {
-      //new line
-      if (editor.editMode.isNewLine) {
-        !editor.editMode.newLineFirst
-          ? firstPoint(event, editor)(dispatch)
-          : saveNewLine(editor)(dispatch);
-      }
-      //new curve
-      if (editor.editMode.isNewCurve) {
-        if (!editor.editMode.newCurveCenter) {
-          centerPoint(event, editor)(dispatch);
-        } else if (!editor.editMode.thetaStart) {
-          thetaStart(editor)(dispatch);
-        } else if (!editor.editMode.thetaLength) {
-          saveNewCurve(editor)(dispatch);
-        }
-      }
       //clone object
       if (editor.editMode.clone.active) {
         if (!editor.editMode.clone.point) {
@@ -414,17 +361,22 @@ export const onMouseDown = (event, editor) => {
       switch (tool) {
         case TOOL_NEW_CURVE:
           {
-            if (!editor.editMode.newCurveCenter) {
-              centerPoint(event, editor)(dispatch);
-            } else if (!editor.editMode.thetaStart) {
-              thetaStart(editor)(dispatch);
-            } else if (!editor.editMode.thetaLength) {
-              saveNewCurve(editor)(dispatch);
+            editor.editMode.isNewCurve = true;
+            if (editor.editMode.isNewCurve) {
+              if (!editor.editMode.newCurveCenter) {
+                centerPoint(event, editor)(dispatch);
+              } else if (!editor.editMode.thetaStart) {
+                thetaStart(editor)(dispatch);
+              } else if (!editor.editMode.thetaLength) {
+                saveNewCurve(editor)(dispatch);
+              }
             }
           }
           break;
+
         case TOOL_POINT:
           {
+            // todo розібрати що тут твориться обєднати з функціоналом кадкдік
             if (editor.editMode.isEdit) {
               // do edit here
               if (editor.activeEntities.length) {
@@ -440,6 +392,7 @@ export const onMouseDown = (event, editor) => {
             }
           }
           break;
+
         case TOOL_MEASUREMENT:
           {
             if (editor.options.selectMode === MEASUREMENT_POINT) {
@@ -478,11 +431,13 @@ export const onMouseDown = (event, editor) => {
             }
           }
           break;
+
         case TOOL_SELECT:
           {
             selectionBegin(event, editor)(dispatch);
           }
           break;
+
         case TOOL_LINE:
           {
             if (editor.options.selectMode === LINE_TWO_POINT) {
@@ -519,6 +474,354 @@ export const onMouseDown = (event, editor) => {
             }
           }
           break;
+
+        case TOOL_COPY_PASTE:
+          {
+            copyPaste(editor);
+          }
+          break;
+
+        case TOOL_BORDER_RADIUS:
+          {
+            if (editor.editMode.isEdit) {
+              if (editor.activeEntities.length === 2) {
+                let line0 = editor.activeEntities[0].geometry;
+                let line1 = editor.activeEntities[1].geometry;
+                if (line0.type === 'Geometry' && line1.type === 'Geometry') {
+                  if (
+                    (line0.vertices[0].x === line1.vertices[0].x &&
+                      line0.vertices[0].y === line1.vertices[0].y) ||
+                    (line0.vertices[0].x === line1.vertices[1].x &&
+                      line0.vertices[0].y === line1.vertices[1].y) ||
+                    (line0.vertices[1].x === line1.vertices[0].x &&
+                      line0.vertices[1].y === line1.vertices[0].y) ||
+                    (line0.vertices[1].x === line1.vertices[1].x &&
+                      line0.vertices[1].y === line1.vertices[1].y)
+                  ) {
+                    let parent = editor.activeEntities[0].parent;
+                    let helpLayer = scene.getObjectByName('HelpLayer');
+                    let pointCurveCenter = helpLayer.getObjectByName(
+                      'pointCurveCenter'
+                    );
+
+                    helpLayerService.selectCenterPoint(editor);
+                    let curveParam = {
+                      newCurveCenter: pointCurveCenter.position,
+                      thetaStart: circleIntersectionAngle(
+                        pointCurveCenter.userData.A,
+                        pointCurveCenter.position
+                      ),
+                      thetaLength:
+                        2 *
+                        Math.acos(
+                          pointCurveCenter.userData.EcenterAC /
+                            pointCurveCenter.userData.radius
+                        ),
+                      radius: pointCurveCenter.userData.radius //????
+                    };
+
+                    // todo зашліфувати, убрати лишнє
+                    let materialLine = new THREE.LineBasicMaterial({
+                      color: 0x00ff00
+                    });
+
+                    let changedGeometry = {
+                      radius: curveParam.radius,
+                      thetaStart: curveParam.thetaStart,
+                      thetaLength: curveParam.thetaLength
+                    };
+
+                    let copyCircleGeometry = changeArcGeometry(
+                      { 0: 'copy' },
+                      changedGeometry
+                    );
+                    let copyCircle = new THREE.Line(
+                      copyCircleGeometry,
+                      materialLine
+                    );
+                    copyCircle.position.x = curveParam.newCurveCenter.x;
+                    copyCircle.position.y = curveParam.newCurveCenter.y;
+
+                    let pointEnd = {
+                      x:
+                        copyCircle.position.x +
+                        copyCircle.geometry.vertices[
+                          copyCircle.geometry.vertices.length - 1
+                        ].x,
+                      y:
+                        copyCircle.position.y +
+                        copyCircle.geometry.vertices[
+                          copyCircle.geometry.vertices.length - 1
+                        ].y
+                    };
+                    let pointStart = {
+                      x:
+                        copyCircle.position.x +
+                        copyCircle.geometry.vertices[0].x,
+                      y:
+                        copyCircle.position.y +
+                        copyCircle.geometry.vertices[0].y
+                    };
+                    let endA = helpLayerService.lengthLine(
+                      pointCurveCenter.userData.A,
+                      pointEnd
+                    );
+                    let startA = helpLayerService.lengthLine(
+                      pointCurveCenter.userData.A,
+                      pointStart
+                    );
+                    let endC = helpLayerService.lengthLine(
+                      pointCurveCenter.userData.C,
+                      pointEnd
+                    );
+                    let startC = helpLayerService.lengthLine(
+                      pointCurveCenter.userData.C,
+                      pointStart
+                    );
+
+                    if (
+                      !(startA < 1e-3 && endC < 1e-3) ||
+                      (endA < 1e-3 && startC < 1e-3)
+                    ) {
+                      changedGeometry = {
+                        radius: curveParam.radius,
+                        thetaStart: circleIntersectionAngle(
+                          pointCurveCenter.userData.C,
+                          pointCurveCenter.position
+                        ),
+                        thetaLength: curveParam.thetaLength
+                      };
+                      copyCircleGeometry = changeArcGeometry(
+                        { 0: 'copy' },
+                        changedGeometry
+                      );
+                      copyCircle = new THREE.Line(
+                        copyCircleGeometry,
+                        materialLine
+                      );
+                      copyCircle.position.x = curveParam.newCurveCenter.x;
+                      copyCircle.position.y = curveParam.newCurveCenter.y;
+                      // debugger;
+                    }
+
+                    if (parent.children.length) {
+                      copyCircle.userData.originalColor =
+                        parent.children[0].userData.originalColor;
+                    } else {
+                      copyCircle.userData.originalColor = 0x808000;
+                    }
+                    parent.add(copyCircle);
+
+                    editor.scene.getObjectByName('HelpLayer').children = [];
+                    cadCanvas.render();
+
+                    renderer.render(scene, camera);
+                    return;
+                  }
+                }
+              }
+
+              let activeEntities = facetBorderRadiusClick(editor, event);
+              dispatch({
+                type: CAD_DO_SELECTION,
+                payload: {
+                  activeEntities
+                }
+              });
+
+              if (editor.activeEntities.length === 2) {
+                let line0 = editor.activeEntities[0].geometry;
+                let line1 = editor.activeEntities[1].geometry;
+                if (line0.type === 'Geometry' && line1.type === 'Geometry') {
+                  if (
+                    (line0.vertices[0].x === line1.vertices[0].x &&
+                      line0.vertices[0].y === line1.vertices[0].y) ||
+                    (line0.vertices[0].x === line1.vertices[1].x &&
+                      line0.vertices[0].y === line1.vertices[1].y) ||
+                    (line0.vertices[1].x === line1.vertices[0].x &&
+                      line0.vertices[1].y === line1.vertices[0].y) ||
+                    (line0.vertices[1].x === line1.vertices[1].x &&
+                      line0.vertices[1].y === line1.vertices[1].y)
+                  ) {
+                    helpLayerService.lengthNewLine(editor, event);
+                    renderer.render(scene, camera);
+                  }
+                }
+              }
+            }
+          }
+          break;
+        case TOOL_FACET:
+          {
+            if (editor.editMode.isEdit) {
+              if (editor.activeEntities.length === 2) {
+                let line0 = editor.activeEntities[0].geometry;
+                let line1 = editor.activeEntities[1].geometry;
+                if (line0.type === 'Geometry' && line1.type === 'Geometry') {
+                  if (
+                    (line0.vertices[0].x === line1.vertices[0].x &&
+                      line0.vertices[0].y === line1.vertices[0].y) ||
+                    (line0.vertices[0].x === line1.vertices[1].x &&
+                      line0.vertices[0].y === line1.vertices[1].y) ||
+                    (line0.vertices[1].x === line1.vertices[0].x &&
+                      line0.vertices[1].y === line1.vertices[0].y) ||
+                    (line0.vertices[1].x === line1.vertices[1].x &&
+                      line0.vertices[1].y === line1.vertices[1].y)
+                  ) {
+                    let clickResult = sceneService.onClick(
+                      event,
+                      scene,
+                      camera
+                    );
+                    let helpLayer = scene.getObjectByName('HelpLayer');
+                    let pointInLine0 = helpLayer.getObjectByName(
+                      'pointInLine0'
+                    );
+                    let pointInLine1 = helpLayer.getObjectByName(
+                      'pointInLine1'
+                    );
+
+                    let length0 = helpLayerService.lengthLine(
+                      clickResult.point,
+                      pointInLine0.position
+                    );
+                    let length1 = helpLayerService.lengthLine(
+                      clickResult.point,
+                      pointInLine1.position
+                    );
+
+                    if (!pointInLine1.userData.fix) {
+                      if (length1 > length0 && !pointInLine0.userData.fix) {
+                        pointInLine0.userData.fix = true;
+                      } else {
+                        pointInLine1.userData.fix = true;
+                      }
+                    } else if (!pointInLine0.userData.fix) {
+                      pointInLine0.userData.fix = true;
+                    }
+
+                    if (
+                      pointInLine0.userData.fix &&
+                      pointInLine1.userData.fix
+                    ) {
+                      // debugger;
+
+                      let parent = editor.activeEntities[0].parent;
+                      // debugger;
+                      let lineParameters = {
+                        0: {
+                          x: pointInLine0.position.x,
+                          y: pointInLine0.position.y
+                        },
+                        1: {
+                          x: pointInLine1.position.x,
+                          y: pointInLine1.position.y
+                        }
+                      };
+                      const newFacetLine = createLine(
+                        lineParameters[0],
+                        lineParameters[1]
+                      );
+                      if (parent.children.length) {
+                        newFacetLine.userData.originalColor =
+                          parent.children[0].userData.originalColor;
+                      } else {
+                        newFacetLine.userData.originalColor = 0x808000;
+                      }
+                      parent.add(newFacetLine);
+
+                      if (
+                        line0.vertices[0].x === line1.vertices[0].x &&
+                        line0.vertices[0].y === line1.vertices[0].y
+                      ) {
+                        changeGeometry(
+                          [editor.activeEntities[0]],
+                          [0],
+                          pointInLine0.position,
+                          scene,
+                          editor
+                        );
+                        changeGeometry(
+                          [editor.activeEntities[1]],
+                          [0],
+                          pointInLine1.position,
+                          scene,
+                          editor
+                        );
+                      } else if (
+                        line0.vertices[0].x === line1.vertices[1].x &&
+                        line0.vertices[0].y === line1.vertices[1].y
+                      ) {
+                        changeGeometry(
+                          [editor.activeEntities[0]],
+                          [0],
+                          pointInLine0.position,
+                          scene,
+                          editor
+                        );
+                        changeGeometry(
+                          [editor.activeEntities[1]],
+                          [1],
+                          pointInLine1.position,
+                          scene,
+                          editor
+                        );
+                      } else if (
+                        line0.vertices[1].x === line1.vertices[0].x &&
+                        line0.vertices[1].y === line1.vertices[0].y
+                      ) {
+                        changeGeometry(
+                          [editor.activeEntities[0]],
+                          [1],
+                          pointInLine0.position,
+                          scene,
+                          editor
+                        );
+                        changeGeometry(
+                          [editor.activeEntities[1]],
+                          [0],
+                          pointInLine1.position,
+                          scene,
+                          editor
+                        );
+                      } else if (
+                        line0.vertices[1].x === line1.vertices[1].x &&
+                        line0.vertices[1].y === line1.vertices[1].y
+                      ) {
+                        changeGeometry(
+                          [editor.activeEntities[0]],
+                          [1],
+                          pointInLine0.position,
+                          scene,
+                          editor
+                        );
+                        changeGeometry(
+                          [editor.activeEntities[1]],
+                          [1],
+                          pointInLine1.position,
+                          scene,
+                          editor
+                        );
+                      }
+                      editor.scene.getObjectByName('HelpLayer').children = [];
+                      cadCanvas.render();
+                      renderer.render(scene, camera);
+                    }
+                    return;
+                  }
+                }
+              }
+              let activeEntities = facetBorderRadiusClick(editor, event);
+              dispatch({
+                type: CAD_DO_SELECTION,
+                payload: {
+                  activeEntities
+                }
+              });
+              // }
+            }
+          }
+          break;
         default:
           console.log(`cadonMouseDown not handled for tool: ${tool}`);
           break;
@@ -535,9 +838,6 @@ export const onMouseUp = (event, editor) => {
     if (editor.editMode.move.active && editor.editMode.move.point) {
       disableMovePoint(editor.editMode.move.moveObject)(dispatch);
     }
-
-    console.log(editor);
-    // debugger;
 
     switch (tool) {
       case TOOL_SELECT:
@@ -561,45 +861,14 @@ export const onMouseUp = (event, editor) => {
             let { scene, camera, renderer } = editor;
 
             //TODO викинути непотрібне, залишити важливе
-            // console.log(selectResult);
-            // debugger;
-            // debugger;
-            // let activeEntities = sceneService.doSelection(
-            //   selectResult,
-            //   editor
-            // );
-            // dispatch({
-            //   type: CAD_DO_SELECTION,
-            //   payload: {
-            //     activeEntities
-            //   }
-            // });
-            // dispatch({
-            //   type: CAD_EDITMODE_SET_ACTIVE_LINE,
-            //   payload: {
-            //     activeLine: editor.activeEntities[0]
-            //   }
-            // });
+
             renderer.render(scene, camera);
             // debugger;
             if (selectResult.length !== 0) {
-              // debugger;
-              // if (selectResult[0].id !== editor.editMode.activeLine[0].id) {
-              // debugger;
-              // let activeEntities = sceneService.doSelection(
-              //   selectResult,
-              //   editor
-              // );
-              // dispatch({
-              //   type: CAD_DO_SELECTION,
-              //   payload: {
-              //     activeEntities
-              //   }
-              // });
-              // debugger;
-
-              const rPoint = getScale(camera);
-              addHelpPoints(editor, scene, rPoint);
+              if (editor.editMode.isEdit) {
+                const rPoint = getScale(camera);
+                addHelpPoints(editor, scene, rPoint);
+              }
               // dispatch({
               //   type: CAD_EDITMODE_SET_ACTIVE_LINE,
               //   payload: {
@@ -634,48 +903,8 @@ export const onMouseUp = (event, editor) => {
 
 export const onMouseMove = (event, editor) => {
   return dispatch => {
-    let { tool } = editor;
+    let { scene, camera, renderer, tool, cadCanvas } = editor;
 
-    //new Line
-    if (editor.editMode.isNewLine) {
-      let parent = editor.editMode.editObject;
-      if (!parent || parent.metadata) {
-        parent = editor.scene.getObjectByName('Layers').children[0];
-        dispatch({
-          type: PANEL_LAYERS_TOGGLE,
-          payload: {
-            activeLayer: parent
-          }
-        });
-      }
-      !editor.editMode.newLineFirst
-        ? startNewLine(event, editor)(dispatch)
-        : drawLine(event, editor, parent)(dispatch);
-    }
-    //new Curve
-    if (editor.editMode.isNewCurve) {
-      let parent =
-        editor.tool === TOOL_NEW_CURVE
-          ? editor.activeLayer
-          : editor.editMode.editObject;
-      if (!parent || parent.metadata) {
-        parent = editor.scene.getObjectByName('Layers').children[0];
-        dispatch({
-          type: PANEL_LAYERS_TOGGLE,
-          payload: {
-            activeLayer: parent
-          }
-        });
-      }
-
-      if (!editor.editMode.newCurveCenter) {
-        centerCurve(event, editor)(dispatch);
-      } else if (!editor.editMode.thetaStart) {
-        radius(event, editor)(dispatch);
-      } else if (!editor.editMode.thetaLength) {
-        thetaLength(event, editor, parent)(dispatch);
-      }
-    }
     //clone object
     if (editor.editMode.clone.active) {
       selectClonePoint(event, editor)(dispatch);
@@ -709,10 +938,6 @@ export const onMouseMove = (event, editor) => {
             (editor.editMode.selectPointIndex ||
               editor.editMode.selectPointIndex === 0)
           ) {
-            // do edit here
-            console.log(editor);
-            console.log(editor.activeEntities);
-            // debugger;
             movePoint(
               editor.editMode.activeLine,
               editor.editMode.selectPointIndex,
@@ -753,23 +978,24 @@ export const onMouseMove = (event, editor) => {
 
       case TOOL_LINE:
         {
+          let parent = editor.editMode.isEdit
+            ? editor.editMode.editObject
+            : cadCanvas.getNewLineLayer();
+          if (!parent || parent.metadata) {
+            parent = editor.scene.getObjectByName('Layers').children[0];
+            dispatch({
+              type: PANEL_LAYERS_TOGGLE,
+              payload: {
+                activeLayer: parent
+              }
+            });
+          }
+
+          // todo розібратись з куском кода вище і нище, розібратись з новими лініями які паралельні і перпендикулярні
           // if (editor.tool === TOOL_LINE) {
           switch (editor.options.selectMode) {
             case LINE_TWO_POINT:
               {
-                let parent =
-                  editor.tool === TOOL_LINE
-                    ? editor.activeLayer
-                    : editor.editMode.editObject;
-                if (!parent || parent.metadata) {
-                  parent = editor.scene.getObjectByName('Layers').children[0];
-                  dispatch({
-                    type: PANEL_LAYERS_TOGGLE,
-                    payload: {
-                      activeLayer: parent
-                    }
-                  });
-                }
                 !editor.editMode.newLineFirst
                   ? startNewLine(event, editor)(dispatch)
                   : drawLine(event, editor, parent)(dispatch);
@@ -786,7 +1012,8 @@ export const onMouseMove = (event, editor) => {
                   editor,
                   editor.line.parallel.baseLine,
                   editor.line.parallel.firstPoint,
-                  editor.line.parallel.distance
+                  editor.line.parallel.distance,
+                  parent
                 )(dispatch);
               }
 
@@ -801,7 +1028,8 @@ export const onMouseMove = (event, editor) => {
                   event,
                   editor,
                   editor.line.perpendicular.baseLine,
-                  editor.line.perpendicular.firstPoint
+                  editor.line.perpendicular.firstPoint,
+                  parent
                 )(dispatch);
               }
 
@@ -813,7 +1041,8 @@ export const onMouseMove = (event, editor) => {
                 tangentLineDraw(
                   event,
                   editor,
-                  editor.line.tangent.baseArc
+                  editor.line.tangent.baseArc,
+                  parent
                 )(dispatch);
               }
 
@@ -830,10 +1059,10 @@ export const onMouseMove = (event, editor) => {
 
       case TOOL_NEW_CURVE:
         {
-          let parent =
-            editor.tool === TOOL_NEW_CURVE
-              ? editor.activeLayer
-              : editor.editMode.editObject;
+          // todo добавити слой parent у випадку isEdit - false
+          let parent = editor.editMode.isEdit
+            ? editor.editMode.editObject
+            : editor.activeLayer;
           if (!parent || parent.metadata) {
             parent = editor.scene.getObjectByName('Layers').children[0];
             dispatch({
@@ -842,6 +1071,166 @@ export const onMouseMove = (event, editor) => {
                 activeLayer: parent
               }
             });
+          }
+          if (!editor.editMode.newCurveCenter) {
+            centerCurve(event, editor)(dispatch);
+          } else if (!editor.editMode.thetaStart) {
+            radius(event, editor)(dispatch);
+          } else if (!editor.editMode.thetaLength) {
+            thetaLength(event, editor, parent)(dispatch);
+          }
+        }
+        break;
+
+      case TOOL_BORDER_RADIUS:
+        {
+          if (editor.editMode.isEdit) {
+            movePointInfo(event, 'Сhoose a corner')(dispatch);
+            if (editor.activeEntities.length === 2) {
+              let line0 = editor.activeEntities[0].geometry;
+              let line1 = editor.activeEntities[1].geometry;
+              if (line0.type === 'Geometry' && line1.type === 'Geometry') {
+                if (
+                  (line0.vertices[0].x === line1.vertices[0].x &&
+                    line0.vertices[0].y === line1.vertices[0].y) ||
+                  (line0.vertices[1].x === line1.vertices[0].x &&
+                    line0.vertices[1].y === line1.vertices[0].y) ||
+                  (line0.vertices[1].x === line1.vertices[1].x &&
+                    line0.vertices[1].y === line1.vertices[1].y) ||
+                  (line0.vertices[0].x === line1.vertices[1].x &&
+                    line0.vertices[0].y === line1.vertices[1].y)
+                ) {
+                  let center = helpLayerService.lengthNewLine(editor, event);
+                  renderer.render(scene, camera);
+                  let radius =
+                    Math.floor(
+                      helpLayerService.lengthLine(
+                        center.userData.B,
+                        center.position
+                      ) * 100
+                    ) / 100;
+                  movePointInfo(
+                    event,
+                    'Radius:   ' + radius.toString()
+                  )(dispatch);
+                }
+              }
+            }
+          }
+        }
+        break;
+
+      case TOOL_FACET:
+        {
+          if (editor.editMode.isEdit) {
+            if (editor.activeEntities.length === 2) {
+              let line0 = editor.activeEntities[0].geometry;
+              let line1 = editor.activeEntities[1].geometry;
+              if (line0.type === 'Geometry' && line1.type === 'Geometry') {
+                if (
+                  (line0.vertices[0].x === line1.vertices[0].x &&
+                    line0.vertices[0].y === line1.vertices[0].y) ||
+                  (line0.vertices[1].x === line1.vertices[0].x &&
+                    line0.vertices[1].y === line1.vertices[0].y) ||
+                  (line0.vertices[1].x === line1.vertices[1].x &&
+                    line0.vertices[1].y === line1.vertices[1].y) ||
+                  (line0.vertices[0].x === line1.vertices[1].x &&
+                    line0.vertices[0].y === line1.vertices[1].y)
+                ) {
+                  let { camera, scene } = editor;
+                  // debugger;
+                  let clickResult = sceneService.onClick(event, scene, camera);
+                  let helpLayer = scene.getObjectByName('HelpLayer');
+                  let pointInLine0 = helpLayer.getObjectByName('pointInLine0');
+                  let pointInLine1 = helpLayer.getObjectByName('pointInLine1');
+                  // debugger;
+                  if (!pointInLine0) {
+                    pointInLine0 = helpLayerService.positionInLine(
+                      editor,
+                      line0.vertices,
+                      clickResult.point
+                    );
+                    pointInLine1 = helpLayerService.positionInLine(
+                      editor,
+                      line1.vertices,
+                      clickResult.point
+                    );
+                    pointInLine0.name = 'pointInLine0';
+                    pointInLine1.name = 'pointInLine1';
+                    helpLayer.add(pointInLine0);
+                    helpLayer.add(pointInLine1);
+                  } else {
+                    if (!pointInLine0.userData.fix) {
+                      helpLayerService.positionInLine(
+                        editor,
+                        line0.vertices,
+                        clickResult.point,
+                        pointInLine0
+                      );
+                    }
+                    if (!pointInLine1.userData.fix) {
+                      helpLayerService.positionInLine(
+                        editor,
+                        line1.vertices,
+                        clickResult.point,
+                        pointInLine1
+                      );
+                    }
+                  }
+
+                  let length0 =
+                    Math.floor(
+                      helpLayerService.lengthLine(
+                        clickResult.point,
+                        pointInLine0.position
+                      ) * 100
+                    ) / 100;
+                  let length1 =
+                    Math.floor(
+                      helpLayerService.lengthLine(
+                        clickResult.point,
+                        pointInLine1.position
+                      ) * 100
+                    ) / 100;
+                  if (!pointInLine1.userData.fix) {
+                    if (length1 > length0 && !pointInLine0.userData.fix) {
+                      movePointInfo(
+                        event,
+                        'line length:   ' + length1.toString()
+                      )(dispatch);
+                    } else {
+                      movePointInfo(
+                        event,
+                        'line length:   ' + length0.toString()
+                      )(dispatch);
+                    }
+                  } else if (!pointInLine0.userData.fix) {
+                    movePointInfo(
+                      event,
+                      'line length:   ' + length1.toString()
+                    )(dispatch);
+                  }
+
+                  renderer.render(scene, camera);
+                  return;
+                }
+              }
+            }
+            movePointInfo(event, 'Сhoose a corner')(dispatch);
+          }
+        }
+        break;
+
+      case MOVE_NEW_OBJECT:
+        {
+          let newObjectLines = editor.editMode.activeLine.lines;
+          if (newObjectLines) {
+            movePoint(
+              newObjectLines,
+              'MOVE_NEW_OBJECT',
+              event,
+              editor
+            )(dispatch);
           }
         }
         break;
@@ -922,4 +1311,143 @@ export const toggleChanged = isChanged => {
         isChanged: !isChanged
       }
     });
+};
+
+export const copyClick = editor => {
+  // let lastMode = editor.options.selectMode;
+  // editor.options.selectMode = "COPY";
+  copyPaste(editor, 'COPY');
+};
+
+export const pasteClick = editor => {
+  // editor.options.selectMode = "PASTE";
+  copyPaste(editor, 'PASTE');
+};
+
+let facetBorderRadiusClick = (editor, event) => {
+  let { scene, camera } = editor;
+  let clickResult = sceneService.onClick(event, scene, camera);
+  console.log(
+    `Click position [${clickResult.point.x.toFixed(
+      4
+    )}, ${clickResult.point.y.toFixed(4)}]`,
+    clickResult
+  );
+  let payload = {
+    ...clickResult,
+    object: null
+  };
+  let selectResult = clickResult.activeEntities;
+  if (selectResult.length) {
+    if (selectResult[0].userData.belongsToObject) {
+      payload.object = selectResult[0].parent;
+    }
+  }
+  return sceneService.doSelection(selectResult, editor);
+};
+
+let copyPaste = (editor, copyPasteMode) => {
+  let { renderer, scene, cadCanvas, camera } = editor;
+  // todo place - місце для зберігання copyEntities, треба подумати де зберігати
+  let place = camera.copyEntities;
+  if (!place) {
+    place = [];
+  }
+  if (copyPasteMode === 'COPY') {
+    place = [];
+
+    editor.activeEntities.forEach((line, i) => {
+      if (line.geometry.type === 'Geometry') {
+        place[i] = {
+          geometry: {
+            type: line.geometry.type,
+            vertices: [
+              new THREE.Vector3().copy(line.geometry.vertices[0]),
+              new THREE.Vector3().copy(line.geometry.vertices[1])
+            ]
+          }
+        };
+      } else if (line.geometry.type === 'CircleGeometry') {
+        console.log(line.geometry);
+        place[i] = {
+          geometry: {
+            type: line.geometry.type,
+            parameters: {
+              radius: line.geometry.parameters.radius,
+              thetaStart: line.geometry.parameters.thetaStart,
+              thetaLength: line.geometry.parameters.thetaLength
+            }
+          },
+          position: new THREE.Vector3().copy(line.position)
+        };
+      }
+    });
+    place[
+      place.length
+    ] = GeometryUtils.getBoundingBox(editor.activeEntities);
+  } else if (copyPasteMode === 'PASTE') {
+    if (place.length) {
+      let copyEntitiesBoundingBox =
+        place[place.length - 1];
+      let changeGeometry = {
+        x: copyEntitiesBoundingBox.center.x - editor.camera.position.x,
+        y: copyEntitiesBoundingBox.center.y - editor.camera.position.y
+      };
+      let parent = !editor.editMode.isEdit
+        ? cadCanvas.getNewLineLayer()
+        : editor.editMode.editObject;
+      // todo де зберігаються нові лінії якщо без режиму змін об'єкту
+      let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+      place.forEach(line => {
+        if (line.geometry) {
+          if (line.geometry.type === 'Geometry') {
+            let changeLineParameters = {
+              0: {
+                x: line.geometry.vertices[0].x - changeGeometry.x,
+                y: line.geometry.vertices[0].y - changeGeometry.y
+              },
+              1: {
+                x: line.geometry.vertices[1].x - changeGeometry.x,
+                y: line.geometry.vertices[1].y - changeGeometry.y
+              }
+            };
+            const copyLine = createLine(
+              changeLineParameters[0],
+              changeLineParameters[1]
+            );
+            if (parent.children.length) {
+              copyLine.userData.originalColor =
+                parent.children[0].userData.originalColor;
+            } else {
+              copyLine.userData.originalColor = 0x808000;
+            }
+            parent.add(copyLine);
+          } else if (line.geometry.type === 'CircleGeometry') {
+            let changedGeometry = {
+              radius: line.geometry.parameters.radius,
+              thetaStart: line.geometry.parameters.thetaStart,
+              thetaLength: line.geometry.parameters.thetaLength
+            };
+
+            let copyCircleGeometry = changeArcGeometry(
+              { 0: 'copy' },
+              changedGeometry
+            );
+            let copyCircle = new THREE.Line(copyCircleGeometry, materialLine);
+            copyCircle.position.x = line.position.x - changeGeometry.x;
+            copyCircle.position.y = line.position.y - changeGeometry.y;
+            if (parent.children.length) {
+              copyCircle.userData.originalColor =
+                parent.children[0].userData.originalColor;
+            } else {
+              copyCircle.userData.originalColor = 0x808000;
+            }
+            parent.add(copyCircle);
+          }
+        }
+      });
+
+      renderer.render(scene, camera);
+    }
+  }
 };
