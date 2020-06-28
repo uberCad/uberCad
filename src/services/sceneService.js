@@ -900,7 +900,7 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
 
   // console.error('collisionPoints', collisionPoints)
 
-  let branches = GeometryUtils.generateCollisionBranches(
+    let branches = GeometryUtils.generateCollisionBranches(
     collisionPoints,
     threshold
   );

@@ -2954,8 +2954,13 @@ let fixObjectsPaths = scene => {
           region.path = path;
           region.path.forEach(v => {
             if (v.parentUuid) {
+              // todo remove this block. It's deprecated, after parentId property
               v.parent = scene.getObjectByProperty('uuid', v.parentUuid);
               delete v.parentUuid;
+            }
+            if (v.parentId) {
+              v.parent = scene.getObjectById(v.parentId);
+              delete v.parentId;
             }
           });
         }

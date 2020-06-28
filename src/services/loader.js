@@ -1,16 +1,112 @@
 import * as THREE from '../extend/THREE';
 import sceneService from "./sceneService";
+import arrayUtils from "./arrayUtils";
 
-export const load = () => {};
+const CAD_LOADER = "cad loader";
 
-export const save = (container) => {
+export const parse = (data) => {
+    console.log(data);
+
+    if (data.title === CAD_LOADER) {
+        //full drawing data
+
+        //new scene
+
+    } else {
+        if (Array.isArray(data)) {
+            //array of objects or layers
+            return parseContainer(data);
+        } else {
+            return parseObject(data);
+            //single object or layer
+        }
+    }
+};
+
+// Layers or Objects
+const parseContainer = data => {
+    let container = new THREE.Object3D();
+    let type;
+    data.forEach(child => {
+        container.add(parseObject(child));
+        type = child.type;
+    });
+
+    if (type) {
+        container.name = type === "Layer" ? "Layers" : "Objects";
+    }
+    return container;
+};
+
+const parseObject = obj => {
+    let container = new THREE.Object3D();
+    container.name = obj.name;
+    // container.id = obj.id;
+    container.userData = obj.userData;
+    obj.children.forEach(child => {
+        container.add(parsePrimitive(child));
+    });
+    return container;
+};
+
+const parsePrimitive = primitive => {
+    return primitive.type === "Arc" ? parseArc(primitive) : parseLine(primitive);
+};
+
+const parseArc = data => {
+    //todo id/uuid
+    //todo userData
+
+    let geometry, material, circle;
+    let color = new THREE.Color(data.color.r, data.color.g, data.color.b);
+
+    geometry = new THREE.CircleGeometry(
+        data.geometry.radius,
+        32,
+        data.geometry.thetaStart,
+        data.geometry.thetaLength
+    );
+    geometry.vertices.shift();
+
+    material = new THREE.LineBasicMaterial({ color });
+
+    circle = new THREE.Line(geometry, material);
+    circle.position.x = data.geometry.position.x;
+    circle.position.y = data.geometry.position.y;
+    circle.position.z = data.geometry.position.z;
+    circle.name = data.name;
+    return circle;
+};
+
+const parseLine = data => {
+    //todo userData
+    //todo id/uuid
+
+    let geometry = new THREE.Geometry();
+    let color = new THREE.Color(data.color.r, data.color.g, data.color.b);
+    let material,
+        vertex;
+
+    for (let i = 0; i < data.geometry.vertices.length; i++) {
+        vertex = data.geometry.vertices[i];
+        geometry.vertices.push(new THREE.Vector3(vertex.x, vertex.y, 0));
+    }
+
+    material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
+    let line = new THREE.Line(geometry, material);
+    line.name = data.name;
+    return line;
+};
+
+
+
+
+export const serialize = (container) => {
     return {
-        title: "cad loader",
+        title: CAD_LOADER,
         version: 1,
-        data: {
-            layers: exportLayers(container),
-            objects: exportObjects(container)
-        },
+        layers: exportLayers(container),
+        objects: exportObjects(container),
         settings: {}
     }
 };
@@ -23,6 +119,7 @@ const exportLayers = scene => {
         result.push({
             id: layer.id,
             name: layer.name,
+            type: 'Layer',
             userData: exportUserData(layer),
             children: layer.children.map(child => exportPrimitive(child))
         })
@@ -37,9 +134,9 @@ const exportObjects = scene => {
 
     objects.forEach(object => {
         result.push({
-            object,
             id: object.id,
             name: object.name,
+            type: 'Object',
             userData: exportUserData(object),
             children: object.children.map(child => exportPrimitive(child))
         })
@@ -55,29 +152,17 @@ const exportUserData = object => {
     Object.keys(userData).forEach(key => {
         switch (key) {
             case 'edgeModel': {
-
-                //TODO make deep copy of edgeModel, and override custom Path
-                let a = {
-                    regions: [],
-                    svgData: {}
-                };
-
-                result[key] = userData[key];
+                // There is Path obj in each region. Make JSON.stringify to convert paren line obj to id
+                result[key] = JSON.parse(JSON.stringify(userData[key]));
+                // or deep copy
             } break;
-            // case 'material': {
-            //     result[key] = userData[key];
-            // } break;
-            // case 'info': {
-            //     result[key] = userData[key];
-            // } break;
-
             default:
                 result[key] = userData[key];
         }
     });
 
     return result;
-}
+};
 
 // line or arc
 const exportPrimitive = primitive => {
@@ -90,9 +175,7 @@ const exportPrimitive = primitive => {
         // children?
         userData: exportUserData(primitive),
         // geometry,
-        material: {
-            color: exportColor(primitive.material.color)
-        }
+        color: exportColor(primitive.material.color)
     };
 
     if (isArc) {

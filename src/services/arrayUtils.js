@@ -42,5 +42,38 @@ export default {
       }
     }
     return true;
-  }
+  },
+  // deepCopy
 };
+
+function isPrimitive(arg) {
+    var type = typeof arg;
+    return arg == null || (type !== "object" && type !== "function");
+}
+
+// function deepCopy (data) {
+//     if (isPrimitive(data)) {
+//         return data;
+//     }
+//
+//
+//     if (Array.isArray(data)) {
+//         return data.map(data => deepCopy(data));
+//     }
+//
+//     if (isPlainObject(data)) {
+//         let result = {};
+//         for (let key in data) {
+//             result[key] = deepCopy(data[key]);
+//         }
+//         return result
+//     } else {
+//         console.log('hard case', data);
+//     }
+//
+//
+// }
+//
+// function isPlainObject(o) {
+//     return typeof o === 'object' && o.constructor === Object;
+// }

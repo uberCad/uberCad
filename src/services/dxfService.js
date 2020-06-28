@@ -5,6 +5,8 @@ import GeometryUtils from './GeometryUtils';
 import Stats from 'stats.js';
 import { OrthographicControls } from '../classes/OrthographicControls';
 import throttle from 'lodash/throttle';
+import { parse, serialize } from "../services/loader";
+
 
 export function parseDxf(dxf) {
   let parser = new DxfParser();
@@ -79,6 +81,22 @@ export function Viewer(data = null, container, snapshot = null, font) {
   }
 
   if (snapshot) {
+    scene.remove(layersEntity); //empty layers container
+
+      layersEntity = parse(snapshot.layers);
+      // sceneService.fixSceneAfterImport(layersEntity);
+      scene.add(layersEntity);
+
+    snapshot.objects.forEach(item => {
+        const object = parse(item);
+        // sceneService.fixSceneAfterImport(object);
+        objectsEntity.add(object);
+    });
+
+    // GeometryUtils.fixObjectsPaths(scene);
+  }
+
+  if (!snapshot) {
     scene.remove(layersEntity); //empty layers container
     let loader = new THREE.ObjectLoader();
 
