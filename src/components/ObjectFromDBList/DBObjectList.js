@@ -224,7 +224,8 @@ export default class DBObjectList extends Component {
                       accept=".dxf"
                       placeholder={placeholder}
                       onChange={this.handleChange}
-                      onClick = {this.tester}
+                      // onClick = {this.tester}
+                      onClick={(e) => e.stopPropagation()}
                     />
                   )}
                 </FormattedMessage>
