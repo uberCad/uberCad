@@ -82,7 +82,7 @@ export default class UserLoginComponent extends Component {
               </Col>
               <Col sm={3}>
                 <a
-                  href={`${API_HOST}api/auth/facebook`}
+                  href={`${API_HOST}auth/facebook`}
                 >
                   <span className="fa fa-facebook-official" /> Facebook
                 </a>
