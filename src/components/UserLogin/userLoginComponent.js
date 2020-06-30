@@ -11,6 +11,7 @@ import {
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import {API_HOST} from "../../config";
 
 export default class UserLoginComponent extends Component {
   constructor(props) {
@@ -81,10 +82,7 @@ export default class UserLoginComponent extends Component {
               </Col>
               <Col sm={3}>
                 <a
-                  href={
-                    'https://www.facebook.com/dialog/oauth?response_type=code&client_id=1802126316499818&redirect_uri=' +
-                    encodeURI(process.env.REACT_APP_REDIRECT_URL)
-                  }
+                  href={`${API_HOST}api/auth/facebook`}
                 >
                   <span className="fa fa-facebook-official" /> Facebook
                 </a>
