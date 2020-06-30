@@ -31,17 +31,23 @@ export default class UserService {
 
   static logout() {
     return new Promise(function(resolve, reject) {
-      api
-        .post('/auth/logout')
-        .then(res => {
-          window.localStorage.clear();
-          axios.defaults.headers.common['X-Session-Id'] = '';
-          resolve(res);
-          history.push(`${process.env.PUBLIC_URL}/login`);
-        })
-        .catch(error => {
-          reject(error);
-        });
+        window.localStorage.clear();
+        axios.defaults.headers.common['X-Session-Id'] = '';
+        resolve(1);
+        history.push(`${process.env.PUBLIC_URL}/login`);
+
+      //
+      // api
+      //   .post('/auth/logout')
+      //   .then(res => {
+      //     window.localStorage.clear();
+      //     axios.defaults.headers.common['X-Session-Id'] = '';
+      //     resolve(res);
+      //     history.push(`${process.env.PUBLIC_URL}/login`);
+      //   })
+      //   .catch(error => {
+      //     reject(error);
+      //   });
     });
   }
 
