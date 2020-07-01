@@ -149,18 +149,27 @@ let previewPathInConsole = (path, vertex, ...textData) => {
 };
 
 let getSvg = object => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox={`${object.userData.edgeModel.svgData.viewBox.x}
-         ${object.userData.edgeModel.svgData.viewBox.y}
-         ${object.userData.edgeModel.svgData.viewBox.width}
-         ${object.userData.edgeModel.svgData.viewBox.height}
+  if(object && (object.viewBox || object.userData)) {
+    let svgData = object.viewBox ? object : object.userData.edgeModel.svgData;
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        // viewBox={`${object.userData.edgeModel.svgData.viewBox.x}
+        //    ${object.userData.edgeModel.svgData.viewBox.y}
+        //    ${object.userData.edgeModel.svgData.viewBox.width}
+        //    ${object.userData.edgeModel.svgData.viewBox.height}
+        //   `}
+        viewBox={`${svgData.viewBox.x}
+         ${svgData.viewBox.y}
+         ${svgData.viewBox.width}
+         ${svgData.viewBox.height}
         `}
-    >
-      <path fill="#9F9F9F" d={object.userData.edgeModel.svgData.pathD} />
-    </svg>
-  );
+      >
+        {/*<path fill="#9F9F9F" d={object.userData.edgeModel.svgData.pathD}/>*/}
+        <path fill="#9F9F9F" d={svgData.pathD}/>
+      </svg>
+    );
+  }
 };
 
 export default {

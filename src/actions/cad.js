@@ -1382,13 +1382,10 @@ let copyPaste = (editor, copyPasteMode) => {
         };
       }
     });
-    place[
-      place.length
-    ] = GeometryUtils.getBoundingBox(editor.activeEntities);
+    place[place.length] = GeometryUtils.getBoundingBox(editor.activeEntities);
   } else if (copyPasteMode === 'PASTE') {
     if (place.length) {
-      let copyEntitiesBoundingBox =
-        place[place.length - 1];
+      let copyEntitiesBoundingBox = place[place.length - 1];
       let changeGeometry = {
         x: copyEntitiesBoundingBox.center.x - editor.camera.position.x,
         y: copyEntitiesBoundingBox.center.y - editor.camera.position.y

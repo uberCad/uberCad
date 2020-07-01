@@ -6,7 +6,6 @@ import userPic from './userPhoto.png';
 import { appName } from './../../config';
 import './Header.css';
 import history from '../../config/history';
-import addElement from '../Toolbar/addElement.svg';
 import DBObjectList from '../ObjectFromDBList/DBObjectListContainer';
 import {
   Navbar,
@@ -70,28 +69,28 @@ export default class HeaderComponent extends Component {
     if (!this.props.editor.scene) {
       return value => <div href="/cad/editObjectElement">{value}</div>;
     } else {
-    const file = this.state.file;
-    if (!file) {
-      this.setState({ error: 'Missing project file' });
-    } else {
-      this.setState({ error: '' });
-    }
-    if (file) {
-      let fileReader = new FileReader();
-      let container = document.getElementById('sceneID');
-      let editor = this.props.editor;
-      console.log(this.props.editor);
-      fileReader.onload = function() {
-        let fileText = fileReader.result;
-        drawDxf(parseDxf(fileText), container, null, editor);
-        let { scene, camera, renderer } = editor;
-        renderer.render(scene, camera);
-      };
-      fileReader.readAsText(file);
-      this.props.editor.options.oldMode = this.props.editor.options.selectMode;
-      this.props.chooseTool('MOVE_NEW_OBJECT');
-      this.handleClose();
-    }
+      const file = this.state.file;
+      if (!file) {
+        this.setState({ error: 'Missing project file' });
+      } else {
+        this.setState({ error: '' });
+      }
+      if (file) {
+        let fileReader = new FileReader();
+        let container = document.getElementById('sceneID');
+        let editor = this.props.editor;
+        console.log(this.props.editor);
+        fileReader.onload = function() {
+          let fileText = fileReader.result;
+          drawDxf(parseDxf(fileText), container, null, editor);
+          let { scene, camera, renderer } = editor;
+          renderer.render(scene, camera);
+        };
+        fileReader.readAsText(file);
+        this.props.editor.options.oldMode = this.props.editor.options.selectMode;
+        this.props.chooseTool('MOVE_NEW_OBJECT');
+        this.handleClose();
+      }
     }
   };
 
@@ -162,13 +161,11 @@ export default class HeaderComponent extends Component {
             </NavItem>
 
             {/*<NavItem onClick={this.handleShow}>*/}
-              {/*<FormattedMessage id="header.store" defaultMessage="Store" />*/}
+            {/*<FormattedMessage id="header.store" defaultMessage="Store" />*/}
 
-              <NavItem>
-                <DBObjectList/>
+            <NavItem>
+              <DBObjectList />
             </NavItem>
-
-
 
             <NavItem href={`${process.env.PUBLIC_URL}/demo`}>
               <FormattedMessage
@@ -253,9 +250,7 @@ export default class HeaderComponent extends Component {
                     <th>Inform</th>
                   </tr>
                 </thead>
-                <tbody id = 'DB_object_list'>
-
-                </tbody>
+                <tbody id="DB_object_list"></tbody>
               </Table>
             </Form>
             <Form
@@ -296,7 +291,16 @@ export default class HeaderComponent extends Component {
             )}
             <FormattedMessage id="addObject.open" defaultMessage="Open">
               {/*{this.oppenButton()}*/}
-              {value => <Button href = {!this.props.editor.scene? "/cad/editObjectElement":""} onClick= {this.addObject}>{value}</Button>}
+              {value => (
+                <Button
+                  href={
+                    !this.props.editor.scene ? '/cad/editObjectElement' : ''
+                  }
+                  onClick={this.addObject}
+                >
+                  {value}
+                </Button>
+              )}
             </FormattedMessage>
             <FormattedMessage id="btn.cancel" defaultMessage="Close">
               {/*{this.oppenButton()}*/}
