@@ -24,12 +24,15 @@ export default class UserLoginComponent extends Component {
   }
 
   componentDidMount() {
+    console.log('login:componentDidMount()');
     const token = this.props.match.params.token;
     const username = this.props.match.params.username;
+      console.log('login:componentDidMount()', {token, username});
+
     if (token && username) {
-      UserService.updateToken(token);
-      this.props.getProfile();
-      this.props.history.push(`${process.env.PUBLIC_URL}/`);
+        UserService.updateToken(token);
+        this.props.getProfile();
+        this.props.history.push(`${process.env.PUBLIC_URL}/`);
     }
   }
 

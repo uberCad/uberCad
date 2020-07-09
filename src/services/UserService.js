@@ -7,7 +7,9 @@ export default class UserService {
     return !!window.localStorage.token;
   }
   static updateToken(token) {
-    axios.defaults.headers.Authorization = 'bearer ' + token;
+      console.log(`updateToken(${token})`);
+
+      axios.defaults.headers.Authorization = 'bearer ' + token;
     window.localStorage.setItem('token', token);
   }
 
