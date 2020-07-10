@@ -80,7 +80,6 @@ export default class HeaderComponent extends Component {
       let fileReader = new FileReader();
       let container = document.getElementById('sceneID');
       let editor = this.props.editor;
-      console.log(this.props.editor);
       fileReader.onload = function() {
         let fileText = fileReader.result;
         drawDxf(parseDxf(fileText), container, null, editor);

@@ -27,6 +27,21 @@ export const authorize = (username, password, history) => {
   };
 };
 
+export const setToken = (username, token, history) => {
+    return async dispatch => {
+        userService.updateToken(token);
+        let profile = await userService.getProfile();
+        dispatch({
+            type: LOGIN_ACTION,
+            payload: {
+                token: token,
+                username: username,
+                pictureUrl: profile.pictureUrl
+            }
+        });
+    };
+};
+
 export const logout = history => {
   return dispatch => {
     userService.logout().then(() => {

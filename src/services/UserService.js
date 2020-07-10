@@ -7,9 +7,7 @@ export default class UserService {
     return !!window.localStorage.token;
   }
   static updateToken(token) {
-      console.log(`updateToken(${token})`);
-
-      axios.defaults.headers.Authorization = 'bearer ' + token;
+    axios.defaults.headers.Authorization = 'bearer ' + token;
     window.localStorage.setItem('token', token);
   }
 
@@ -54,11 +52,14 @@ export default class UserService {
     });
   }
 
+  static getProfile() {
+    return api.get('/user/profile')
+  }
+
   static changePassword(currentPassword, newPassword) {
     let that = this;
     return new Promise((resolve, reject) => {
       let user = JSON.parse(window.localStorage.user);
-      console.log('user local', user);
       that
         .login(user.email, currentPassword)
         .then(() => {

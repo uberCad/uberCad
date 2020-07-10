@@ -29,8 +29,7 @@ export default class UserLoginComponent extends Component {
       console.log('login:componentDidMount()', {token, username}, this.props.match.params);
 
     if (token && username) {
-        UserService.updateToken(token);
-        this.props.getProfile();
+        this.props.setToken(username, token, this.props.history);
         this.props.history.push(`${process.env.PUBLIC_URL}/`);
     }
   }
@@ -204,6 +203,7 @@ export default class UserLoginComponent extends Component {
     lang: PropTypes.string.isRequired,
     getProfile: PropTypes.func.isRequired,
     authorize: PropTypes.func.isRequired,
+    setToken: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     match: PropTypes.shape({
       params: PropTypes.shape({
