@@ -33,6 +33,7 @@ export default class UserService {
 
   static logout() {
     return new Promise(function(resolve, reject) {
+      console.log('logout()');
         window.localStorage.clear();
         axios.defaults.headers.common['X-Session-Id'] = '';
         resolve(1);

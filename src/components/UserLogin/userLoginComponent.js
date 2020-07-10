@@ -25,9 +25,8 @@ export default class UserLoginComponent extends Component {
 
   componentDidMount() {
     console.log('login:componentDidMount()');
-    const token = this.props.match.params.token;
-    const username = this.props.match.params.username;
-      console.log('login:componentDidMount()', {token, username});
+    const { token, username } = this.props.match.params;
+      console.log('login:componentDidMount()', {token, username}, this.props.match.params);
 
     if (token && username) {
         UserService.updateToken(token);
