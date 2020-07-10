@@ -24,10 +24,7 @@ export default class UserLoginComponent extends Component {
   }
 
   componentDidMount() {
-    console.log('login:componentDidMount()');
     const { token, username } = this.props.match.params;
-      console.log('login:componentDidMount()', {token, username}, this.props.match.params);
-
     if (token && username) {
         this.props.setToken(username, token, this.props.history);
         this.props.history.push(`${process.env.PUBLIC_URL}/`);
