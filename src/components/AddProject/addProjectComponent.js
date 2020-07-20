@@ -78,6 +78,7 @@ export default class AddProjectComponent extends Component {
           {value => (
             <Button
               bsStyle="primary"
+              style={{background:"#51a7f9"}}
               className="pull-right"
               onClick={this.handleShow}
             >

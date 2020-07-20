@@ -2,10 +2,11 @@
 
 .Projects {
   ul.ProjectsFilter {
+    margin-left: 15px;
 
     li {
       display: inline-block;
-      margin-left: 20px;
+      margin-left: 30px;
       cursor: pointer;
 
       &.active {
@@ -16,5 +17,6 @@
 
   .component-head {
     padding: 0 20px;
+    margin-left: 10px;
   }
 }

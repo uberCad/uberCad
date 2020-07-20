@@ -7,16 +7,14 @@ export const GET_OBJECT_FROM_DB = 'PROJECTS_SORT_FIELD';
 
 export const getObjectFromDB = () => dispatch => {
   spinnerShow()(dispatch);
-    return Api.get(`/store/category/0`) //done
-      .then(ObjectFromDB => {
-        spinnerHide()(dispatch);
-
-        return ObjectFromDB;
-
-        // todo через діспач не працює..... хз чого
-        dispatch({
-            type: GET_OBJECT_FROM_DB,
-            payload: { ObjectFromDB }
-          });
-      })
+  return Api.get(`/store/category/0`) //done
+    .then(ObjectFromDB => {
+      spinnerHide()(dispatch);
+      // todo через діспач не працює..... хз чого
+      dispatch({
+        type: GET_OBJECT_FROM_DB,
+        payload: { ObjectFromDB }
+      });
+      return ObjectFromDB;
+    });
 };

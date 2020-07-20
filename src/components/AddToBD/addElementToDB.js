@@ -15,7 +15,7 @@ import Scene from '../../services/sceneService';
 import { drawDxf } from '../../actions/cad';
 import { parseDxf } from '../../services/dxfService';
 import MaterialComponent from '../Material/materrialComponentContainer';
-import GeometryUtils from '../../services/GeometryUtils'
+import GeometryUtils from '../../services/GeometryUtils';
 import Api from '../../services/apiService';
 
 export default class addElementToDB extends Component {
@@ -69,23 +69,22 @@ export default class addElementToDB extends Component {
     }
   };
 
-
-  categoryСonstructor = (categoryFromDB) =>{
+  categoryСonstructor = categoryFromDB => {
     let allCategories = [];
-    let parent_keys =[];
-    categoryFromDB.forEach((category,numOfCategory)=>{
-      for(let i = 0; i< parent_keys.length; i++){
-        if (parent_keys[i] === category.parent_key){
+    let parent_keys = [];
+    categoryFromDB.forEach((category) => {
+      for (let i = 0; i < parent_keys.length; i++) {
+        if (parent_keys[i] === category.parent_key) {
           return;
         }
       }
       parent_keys[parent_keys.length] = category.parent_key;
     });
 
-    this.recursiveStructuring (categoryFromDB,allCategories,parent_keys,0,0);
+    this.recursiveStructuring(categoryFromDB, allCategories, parent_keys, 0, 0);
 
     console.log(allCategories);
-    for (let i = 0; i< allCategories.length; i ++ ){
+    for (let i = 0; i < allCategories.length; i++) {
       console.log(allCategories[i].title);
     }
     this.setState({
@@ -93,23 +92,34 @@ export default class addElementToDB extends Component {
     });
   };
 
-
-  recursiveStructuring = (categoryFromDB, allCategories, parent_keys, thisParentKey, ind) => {
-    categoryFromDB.forEach((category)=>{
+  recursiveStructuring = (
+    categoryFromDB,
+    allCategories,
+    parent_keys,
+    thisParentKey,
+    ind
+  ) => {
+    categoryFromDB.forEach(category => {
       // only '==' not '===' - different value types
       if (thisParentKey == category.parent_key) {
-        for (let j = 0; j<ind; j ++) {
+        for (let j = 0; j < ind; j++) {
           category.title = '-' + category.title;
         }
         allCategories.push(category);
         for (let i = 0; i < parent_keys.length; i++) {
           if (parent_keys[i] == category._key) {
-            this.recursiveStructuring (categoryFromDB, allCategories, parent_keys, category._key, ind + 1);
+            this.recursiveStructuring(
+              categoryFromDB,
+              allCategories,
+              parent_keys,
+              category._key,
+              ind + 1
+            );
           }
         }
       }
     });
-    ind -=1;
+    ind -= 1;
   };
 
   changeName = event => {
@@ -134,7 +144,7 @@ export default class addElementToDB extends Component {
       this.setState({ title: text });
       target.title = text;
     } else if (parameter === 'type') {
-      this.setState({ type: + event.target.selectedOptions.value });
+      this.setState({ type: +event.target.selectedOptions.value });
       target.type = text;
     }
   };
@@ -166,7 +176,10 @@ export default class addElementToDB extends Component {
     let target = this.props.activeObject;
     if (!target.userData.title) {
       this.setState({ error: 'Missing element Name' });
-    } else if (!target.userData.material || target.userData.material.name === 'Choose material') {
+    } else if (
+      !target.userData.material ||
+      target.userData.material.name === 'Choose material'
+    ) {
       this.setState({
         error: 'Missing element Material. Please choice material'
       });
@@ -263,15 +276,20 @@ export default class addElementToDB extends Component {
                 <FormGroup controlId="exampleForm.ControlSelect1">
                   <FormGroup controlId="group">
                     <ControlLabel>Group</ControlLabel>
-                    <FormControl componentClass="select" placeholder="Group"
-                                 // inputRef={(ref) => { this.state.groupSelect = ref }}
-                                 onChange={this.changeType}
+                    <FormControl
+                      componentClass="select"
+                      placeholder="Group"
+                      // inputRef={(ref) => { this.state.groupSelect = ref }}
+                      onChange={this.changeType}
                     >
-                    <option></option>
-                      {
-                        this.state.category ? this.state.category.map(category => (
-                          <option key ={category._key} value={category._key}>{category.title}</option>)) : null
-                      }
+                      <option></option>
+                      {this.state.category
+                        ? this.state.category.map(category => (
+                            <option key={category._key} value={category._key}>
+                              {category.title}
+                            </option>
+                          ))
+                        : null}
                     </FormControl>
                   </FormGroup>
                 </FormGroup>
