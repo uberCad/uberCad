@@ -11,6 +11,7 @@ import {
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import {API_HOST} from "../../config";
 
 export default class UserLoginComponent extends Component {
   constructor(props) {
@@ -23,12 +24,13 @@ export default class UserLoginComponent extends Component {
   }
 
   componentDidMount() {
-    const token = this.props.match.params.token;
-    const username = this.props.match.params.username;
+    console.log('login:componentDidMount()');
+    const { token, username } = this.props.match.params;
+      console.log('login:componentDidMount()', {token, username}, this.props.match.params);
+
     if (token && username) {
-      UserService.updateToken(token);
-      this.props.getProfile();
-      this.props.history.push(`${process.env.PUBLIC_URL}/`);
+        this.props.setToken(username, token, this.props.history);
+        this.props.history.push(`${process.env.PUBLIC_URL}/`);
     }
   }
 
@@ -81,10 +83,7 @@ export default class UserLoginComponent extends Component {
               </Col>
               <Col sm={3}>
                 <a
-                  href={
-                    'https://www.facebook.com/dialog/oauth?response_type=code&client_id=1802126316499818&redirect_uri=' +
-                    encodeURI(process.env.REACT_APP_REDIRECT_URL)
-                  }
+                  href={`${API_HOST}auth/facebook`}
                 >
                   <span className="fa fa-facebook-official" /> Facebook
                 </a>
@@ -204,6 +203,7 @@ export default class UserLoginComponent extends Component {
     lang: PropTypes.string.isRequired,
     getProfile: PropTypes.func.isRequired,
     authorize: PropTypes.func.isRequired,
+    setToken: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     match: PropTypes.shape({
       params: PropTypes.shape({

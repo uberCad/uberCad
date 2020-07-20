@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import UserLoginComponent from './userLoginComponent';
-import { authorize, logout, getProfile } from '../../actions/userLogin';
+import { authorize, logout, getProfile, setToken } from '../../actions/userLogin';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -16,6 +16,9 @@ const mapDispatchToProps = dispatch => {
     },
     authorize: function(login, password, history) {
       return authorize(login, password, history)(dispatch);
+    },
+    setToken: function(username, token, history) {
+      return setToken(username, token, history)(dispatch);
     },
     logout: function(history) {
       logout(history)(dispatch);
