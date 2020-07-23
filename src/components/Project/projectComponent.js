@@ -179,7 +179,7 @@ export default class ProjectComponent extends Component {
         </Modal>
 
         {project && (
-          <div>
+          <div className="data-snap">
             <Row className="table-head">
               <Col xs={0} sm={1} className="table-head-name" />
               <Col xs={3} sm={3} className="hidden-sm-down table-head-name">
