@@ -152,7 +152,7 @@ export default class HeaderComponent extends Component {
         </Navbar.Header>
         <Navbar.Collapse>
           <Nav className="nav-group">
-            <NavItem href={`${process.env.PUBLIC_URL}/`}>
+            <NavItem href={`${process.env.PUBLIC_URL}/`} className= "li-Header">
               <FormattedMessage
                 id="header.projects"
                 defaultMessage="Projects!"
@@ -166,7 +166,7 @@ export default class HeaderComponent extends Component {
               <DBObjectList />
             </NavItem>
 
-            <NavItem href={`${process.env.PUBLIC_URL}/demo`}>
+            <NavItem href={`${process.env.PUBLIC_URL}/demo`} className= "li-Header">
               <FormattedMessage
                 id="header.creators"
                 defaultMessage="Creators"

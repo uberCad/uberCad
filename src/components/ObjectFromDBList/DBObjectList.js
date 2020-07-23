@@ -131,7 +131,7 @@ export default class DBObjectList extends Component {
   render() {
     return (
       <div>
-        <div onClick={this.handleShow}>
+        <div onClick={this.handleShow} className= "li-Header">
           <FormattedMessage id="header.store" defaultMessage="Store" />
         </div>
 
