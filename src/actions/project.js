@@ -53,7 +53,6 @@ export const fetchProject = (id, preloadedProject) => dispatch => {
 export const delProject = key => dispatch => {
   dispatch(spinnerShow());
   return Api.delete(`/project/${key}`).then(res => {
-    console.log(res);
     history.push(`/projects`);
     dispatch(spinnerHide());
   });

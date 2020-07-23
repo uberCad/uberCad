@@ -31,25 +31,35 @@ export default class UserService {
 
   static logout() {
     return new Promise(function(resolve, reject) {
-      api
-        .post('/auth/logout')
-        .then(res => {
-          window.localStorage.clear();
-          axios.defaults.headers.common['X-Session-Id'] = '';
-          resolve(res);
-          history.push(`${process.env.PUBLIC_URL}/login`);
-        })
-        .catch(error => {
-          reject(error);
-        });
+      console.log('logout()');
+        window.localStorage.clear();
+        axios.defaults.headers.common['X-Session-Id'] = '';
+        resolve(1);
+        history.push(`${process.env.PUBLIC_URL}/login`);
+
+      //
+      // api
+      //   .post('/auth/logout')
+      //   .then(res => {
+      //     window.localStorage.clear();
+      //     axios.defaults.headers.common['X-Session-Id'] = '';
+      //     resolve(res);
+      //     history.push(`${process.env.PUBLIC_URL}/login`);
+      //   })
+      //   .catch(error => {
+      //     reject(error);
+      //   });
     });
+  }
+
+  static getProfile() {
+    return api.get('/user/profile')
   }
 
   static changePassword(currentPassword, newPassword) {
     let that = this;
     return new Promise((resolve, reject) => {
       let user = JSON.parse(window.localStorage.user);
-      console.log('user local', user);
       that
         .login(user.email, currentPassword)
         .then(() => {
