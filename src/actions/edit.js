@@ -21,6 +21,8 @@ import {
 import sceneService from '../services/sceneService';
 import { activePoint, disablePoint, movePointInfo } from './pointInfo';
 import GeometryUtils from '../services/GeometryUtils';
+import helpLayerService from '../services/helpLayerService';
+
 
 export const EDIT_IS_EDIT = 'EDIT_IS_EDIT';
 export const EDIT_CANCEL = 'EDIT_CANCEL';
@@ -223,19 +225,84 @@ export const selectPoint = (lines, event, editor) => {
 };
 
 export const movePoint = (lines, index, event, editor) => {
+  console.log (lines);
   let { scene, camera, cadCanvas } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   let point = {
     x: clickResult.point.x,
     y: clickResult.point.y
   };
-  const crossing = crossingPoint(point, clickResult.activeEntities);
+  let closestLine = null;
+  let distanceToClosestLine;
+  let activeEntities = clickResult.activeEntities;
+  console.log (activeEntities);
+  if (activeEntities.length > 0){
+    // debugger;
+    // distanceToClosestLine = GeometryUtils.distanceToEntity(point,activeEntities[0]);
+    lines.forEach(line => {
+      line.name = 'NewObjectLine'
+    });
+    activeEntities.forEach (entity => {
+      let distance = GeometryUtils.distanceToEntity(point,activeEntities[0]);
+      if (!distanceToClosestLine || distanceToClosestLine > distance){
+        if (
+          entity.name !== 'ActiveLine' &&
+          entity.name !== 'NewObjectLine' &&
+          entity.name !== 'point1' &&
+          entity.name !== 'point2' &&
+          entity.name !== 'pointCenter' &&
+          entity.name !== 'pointGeometryCenter' &&
+          entity.name !== 'Center' &&
+          entity.name !== 'Start' &&
+          entity.name !== 'End' &&
+          entity.name !== 'Radius' &&
+          entity.name !== 'newLine' &&
+          entity.name !== 'helpLine'
+        ) {
+          distanceToClosestLine = distance;
+          closestLine = entity;
+          // debugger;
+        }
+      }
+    });
+    // пошук прямих поручі і точки на них на базі crossingPoint і helpLayerService.positionInLine
+  }
+
+  let crossing = false;
+
+  if (index === 'MOVE_NEW_OBJECT' ){
+    if (closestLine){
+      let newPointInLine = {
+        position: {}
+      }
+      // debugger;
+      helpLayerService.positionInLine (editor,
+        closestLine.geometry.vertices, point, newPointInLine);
+      if (newPointInLine.position.x) {
+
+
+       // перевірка на переин обєкту який я таскаю і батьківського обєкту closestLine з перевіркою відстані між point і crossing
+        crossing = newPointInLine.position;
+
+
+
+
+      }
+    }
+  } else{
+    crossing = crossingPoint(point, closestLine, activeEntities, camera.top / 70);
+  }
+  // debugger;
+  // if (crossing.x === NaN || crossing.y === NaN){
+  //   debugger;
+  // }
+  console.log (crossing);
   const pointCnange = crossing ? crossing : point;
   changeGeometry(lines, index, pointCnange, scene, editor);
 
   cadCanvas.render();
   // renderer.render(scene, camera);
-
+// debugger;
   return dispatch => {
     crossing
       ? movePointInfo(event, 'Crossing point')(dispatch)
@@ -1016,4 +1083,113 @@ export const setScale = (scale, object, editor) => {
       type: 'SET_SCALE'
     });
   };
+};
+
+export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
+  // 1 шукаємо найдовшу лінію, як правило це бічна сторона яка являється одним слошним елементом
+  let longestLine = null;
+  let longestLineLength = null;
+
+  // модуль пошуку найдовшої лінії з масиву ліній
+  newObjectLines.forEach(line =>{
+    // debugger;
+  if( line.geometry.type = "Geometry") {
+    // debugger;
+    if (!longestLine) {
+      longestLine = line;
+      longestLineLength = GeometryUtils.getDistance(line.geometry.vertices[0],
+        line.geometry.vertices[line.geometry.vertices.length-1]);
+    }
+    let thisLineLength = GeometryUtils.getDistance(line.geometry.vertices[0],
+      line.geometry.vertices[line.geometry.vertices.length-1]);
+    if (thisLineLength > longestLineLength){
+      longestLine = line;
+      longestLineLength = thisLineLength;
+    }
+  }
+  });
+
+  //todo вирівнювання кута обєкту за біччною стороною (найдовша лінія має статити вертикальною
+
+
+
+  // пошук точок і ліній на верхній горизонтальній стороні
+  let boundingBox = GeometryUtils.getBoundingBox (newObjectLines[0].parent);
+  console.log (boundingBox);
+
+  let linesInBoxSide = [];
+  let linesInBoxSideMin = {};
+  let linesInBoxSideMax = {};
+  // if (boundingBox.height> boundingBox.width) {
+    newObjectLines.forEach(line => {
+      // if  (Math.abs(line.geometry.vertices[0].y - boundingBox.min.y) < 0.001
+      // || Math.abs(line.geometry.vertices[line.geometry.vertices.length-1].y - boundingBox.min.y) < 0.001
+      // ){
+      //   let index = null;
+      //   line.geometry.vertices.forEach( point => {
+      let point = line.geometry.vertices[0];
+      if (Math.abs(point.y - boundingBox.max.y) < 0.01) {
+        // debugger;
+        if (!linesInBoxSideMin.x) {
+          linesInBoxSideMin.x = point.x;
+          linesInBoxSideMin.y = point.y;
+        }
+        if (!linesInBoxSideMax.x) {
+          linesInBoxSideMax.x = point.x;
+          linesInBoxSideMax.y = point.y;
+        }
+        if (linesInBoxSideMin.x > point.x) {
+          linesInBoxSideMin.x = point.x;
+          linesInBoxSideMin.y = point.y;
+        }
+        if (linesInBoxSideMax.x < point.x) {
+          linesInBoxSideMax.x = point.x;
+          linesInBoxSideMax.y = point.y;
+        }
+        // debugger;
+      }
+      // debugger
+      point = line.geometry.vertices[line.geometry.vertices.length - 1];
+      if (Math.abs(point.y - boundingBox.max.y) < 0.01) {
+        // debugger;
+        if (!linesInBoxSideMin.x) {
+          linesInBoxSideMin.x = point.x;
+          linesInBoxSideMin.y = point.y;
+        }
+        if (!linesInBoxSideMax.x) {
+          linesInBoxSideMax.x = point.x;
+          linesInBoxSideMax.y = point.y;
+        }
+        if (linesInBoxSideMin.x > point.x) {
+          linesInBoxSideMin.x = point.x;
+          linesInBoxSideMin.y = point.y;
+        }
+        if (linesInBoxSideMax.x < point.x) {
+          linesInBoxSideMax.x = point.x;
+          linesInBoxSideMax.y = point.y;
+        }
+      }
+
+    });
+
+
+    // добавить проверку направления центра мас (от крайньой точке к крайньой точке)
+
+
+    //порівняння лінії яка утворюється між крайними точками які лежать на горизонтальній стороні баундін бокса з бічною стороною
+
+    // фіксація як точку привязки центр лінії яку знайшли вище
+    // debugger;
+  if(!linesInBoxSideMin.x || !linesInBoxSideMax.x
+    || !linesInBoxSideMin.y || !linesInBoxSideMax.y
+    || boundingBox.width > boundingBox.height
+  ){
+    dovetail.x = boundingBox.center.x;
+    dovetail.y = boundingBox.center.y;
+  } else {
+    dovetail.x = (linesInBoxSideMin.x + linesInBoxSideMax.x) / 2;
+    dovetail.y = (linesInBoxSideMin.y + linesInBoxSideMax.y) / 2;
+  }
+    // debugger;
+  // }
 };

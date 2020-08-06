@@ -222,18 +222,6 @@ let isPoint = (a, r, rCenter) => {
 };
 
 let startPointIndex = (line, mousePoint, editor) => {
-  // todo тимчасовий КОСТИЛЬ поки не буде реалізована спільна частина коду з рядків 199
-  //   console.log(line);
-  //   if (!line.geometry){
-  //     // debugger;
-  //     // editor.editMode.activeLine = editor.activeEntities[0];
-  //     line = editor.editMode.activeLine[0];
-  //   }
-  // todo це є костиль
-  // line = editor.activeEntities;
-  // debugger;
-  //todo переробити helpPointsPosition для всих helpPoints в автоматичному режимі
-
   // todo скоріше за все буде спільним куском і для кругів
   let activeEntities = editor.activeEntities;
   let helpPointsPosition = [];
@@ -558,9 +546,11 @@ let changeGeometry = (lines, index, point, scene, editor) => {
     if (index == 'MOVE_NEW_OBJECT') {
       pointGeometryCenter = {};
       pointGeometryCenter.position = {};
-      let activeEntitiesBoundingBox = GeometryUtils.getBoundingBox(lines);
-      pointGeometryCenter.position.x = activeEntitiesBoundingBox.center.x;
-      pointGeometryCenter.position.y = activeEntitiesBoundingBox.center.y;
+      // let activeEntitiesBoundingBox = GeometryUtils.getBoundingBox(lines);
+      // pointGeometryCenter.position.x = activeEntitiesBoundingBox.center.x;
+      // pointGeometryCenter.position.y = activeEntitiesBoundingBox.center.y;
+      pointGeometryCenter.position.x = editor.editMode.dovetail.x;
+      pointGeometryCenter.position.y = editor.editMode.dovetail.y;
     }
 
     if (index == 'MOVE_NEW_OBJECT' || pointGeometryCenter.userData.groupMove) {
@@ -573,10 +563,14 @@ let changeGeometry = (lines, index, point, scene, editor) => {
         if (line.geometry.type === 'Geometry') {
           line.geometry.verticesNeedUpdate = true;
           if (index == 'MOVE_NEW_OBJECT') {
-            line.geometry.vertices[0].x += changeX;
-            line.geometry.vertices[0].y += changeY;
-            line.geometry.vertices[1].x += changeX;
-            line.geometry.vertices[1].y += changeY;
+            line.geometry.vertices.forEach(pointVertices => {
+              pointVertices.x += changeX;
+              pointVertices.y += changeY;
+            });
+            // line.geometry.vertices[0].x += changeX;
+            // line.geometry.vertices[0].y += changeY;
+            // line.geometry.vertices[1].x += changeX;
+            // line.geometry.vertices[1].y += changeY;
           } else {
             let point1 = line.userData.helpPoints.point1;
             let point2 = line.userData.helpPoints.point2;
@@ -603,11 +597,13 @@ let changeGeometry = (lines, index, point, scene, editor) => {
         } else if (line.geometry.type === 'CircleGeometry') {
           line.position.x += changeX;
           line.position.y += changeY;
-          if (index !== 'MOVE_NEW_OBJECT') circleHelpPoint(line, scene);
+          if (index !== 'MOVE_NEW_OBJECT') {
+            circleHelpPoint(line, scene);
+          }
         }
       });
-      pointGeometryCenter.position.x = point.x;
-      pointGeometryCenter.position.y = point.y;
+      // pointGeometryCenter.position.x = point.x;
+      // pointGeometryCenter.position.y = point.y;
       // debugger;
     }
   }
@@ -843,7 +839,7 @@ let circleHelpPoint = (arc, scene) => {
   }
 };
 
-let crossingPoint = (pointMouse, activeEntities, entrainment = 0.05) => {
+let crossingPoint = (pointMouse, closestLine, activeEntities, entrainment = 0.05) => {
   try {
     if (activeEntities.length > 0 && pointMouse) {
       entrainment *= 10;
@@ -852,6 +848,7 @@ let crossingPoint = (pointMouse, activeEntities, entrainment = 0.05) => {
         if (
           !line &&
           entity.name !== 'ActiveLine' &&
+          entity.name !== 'NewObjectLine' &&
           entity.name !== 'point1' &&
           entity.name !== 'point2' &&
           entity.name !== 'pointCenter' &&
@@ -864,8 +861,10 @@ let crossingPoint = (pointMouse, activeEntities, entrainment = 0.05) => {
           entity.name !== 'helpLine'
         ) {
           line = entity;
+          //todo подальші операції треба робити для всих ліній (line має бути масивом), бо актів лайн може зацепити декілька ліній а чиплятись до тої до якої менша відстань
         }
       });
+      line = closestLine? closestLine : line;
       if (line) {
         if (line.geometry.type === 'Geometry') {
           let index = closestPoint(line.geometry.vertices, pointMouse);
@@ -1088,6 +1087,7 @@ let addMaterialBackgroundShape = object => {
 };
 
 export {
+  closestPoint,
   isPoint,
   setColor,
   setOriginalColor,

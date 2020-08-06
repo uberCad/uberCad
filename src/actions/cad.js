@@ -46,7 +46,8 @@ import {
   setClone,
   startNewLine,
   thetaLength,
-  thetaStart
+  thetaStart,
+  dovetailPointSearch
 } from './edit';
 import {
   angleFirstInfo,
@@ -1224,13 +1225,21 @@ export const onMouseMove = (event, editor) => {
       case MOVE_NEW_OBJECT:
         {
           let newObjectLines = editor.editMode.activeLine.lines;
-          if (newObjectLines) {
-            movePoint(
-              newObjectLines,
-              'MOVE_NEW_OBJECT',
-              event,
-              editor
-            )(dispatch);
+          if(newObjectLines) {
+            // debugger;
+            // if (!editor.editMode.dovetail) {
+              editor.editMode.dovetail = {};
+              dovetailPointSearch(editor, editor.editMode.dovetail, newObjectLines);
+              // debugger;
+            // }
+            if (newObjectLines) {
+              movePoint(
+                newObjectLines,
+                'MOVE_NEW_OBJECT',
+                event,
+                editor
+              )(dispatch);
+            }
           }
         }
         break;
