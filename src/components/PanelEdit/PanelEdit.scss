@@ -7,9 +7,14 @@
     height: calc(100% - #{$sidebar-toolbar-size});
     max-height: calc(100% - #{$sidebar-toolbar-size});
     overflow: auto;
+    padding: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
 
     .line {
       padding: 3px;
+      padding-left: 10px;
+      padding-right: 10px;
       transition: All 0.2s;
 
       .del-line {
