@@ -299,6 +299,7 @@ let positionInLine = (editor, lineWithPoint, pointB, point) => {
 };
 
 let lengthLine = (firstPoint, endPoint) => {
+  //todo все визови перенаправить на getDistance в геометрі утілах
   let xLength = firstPoint.x - endPoint.x;
   let yLength = firstPoint.y - endPoint.y;
   return Math.sqrt(xLength * xLength + yLength * yLength);

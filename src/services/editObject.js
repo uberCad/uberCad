@@ -555,6 +555,11 @@ let changeGeometry = (lines, index, point, scene, editor) => {
 
     if (index == 'MOVE_NEW_OBJECT' || pointGeometryCenter.userData.groupMove) {
       lines.forEach(line => {
+        if (
+          line.geometry instanceof THREE.CircleGeometry
+        ) {
+          debugger;
+        }
         let changeX = point.x - pointGeometryCenter.position.x;
         let changeY = point.y - pointGeometryCenter.position.y;
 
