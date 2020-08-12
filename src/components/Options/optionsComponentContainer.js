@@ -19,6 +19,7 @@ import {
 } from '../../actions/edit';
 
 import { copyClick, pasteClick } from '../../actions/cad';
+import { addSnapshot } from '../../actions/panelSnapshots';
 
 // todo mapStateToProps об'являється двічі тут і в .\src\components\ActiveEntities\activeEntitiesComponentContainer.js
 const mapStateToProps = (state, ownProps) => {
@@ -36,6 +37,8 @@ const mapStateToProps = (state, ownProps) => {
       isEdit: state.cad.editMode.isEdit,
       activeLine: state.cad.activeLine
     },
+    project: state.project.project,
+
     scene: state.cad.scene,
     tool: state.toolbar.tool,
     editMode: state.cad.editMode,
@@ -65,6 +68,9 @@ const mapDispatchToProps = dispatch => {
     },
     saveEdit: function(editor) {
       saveEdit(editor)(dispatch);
+    },
+    saveSnap: function(snapshot, projectKey, fastSave) {
+      addSnapshot(snapshot, projectKey, fastSave)(dispatch);
     },
     cancelNewLine: function(editor) {
       cancelNewLine(editor)(dispatch);
