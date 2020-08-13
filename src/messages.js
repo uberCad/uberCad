@@ -17,22 +17,22 @@ export default {
       signUp: 'Sign Up'
     },
     projects: {
-      title: 'title',
-      createdBy: 'created by',
-      rating: 'rating',
-      price: 'price',
-      efficiency: 'efficiency',
-      details: 'details',
-      status: 'status'
+      title: 'Title',
+      createdBy: 'Created by',
+      rating: 'Rating',
+      price: 'Price',
+      efficiency: 'Efficiency',
+      details: 'Details',
+      status: 'Status'
     },
     project: {
-      title: 'title',
-      createdBy: 'created by',
-      rating: 'rating',
-      price: 'price',
-      efficiency: 'efficiency',
-      details: 'details',
-      status: 'status',
+      title: 'Title',
+      createdBy: 'Created by',
+      rating: 'Rating',
+      price: 'Price',
+      efficiency: 'Efficiency',
+      details: 'Details',
+      status: 'Status',
       btnDel: 'Delete project',
       delMsg: 'Do you really want to delete the project and all the snapshots?'
     },
