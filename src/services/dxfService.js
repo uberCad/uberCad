@@ -184,7 +184,12 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   camera.position.x = viewPort.center.x;
   camera.position.y = viewPort.center.y;
 
-  let renderer = (this.renderer = new THREE.WebGLRenderer());
+  // let renderer = (this.renderer = new THREE.WebGLRenderer());
+  let renderer = (this.renderer = new THREE.WebGLRenderer({
+    // antialias: true,
+  }));
+
+
   renderer.setSize(width, height);
   renderer.setClearColor(0xfffffff, 1);
 
