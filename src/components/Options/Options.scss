@@ -166,4 +166,17 @@
       }
     }
   }
+  .save-Snap{
+    background: url("save.svg") no-repeat left transparent;
+    background-size: $toolSize - 25px;
+    float: right;
+    opacity: 0.7;
+    transition: All 0.3s;
+    display: inline-block;
+    height: 100%;
+    padding-left: $toolSize - 20px;
+    margin-right: 10px;
+    font-weight: normal;
+    font-size: 13px;
+  }
 }

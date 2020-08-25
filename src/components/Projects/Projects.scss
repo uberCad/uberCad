@@ -15,9 +15,27 @@
     }
   }
 
+  .table-data.link {
+    //margin: 0 0 10px;
+    color: #51a7f9;
+    padding-left: 0px;
+  }
+
+  .table-data p {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #cccccc;
+  }
+
   .component-head {
     //margin: 20px;
     padding: 0 20px;
     margin-left: 10px;
+
+    h3 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
   }
 }

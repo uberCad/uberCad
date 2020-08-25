@@ -3,8 +3,21 @@
 .warning {
   color: red !important;
 }
-
-.pull-right {
-  background: #51a7f9;
+.uberCad{
+  .Projects{
+    .component-head {
+      .pull-right {
+        background: #51a7f9;
+        border-color: #51a7f9;
+      }
+    }
+  }
 }
 
+.modal-body{
+  .form-group{
+    .control-label{
+      margin-bottom: 5px;
+    }
+  }
+}
