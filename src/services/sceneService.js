@@ -1067,21 +1067,21 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
     // // renderer.render(scene, camera);
     // // debugger;
     // // путь 1
-    helpLayer.add(helpPointA);
-    renderer.render(scene, camera);
-    // debugger;
-    // путь 2
-    helpLayer.add(helpPointB);
-    renderer.render(scene, camera);
-    // debugger;
-    // откуда
-    helpLayer.add(helpPointE);
-    renderer.render(scene, camera);
-    // debugger;
-    // куда
-    helpLayer.add(helpPointD);
-    renderer.render(scene, camera);
-    // debugger;
+    // helpLayer.add(helpPointA);
+    // renderer.render(scene, camera);
+    // // debugger;
+    // // путь 2
+    // helpLayer.add(helpPointB);
+    // renderer.render(scene, camera);
+    // // debugger;
+    // // откуда
+    // helpLayer.add(helpPointE);
+    // renderer.render(scene, camera);
+    // // debugger;
+    // // куда
+    // helpLayer.add(helpPointD);
+    // renderer.render(scene, camera);
+    // // debugger;
 
 
     // 16/07/2020 розібратись з тим які кути повертаються,
@@ -1518,8 +1518,8 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
         }
 
         // todo ВЕРНИ ПОСТУПОВЕ Закрашення ліній
-        thisLine.material.color.set(new THREE.Color(0xFFDC00));
-        render(editor);
+        // thisLine.material.color.set(new THREE.Color(0xFFDC00));
+        // render(editor);
 
         // debugger;
       }

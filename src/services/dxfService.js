@@ -186,7 +186,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
 
   // let renderer = (this.renderer = new THREE.WebGLRenderer());
   let renderer = (this.renderer = new THREE.WebGLRenderer({
-    // antialias: true,
+    antialias: true,
   }));
 
 

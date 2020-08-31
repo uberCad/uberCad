@@ -2779,22 +2779,22 @@ function entityIntersectArea(entity, area) {
   // alert('Unexpected geometry @ThreeDxf.entityIntersectArea()');
 }
 
-function getRegionClusters(path) {
+function getRegionClusters(path, amount = 3) {
   let data = path.map(dot => {
     return [dot.x, dot.y];
   });
 
   let km = new KMeans({
-    K: 3
+    K: amount
   });
 
-  km.maxIterations = 300;
+  km.maxIterations = amount>3? amount * 100 : 300;
 
   km.cluster(data);
   while (km.step()) {
     km.findClosestCentroids();
     km.moveCentroids();
-    if (km.hasConverged() || km.currentIteration > 300) {
+    if (km.hasConverged() || km.currentIteration > km.maxIterations) {
       break;
     }
   }
@@ -3458,5 +3458,6 @@ export default {
   buildBoundingBox,
   computeBoundingBoxAdditionalInfo,
   getPathVariants,
-  filterSelfIntersectingPaths
+  filterSelfIntersectingPaths,
+  getRegionClusters
 };

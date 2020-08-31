@@ -558,7 +558,7 @@ let changeGeometry = (lines, index, point, scene, editor) => {
         if (
           line.geometry instanceof THREE.CircleGeometry
         ) {
-          debugger;
+          // debugger;
         }
         let changeX = point.x - pointGeometryCenter.position.x;
         let changeY = point.y - pointGeometryCenter.position.y;

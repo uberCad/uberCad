@@ -946,6 +946,7 @@ export const ungroup = (editor, object) => {
 };
 
 export const rotationActive = (active, rotationObject = null) => {
+  debugger;
   return dispatch => {
     dispatch({
       type: EDIT_ROTATION_AVTIVE,
@@ -1111,6 +1112,67 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
 
   //todo вирівнювання кута обєкту за біччною стороною (найдовша лінія має статити вертикальною
 
+  let info = GeometryUtils.getObjectInfo(newObjectLines[0].parent);
+  console.log (info);
+
+  let { camera, scene, renderer } = editor;
+  let res = GeometryUtils.getRegionClusters(newObjectLines[0].parent.userData.edgeModel.regions[0].path, 5);
+  console.log (res);
+
+  let maxDistance = 0;
+  let points = [];
+  // debugger;
+  for (let i = 0; i < res.centroids.length; i++) {
+    for (let j = i+1; j < res.centroids.length; j++) {
+      let thisDistance = GeometryUtils.getDistance(
+        { x: res.centroids[i][0], y: res.centroids[i][1]},
+        { x: res.centroids[j][0], y: res.centroids[j][1]});
+      if (thisDistance > maxDistance){
+        maxDistance = thisDistance;
+        points [0] = { x: res.centroids[i][0], y: res.centroids[i][1]};
+        points [1] = { x: res.centroids[j][0], y: res.centroids[j][1]};
+      }
+    }
+  }
+
+
+  let helpLayer = scene.getObjectByName('HelpLayer');
+  let pointGeometry = new THREE.CircleGeometry(
+    camera.top / 100,
+    32,
+    0,
+    2 * Math.PI
+  );
+  pointGeometry.vertices.shift();
+  let centralLineColor = 0xff00ff;
+  let pointMaterial = new THREE.LineBasicMaterial({
+    color: centralLineColor,
+    opacity: 0.8,
+    transparent: true
+  });
+  let point = new THREE.Line(pointGeometry, pointMaterial);
+  let point2 = new THREE.Line(pointGeometry, pointMaterial);
+  point.name = 'mas';
+  point.position.x = points[0].x;
+  point.position.y = points[0].y;
+  point2.position.x = points[1].x;
+  point2.position.y = points[1].y;
+  helpLayer.add(point);
+  helpLayer.add(point2);
+  renderer.render(scene, camera);
+
+
+  // знаходимо кут повороту
+  // використовуючи rotationAngle повертаємо так щоб лінія з точок points була вертикальною.
+  // на  контурі знаходимо точку яка торкається верхнього або нижнього кордону
+  // знаходимо праяму яка має невеликий горизонтальний кут і знаходиться недалеко від кордону
+  // вирівнємо фігуру так щоб верхня лінія була горизонтальною
+  // шукаємо паралельну лінію і приблизно такої ж дліни на нижньому контурі
+
+
+
+  // GeometryUtils.getDistance
+  debugger;
 
 
   // пошук точок і ліній на верхній горизонтальній стороні
