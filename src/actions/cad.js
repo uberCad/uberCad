@@ -120,32 +120,32 @@ export const drawDxf = (
   snapshot = null,
   editor = null
 ) => {
-  let cadCanvas = new Viewer(data, container, snapshot, null, editor);
-  let scene = cadCanvas.getScene();
-  let camera = cadCanvas.getCamera();
-  let renderer = cadCanvas.getRenderer();
+  const cadCanvas = new Viewer(data, container, snapshot, null, editor);
+  const scene = cadCanvas.getScene();
+  const camera = cadCanvas.getCamera();
+  const renderer = cadCanvas.getRenderer();
   container.appendChild(renderer.domElement);
 
   /**
    * init
    */
-
-  try {
-    // let editor = {
-    //     scene,
-    //     camera,
-    //     renderer,
-    //     cadCanvas,
-    //     options: {
-    //         threshold: 0.01,
-    //         selectMode: SELECT_MODE_NEW,
-    //         singleLayerSelect: true
-    //     }
-    // };
-    // testExample(editor);
-  } catch (e) {
-    console.error(e);
-  }
+  // TODO: delete it if no needed
+  // try {
+  //   // let editor = {
+  //   //     scene,
+  //   //     camera,
+  //   //     renderer,
+  //   //     cadCanvas,
+  //   //     options: {
+  //   //         threshold: 0.01,
+  //   //         selectMode: SELECT_MODE_NEW,
+  //   //         singleLayerSelect: true
+  //   //     }
+  //   // };
+  //   // testExample(editor);
+  // } catch (e) {
+  //   console.error(e);
+  // }
 
   return dispatch =>
     dispatch({
@@ -176,9 +176,10 @@ export const drawDxf = (
 
 export const cadClick = (event, editor) => {
   return dispatch => {
-    let { scene, camera, tool, renderer } = editor;
+    const { scene, camera, tool, renderer, activeEntities } = editor;
+    console.log('________Scene________', scene, activeEntities)
     // todo в HelpLayerService і переробити з використанням changeArcGeometry
-    let controls = editor.cadCanvas.getControls();
+    const controls = editor.cadCanvas.getControls();
     controls.addEventListener('change', () => {
       let helpLayer = scene.getObjectByName('HelpLayer');
       if (helpLayer.children.length) {
@@ -186,7 +187,14 @@ export const cadClick = (event, editor) => {
       }
     });
     switch (tool) {
-
+      // case TOOL_UNDO:
+      //   dispatch({
+      //     type: UNDO,
+      //     payload: {
+      //       activeEntities
+      //     }
+      //   });
+      // break;
       case TOOL_POINT:
         {
           let clickResult = sceneService.onClick(event, scene, camera);
