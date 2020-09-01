@@ -2,7 +2,7 @@ import * as THREE from '../extend/THREE';
 import GeometryUtils from '../services/GeometryUtils';
 import helpLayerService from './helpLayerService';
 
-let setColor = function (entity, bgColor, objId, objColor) {
+const setColor = function (entity, bgColor, objId, objColor) {
   entity.children.forEach(function (entity) {
     if (entity.children.length > 0) {
       setColor(entity, bgColor, objId, objColor);
@@ -24,7 +24,7 @@ let setColor = function (entity, bgColor, objId, objColor) {
   });
 };
 
-let setOriginalColor = entity => {
+const setOriginalColor = entity => {
   entity.children.forEach(function (entity) {
     if (entity.children.length > 0) {
       setOriginalColor(entity);
@@ -43,7 +43,7 @@ let setOriginalColor = entity => {
   });
 };
 
-let addHelpPoints = (editor, scene) => {
+const addHelpPoints = (editor, scene) => {
   if (!editor.editMode.isEdit) {
     console.log('Add HelpPoint with no Edit mode');
     return;
@@ -166,14 +166,14 @@ let addHelpPoints = (editor, scene) => {
   }
 };
 
-let getScale = camera => {
+const getScale = camera => {
   let scale = camera.zoom;
   scale = scale >= 1 ? 1 / scale : scale * 2;
   scale = scale > 0.5 ? 0.5 : scale;
   return scale;
 };
 
-let unselectLine = (lines, scene) => {
+const unselectLine = (lines, scene) => {
   // debugger;
   scene.getObjectByName('HelpLayer').children = [];
   lines.forEach(line => {
@@ -193,7 +193,7 @@ let unselectLine = (lines, scene) => {
   return {};
 };
 
-let closestPoint = (arr, c) => {
+const closestPoint = (arr, c) => {
   let index;
   arr.forEach(function (item) {
     item.distance = Math.sqrt(
@@ -213,7 +213,7 @@ let closestPoint = (arr, c) => {
   return index;
 };
 
-let isPoint = (a, r, rCenter) => {
+const isPoint = (a, r, rCenter) => {
   let rXy = Math.sqrt(
     (rCenter.x - a.x) * (rCenter.x - a.x) +
     (rCenter.y - a.y) * (rCenter.y - a.y)
@@ -221,7 +221,7 @@ let isPoint = (a, r, rCenter) => {
   return rXy <= r;
 };
 
-let startPointIndex = (line, mousePoint, editor) => {
+const startPointIndex = (line, mousePoint, editor) => {
   // todo скоріше за все буде спільним куском і для кругів
   let activeEntities = editor.activeEntities;
   let helpPointsPosition = [];
@@ -248,7 +248,7 @@ let startPointIndex = (line, mousePoint, editor) => {
     );
     // debugger;
   }
-  if (!isSelectPoint === true) {
+  if (!!isSelectPoint === true) {
     // console.log(index.length);
     index[0] = helpLayer.children.length - 1;
     editor.editMode.activeLine = activeEntities;
@@ -276,7 +276,7 @@ let startPointIndex = (line, mousePoint, editor) => {
           scale,
           mousePoint
         );
-        if (!isSelectPoint === true) {
+        if (!!isSelectPoint === true) {
           // console.log(index.length);
           index[editor.editMode.activeLine.length] = temporaryIndex;
           editor.editMode.activeLine.push(line);
@@ -335,7 +335,9 @@ let startPointIndex = (line, mousePoint, editor) => {
   return index.length ? index : null;
 };
 
-let changeGeometry = (lines, index, point, scene, editor) => {
+const changeGeometry = (lines, index, point, scene, editor) => {
+  console.log('_____INDEX_______', index)
+
   if (lines.length && lines.length === index.length) {
     lines.forEach((line, i) => {
       let points = false;
@@ -614,7 +616,7 @@ let changeGeometry = (lines, index, point, scene, editor) => {
   }
 };
 
-let changeArcGeometry = (arcGeometry, parameters) => {
+const changeArcGeometry = (arcGeometry, parameters) => {
   if (arcGeometry[0] !== 'copy') {
     arcGeometry.dispose();
   }
@@ -628,13 +630,13 @@ let changeArcGeometry = (arcGeometry, parameters) => {
   return geometry;
 };
 
-let radiusArc = (point, line) =>
+const radiusArc = (point, line) =>
   Math.sqrt(
     (line.position.x - point.x) * (line.position.x - point.x) +
     (line.position.y - point.y) * (line.position.y - point.y)
   );
 
-let editThetaLenght = (mousePoint, line) => {
+const editThetaLenght = (mousePoint, line) => {
   let result = {};
 
   let helpStart =
@@ -725,7 +727,7 @@ let editThetaLenght = (mousePoint, line) => {
   return result;
 };
 
-let editThetaStart = (mousePoint, line) => {
+const editThetaStart = (mousePoint, line) => {
   let helpLength = line.userData.helpGeometry.helpLength;
   let helpStart = line.userData.helpGeometry.helpStart;
   let pastDeltaLength = line.userData.helpGeometry.pastDeltaLength;
@@ -791,7 +793,7 @@ let editThetaStart = (mousePoint, line) => {
   return result;
 };
 
-let circleIntersectionAngle = (vertex, circle) => {
+const circleIntersectionAngle = (vertex, circle) => {
   let catheterX = Math.abs(vertex.x - circle.x);
   let catheterY = Math.abs(vertex.y - circle.y);
   let angle = Math.atan(catheterY / catheterX);
@@ -813,7 +815,7 @@ let circleIntersectionAngle = (vertex, circle) => {
 };
 
 // change circle help point
-let circleHelpPoint = (arc, scene) => {
+const circleHelpPoint = (arc, scene) => {
   try {
     let center = scene.getObjectByName('Center');
     let start = scene.getObjectByName('Start');
@@ -844,12 +846,12 @@ let circleHelpPoint = (arc, scene) => {
   }
 };
 
-let crossingPoint = (pointMouse, closestLine, activeEntities, entrainment = 0.05) => {
+const crossingPoint = (pointMouse, closestLine, activeEntities, entrainment = 0.05) => {
   try {
     if (activeEntities.length > 0 && pointMouse) {
       entrainment *= 10;
       let line;
-      activeEntities.forEach(function (entity) {
+      activeEntities.forEach((entity) => {
         if (
           !line &&
           entity.name !== 'ActiveLine' &&
@@ -912,7 +914,7 @@ let crossingPoint = (pointMouse, closestLine, activeEntities, entrainment = 0.05
   }
 };
 
-let createLine = (point0, point1) => {
+const createLine = (point0, point1) => {
   if (
     (point0.x || point0.x === 0) &&
     (point0.y || point0.y === 0) &&
@@ -937,7 +939,7 @@ let createLine = (point0, point1) => {
   }
 };
 
-let helpArc = radius => {
+const helpArc = radius => {
   let geometryArc = new THREE.CircleGeometry(radius, 32, 0, 2 * Math.PI);
   geometryArc.vertices.shift();
   let materialArc = new THREE.LineBasicMaterial({ color: 0xcccccc });
@@ -948,7 +950,7 @@ let helpArc = radius => {
   return helpLine;
 };
 
-let newArc = (radius, thetaStart, thetaLength) => {
+const newArc = (radius, thetaStart, thetaLength) => {
   let geometryArc = new THREE.CircleGeometry(
     radius,
     32,
@@ -962,7 +964,7 @@ let newArc = (radius, thetaStart, thetaLength) => {
   return line;
 };
 
-let clone = (obj, name) => {
+const clone = (obj, name) => {
   let object = new THREE.Group();
   obj.children.forEach(item => {
     let cloneGeometry, line;
@@ -990,7 +992,7 @@ let clone = (obj, name) => {
   return object;
 };
 
-let fixPosition = object => {
+const fixPosition = object => {
   object.children.forEach(line => {
     if (line.geometry instanceof THREE.Geometry) {
       line.geometry.vertices.forEach(vertex => {
@@ -1013,7 +1015,7 @@ let fixPosition = object => {
   return object;
 };
 
-let mirrorObject = (object, option) => {
+const mirrorObject = (object, option) => {
   let box = new THREE.BoxHelper(object, 0xffff00);
   object.children.forEach(line => {
     if (line.geometry.type === 'Geometry') {
@@ -1048,7 +1050,7 @@ let mirrorObject = (object, option) => {
   return object;
 };
 
-let rotationPoint = (vertex, center, angle) => {
+const rotationPoint = (vertex, center, angle) => {
   const r = Math.sqrt(
     (vertex.x - center.x) * (vertex.x - center.x) +
     (vertex.y - center.y) * (vertex.y - center.y)
@@ -1059,7 +1061,7 @@ let rotationPoint = (vertex, center, angle) => {
   return vertex;
 };
 
-let addMaterialBackgroundShape = object => {
+const addMaterialBackgroundShape = object => {
   let oldMeshes = [];
   object.traverse(child => {
     if (child instanceof THREE.Mesh) {
