@@ -1,7 +1,23 @@
 // ICONS: https://www.flaticon.com/free-icon/computer-mouse-cursor_70358#term=cursor&page=1&position=11
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
+// TODO: delete it if not needed
+// import {
+//   Button,
+//   ControlLabel,
+//   Form,
+//   FormControl,
+//   FormGroup,
+//   HelpBlock,
+//   Modal
+// } from 'react-bootstrap';
+// import { drawDxf } from '../../actions/cad';
+// import { parseDxf } from '../../services/dxfService';
+
 import './Toolbar.css';
+import '../AddProject/AddProject.css';
 import toolPoint from './point.svg';
 import toolSelect from './select.svg';
 import toolUndo from './undo.svg';
@@ -12,22 +28,8 @@ import toolMeasurement from './measurement.svg';
 import toolCopyPaste from './copy.svg';
 import toolBorderRadius from './borderRadius.svg';
 import toolFacet from './facet.svg';
-import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import {
-  Button,
-  ControlLabel,
-  Form,
-  FormControl,
-  FormGroup,
-  HelpBlock,
-  Modal
-} from 'react-bootstrap';
 
-import { drawDxf } from '../../actions/cad';
-import { parseDxf } from '../../services/dxfService';
-import '../AddProject/AddProject.css';
-
+// export const ADD_ELEMENT = 'ADD_ELEMENT';
 export const TOOL_POINT = 'TOOL_POINT';
 export const TOOL_SELECT = 'TOOL_SELECT';
 export const TOOL_UNDO = 'TOOL_UNDO';
@@ -38,7 +40,6 @@ export const TOOL_LINE = 'TOOL_LINE';
 export const TOOL_COPY_PASTE = 'TOOL_COPY_PASTE';
 export const TOOL_BORDER_RADIUS = 'TOOL_BORDER_RADIUS';
 export const TOOL_FACET = 'TOOL_FACET';
-// export const ADD_ELEMENT = 'ADD_ELEMENT';
 
 export default class ToolbarComponent extends Component {
   onClick = ({
@@ -221,7 +222,7 @@ export default class ToolbarComponent extends Component {
             <button
               className={`btn ${
                 tool === TOOL_BORDER_RADIUS ? 'btn-success' : ''
-              }`}
+                }`}
               data-tool={TOOL_BORDER_RADIUS}
               onClick={this.onClick}
               title={value}
@@ -245,59 +246,59 @@ export default class ToolbarComponent extends Component {
         </FormattedMessage>
 
         {/*<Modal show={this.state.show} onHide={this.handleClose}>*/}
-          {/*<Modal.Header closeButton>*/}
-            {/*<FormattedMessage*/}
-              {/*id="addElement.modal.title"*/}
-              {/*defaultMessage="Add new element"*/}
-            {/*>*/}
-              {/*{value => <Modal.Title>{value}</Modal.Title>}*/}
-            {/*</FormattedMessage>*/}
-          {/*</Modal.Header>*/}
-          {/*<Modal.Body>*/}
-            {/*<Form*/}
-              {/*onSubmit={event => {*/}
-                {/*event.preventDefault();*/}
-                {/*return false;*/}
-              {/*}}*/}
-            {/*>*/}
-              {/*<FormGroup controlId="formControlsFile">*/}
-                {/*<FormattedMessage*/}
-                  {/*id="addProject.modal.fileLabel"*/}
-                  {/*defaultMessage="File"*/}
-                {/*>*/}
-                  {/*{value => <ControlLabel>{value}</ControlLabel>}*/}
-                {/*</FormattedMessage>*/}
-                {/*<FormattedMessage*/}
-                  {/*id="addProject.modal.filePlaceholder"*/}
-                  {/*defaultMessage="Chose file ..."*/}
-                {/*>*/}
-                  {/*{placeholder => (*/}
-                    {/*<FormControl*/}
-                      {/*type="file"*/}
-                      {/*name="file"*/}
-                      {/*accept=".dxf"*/}
-                      {/*placeholder={placeholder}*/}
-                      {/*onChange={this.handleChange}*/}
-                    {/*/>*/}
-                  {/*)}*/}
-                {/*</FormattedMessage>*/}
-                {/*<HelpBlock>Only *.dxf file supported</HelpBlock>*/}
-                {/*<FormControl.Feedback />*/}
-              {/*</FormGroup>*/}
-            {/*</Form>*/}
-          {/*</Modal.Body>*/}
+        {/*<Modal.Header closeButton>*/}
+        {/*<FormattedMessage*/}
+        {/*id="addElement.modal.title"*/}
+        {/*defaultMessage="Add new element"*/}
+        {/*>*/}
+        {/*{value => <Modal.Title>{value}</Modal.Title>}*/}
+        {/*</FormattedMessage>*/}
+        {/*</Modal.Header>*/}
+        {/*<Modal.Body>*/}
+        {/*<Form*/}
+        {/*onSubmit={event => {*/}
+        {/*event.preventDefault();*/}
+        {/*return false;*/}
+        {/*}}*/}
+        {/*>*/}
+        {/*<FormGroup controlId="formControlsFile">*/}
+        {/*<FormattedMessage*/}
+        {/*id="addProject.modal.fileLabel"*/}
+        {/*defaultMessage="File"*/}
+        {/*>*/}
+        {/*{value => <ControlLabel>{value}</ControlLabel>}*/}
+        {/*</FormattedMessage>*/}
+        {/*<FormattedMessage*/}
+        {/*id="addProject.modal.filePlaceholder"*/}
+        {/*defaultMessage="Chose file ..."*/}
+        {/*>*/}
+        {/*{placeholder => (*/}
+        {/*<FormControl*/}
+        {/*type="file"*/}
+        {/*name="file"*/}
+        {/*accept=".dxf"*/}
+        {/*placeholder={placeholder}*/}
+        {/*onChange={this.handleChange}*/}
+        {/*/>*/}
+        {/*)}*/}
+        {/*</FormattedMessage>*/}
+        {/*<HelpBlock>Only *.dxf file supported</HelpBlock>*/}
+        {/*<FormControl.Feedback />*/}
+        {/*</FormGroup>*/}
+        {/*</Form>*/}
+        {/*</Modal.Body>*/}
 
-          {/*<Modal.Footer>*/}
-            {/*{this.state.error && (*/}
-              {/*<HelpBlock className="warning">{this.state.error}</HelpBlock>*/}
-            {/*)}*/}
-            {/*<FormattedMessage id="addProject.open" defaultMessage="Open">*/}
-              {/*{value => <Button onClick={this.addProject}>{value}</Button>}*/}
-            {/*</FormattedMessage>*/}
-            {/*<FormattedMessage id="btn.cancel" defaultMessage="Close">*/}
-              {/*{value => <Button onClick={this.handleClose}>{value}</Button>}*/}
-            {/*</FormattedMessage>*/}
-          {/*</Modal.Footer>*/}
+        {/*<Modal.Footer>*/}
+        {/*{this.state.error && (*/}
+        {/*<HelpBlock className="warning">{this.state.error}</HelpBlock>*/}
+        {/*)}*/}
+        {/*<FormattedMessage id="addProject.open" defaultMessage="Open">*/}
+        {/*{value => <Button onClick={this.addProject}>{value}</Button>}*/}
+        {/*</FormattedMessage>*/}
+        {/*<FormattedMessage id="btn.cancel" defaultMessage="Close">*/}
+        {/*{value => <Button onClick={this.handleClose}>{value}</Button>}*/}
+        {/*</FormattedMessage>*/}
+        {/*</Modal.Footer>*/}
         {/*</Modal>*/}
 
         {/* <button className="btn" id="back" type="submit" disabled="true" ng-click="back()" title="Back"><i */}

@@ -2,8 +2,8 @@ import * as THREE from '../extend/THREE';
 import GeometryUtils from '../services/GeometryUtils';
 import helpLayerService from './helpLayerService';
 
-let setColor = function(entity, bgColor, objId, objColor) {
-  entity.children.forEach(function(entity) {
+let setColor = function (entity, bgColor, objId, objColor) {
+  entity.children.forEach(function (entity) {
     if (entity.children.length > 0) {
       setColor(entity, bgColor, objId, objColor);
     } else {
@@ -25,7 +25,7 @@ let setColor = function(entity, bgColor, objId, objColor) {
 };
 
 let setOriginalColor = entity => {
-  entity.children.forEach(function(entity) {
+  entity.children.forEach(function (entity) {
     if (entity.children.length > 0) {
       setOriginalColor(entity);
     } else {
@@ -195,7 +195,7 @@ let unselectLine = (lines, scene) => {
 
 let closestPoint = (arr, c) => {
   let index;
-  arr.forEach(function(item) {
+  arr.forEach(function (item) {
     item.distance = Math.sqrt(
       (item.x - c.x) * (item.x - c.x) + (item.y - c.y) * (item.y - c.y)
     );
@@ -216,7 +216,7 @@ let closestPoint = (arr, c) => {
 let isPoint = (a, r, rCenter) => {
   let rXy = Math.sqrt(
     (rCenter.x - a.x) * (rCenter.x - a.x) +
-      (rCenter.y - a.y) * (rCenter.y - a.y)
+    (rCenter.y - a.y) * (rCenter.y - a.y)
   );
   return rXy <= r;
 };
@@ -238,8 +238,8 @@ let startPointIndex = (line, mousePoint, editor) => {
   if (
     helpLayer.children[helpLayer.children.length - 1] &&
     editor.activeEntities.length !== 1 &&
-    helpLayer.children[helpLayer.children.length - 1].name ==
-      'pointGeometryCenter'
+    String(helpLayer.children[helpLayer.children.length - 1].name) ===
+    'pointGeometryCenter'
   ) {
     isSelectPoint = isPoint(
       helpLayer.children[helpLayer.children.length - 1].position,
@@ -248,7 +248,7 @@ let startPointIndex = (line, mousePoint, editor) => {
     );
     // debugger;
   }
-  if (isSelectPoint == true) {
+  if (!isSelectPoint === true) {
     // console.log(index.length);
     index[0] = helpLayer.children.length - 1;
     editor.editMode.activeLine = activeEntities;
@@ -276,7 +276,7 @@ let startPointIndex = (line, mousePoint, editor) => {
           scale,
           mousePoint
         );
-        if (isSelectPoint == true) {
+        if (!isSelectPoint === true) {
           // console.log(index.length);
           index[editor.editMode.activeLine.length] = temporaryIndex;
           editor.editMode.activeLine.push(line);
@@ -407,14 +407,14 @@ let changeGeometry = (lines, index, point, scene, editor) => {
             if (
               (checkLine.geometry.vertices[0].x -
                 checkHelpPoint.pointStart.position.x) *
-                (checkLine.geometry.vertices[0].x -
-                  checkHelpPoint.pointStart.position.x) <
-                helpRad &&
+              (checkLine.geometry.vertices[0].x -
+                checkHelpPoint.pointStart.position.x) <
+              helpRad &&
               (checkLine.geometry.vertices[0].y -
                 checkHelpPoint.pointStart.position.y) *
-                (checkLine.geometry.vertices[0].y -
-                  checkHelpPoint.pointStart.position.y) <
-                helpRad
+              (checkLine.geometry.vertices[0].y -
+                checkHelpPoint.pointStart.position.y) <
+              helpRad
             ) {
               // debugger;
               selectLines[selectLines.length] = [
@@ -426,14 +426,14 @@ let changeGeometry = (lines, index, point, scene, editor) => {
             } else if (
               (checkLine.geometry.vertices[1].x -
                 checkHelpPoint.pointStart.position.x) *
-                (checkLine.geometry.vertices[1].x -
-                  checkHelpPoint.pointStart.position.x) <
-                helpRad &&
+              (checkLine.geometry.vertices[1].x -
+                checkHelpPoint.pointStart.position.x) <
+              helpRad &&
               (checkLine.geometry.vertices[1].y -
                 checkHelpPoint.pointStart.position.y) *
-                (checkLine.geometry.vertices[1].y -
-                  checkHelpPoint.pointStart.position.y) <
-                helpRad
+              (checkLine.geometry.vertices[1].y -
+                checkHelpPoint.pointStart.position.y) <
+              helpRad
             ) {
               // debugger;
               selectLines[selectLines.length] = [
@@ -445,14 +445,14 @@ let changeGeometry = (lines, index, point, scene, editor) => {
             } else if (
               (checkLine.geometry.vertices[0].x -
                 checkHelpPoint.pointEnd.position.x) *
-                (checkLine.geometry.vertices[0].x -
-                  checkHelpPoint.pointEnd.position.x) <
-                helpRad &&
+              (checkLine.geometry.vertices[0].x -
+                checkHelpPoint.pointEnd.position.x) <
+              helpRad &&
               (checkLine.geometry.vertices[0].y -
                 checkHelpPoint.pointEnd.position.y) *
-                (checkLine.geometry.vertices[0].y -
-                  checkHelpPoint.pointEnd.position.y) <
-                helpRad
+              (checkLine.geometry.vertices[0].y -
+                checkHelpPoint.pointEnd.position.y) <
+              helpRad
             ) {
               // debugger;
               selectLines[selectLines.length] = [
@@ -464,14 +464,14 @@ let changeGeometry = (lines, index, point, scene, editor) => {
             } else if (
               (checkLine.geometry.vertices[1].x -
                 checkHelpPoint.pointEnd.position.x) *
-                (checkLine.geometry.vertices[1].x -
-                  checkHelpPoint.pointEnd.position.x) <
-                helpRad &&
+              (checkLine.geometry.vertices[1].x -
+                checkHelpPoint.pointEnd.position.x) <
+              helpRad &&
               (checkLine.geometry.vertices[1].y -
                 checkHelpPoint.pointEnd.position.y) *
-                (checkLine.geometry.vertices[1].y -
-                  checkHelpPoint.pointEnd.position.y) <
-                helpRad
+              (checkLine.geometry.vertices[1].y -
+                checkHelpPoint.pointEnd.position.y) <
+              helpRad
             ) {
               // debugger;
               selectLines[selectLines.length] = [
@@ -539,11 +539,11 @@ let changeGeometry = (lines, index, point, scene, editor) => {
     //   // todo  для декількох ліній
   } else if (
     lines.length &&
-    (index.length === 1 || index == 'MOVE_NEW_OBJECT')
+    (index.length === 1 || index === 'MOVE_NEW_OBJECT')
   ) {
     let helpLayer = scene.getObjectByName('HelpLayer');
     let pointGeometryCenter = helpLayer.children[helpLayer.children.length - 1];
-    if (index == 'MOVE_NEW_OBJECT') {
+    if (index === 'MOVE_NEW_OBJECT') {
       pointGeometryCenter = {};
       pointGeometryCenter.position = {};
       // let activeEntitiesBoundingBox = GeometryUtils.getBoundingBox(lines);
@@ -553,7 +553,7 @@ let changeGeometry = (lines, index, point, scene, editor) => {
       pointGeometryCenter.position.y = editor.editMode.dovetail.y;
     }
 
-    if (index == 'MOVE_NEW_OBJECT' || pointGeometryCenter.userData.groupMove) {
+    if (index === 'MOVE_NEW_OBJECT' || pointGeometryCenter.userData.groupMove) {
       lines.forEach(line => {
         if (
           line.geometry instanceof THREE.CircleGeometry
@@ -567,7 +567,7 @@ let changeGeometry = (lines, index, point, scene, editor) => {
 
         if (line.geometry.type === 'Geometry') {
           line.geometry.verticesNeedUpdate = true;
-          if (index == 'MOVE_NEW_OBJECT') {
+          if (index === 'MOVE_NEW_OBJECT') {
             line.geometry.vertices.forEach(pointVertices => {
               pointVertices.x += changeX;
               pointVertices.y += changeY;
@@ -631,7 +631,7 @@ let changeArcGeometry = (arcGeometry, parameters) => {
 let radiusArc = (point, line) =>
   Math.sqrt(
     (line.position.x - point.x) * (line.position.x - point.x) +
-      (line.position.y - point.y) * (line.position.y - point.y)
+    (line.position.y - point.y) * (line.position.y - point.y)
   );
 
 let editThetaLenght = (mousePoint, line) => {
@@ -710,15 +710,15 @@ let editThetaLenght = (mousePoint, line) => {
   result =
     deltaLength < 0
       ? {
-          ...result,
-          thetaStart: start1 + deltaLength,
-          thetaLength: -deltaLength
-        }
+        ...result,
+        thetaStart: start1 + deltaLength,
+        thetaLength: -deltaLength
+      }
       : {
-          ...result,
-          thetaStart: start1,
-          thetaLength: deltaLength
-        };
+        ...result,
+        thetaStart: start1,
+        thetaLength: deltaLength
+      };
   // start < 0
   result.thetaStart =
     result.thetaStart < 0 ? result.thetaStart + 2 * Math.PI : result.thetaStart;
@@ -775,15 +775,15 @@ let editThetaStart = (mousePoint, line) => {
   result =
     deltaLength < 0
       ? {
-          ...result,
-          thetaStart: q + deltaLength,
-          thetaLength: -deltaLength
-        }
+        ...result,
+        thetaStart: q + deltaLength,
+        thetaLength: -deltaLength
+      }
       : {
-          ...result,
-          thetaStart: q,
-          thetaLength: deltaLength
-        };
+        ...result,
+        thetaStart: q,
+        thetaLength: deltaLength
+      };
 
   // start < 0
   result.thetaStart =
@@ -849,7 +849,7 @@ let crossingPoint = (pointMouse, closestLine, activeEntities, entrainment = 0.05
     if (activeEntities.length > 0 && pointMouse) {
       entrainment *= 10;
       let line;
-      activeEntities.forEach(function(entity) {
+      activeEntities.forEach(function (entity) {
         if (
           !line &&
           entity.name !== 'ActiveLine' &&
@@ -869,7 +869,7 @@ let crossingPoint = (pointMouse, closestLine, activeEntities, entrainment = 0.05
           //todo подальші операції треба робити для всих ліній (line має бути масивом), бо актів лайн може зацепити декілька ліній а чиплятись до тої до якої менша відстань
         }
       });
-      line = closestLine? closestLine : line;
+      line = closestLine ? closestLine : line;
       if (line) {
         if (line.geometry.type === 'Geometry') {
           let index = closestPoint(line.geometry.vertices, pointMouse);
@@ -1051,7 +1051,7 @@ let mirrorObject = (object, option) => {
 let rotationPoint = (vertex, center, angle) => {
   const r = Math.sqrt(
     (vertex.x - center.x) * (vertex.x - center.x) +
-      (vertex.y - center.y) * (vertex.y - center.y)
+    (vertex.y - center.y) * (vertex.y - center.y)
   );
   const alpha = circleIntersectionAngle(vertex, center) + angle;
   vertex.x = r * Math.cos(alpha) + center.x;

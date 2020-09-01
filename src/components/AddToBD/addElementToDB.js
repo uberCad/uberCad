@@ -9,14 +9,19 @@ import {
   HelpBlock,
   Modal
 } from 'react-bootstrap';
-import './addElementToDB.css';
 import { FormattedMessage } from 'react-intl';
-import Scene from '../../services/sceneService';
-import { drawDxf } from '../../actions/cad';
-import { parseDxf } from '../../services/dxfService';
-import MaterialComponent from '../Material/materrialComponentContainer';
-import GeometryUtils from '../../services/GeometryUtils';
+
 import Api from '../../services/apiService';
+import Scene from '../../services/sceneService';
+import GeometryUtils from '../../services/GeometryUtils';
+
+import MaterialComponent from '../Material/materrialComponentContainer';
+
+import './addElementToDB.css';
+
+// TODO: delete it if we don't need it anymore
+// import { drawDxf } from '../../actions/cad';
+// import { parseDxf } from '../../services/dxfService';
 
 export default class addElementToDB extends Component {
   constructor(props) {
@@ -101,13 +106,13 @@ export default class addElementToDB extends Component {
   ) => {
     categoryFromDB.forEach(category => {
       // only '==' not '===' - different value types
-      if (thisParentKey == category.parent_key) {
+      if (String(thisParentKey) === String(category.parent_key)) {
         for (let j = 0; j < ind; j++) {
           category.title = '-' + category.title;
         }
         allCategories.push(category);
         for (let i = 0; i < parent_keys.length; i++) {
-          if (parent_keys[i] == category._key) {
+          if (String(parent_keys[i]) === String(category._key)) {
             this.recursiveStructuring(
               categoryFromDB,
               allCategories,
@@ -285,10 +290,10 @@ export default class addElementToDB extends Component {
                       <option></option>
                       {this.state.category
                         ? this.state.category.map(category => (
-                            <option key={category._key} value={category._key}>
-                              {category.title}
-                            </option>
-                          ))
+                          <option key={category._key} value={category._key}>
+                            {category.title}
+                          </option>
+                        ))
                         : null}
                     </FormControl>
                   </FormGroup>

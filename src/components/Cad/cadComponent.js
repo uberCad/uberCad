@@ -77,7 +77,7 @@ export default class CadComponent extends Component {
 
   render() {
     if (this.props.isChanged) {
-      window.onbeforeunload = function(evt) {
+      window.onbeforeunload = function (evt) {
         let message =
           'Document is not saved. You will lost the changes if you leave the page.';
         if (typeof evt === 'undefined') {
@@ -96,7 +96,7 @@ export default class CadComponent extends Component {
       <div
         className={`threejs-app ${
           this.props.sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'
-        }`}
+          }`}
         onMouseUp={this.onMouseUp}
       >
         <div

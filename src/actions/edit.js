@@ -225,7 +225,7 @@ export const selectPoint = (lines, event, editor) => {
 };
 
 export const movePoint = (lines, index, event, editor) => {
-  console.log (lines);
+  console.log(lines);
   let { scene, camera, cadCanvas } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   let point = {
@@ -235,16 +235,16 @@ export const movePoint = (lines, index, event, editor) => {
   let closestLine = null;
   let distanceToClosestLine;
   let activeEntities = clickResult.activeEntities;
-  console.log (activeEntities);
-  if (activeEntities.length > 0){
+  console.log(activeEntities);
+  if (activeEntities.length > 0) {
     // debugger;
     // distanceToClosestLine = GeometryUtils.distanceToEntity(point,activeEntities[0]);
     lines.forEach(line => {
       line.name = 'NewObjectLine'
     });
-    activeEntities.forEach (entity => {
-      let distance = GeometryUtils.distanceToEntity(point,activeEntities[0]);
-      if (!distanceToClosestLine || distanceToClosestLine > distance){
+    activeEntities.forEach(entity => {
+      let distance = GeometryUtils.distanceToEntity(point, activeEntities[0]);
+      if (!distanceToClosestLine || distanceToClosestLine > distance) {
         if (
           entity.name !== 'ActiveLine' &&
           entity.name !== 'NewObjectLine' &&
@@ -270,18 +270,18 @@ export const movePoint = (lines, index, event, editor) => {
 
   let crossing = false;
 
-  if (index === 'MOVE_NEW_OBJECT' ){
-    if (closestLine){
+  if (index === 'MOVE_NEW_OBJECT') {
+    if (closestLine) {
       let newPointInLine = {
         position: {}
       }
       // debugger;
-      helpLayerService.positionInLine (editor,
+      helpLayerService.positionInLine(editor,
         closestLine.geometry.vertices, point, newPointInLine);
       if (newPointInLine.position.x) {
 
 
-       // перевірка на переин обєкту який я таскаю і батьківського обєкту closestLine з перевіркою відстані між point і crossing
+        // перевірка на переин обєкту який я таскаю і батьківського обєкту closestLine з перевіркою відстані між point і crossing
         crossing = newPointInLine.position;
 
 
@@ -289,20 +289,20 @@ export const movePoint = (lines, index, event, editor) => {
 
       }
     }
-  } else{
+  } else {
     crossing = crossingPoint(point, closestLine, activeEntities, camera.top / 70);
   }
   // debugger;
   // if (crossing.x === NaN || crossing.y === NaN){
   //   debugger;
   // }
-  console.log (crossing);
+  console.log(crossing);
   const pointCnange = crossing ? crossing : point;
   changeGeometry(lines, index, pointCnange, scene, editor);
 
   cadCanvas.render();
   // renderer.render(scene, camera);
-// debugger;
+  // debugger;
   return dispatch => {
     crossing
       ? movePointInfo(event, 'Crossing point')(dispatch)
@@ -569,9 +569,9 @@ export const radius = (event, editor, copyPoint) => {
   const start = !crossing ? mousePoint : crossing;
   let radius = Math.sqrt(
     (editMode.newCurveCenter.x - start.x) *
-      (editMode.newCurveCenter.x - start.x) +
-      (editMode.newCurveCenter.y - start.y) *
-        (editMode.newCurveCenter.y - start.y)
+    (editMode.newCurveCenter.x - start.x) +
+    (editMode.newCurveCenter.y - start.y) *
+    (editMode.newCurveCenter.y - start.y)
   );
   let helpLine = helpArc(radius);
   helpLine.position.x = editMode.newCurveCenter.x;
@@ -615,13 +615,13 @@ export const thetaLength = (event, editor, parent, curveParam) => {
   let clickResult = sceneService.onClick(event, scene, camera);
   let mousePoint = curveParam
     ? {
-        x: curveParam.thetaLength.x,
-        y: curveParam.thetaLength.y
-      }
+      x: curveParam.thetaLength.x,
+      y: curveParam.thetaLength.y
+    }
     : {
-        x: clickResult.point.x,
-        y: clickResult.point.y
-      };
+      x: clickResult.point.x,
+      y: clickResult.point.y
+    };
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   const length = !crossing ? mousePoint : crossing;
   const t = editThetaLenght(length, oldLine);
@@ -1071,11 +1071,11 @@ export const setScale = (scale, object, editor) => {
   let box1 = new THREE.BoxHelper(sceneOject, 0x222222);
   sceneOject.position.set(
     box0.geometry.boundingSphere.center.x -
-      box1.geometry.boundingSphere.center.x,
+    box1.geometry.boundingSphere.center.x,
     box0.geometry.boundingSphere.center.y -
-      box1.geometry.boundingSphere.center.y,
+    box1.geometry.boundingSphere.center.y,
     box0.geometry.boundingSphere.center.z -
-      box1.geometry.boundingSphere.center.z
+    box1.geometry.boundingSphere.center.z
   );
   fixPosition(sceneOject);
   renderer.render(scene, camera);
@@ -1092,45 +1092,45 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
   let longestLineLength = null;
 
   // модуль пошуку найдовшої лінії з масиву ліній
-  newObjectLines.forEach(line =>{
+  newObjectLines.forEach(line => {
     // debugger;
-  if( line.geometry.type = "Geometry") {
-    // debugger;
-    if (!longestLine) {
-      longestLine = line;
-      longestLineLength = GeometryUtils.getDistance(line.geometry.vertices[0],
-        line.geometry.vertices[line.geometry.vertices.length-1]);
+    if (line.geometry.type === "Geometry") {
+      // debugger;
+      if (!longestLine) {
+        longestLine = line;
+        longestLineLength = GeometryUtils.getDistance(line.geometry.vertices[0],
+          line.geometry.vertices[line.geometry.vertices.length - 1]);
+      }
+      let thisLineLength = GeometryUtils.getDistance(line.geometry.vertices[0],
+        line.geometry.vertices[line.geometry.vertices.length - 1]);
+      if (thisLineLength > longestLineLength) {
+        longestLine = line;
+        longestLineLength = thisLineLength;
+      }
     }
-    let thisLineLength = GeometryUtils.getDistance(line.geometry.vertices[0],
-      line.geometry.vertices[line.geometry.vertices.length-1]);
-    if (thisLineLength > longestLineLength){
-      longestLine = line;
-      longestLineLength = thisLineLength;
-    }
-  }
   });
 
   //todo вирівнювання кута обєкту за біччною стороною (найдовша лінія має статити вертикальною
 
   let info = GeometryUtils.getObjectInfo(newObjectLines[0].parent);
-  console.log (info);
+  console.log(info);
 
   let { camera, scene, renderer } = editor;
   let res = GeometryUtils.getRegionClusters(newObjectLines[0].parent.userData.edgeModel.regions[0].path, 5);
-  console.log (res);
+  console.log(res);
 
   let maxDistance = 0;
   let points = [];
   // debugger;
   for (let i = 0; i < res.centroids.length; i++) {
-    for (let j = i+1; j < res.centroids.length; j++) {
+    for (let j = i + 1; j < res.centroids.length; j++) {
       let thisDistance = GeometryUtils.getDistance(
-        { x: res.centroids[i][0], y: res.centroids[i][1]},
-        { x: res.centroids[j][0], y: res.centroids[j][1]});
-      if (thisDistance > maxDistance){
+        { x: res.centroids[i][0], y: res.centroids[i][1] },
+        { x: res.centroids[j][0], y: res.centroids[j][1] });
+      if (thisDistance > maxDistance) {
         maxDistance = thisDistance;
-        points [0] = { x: res.centroids[i][0], y: res.centroids[i][1]};
-        points [1] = { x: res.centroids[j][0], y: res.centroids[j][1]};
+        points[0] = { x: res.centroids[i][0], y: res.centroids[i][1] };
+        points[1] = { x: res.centroids[j][0], y: res.centroids[j][1] };
       }
     }
   }
@@ -1176,82 +1176,81 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
 
 
   // пошук точок і ліній на верхній горизонтальній стороні
-  let boundingBox = GeometryUtils.getBoundingBox (newObjectLines[0].parent);
-  console.log (boundingBox);
+  let boundingBox = GeometryUtils.getBoundingBox(newObjectLines[0].parent);
+  console.log(boundingBox);
 
-  let linesInBoxSide = [];
   let linesInBoxSideMin = {};
   let linesInBoxSideMax = {};
   // if (boundingBox.height> boundingBox.width) {
-    newObjectLines.forEach(line => {
-      // if  (Math.abs(line.geometry.vertices[0].y - boundingBox.min.y) < 0.001
-      // || Math.abs(line.geometry.vertices[line.geometry.vertices.length-1].y - boundingBox.min.y) < 0.001
-      // ){
-      //   let index = null;
-      //   line.geometry.vertices.forEach( point => {
-      let point = line.geometry.vertices[0];
-      if (Math.abs(point.y - boundingBox.max.y) < 0.01) {
-        // debugger;
-        if (!linesInBoxSideMin.x) {
-          linesInBoxSideMin.x = point.x;
-          linesInBoxSideMin.y = point.y;
-        }
-        if (!linesInBoxSideMax.x) {
-          linesInBoxSideMax.x = point.x;
-          linesInBoxSideMax.y = point.y;
-        }
-        if (linesInBoxSideMin.x > point.x) {
-          linesInBoxSideMin.x = point.x;
-          linesInBoxSideMin.y = point.y;
-        }
-        if (linesInBoxSideMax.x < point.x) {
-          linesInBoxSideMax.x = point.x;
-          linesInBoxSideMax.y = point.y;
-        }
-        // debugger;
+  newObjectLines.forEach(line => {
+    // if  (Math.abs(line.geometry.vertices[0].y - boundingBox.min.y) < 0.001
+    // || Math.abs(line.geometry.vertices[line.geometry.vertices.length-1].y - boundingBox.min.y) < 0.001
+    // ){
+    //   let index = null;
+    //   line.geometry.vertices.forEach( point => {
+    let point = line.geometry.vertices[0];
+    if (Math.abs(point.y - boundingBox.max.y) < 0.01) {
+      // debugger;
+      if (!linesInBoxSideMin.x) {
+        linesInBoxSideMin.x = point.x;
+        linesInBoxSideMin.y = point.y;
       }
-      // debugger
-      point = line.geometry.vertices[line.geometry.vertices.length - 1];
-      if (Math.abs(point.y - boundingBox.max.y) < 0.01) {
-        // debugger;
-        if (!linesInBoxSideMin.x) {
-          linesInBoxSideMin.x = point.x;
-          linesInBoxSideMin.y = point.y;
-        }
-        if (!linesInBoxSideMax.x) {
-          linesInBoxSideMax.x = point.x;
-          linesInBoxSideMax.y = point.y;
-        }
-        if (linesInBoxSideMin.x > point.x) {
-          linesInBoxSideMin.x = point.x;
-          linesInBoxSideMin.y = point.y;
-        }
-        if (linesInBoxSideMax.x < point.x) {
-          linesInBoxSideMax.x = point.x;
-          linesInBoxSideMax.y = point.y;
-        }
+      if (!linesInBoxSideMax.x) {
+        linesInBoxSideMax.x = point.x;
+        linesInBoxSideMax.y = point.y;
       }
+      if (linesInBoxSideMin.x > point.x) {
+        linesInBoxSideMin.x = point.x;
+        linesInBoxSideMin.y = point.y;
+      }
+      if (linesInBoxSideMax.x < point.x) {
+        linesInBoxSideMax.x = point.x;
+        linesInBoxSideMax.y = point.y;
+      }
+      // debugger;
+    }
+    // debugger
+    point = line.geometry.vertices[line.geometry.vertices.length - 1];
+    if (Math.abs(point.y - boundingBox.max.y) < 0.01) {
+      // debugger;
+      if (!linesInBoxSideMin.x) {
+        linesInBoxSideMin.x = point.x;
+        linesInBoxSideMin.y = point.y;
+      }
+      if (!linesInBoxSideMax.x) {
+        linesInBoxSideMax.x = point.x;
+        linesInBoxSideMax.y = point.y;
+      }
+      if (linesInBoxSideMin.x > point.x) {
+        linesInBoxSideMin.x = point.x;
+        linesInBoxSideMin.y = point.y;
+      }
+      if (linesInBoxSideMax.x < point.x) {
+        linesInBoxSideMax.x = point.x;
+        linesInBoxSideMax.y = point.y;
+      }
+    }
 
-    });
+  });
 
 
-    // добавить проверку направления центра мас (от крайньой точке к крайньой точке)
+  // добавить проверку направления центра мас (от крайньой точке к крайньой точке)
 
 
-    //порівняння лінії яка утворюється між крайними точками які лежать на горизонтальній стороні баундін бокса з бічною стороною
+  //порівняння лінії яка утворюється між крайними точками які лежать на горизонтальній стороні баундін бокса з бічною стороною
 
-    // фіксація як точку привязки центр лінії яку знайшли вище
-    // debugger;
-  if(!linesInBoxSideMin.x || !linesInBoxSideMax.x
+  // фіксація як точку привязки центр лінії яку знайшли вище
+  // debugger;
+  if (!linesInBoxSideMin.x || !linesInBoxSideMax.x
     || !linesInBoxSideMin.y || !linesInBoxSideMax.y
     || boundingBox.width > boundingBox.height
-  ){
+  ) {
     dovetail.x = boundingBox.center.x;
     dovetail.y = boundingBox.center.y;
   } else {
     dovetail.x = (linesInBoxSideMin.x + linesInBoxSideMax.x) / 2;
     dovetail.y = (linesInBoxSideMin.y + linesInBoxSideMax.y) / 2;
   }
-    // debugger;
+  // debugger;
   // }
 };

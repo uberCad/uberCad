@@ -1,7 +1,6 @@
 // todo все що нижче перековиряти для обєктів з БД
 import { spinnerShow, spinnerHide } from './spinner';
 import Api from '../services/apiService';
-import React from 'react';
 
 export const GET_OBJECT_FROM_DB = 'PROJECTS_SORT_FIELD';
 

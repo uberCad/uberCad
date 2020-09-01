@@ -23,7 +23,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   let scene = editor ? editor.scene : new THREE.Scene();
   let check = name => {
     for (let i = 0; i <= editor.scene.children.length; i++) {
-      if (editor.scene.children[i].name == name) {
+      if (editor.scene.children[i].name === name) {
         return editor.scene.children[i];
       }
     }
@@ -195,7 +195,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
 
   let controls = new OrthographicControls(camera, container);
 
-  this.render = function() {
+  this.render = function () {
     renderer.render(scene, camera);
   };
 
@@ -204,7 +204,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(stats.dom);
 
-    this.render = function() {
+    this.render = function () {
       stats.begin();
       renderer.render(scene, camera);
       stats.end();
@@ -218,7 +218,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
 
   this.getControls = () => controls;
 
-  this.resize = function(width, height) {
+  this.resize = function (width, height) {
     let originalWidth = renderer.domElement.width;
     let originalHeight = renderer.domElement.height;
 
@@ -297,7 +297,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
 
     let xrad = Math.sqrt(
       Math.pow(entity.majorAxisEndPoint.x, 2) +
-        Math.pow(entity.majorAxisEndPoint.y, 2)
+      Math.pow(entity.majorAxisEndPoint.y, 2)
     );
     let yrad = xrad * entity.axisRatio;
     let rotation = Math.atan2(
@@ -408,7 +408,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   function drawSpline(entity, data) {
     let color = getColor(entity, data);
 
-    let points = entity.controlPoints.map(function(vec) {
+    let points = entity.controlPoints.map(function (vec) {
       return new THREE.Vector2(vec.x, vec.y);
     });
 
@@ -837,7 +837,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
       color = data.tables.layer.layers[entity.layer].color;
     }
 
-    if (color == null || color === 0xffffff) {
+    if (!color || color === 0xffffff) {
       color = 0x000000;
     }
     return color;

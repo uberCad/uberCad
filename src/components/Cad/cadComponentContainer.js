@@ -45,15 +45,15 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    fetchProject: function(id) {
+    fetchProject: function (id) {
       fetchProject(id)(dispatch);
     },
 
-    spinnerShow: function() {
+    spinnerShow: function () {
       spinnerShow()(dispatch);
     },
 
-    spinnerHide: function() {
+    spinnerHide: function () {
       spinnerHide()(dispatch);
     },
 
