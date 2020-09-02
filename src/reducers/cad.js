@@ -613,16 +613,10 @@ const cad = (state = initialState, action) => {
         })
       };
     case CAD_UNDO:
-      console.log(state.sceneChildrenHistory.length, state.sceneChildrenHistory[state.activeSceneChildren.counter - 1], state.activeSceneChildren.counter)
       if (
         state.sceneChildrenHistory.length &&
         state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
       ) {
-        console.log(
-          '_____TEST_UNDO_____',
-          state.activeSceneChildren,
-          state.activeSceneChildren.counter - 1
-        );
         // set previous version of state and decrease counter
         action.payload.renderer.render(
           state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
@@ -643,12 +637,10 @@ const cad = (state = initialState, action) => {
       }
       return state;
     case CAD_REDO:
-      console.log(state.sceneChildrenHistory.length, state.sceneChildrenHistory[state.activeSceneChildren.counter + 1], state.activeSceneChildren.counter)
       if (
         state.sceneChildrenHistory.length &&
         state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
       ) {
-        console.log('_____TEST_REDO_____', state.activeSceneChildren + 1);
         // set next version of state and increase counter
         action.payload.renderer.render(
           state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
