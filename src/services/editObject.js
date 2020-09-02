@@ -94,16 +94,11 @@ const addHelpPoints = (editor, scene) => {
         pointCenter.name = 'pointCenter';
 
         helpLayer.add(point1, point2, pointCenter);
-        // console.log(helpLayer.children.length);
         object.userData.helpPoints = {
           point1,
           point2,
           pointCenter
         };
-
-        console.log(object);
-
-        console.log('helppoint');
       } else if (object.geometry.type === 'CircleGeometry') {
         let pointCenter = new THREE.Line(pointGeometry, pointMaterial);
         let pointStart = new THREE.Line(pointGeometry, pointMaterial);
@@ -249,19 +244,16 @@ const startPointIndex = (line, mousePoint, editor) => {
     // debugger;
   }
   if (!!isSelectPoint === true) {
-    // console.log(index.length);
     index[0] = helpLayer.children.length - 1;
     editor.editMode.activeLine = activeEntities;
   } else {
     activeEntities.forEach(line => {
       let helpPoints = line.userData.helpPoints;
       // if(isSelectPoint == false){
-      // console.log(line);
       if (line.geometry.type === 'Geometry') {
         if (!helpPoints) {
           // todo щоб прибрати цей костиль потрібно добавить скидання  activeEntities при зміні режиму роботи на isEdit
           console.log('some thing gone wrong');
-          // debugger;
           return null;
         }
         helpPointsPosition = [
@@ -269,7 +261,6 @@ const startPointIndex = (line, mousePoint, editor) => {
           helpPoints.point2.position,
           helpPoints.pointCenter.position
         ];
-        console.log('test helpPoint in move');
         let temporaryIndex = closestPoint(helpPointsPosition, mousePoint);
         isSelectPoint = isPoint(
           helpPointsPosition[temporaryIndex],
@@ -277,13 +268,8 @@ const startPointIndex = (line, mousePoint, editor) => {
           mousePoint
         );
         if (!!isSelectPoint === true) {
-          // console.log(index.length);
           index[editor.editMode.activeLine.length] = temporaryIndex;
           editor.editMode.activeLine.push(line);
-          console.log('work with this line');
-          // console.log(editor.editMode.activeLine);
-          // console.log(index);
-          // debugger;
         }
         // }
       } else if (line.geometry.type === 'CircleGeometry') {
@@ -336,8 +322,6 @@ const startPointIndex = (line, mousePoint, editor) => {
 };
 
 const changeGeometry = (lines, index, point, scene, editor) => {
-  console.log('_____INDEX_______', index)
-
   if (lines.length && lines.length === index.length) {
     lines.forEach((line, i) => {
       let points = false;

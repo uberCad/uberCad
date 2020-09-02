@@ -3,6 +3,8 @@ import update from 'immutability-helper';
 import {
   CAD_DRAW_DXF,
   CAD_DO_SELECTION,
+  CAD_UNDO,
+  CAD_REDO,
   CAD_TOGGLE_VISIBLE,
   CAD_TOGGLE_VISIBLE_LAYER,
   CAD_SHOW_ALL,
@@ -60,6 +62,12 @@ import { SNAPSHOT_LOAD_OBJECT } from '../actions/panelObjects';
 
 let initialState = {
   scene: null,
+  sceneChildrenHistory: [],
+  activeSceneChildren: {
+    canRedo: false,
+    counter: 0,
+    canUndo: false
+  },
   camera: null,
   renderer: null,
   cadCanvas: null,
@@ -122,8 +130,12 @@ const cad = (state = initialState, action) => {
       return update(state, {
         editMode: {
           scale: {
-            active: { $set: action.payload.active },
-            scaleObject: { $set: action.payload.scaleObject }
+            active: {
+              $set: action.payload.active
+            },
+            scaleObject: {
+              $set: action.payload.scaleObject
+            }
           }
         }
       });
@@ -132,9 +144,15 @@ const cad = (state = initialState, action) => {
       return update(state, {
         editMode: {
           scale: {
-            active: { $set: action.payload.active },
-            scaleObject: { $set: action.payload.scaleObject },
-            scale: { $set: action.payload.scale }
+            active: {
+              $set: action.payload.active
+            },
+            scaleObject: {
+              $set: action.payload.scaleObject
+            },
+            scale: {
+              $set: action.payload.scale
+            }
           }
         }
       });
@@ -142,7 +160,9 @@ const cad = (state = initialState, action) => {
       return update(state, {
         editMode: {
           scale: {
-            scale: { $set: action.payload.scale }
+            scale: {
+              $set: action.payload.scale
+            }
           }
         }
       });
@@ -151,8 +171,12 @@ const cad = (state = initialState, action) => {
       return update(state, {
         editMode: {
           rotation: {
-            active: { $set: action.payload.active },
-            rotationObject: { $set: action.payload.rotationObject }
+            active: {
+              $set: action.payload.active
+            },
+            rotationObject: {
+              $set: action.payload.rotationObject
+            }
           }
         }
       });
@@ -161,7 +185,9 @@ const cad = (state = initialState, action) => {
       return update(state, {
         editMode: {
           rotation: {
-            angle: { $set: action.payload.angle }
+            angle: {
+              $set: action.payload.angle
+            }
           }
         }
       });
@@ -169,13 +195,18 @@ const cad = (state = initialState, action) => {
       return update(state, {
         editMode: {
           rotation: {
-            active: { $set: action.payload.active },
-            angle: { $set: action.payload.angle }
+            active: {
+              $set: action.payload.active
+            },
+            angle: {
+              $set: action.payload.angle
+            }
           }
         }
       });
 
     case EDIT_UNGROUP:
+      console.log(5);
       return {
         ...state,
         scene: action.payload.scene
@@ -191,190 +222,339 @@ const cad = (state = initialState, action) => {
       return update(state, {
         editMode: {
           move: {
-            active: { $set: action.payload.active },
-            moveObject: { $set: action.payload.moveObject }
+            active: {
+              $set: action.payload.active
+            },
+            moveObject: {
+              $set: action.payload.moveObject
+            }
           }
         }
       });
     case EDIT_MOVE_OBJECT_CANCEL:
       return update(state, {
-        editMode: { move: { $set: action.payload.move } }
+        editMode: {
+          move: {
+            $set: action.payload.move
+          }
+        }
       });
     case EDIT_MOVE_OBJECT_POINT:
       return update(state, {
-        editMode: { move: { point: { $set: action.payload.point } } }
+        editMode: {
+          move: {
+            point: {
+              $set: action.payload.point
+            }
+          }
+        }
       });
     case EDIT_MOVE_DISABLE_POINT:
       return update(state, {
-        editMode: { move: { point: { $set: action.payload.point } } }
+        editMode: {
+          move: {
+            point: {
+              $set: action.payload.point
+            }
+          }
+        }
       });
 
     case EDIT_MIRROR:
       return update(state, {
-        editMode: { editObject: { $set: action.payload.editObject } }
+        editMode: {
+          editObject: {
+            $set: action.payload.editObject
+          }
+        }
       });
     case EDIT_CLONE_CANCEL:
       return update(state, {
-        editMode: { clone: { $set: action.payload.clone } }
+        editMode: {
+          clone: {
+            $set: action.payload.clone
+          }
+        }
       });
     case EDIT_CLONE_SAVE:
       return update(state, {
-        editMode: { clone: { $set: action.payload.clone } }
+        editMode: {
+          clone: {
+            $set: action.payload.clone
+          }
+        }
       });
     case EDIT_CLONE_ACTIVE:
       return update(state, {
-        editMode: { clone: { active: { $set: action.payload.active } } }
+        editMode: {
+          clone: {
+            active: {
+              $set: action.payload.active
+            }
+          }
+        }
       });
     case EDIT_CLONE_POINT:
       return update(state, {
-        editMode: { clone: { point: { $set: action.payload.point } } }
+        editMode: {
+          clone: {
+            point: {
+              $set: action.payload.point
+            }
+          }
+        }
       });
     case EDIT_CLONE_OBJECT:
       return update(state, {
         editMode: {
-          clone: { cloneObject: { $set: action.payload.cloneObject } }
+          clone: {
+            cloneObject: {
+              $set: action.payload.cloneObject
+            }
+          }
         }
       });
 
     case EDIT_DELETE_LINE:
       return update(state, {
-        editMode: { activeLine: { $set: action.payload.activeLine } }
+        editMode: {
+          activeLine: {
+            $set: action.payload.activeLine
+          }
+        }
       });
 
     case EDIT_NEW_CURVE:
       return update(state, {
-        editMode: { isNewCurve: { $set: action.payload.isNewCurve } }
+        editMode: {
+          isNewCurve: {
+            $set: action.payload.isNewCurve
+          }
+        }
       });
     case EDIT_CANCEL_NEW_CURVE:
       return update(state, {
         editMode: {
-          isNewCurve: { $set: action.payload.isNewCurve },
-          newCurveCenter: { $set: action.payload.newCurveCenter },
-          radius: { $set: action.payload.radius },
-          start: { $set: action.payload.start },
-          thetaStart: { $set: action.payload.thetaStart },
-          thetaLength: { $set: action.payload.thetaLength }
+          isNewCurve: {
+            $set: action.payload.isNewCurve
+          },
+          newCurveCenter: {
+            $set: action.payload.newCurveCenter
+          },
+          radius: {
+            $set: action.payload.radius
+          },
+          start: {
+            $set: action.payload.start
+          },
+          thetaStart: {
+            $set: action.payload.thetaStart
+          },
+          thetaLength: {
+            $set: action.payload.thetaLength
+          }
         }
       });
     case EDIT_CURVE_CENTER_POINT:
       return update(state, {
-        editMode: { newCurveCenter: { $set: action.payload.firstPoint } }
+        editMode: {
+          newCurveCenter: {
+            $set: action.payload.firstPoint
+          }
+        }
       });
     case EDIT_CURVE_RADIUS:
       return update(state, {
         editMode: {
-          radius: { $set: action.payload.radius },
-          start: { $set: action.payload.start }
+          radius: {
+            $set: action.payload.radius
+          },
+          start: {
+            $set: action.payload.start
+          }
         }
       });
     case EDIT_THETA_START:
       return update(state, {
-        editMode: { thetaStart: { $set: action.payload.thetaStart } }
+        editMode: {
+          thetaStart: {
+            $set: action.payload.thetaStart
+          }
+        }
       });
     case EDIT_NEW_CURVE_SAVE:
       return update(state, {
         editMode: {
-          isNewCurve: { $set: action.payload.isNewCurve },
-          newCurveCenter: { $set: action.payload.newCurveCenter },
-          radius: { $set: action.payload.radius },
-          start: { $set: action.payload.start },
-          thetaStart: { $set: action.payload.thetaStart },
-          thetaLength: { $set: action.payload.thetaLength }
+          isNewCurve: {
+            $set: action.payload.isNewCurve
+          },
+          newCurveCenter: {
+            $set: action.payload.newCurveCenter
+          },
+          radius: {
+            $set: action.payload.radius
+          },
+          start: {
+            $set: action.payload.start
+          },
+          thetaStart: {
+            $set: action.payload.thetaStart
+          },
+          thetaLength: {
+            $set: action.payload.thetaLength
+          }
         }
       });
 
     case EDIT_NEW_LINE_SAVE:
       return update(state, {
         editMode: {
-          isNewLine: { $set: action.payload.isNewLine },
-          newLineFirst: { $set: action.payload.firstPoint }
+          isNewLine: {
+            $set: action.payload.isNewLine
+          },
+          newLineFirst: {
+            $set: action.payload.firstPoint
+          }
         }
       });
     case EDIT_LINE_FIRST_POINT:
       return update(state, {
-        editMode: { newLineFirst: { $set: action.payload.firstPoint } }
+        editMode: {
+          newLineFirst: {
+            $set: action.payload.firstPoint
+          }
+        }
       });
     case EDIT_CANCEL_NEW_LINE:
       return update(state, {
         editMode: {
-          isNewLine: { $set: action.payload.isNewLine },
-          newLineFirst: { $set: action.payload.newLineFirst }
+          isNewLine: {
+            $set: action.payload.isNewLine
+          },
+          newLineFirst: {
+            $set: action.payload.newLineFirst
+          }
         }
       });
     case EDIT_NEW_LINE:
       return update(state, {
-        editMode: { isNewLine: { $set: action.payload.isNewLine } }
+        editMode: {
+          isNewLine: {
+            $set: action.payload.isNewLine
+          }
+        }
       });
 
     case POINT_INFO_ACTIVE:
       return update(state, {
-        pointInfo: { style: { $set: action.payload.style } }
+        pointInfo: {
+          style: {
+            $set: action.payload.style
+          }
+        }
       });
     case POINT_INFO_MOVE:
       return update(state, {
         pointInfo: {
-          style: { $set: action.payload.style },
-          message: { $set: action.payload.message }
+          style: {
+            $set: action.payload.style
+          },
+          message: {
+            $set: action.payload.message
+          }
         }
       });
     case POINT_INFO_DISABLE:
       return update(state, {
         pointInfo: {
-          style: { $set: action.payload.style },
-          message: { $set: action.payload.message }
+          style: {
+            $set: action.payload.style
+          },
+          message: {
+            $set: action.payload.message
+          }
         }
       });
 
     case EDIT_SAVE_POINT:
       return update(state, {
-        editMode: { selectPointIndex: { $set: action.payload.index } }
+        editMode: {
+          selectPointIndex: {
+            $set: action.payload.index
+          }
+        }
       });
     case EDIT_CANCEL:
       return update(state, {
-        editMode: { $set: action.payload.editMode }
+        editMode: {
+          $set: action.payload.editMode
+        }
       });
     case EDIT_SAVE:
       return update(state, {
-        editMode: { $set: action.payload.editMode }
+        editMode: {
+          $set: action.payload.editMode
+        }
       });
     case EDIT_SELECT_POINT:
       return update(state, {
         editMode: {
-          selectPointIndex: { $set: action.payload.selectPointIndex }
+          selectPointIndex: {
+            $set: action.payload.selectPointIndex
+          }
         }
       });
 
     case CAD_EDITMODE_SET_ACTIVE_LINE:
       return update(state, {
         editMode: {
-          activeLine: { $set: action.payload.activeLine }
+          activeLine: {
+            $set: action.payload.activeLine
+          }
         }
       });
     case CAD_EDITMODE_UNSELECT_ACTIVE_LINE:
       return update(state, {
         editMode: {
-          activeLine: { $set: action.payload.activeLine }
+          activeLine: {
+            $set: action.payload.activeLine
+          }
         }
       });
 
     case EDIT_IS_EDIT:
+      console.log(4);
       return update(state, {
         editMode: {
-          isEdit: { $set: action.payload.isEdit },
-          beforeEdit: { $set: action.payload.beforeEdit },
-          editObject: { $set: action.payload.editObject },
-          activeLine: { $set: action.payload.activeLine }
+          isEdit: {
+            $set: action.payload.isEdit
+          },
+          beforeEdit: {
+            $set: action.payload.beforeEdit
+          },
+          editObject: {
+            $set: action.payload.editObject
+          },
+          activeLine: {
+            $set: action.payload.activeLine
+          }
         },
-        scene: { $set: action.payload.scene },
-        isChanged: { $set: action.payload.isChanged }
+        scene: {
+          $set: action.payload.scene
+        },
+        isChanged: {
+          $set: action.payload.isChanged
+        }
       });
     case SNAPSHOT_LOAD_SCENE:
+      console.log(3);
       return {
         ...state,
         scene: action.payload.scene,
         isChanged: action.payload.isChanged
       };
     case SNAPSHOT_LOAD_OBJECT:
+      console.log(2);
       return {
         ...state,
         scene: action.payload.scene,
@@ -382,35 +562,137 @@ const cad = (state = initialState, action) => {
         isChanged: action.payload.isChanged
       };
     case CAD_DRAW_DXF:
+      console.log(1);
       return {
         ...state,
         scene: action.payload.scene,
+        sceneChildrenHistory: [],
+        activeSceneChildren: {
+          canRedo: false,
+          counter: 0,
+          canUndo: false
+        },
         camera: action.payload.camera,
         renderer: action.payload.renderer,
         cadCanvas: action.payload.cadCanvas
       };
     case CAD_DO_SELECTION:
       return update(state, {
-        activeEntities: { $set: [...action.payload.activeEntities] },
-        activeLine: { $set: action.payload.activeLine }
+        activeEntities: {
+          $set: [...action.payload.activeEntities]
+        },
+        activeLine: {
+          $set: action.payload.activeLine
+        }
       });
     case CAD_TOGGLE_VISIBLE:
       return update(state, {
-        activeEntities: { $set: [...state.activeEntities] }
+        activeEntities: {
+          $set: [...state.activeEntities]
+        }
       });
     case CAD_TOGGLE_VISIBLE_LAYER:
-      return update(state, {
-        scene: { children: { $set: [...state.scene.children] } }
-      });
+      // set current version of state and increase counter
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory,
+          {
+            scene: action.payload.previousScene
+          }
+        ],
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        scene: update(state.scene, {
+          children: {
+            $set: [...state.scene.children]
+          }
+        })
+      };
+    case CAD_UNDO:
+      console.log(state.sceneChildrenHistory.length, state.sceneChildrenHistory[state.activeSceneChildren.counter - 1], state.activeSceneChildren.counter)
+      if (
+        state.sceneChildrenHistory.length &&
+        state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
+      ) {
+        console.log(
+          '_____TEST_UNDO_____',
+          state.activeSceneChildren,
+          state.activeSceneChildren.counter - 1
+        );
+        // set previous version of state and decrease counter
+        action.payload.renderer.render(
+          state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
+            .scene,
+          action.payload.camera
+        );
+        return {
+          ...state,
+          activeSceneChildren: {
+            canUndo: state.activeSceneChildren.counter - 1 !== 0,
+            counter: state.activeSceneChildren.counter - 1,
+            canRedo: true
+          },
+          scene:
+            state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
+              .scene
+        };
+      }
+      return state;
+    case CAD_REDO:
+      console.log(state.sceneChildrenHistory.length, state.sceneChildrenHistory[state.activeSceneChildren.counter + 1], state.activeSceneChildren.counter)
+      if (
+        state.sceneChildrenHistory.length &&
+        state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
+      ) {
+        console.log('_____TEST_REDO_____', state.activeSceneChildren + 1);
+        // set next version of state and increase counter
+        action.payload.renderer.render(
+          state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
+            .scene,
+          action.payload.camera
+        );
+        return {
+          ...state,
+          activeSceneChildren: {
+            canUndo: true,
+            counter: state.activeSceneChildren.counter + 1,
+            canRedo:
+              state.activeSceneChildren.counter + 1 <
+              state.sceneChildrenHistory.length
+          },
+          scene:
+            state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
+              .scene
+        };
+      }
+      return state;
     case CAD_SHOW_ALL:
+      console.log(7);
       return update(state, {
-        scene: { children: { $set: [...state.scene.children] } },
-        activeEntities: { $set: [...state.activeEntities] }
+        scene: {
+          children: {
+            $set: [...state.scene.children]
+          }
+        },
+        activeEntities: {
+          $set: [...state.activeEntities]
+        }
       });
     case CAD_GROUP_ENTITIES:
+      console.log(6);
       return update(state, {
-        scene: { children: { $set: [...state.scene.children] } },
-        isChanged: { $set: action.payload.isChanged }
+        scene: {
+          children: {
+            $set: [...state.scene.children]
+          }
+        },
+        isChanged: {
+          $set: action.payload.isChanged
+        }
       });
 
     case SNAPSHOT_ADD:

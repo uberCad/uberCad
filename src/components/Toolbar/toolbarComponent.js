@@ -158,7 +158,10 @@ export default class ToolbarComponent extends Component {
             <button
               className={`btn ${tool === TOOL_UNDO ? 'btn-success' : ''}`}
               data-tool={TOOL_UNDO}
-              onClick={this.onClick}
+              onClick={event => {
+                console.log(11111)
+                this.onClick(event);
+              }}
               title={value}
             >
               <img src={toolUndo} alt="Undo" />

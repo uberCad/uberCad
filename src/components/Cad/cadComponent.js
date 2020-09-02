@@ -22,22 +22,19 @@ export default class CadComponent extends Component {
   componentDidMount() {
     const { projectId, snapshotId } = this.props.match.params;
     this.props.spinnerShow();
-
-    // console.log(projectId);
-    // console.log(snapshotId);
-    // console.log(this.props);
-    if (projectId === 'editObjectElement') {
-      // this.props.drawDxf(null, this.container, null);
-      // в this.props.drawDxf(null, this.container, null); треба подавати або елемент з БД
-      // або загружаємий файл з ПК для створеннм нової сцени і редагування об'єкта
-      // todo тут має підгружатись алемент з бібліотеки або загружаємий елемент, важливо!!!
-    }
+    // if (projectId === 'editObjectElement') {
+    // this.props.drawDxf(null, this.container, null);
+    // в this.props.drawDxf(null, this.container, null); треба подавати або елемент з БД
+    // або загружаємий файл з ПК для створеннм нової сцени і редагування об'єкта
+    // todo тут має підгружатись алемент з бібліотеки або загружаємий елемент, важливо!!!
+    // }
 
     Api.get(
       //done
       snapshotId ? `/snapshot/${snapshotId}` : `/project/file/${projectId}`
     )
       .then(data => {
+        console.log('_________START_POINT________');
         this.container.id = 'sceneID'; // todo тут костиль
         if (snapshotId) {
           this.props.drawDxf(null, this.container, data);
@@ -77,7 +74,7 @@ export default class CadComponent extends Component {
 
   render() {
     if (this.props.isChanged) {
-      window.onbeforeunload = function (evt) {
+      window.onbeforeunload = function(evt) {
         let message =
           'Document is not saved. You will lost the changes if you leave the page.';
         if (typeof evt === 'undefined') {
@@ -96,7 +93,7 @@ export default class CadComponent extends Component {
       <div
         className={`threejs-app ${
           this.props.sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'
-          }`}
+        }`}
         onMouseUp={this.onMouseUp}
       >
         <div

@@ -22,7 +22,7 @@ import { isPoint, unselectLine, closestPoint } from './editObject';
 // TODO: delete it if not needed
 // import helpLayerService from './helpLayerService';
 
-let canvasClick = (event, camera) => {
+const canvasClick = (event, camera) => {
   let canvas = event.target.tagName === 'CANVAS' && event.target;
   let canvasOffset = getOffset(canvas);
 
@@ -46,7 +46,7 @@ let canvasClick = (event, camera) => {
   };
 };
 
-let onClick = (event, scene, camera, renderer) => {
+const onClick = (event, scene, camera, renderer) => {
   let result = {
     point: undefined, // new THREE.Vector3
     activeEntities: []
@@ -102,7 +102,7 @@ let onClick = (event, scene, camera, renderer) => {
   return result;
 };
 
-let doSelection = (selectResultAll, editor) => {
+const doSelection = (selectResultAll, editor) => {
   let selectResult = [];
   if (editor.editMode.isEdit) {
     selectResultAll.forEach(element => {
@@ -160,12 +160,12 @@ let doSelection = (selectResultAll, editor) => {
   return editor.activeEntities;
 };
 
-let render = editor => {
-  let { renderer, scene, camera } = editor;
+const render = editor => {
+  const { renderer, scene, camera } = editor;
   renderer.render(scene, camera);
 };
 
-let highlightEntities = (
+const highlightEntities = (
   editor,
   entities,
   restoreColor = false,
@@ -415,7 +415,7 @@ function getNeighbours_old(entity, editor, entities = []) {
   return entities;
 }
 
-let recursiveSelect = (object, editor) => {
+const recursiveSelect = (object, editor) => {
   let entities = [];
 
   let neighbours = getEntityNeighbours(object, editor);
@@ -582,7 +582,7 @@ let setPointOfInterest = (editor, objects) => {
   animateCameraMove(editor, step, dollyFactor, stepsCount - 1);
 };
 
-let animateCameraMove = (editor, step, dollyFactor, stepsLeft) => {
+const animateCameraMove = (editor, step, dollyFactor, stepsLeft) => {
   let { camera, cadCanvas } = editor;
 
   if (stepsLeft > 0) {
@@ -604,7 +604,7 @@ let animateCameraMove = (editor, step, dollyFactor, stepsLeft) => {
   cadCanvas.render();
 };
 
-let showAll = editor => {
+const showAll = editor => {
   let { scene } = editor;
   let iterator = entityIterator(scene, true);
 
@@ -621,7 +621,7 @@ let showAll = editor => {
   render(editor);
 };
 
-let createObject = (editor, name, entities, threshold = 0.000001) => {
+const createObject = (editor, name, entities, threshold = 0.000001) => {
   let object;
   let { scene } = editor;
 
@@ -802,7 +802,7 @@ let createObject = (editor, name, entities, threshold = 0.000001) => {
 };
 
 let lastObjectName = '';
-let groupEntities = (editor, entities, objectName) => {
+const groupEntities = (editor, entities, objectName) => {
   if (!objectName) {
     objectName = window.prompt('Set object name', lastObjectName);
   }
@@ -827,7 +827,7 @@ let groupEntities = (editor, entities, objectName) => {
   }
 };
 
-let getObjects = (scene, returnObjects = false) => {
+const getObjects = (scene, returnObjects = false) => {
   for (let container of scene.children) {
     if (container.name === 'Objects') {
       if (returnObjects) {
@@ -839,7 +839,7 @@ let getObjects = (scene, returnObjects = false) => {
   }
 };
 
-let getLayers = scene => {
+const getLayers = scene => {
   for (let container of scene.children) {
     if (container.name === 'Layers') {
       return container;
@@ -847,7 +847,7 @@ let getLayers = scene => {
   }
 };
 
-let combineEdgeModels = (editor, svgForFlixo = false) => {
+const combineEdgeModels = (editor, svgForFlixo = false) => {
   let {
     scene,
     options: { threshold }
@@ -1164,7 +1164,7 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
   };
 
   // шукає наступну лінію, наступну точку
-  let findNextLine = (object, thisLine, linePoint) => {
+  const findNextLine = (object, thisLine, linePoint) => {
 
     for (let i = 0; i < object.children.length; i++) {
       let line = object.children[i];
@@ -1202,7 +1202,7 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
     }
   };
 
-  let nextPoint = (object, linePoint = null,
+  const nextPoint = (object, linePoint = null,
     thisLine = null) => {
 
     // let newFindLinePoint = [];
@@ -1551,7 +1551,7 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
   }
 
 
-  let testMyFunktion = (collisionAllPoints, collisionPoints) => {
+  const testMyFunktion = (collisionAllPoints, collisionPoints) => {
     //todo step 1 - mark line with collisionPoints
     collisionAllPoints.forEach((point) => {
       point.entities.forEach((line) => {
@@ -1605,7 +1605,7 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
     }); // collisionPoints.forEach( (point)
 
 
-    let drawLine = async freeSpaces => {
+    const drawLine = async freeSpaces => {
       // freeSpace.forEach(line => {
       // debugger;
       //   for (let i = 0; i<freeSpacesAll.length; i++){
@@ -1921,7 +1921,7 @@ let combineEdgeModels = (editor, svgForFlixo = false) => {
   };
 };
 
-let sendToFlixo = svg => {
+const sendToFlixo = svg => {
   let options = {};
   options.headers = options.headers || {};
   options.data = {
@@ -2098,16 +2098,12 @@ let sendToFlixo = svg => {
       .post(`http://localhost:5000/api/flixo`, options.data, {
         headers: options.headers
       })
-      .then(response => {
-        resolve(response.data);
-      })
-      .catch(error => {
-        reject(error);
-      });
+      .then(response => resolve(response.data))
+      .catch(reject);
   });
 };
 
-let fixSceneAfterImport = scene => {
+const fixSceneAfterImport = scene => {
   scene.children.forEach(object => {
     object.traverse(function (child) {
       if (child.geometry instanceof THREE.CircleGeometry) {
@@ -2124,7 +2120,7 @@ let fixSceneAfterImport = scene => {
 
 let someSvg = ``;
 
-let removeLineByName = (name, scene) => {
+const removeLineByName = (name, scene) => {
   const existLine = scene.getObjectByName(name);
   if (existLine) {
     existLine.parent.remove(existLine);
@@ -2132,7 +2128,7 @@ let removeLineByName = (name, scene) => {
   }
 };
 
-let getOffset = elem => {
+const getOffset = elem => {
   let offset = null;
   if (elem) {
     offset = { left: 0, top: 0 };

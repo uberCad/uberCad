@@ -225,7 +225,6 @@ export const selectPoint = (lines, event, editor) => {
 };
 
 export const movePoint = (lines, index, event, editor) => {
-  console.log(lines);
   let { scene, camera, cadCanvas } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   let point = {
@@ -235,7 +234,6 @@ export const movePoint = (lines, index, event, editor) => {
   let closestLine = null;
   let distanceToClosestLine;
   let activeEntities = clickResult.activeEntities;
-  console.log(activeEntities);
   if (activeEntities.length > 0) {
     // debugger;
     // distanceToClosestLine = GeometryUtils.distanceToEntity(point,activeEntities[0]);
@@ -296,7 +294,6 @@ export const movePoint = (lines, index, event, editor) => {
   // if (crossing.x === NaN || crossing.y === NaN){
   //   debugger;
   // }
-  console.log(crossing);
   const pointCnange = crossing ? crossing : point;
   changeGeometry(lines, index, pointCnange, scene, editor);
 
@@ -399,7 +396,6 @@ export const startNewLine = (event, editor, copyPoint) => {
 export const drawLine = (event, editor, parent, copyPoint) => {
   // debugger;
   //16.03.20 що в радиелю зараз робота з созданием линии
-  // console.log(parent);
   // debugger;
 
   let { scene, camera, renderer, editMode, cadCanvas } = editor;
@@ -433,11 +429,7 @@ export const drawLine = (event, editor, parent, copyPoint) => {
     changeGeometry([changeLine], [1], secondPoint, scene, editor);
   } else {
     const line = createLine(editMode.newLineFirst, secondPoint);
-    if (parent.children.length) {
-      line.userData.originalColor = parent.children[0].userData.originalColor;
-    } else {
-      line.userData.originalColor = 0x808000;
-    }
+    line.userData.originalColor = parent.children.length ? parent.children[0].userData.originalColor : 0x808000;
     parent.add(line);
   }
   renderer.render(scene, camera);
@@ -1111,13 +1103,11 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
   });
 
   //todo вирівнювання кута обєкту за біччною стороною (найдовша лінія має статити вертикальною
-
-  let info = GeometryUtils.getObjectInfo(newObjectLines[0].parent);
-  console.log(info);
+  // TODO: delete it if no needed
+  // let info = GeometryUtils.getObjectInfo(newObjectLines[0].parent);
 
   let { camera, scene, renderer } = editor;
   let res = GeometryUtils.getRegionClusters(newObjectLines[0].parent.userData.edgeModel.regions[0].path, 5);
-  console.log(res);
 
   let maxDistance = 0;
   let points = [];
@@ -1177,7 +1167,6 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
 
   // пошук точок і ліній на верхній горизонтальній стороні
   let boundingBox = GeometryUtils.getBoundingBox(newObjectLines[0].parent);
-  console.log(boundingBox);
 
   let linesInBoxSideMin = {};
   let linesInBoxSideMax = {};

@@ -50,51 +50,51 @@ export default class OptionsComponent extends Component {
     let snapPosInHref = null;
     // console.log(window.location.href);
     // console.log(window.location.href.indexOf('/'));
-    for (let  i = 0; i < href.length - 1; i++){
-      if (href[i] === '/'){
+    for (let i = 0; i < href.length - 1; i++) {
+      if (href[i] === '/') {
         snapPosInHref = i;
       }
     }
-    console.log (snapPosInHref);
+    console.log(snapPosInHref);
     let snapNum = '';
-    for (let  i = snapPosInHref; i < href.length; i++){
-      if (href[i] !== '/'){
+    for (let i = snapPosInHref; i < href.length; i++) {
+      if (href[i] !== '/') {
         snapNum += href[i];
       }
     }
-    console.log (snapNum);
+    console.log(snapNum);
     let title = '';
     let snapshots = this.props.project.snapshots;
     let data = new Date();
 
-    for (let  i = 0; i < snapshots.length; i++){
-      if (snapshots[i]._key === snapNum){
+    for (let i = 0; i < snapshots.length; i++) {
+      if (snapshots[i]._key === snapNum) {
         title = snapshots[i].title;
       }
     }
-    if (title === ''){
+    if (title === '') {
       title = 'Snapshot';
-    } else if ( title.length > 17 &&
-      title[title.length-3] === ':' &&
-      title[title.length-6] === ' ' &&
-      title[title.length-9] === '/' &&
-      title[title.length-12] === '/' &&
-      title[title.length-15] === '0' &&
-      title[title.length-16] === '2'&&
-      title[title.length-17] === ' '){
+    } else if (title.length > 17 &&
+      title[title.length - 3] === ':' &&
+      title[title.length - 6] === ' ' &&
+      title[title.length - 9] === '/' &&
+      title[title.length - 12] === '/' &&
+      title[title.length - 15] === '0' &&
+      title[title.length - 16] === '2' &&
+      title[title.length - 17] === ' ') {
       let titleWithDate = '' + title;
       title = '';
-      for (let  i = 0; i < titleWithDate.length-17; i++){
+      for (let i = 0; i < titleWithDate.length - 17; i++) {
         title += titleWithDate[i];
       }
     }
     let year = data.getFullYear();
-    let month = (1+data.getMonth())>9?
-      (1+data.getMonth()) : '0' + (1+data.getMonth());
-    let date = data.getDate()>9? data.getDate():'0'+ data.getDate();
-    let hours = data.getHours()>9? data.getHours():'0'+ data.getHours();
-    let minutes = data.getMinutes()>9? data.getMinutes():'0'+ data.getMinutes();
-    title = title + ' '+ year +'/'+ month +'/'+ date +' '+ hours +':'+ minutes;
+    let month = (1 + data.getMonth()) > 9 ?
+      (1 + data.getMonth()) : '0' + (1 + data.getMonth());
+    let date = data.getDate() > 9 ? data.getDate() : '0' + data.getDate();
+    let hours = data.getHours() > 9 ? data.getHours() : '0' + data.getHours();
+    let minutes = data.getMinutes() > 9 ? data.getMinutes() : '0' + data.getMinutes();
+    title = title + ' ' + year + '/' + month + '/' + date + ' ' + hours + ':' + minutes;
     const snapshot = {
       title: title,
       scene: this.props.scene
@@ -329,7 +329,7 @@ export default class OptionsComponent extends Component {
                     onChange={this.scaleChange}
                     type="number"
                     min="0"
-                    // max='360'
+                  // max='360'
                   />
                   <button className="apply" onClick={this.setScale}>
                     setScale
