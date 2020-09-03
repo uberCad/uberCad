@@ -2,6 +2,7 @@ export interface IObjectModel {
   createdAt: number;
   createdBy: string;
   title: string;
+  _key: string;
 }
 
 export interface ISnapshot extends IObjectModel {
@@ -22,4 +23,5 @@ export interface IProject {
   fileName: string;
   status: string;
   title: string;
+  _key: string;
 }

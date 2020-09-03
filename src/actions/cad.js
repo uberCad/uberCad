@@ -8,9 +8,9 @@ import {
   TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
   TOOL_POINT,
-  TOOL_REDO,
+  // TOOL_REDO,
   TOOL_SELECT,
-  TOOL_UNDO,
+  // TOOL_UNDO,
   TOOL_FACET
 } from '../components/Toolbar/toolbarComponent';
 import {
@@ -179,7 +179,7 @@ export const drawDxf = (
 export const cadClick = (event, editor) => {
   return dispatch => {
     const { scene, camera, tool, renderer, activeEntities } = editor;
-    console.log('________Scene________', scene, activeEntities)
+    console.log('________Scene________', scene, activeEntities);
     // todo в HelpLayerService і переробити з використанням changeArcGeometry
     const controls = editor.cadCanvas.getControls();
     controls.addEventListener('change', () => {
@@ -367,7 +367,6 @@ export const onMouseDown = (event, editor) => {
       if (editor.editMode.move.active && !editor.editMode.move.point) {
         moveObjectPoint(event, editor)(dispatch);
       }
-      console.log(tool, TOOL_UNDO)
       switch (tool) {
         // TODO: set here later
         // case TOOL_UNDO:
@@ -401,11 +400,7 @@ export const onMouseDown = (event, editor) => {
               if (!editor.editMode.activeLine.length) {
                 editor.editMode.activeLine = editor.activeEntities;
               }
-              selectPoint(
-                editor.editMode.activeLine,
-                event,
-                editor
-              )(dispatch);
+              selectPoint(editor.editMode.activeLine, event, editor)(dispatch);
             }
           }
           break;
@@ -423,10 +418,10 @@ export const onMouseDown = (event, editor) => {
               !editor.measurement.line.first
                 ? lineFirstPoint(event, editor)(dispatch)
                 : lineSecondPoint(
-                  event,
-                  editor,
-                  editor.measurement.line.first
-                )(dispatch);
+                    event,
+                    editor,
+                    editor.measurement.line.first
+                  )(dispatch);
             }
           } else if (editor.options.selectMode === MEASUREMENT_RADIAL) {
             radialSelectLine(editor.activeEntities[0])(dispatch);
@@ -440,9 +435,9 @@ export const onMouseDown = (event, editor) => {
               !editor.measurement.angle.firstLine
                 ? angleSelectFirstLine(editor.activeEntities[0])(dispatch)
                 : angleSelectSecondLine(
-                  editor.measurement.angle.firstLine,
-                  editor.activeEntities[0]
-                )(dispatch);
+                    editor.measurement.angle.firstLine,
+                    editor.activeEntities[0]
+                  )(dispatch);
             }
           }
           break;
@@ -523,7 +518,7 @@ export const onMouseDown = (event, editor) => {
                       2 *
                       Math.acos(
                         pointCurveCenter.userData.EcenterAC /
-                        pointCurveCenter.userData.radius
+                          pointCurveCenter.userData.radius
                       ),
                     radius: pointCurveCenter.userData.radius //????
                   };
@@ -564,11 +559,8 @@ export const onMouseDown = (event, editor) => {
                   };
                   let pointStart = {
                     x:
-                      copyCircle.position.x +
-                      copyCircle.geometry.vertices[0].x,
-                    y:
-                      copyCircle.position.y +
-                      copyCircle.geometry.vertices[0].y
+                      copyCircle.position.x + copyCircle.geometry.vertices[0].x,
+                    y: copyCircle.position.y + copyCircle.geometry.vertices[0].y
                   };
                   let endA = helpLayerService.lengthLine(
                     pointCurveCenter.userData.A,
@@ -674,18 +666,10 @@ export const onMouseDown = (event, editor) => {
                   (line0.vertices[1].x === line1.vertices[1].x &&
                     line0.vertices[1].y === line1.vertices[1].y)
                 ) {
-                  let clickResult = sceneService.onClick(
-                    event,
-                    scene,
-                    camera
-                  );
+                  let clickResult = sceneService.onClick(event, scene, camera);
                   let helpLayer = scene.getObjectByName('HelpLayer');
-                  let pointInLine0 = helpLayer.getObjectByName(
-                    'pointInLine0'
-                  );
-                  let pointInLine1 = helpLayer.getObjectByName(
-                    'pointInLine1'
-                  );
+                  let pointInLine0 = helpLayer.getObjectByName('pointInLine0');
+                  let pointInLine1 = helpLayer.getObjectByName('pointInLine1');
 
                   let length0 = helpLayerService.lengthLine(
                     clickResult.point,
@@ -706,10 +690,7 @@ export const onMouseDown = (event, editor) => {
                     pointInLine0.userData.fix = true;
                   }
 
-                  if (
-                    pointInLine0.userData.fix &&
-                    pointInLine1.userData.fix
-                  ) {
+                  if (pointInLine0.userData.fix && pointInLine1.userData.fix) {
                     // debugger;
 
                     let parent = editor.activeEntities[0].parent;
@@ -837,32 +818,32 @@ export const onMouseDown = (event, editor) => {
 
 export const onMouseUp = (event, editor) => {
   return dispatch => {
-    let { tool, renderer, camera } = editor;
+    let { tool } = editor;
 
     //move object
     if (editor.editMode.move.active && editor.editMode.move.point) {
       disableMovePoint(editor.editMode.move.moveObject)(dispatch);
     }
-    console.log(tool)
+    console.log(tool);
     switch (tool) {
-      case TOOL_UNDO:
-        dispatch({
-          type: CAD_UNDO,
-          payload: {
-            renderer,
-            camera
-          }
-        });
-        break;
-      case TOOL_REDO:
-        dispatch({
-          type: CAD_REDO,
-          payload: {
-            renderer,
-            camera
-          }
-        });
-        break;
+      // case TOOL_UNDO:
+      //   dispatch({
+      //     type: CAD_UNDO,
+      //     payload: {
+      //       renderer,
+      //       camera
+      //     }
+      //   });
+      //   break;
+      // case TOOL_REDO:
+      //   dispatch({
+      //     type: CAD_REDO,
+      //     payload: {
+      //       renderer,
+      //       camera
+      //     }
+      //   });
+      //   break;
 
       case TOOL_SELECT:
         // end select
@@ -1081,7 +1062,8 @@ export const onMouseMove = (event, editor) => {
           ? editor.editMode.editObject
           : editor.activeLayer;
         if (!parentForNewCurve || parentForNewCurve.metadata) {
-          parentForNewCurve = editor.scene.getObjectByName('Layers').children[0];
+          parentForNewCurve = editor.scene.getObjectByName('Layers')
+            .children[0];
           dispatch({
             type: PANEL_LAYERS_TOGGLE,
             payload: {
@@ -1341,6 +1323,28 @@ export const toggleChanged = isChanged => {
       }
     });
 };
+// TODO: Rewrite to TS
+export const undo = (renderer, camera) => {
+  return dispatch =>
+    dispatch({
+      type: CAD_UNDO,
+      payload: {
+        renderer,
+        camera
+      }
+    });
+};
+
+export const redo = (renderer, camera) => {
+  return dispatch =>
+    dispatch({
+      type: CAD_REDO,
+      payload: {
+        renderer,
+        camera
+      }
+    });
+};
 
 export const copyClick = editor => {
   // let lastMode = editor.options.selectMode;
@@ -1353,7 +1357,7 @@ export const pasteClick = editor => {
   copyPaste(editor, 'PASTE');
 };
 
-let facetBorderRadiusClick = (editor, event) => {
+const facetBorderRadiusClick = (editor, event) => {
   let { scene, camera } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
   console.log(
@@ -1375,7 +1379,7 @@ let facetBorderRadiusClick = (editor, event) => {
   return sceneService.doSelection(selectResult, editor);
 };
 
-let copyPaste = (editor, copyPasteMode) => {
+const copyPaste = (editor, copyPasteMode) => {
   let { renderer, scene, cadCanvas, camera } = editor;
   // todo place - місце для зберігання copyEntities, треба подумати де зберігати
   let place = camera.copyEntities;

@@ -1,10 +1,11 @@
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 import OptionsComponent from './optionsComponent';
 import {
   setSelectMode,
   setSingleLayerSelect,
   setThreshold
-} from '../../actions/options';
+} from '../../store/options/action';
 
 import {
   cancelEdit,
@@ -18,7 +19,7 @@ import {
   setScale
 } from '../../actions/edit';
 
-import { copyClick, pasteClick } from '../../actions/cad';
+import { copyClick, pasteClick, redo, undo } from '../../actions/cad';
 import { addSnapshot } from '../../actions/panelSnapshots';
 
 // todo mapStateToProps об'являється двічі тут і в .\src\components\ActiveEntities\activeEntitiesComponentContainer.js
@@ -50,27 +51,21 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    setSelectMode: function(mode) {
-      setSelectMode(mode)(dispatch);
+    setSelectMode: mode => {
+      dispatch(setSelectMode(mode));
     },
-
-    setSingleLayerSelect: function(value) {
-      setSingleLayerSelect(value)(dispatch);
-    },
-
-    setThreshold: function(value) {
-      setThreshold(value)(dispatch);
-    },
+    setSingleLayerSelect: value => dispatch(setSingleLayerSelect(value)),
+    setThreshold: value => dispatch(setThreshold(value)),
     cancelEdit: function(editor, editObject, backup) {
       cancelEdit(editor, editObject, backup)(dispatch);
     },
     saveEdit: function(editor) {
       saveEdit(editor)(dispatch);
     },
-    saveSnap: function(snapshot, projectKey, fastSave) {
-      addSnapshot(snapshot, projectKey, fastSave)(dispatch);
+    saveSnap: function(snapshot, projectKey) {
+      addSnapshot(snapshot, projectKey)(dispatch);
     },
     cancelNewLine: function(editor) {
       cancelNewLine(editor)(dispatch);
@@ -94,11 +89,18 @@ const mapDispatchToProps = dispatch => {
       setScale(scale, scaleObject, editor)(dispatch);
     },
 
-    copyClick: function(editor, event) {
-      copyClick(editor, event);
+    copyClick: function(editor) {
+      copyClick(editor);
     },
-    pasteClick: function(editor, event) {
-      pasteClick(editor, event);
+    pasteClick: function(editor) {
+      pasteClick(editor);
+    },
+
+    undo(renderer, camera) {
+      undo(renderer, camera)(dispatch);
+    },
+    redo(renderer, camera) {
+      redo(renderer, camera)(dispatch);
     }
   };
 };

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import throttle from 'lodash/throttle';
 import PropTypes from 'prop-types';
-import Api from '../../services/apiService';
+
+import api from '../../services/apiService';
 import { parseDxf } from '../../services/dxfService';
+
 import Toolbar from '../Toolbar/toolbarComponentContainer';
 import Options from '../Options/optionsComponentContainer';
 import Sidebar from '../Sidebar/sidebarComponentContainer';
@@ -29,10 +31,10 @@ export default class CadComponent extends Component {
     // todo тут має підгружатись алемент з бібліотеки або загружаємий елемент, важливо!!!
     // }
 
-    Api.get(
-      //done
-      snapshotId ? `/snapshot/${snapshotId}` : `/project/file/${projectId}`
-    )
+    api
+      .get(
+        snapshotId ? `/snapshot/${snapshotId}` : `/project/file/${projectId}`
+      )
       .then(data => {
         console.log('_________START_POINT________');
         this.container.id = 'sceneID'; // todo тут костиль
@@ -53,11 +55,11 @@ export default class CadComponent extends Component {
   }
 
   resizeWindow = () => {
-    let width = this.container.clientWidth;
-    let height = this.container.clientHeight;
-
     try {
-      this.props.editor.cadCanvas.resize(width, height);
+      this.props.editor.cadCanvas.resize(
+        this.container.clientWidth,
+        this.container.clientHeigh
+      );
     } catch (e) {
       console.error(e, 'CadComponent resize problem');
     }
@@ -75,7 +77,7 @@ export default class CadComponent extends Component {
   render() {
     if (this.props.isChanged) {
       window.onbeforeunload = function(evt) {
-        let message =
+        const message =
           'Document is not saved. You will lost the changes if you leave the page.';
         if (typeof evt === 'undefined') {
           evt = window.event;

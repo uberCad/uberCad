@@ -20,8 +20,8 @@ import './Toolbar.css';
 import '../AddProject/AddProject.css';
 import toolPoint from './point.svg';
 import toolSelect from './select.svg';
-import toolUndo from './undo.svg';
-import toolRedo from './redo.svg';
+// import toolUndo from './undo.svg';
+// import toolRedo from './redo.svg';
 import toolLine from './line.svg';
 import toolCurve from './curve.svg';
 import toolMeasurement from './measurement.svg';
@@ -32,8 +32,6 @@ import toolFacet from './facet.svg';
 // export const ADD_ELEMENT = 'ADD_ELEMENT';
 export const TOOL_POINT = 'TOOL_POINT';
 export const TOOL_SELECT = 'TOOL_SELECT';
-export const TOOL_UNDO = 'TOOL_UNDO';
-export const TOOL_REDO = 'TOOL_REDO';
 export const TOOL_NEW_CURVE = 'TOOL_NEW_CURVE';
 export const TOOL_MEASUREMENT = 'TOOL_MEASUREMENT';
 export const TOOL_LINE = 'TOOL_LINE';
@@ -153,7 +151,8 @@ export default class ToolbarComponent extends Component {
           <img src={toolMeasurement} alt="Measurement" />
         </button>
 
-        <FormattedMessage id="toolbar.undo" defaultMessage="Undo">
+        {/* TODO: change TOOL_UNDO on ROTATE_ELEMENT */}
+        {/* <FormattedMessage id="toolbar.undo" defaultMessage="Undo">
           {value => (
             <button
               className={`btn ${tool === TOOL_UNDO ? 'btn-success' : ''}`}
@@ -180,7 +179,7 @@ export default class ToolbarComponent extends Component {
               <img src={toolRedo} alt="Redo" />
             </button>
           )}
-        </FormattedMessage>
+        </FormattedMessage> */}
 
         <button
           className={`btn ${tool === TOOL_LINE ? 'btn-success' : ''}`}
