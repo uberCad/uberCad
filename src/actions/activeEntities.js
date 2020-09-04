@@ -67,11 +67,13 @@ export const selectEntity = (idx, activeEntities, editor) => {
 
 export const showAll = editor => {
   return dispatch => {
+    const previousScene = editor.scene.clone();
     sceneService.showAll(editor);
     dispatch({
       type: CAD_SHOW_ALL,
       payload: {
-        activeEntities: editor.activeEntities
+        activeEntities: editor.activeEntities,
+        previousScene
       }
     });
   };

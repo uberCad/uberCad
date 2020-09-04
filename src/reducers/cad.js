@@ -663,17 +663,40 @@ const cad = (state = initialState, action) => {
       }
       return state;
     case CAD_SHOW_ALL:
-      console.log(7);
-      return update(state, {
-        scene: {
+      // set current version of state and increase counter
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory,
+          {
+            scene: action.payload.previousScene
+          }
+        ],
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        scene: update(state.scene, {
           children: {
             $set: [...state.scene.children]
           }
-        },
-        activeEntities: {
+        }),
+        activeEntities: update(state.activeEntities, {
           $set: [...state.activeEntities]
-        }
-      });
+        })
+      };
+
+      // return update(state, {
+      //   scene: {
+      //     children: {
+      //       $set: [...state.scene.children]
+      //     }
+      //   },
+      //   activeEntities: {
+      //     $set: [...state.activeEntities]
+      //   }
+      // });
     case CAD_GROUP_ENTITIES:
       console.log(6);
       return update(state, {

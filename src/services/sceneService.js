@@ -80,7 +80,7 @@ const onClick = (event, scene, camera, renderer) => {
     }
   });
 
-  result.activeEntities.forEach(function (line) {
+  result.activeEntities.forEach(function(line) {
     if (line.geometry.type === 'Geometry') {
       line.userData.mouseDistance = GeometryUtils.distanceToLine(
         result.point,
@@ -282,7 +282,7 @@ function getIntersections(vertex, objects, usedEntities, threshold = 0.000001) {
 
   // check if we at start point again
   try {
-    intersections = intersections.filter(function (intersect) {
+    intersections = intersections.filter(function(intersect) {
       if (usedEntities.length > 2 && usedEntities[0] === intersect.object) {
         throw new Error('first loop detected');
       }
@@ -392,7 +392,7 @@ function getNeighbours_old(entity, editor, entities = []) {
             checkVertices.push(
               vertex.addVectors(
                 intersect.object.geometry.vertices[
-                intersect.object.geometry.vertices.length - 1
+                  intersect.object.geometry.vertices.length - 1
                 ],
                 intersect.object.position
               )
@@ -605,17 +605,32 @@ const animateCameraMove = (editor, step, dollyFactor, stepsLeft) => {
 };
 
 const showAll = editor => {
-  let { scene } = editor;
-  let iterator = entityIterator(scene, true);
+  const objectElementsReport = {
+    visible: 0,
+    nonVisible: 0,
+    length: editor.scene.children[0].children.length
+  };
+  for (let i = 0; i < editor.scene.children[0].children.length; i++) {
+    objectElementsReport[
+      editor.scene.children[0].children[i].visible ? 'visible' : 'nonVisible'
+    ]++;
+  }
+  const iterator = entityIterator(editor.scene, true);
 
   let entity = iterator.next();
   while (!entity.done) {
     try {
-      entity.value.visible = true;
+      if (
+        objectElementsReport.visible === objectElementsReport.length ||
+        objectElementsReport.nonVisible === objectElementsReport.length
+      ) {
+        entity.value.visible = !entity.value.visible;
+      } else {
+        entity.value.visible = true;
+      }
       entity = iterator.next();
     } catch (e) {
-      // debugger
-      console.error(e, 'problem with showing all, at showAll()');
+      console.error(e, 'sceneService => showAll()');
     }
   }
   render(editor);
@@ -899,10 +914,8 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   );
   collisionPoints = GeometryUtils.filterCollisionPoints(collisionPoints);
 
-
-
   // повертає точки ліній
-  let findWayPoint = (line) => {
+  let findWayPoint = line => {
     let points = [];
     if (!line) {
       return [];
@@ -933,7 +946,13 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   let freeSpace = []; // todo треба розділити всі пробігання щоб легко отримувати закольцовані ділянки
   let entrainment = 0.001;
 
-  let searchTrueNextPoint = (thisLine, linePoint, nextPointLine, closesPoint, oldLine) => {
+  let searchTrueNextPoint = (
+    thisLine,
+    linePoint,
+    nextPointLine,
+    closesPoint,
+    oldLine
+  ) => {
     let pointO = [];
     pointO[0] = closesPoint.point;
     let deviation = 1e-5;
@@ -945,14 +964,15 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     // pointStartС - стартовая точка, старт линии которая соприкасается
     // pointNextLineOldObjectD - точка следущёй лини на старом обекте
 
-    let nextPointOldObject = findNextLine(nextPointLine.line.parent,
+    let nextPointOldObject = findNextLine(
+      nextPointLine.line.parent,
       nextPointLine.line,
-      nextPointLine.newFindLinePoint[nextPointLine.index]);
+      nextPointLine.newFindLinePoint[nextPointLine.index]
+    );
 
     let pointsNewLine = findWayPoint(thisLine);
     // let pointsOldLine = [];
     // pointsOldLine[0] = [linePoint,nextPointLine.newFindLinePoint[nextPointLine.index]];
-
 
     // if (GeometryUtils.getDistance(closesPoint.point,nextPointLine.newFindLinePoint[nextPointLine.index])<deviation){
     //
@@ -966,62 +986,88 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     // let pointsOldLine = findWayPoint (oldLine);
     // проверка и настройка путь откуда
     // debugger;
-    let pointEndOldLine = GeometryUtils.getDistance(closesPoint.point,
-      nextPointLine.newFindLinePoint[nextPointLine.index]) < deviation ?
-      nextPointOldObject.newFindLinePoint[nextPointOldObject.index] :
-      nextPointLine.newFindLinePoint[nextPointLine.index];
+    let pointEndOldLine =
+      GeometryUtils.getDistance(
+        closesPoint.point,
+        nextPointLine.newFindLinePoint[nextPointLine.index]
+      ) < deviation
+        ? nextPointOldObject.newFindLinePoint[nextPointOldObject.index]
+        : nextPointLine.newFindLinePoint[nextPointLine.index];
     // todo я стопорнувся тут. точка Д (pointEndOldLine) щитаяться не коректно
     debugger;
 
     let pointStartOldLine;
     let pointsOldLine = findWayPoint(oldLine);
     if (pointsOldLine[0] === linePoint) {
-      pointStartOldLine = GeometryUtils.getDistance(closesPoint.point, pointsOldLine[0]) < deviation ? pointsOldLine[1] : pointsOldLine[0];
+      pointStartOldLine =
+        GeometryUtils.getDistance(closesPoint.point, pointsOldLine[0]) <
+        deviation
+          ? pointsOldLine[1]
+          : pointsOldLine[0];
       // debugger;
     } else {
-      pointStartOldLine = GeometryUtils.getDistance(closesPoint.point, pointsOldLine[1]) < deviation ? pointsOldLine[0] : pointsOldLine[1];
+      pointStartOldLine =
+        GeometryUtils.getDistance(closesPoint.point, pointsOldLine[1]) <
+        deviation
+          ? pointsOldLine[0]
+          : pointsOldLine[1];
       // debugger;
     }
     if (!pointStartOldLine) {
       // debugger;
     }
     // проверка и настройка пути дальше
-    if (GeometryUtils.getDistance(closesPoint.point, pointsNewLine[0]) < deviation) {
+    if (
+      GeometryUtils.getDistance(closesPoint.point, pointsNewLine[0]) < deviation
+    ) {
       let nextLine = findNextLine(thisLine.parent, thisLine, pointsNewLine[0]);
       pointsNewLine[0] = nextLine.newFindLinePoint[nextLine.index];
       // debugger;
     }
-    if (GeometryUtils.getDistance(closesPoint.point, pointsNewLine[1]) < deviation) {
+    if (
+      GeometryUtils.getDistance(closesPoint.point, pointsNewLine[1]) < deviation
+    ) {
       let nextLine = findNextLine(thisLine.parent, thisLine, pointsNewLine[1]);
       pointsNewLine[1] = nextLine.newFindLinePoint[nextLine.index];
       // debugger;
     }
 
-
-
-
     // todo  первервірка точки перетину точки наступної і тікущої
-
 
     // debugger;
     // let pointO= [];
     // pointO[0] = closesPoint.point;
     // let pointStartС = HelpLayerService.foundNewPoint (pointO[0], linePoint, 4);
     // pointO[1] = HelpLayerService.foundNewPoint (pointStartС, pointO[0], 3);
-    let pointNextLineOldObjectD = HelpLayerService.foundNewPoint(pointO[0],
-      pointEndOldLine, 5);
+    let pointNextLineOldObjectD = HelpLayerService.foundNewPoint(
+      pointO[0],
+      pointEndOldLine,
+      5
+    );
     // pointO[2] = HelpLayerService.foundNewPoint (pointNextLineOldObjectD, pointO[0], 3);
     // todo добавити/змінити на точку на наступній лінії
 
-    let pointNewLineA = HelpLayerService.foundNewPoint(pointO[0], pointsNewLine[0], 4);
+    let pointNewLineA = HelpLayerService.foundNewPoint(
+      pointO[0],
+      pointsNewLine[0],
+      4
+    );
     // pointO[3] = HelpLayerService.foundNewPoint (pointNewLineA, pointO[0], 3);
-    let pointNewLineB = HelpLayerService.foundNewPoint(pointO[0], pointsNewLine[1], 4);
+    let pointNewLineB = HelpLayerService.foundNewPoint(
+      pointO[0],
+      pointsNewLine[1],
+      4
+    );
     // pointO[4] = HelpLayerService.foundNewPoint (pointNewLineB, pointO[0], 3);
 
     // TODO: delete it if not needed
     // let intersectionIndex = 0;
 
-    let pointOldLineE = HelpLayerService.foundNewPoint(pointO[0], pointStartOldLine, 5);
+    let pointOldLineE = HelpLayerService.foundNewPoint(
+      pointO[0],
+      pointStartOldLine,
+      5
+    );
     // debugger;
 
     // TODO: delete it if not needed
@@ -1063,7 +1109,6 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     //
     //     }
 
-
     // //перетин
     // // helpLayer.add(helpPointO);
     // // renderer.render(scene, camera);
@@ -1084,7 +1129,6 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     // helpLayer.add(helpPointD);
     // renderer.render(scene, camera);
     // // debugger;
-
 
     // 16/07/2020 розібратись з тим які кути повертаються,
     // поставити визначення потрібного індекса
@@ -1107,8 +1151,14 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     // let test3Point = GeometryUtils.linesIntersect({x:1, y:3},{x:7, y:1},{x:2,y:1},{x:3,y:5});
     // let test4Point = GeometryUtils.distanseToLinePoint({geometry:{vertices:[{x:1, y:3},{x:7, y:1}]}},{x:1,y:3});
 
-    let pointAinLineOD = GeometryUtils.getDistance(pointNewLineA, pointNextLineOldObjectD);
-    let pointBinLineOD = GeometryUtils.getDistance(pointNewLineB, pointNextLineOldObjectD);
+    let pointAinLineOD = GeometryUtils.getDistance(
+      pointNewLineA,
+      pointNextLineOldObjectD
+    );
+    let pointBinLineOD = GeometryUtils.getDistance(
+      pointNewLineB,
+      pointNextLineOldObjectD
+    );
     // debugger;
     if (pointAinLineOD < 1 + deviation) {
       return 1;
@@ -1116,8 +1166,14 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     if (pointBinLineOD < 1 + deviation) {
       return 0;
     }
-    let pointAinLineOE = GeometryUtils.getDistance(pointNewLineA, pointOldLineE);
-    let pointBinLineOE = GeometryUtils.getDistance(pointNewLineB, pointOldLineE);
+    let pointAinLineOE = GeometryUtils.getDistance(
+      pointNewLineA,
+      pointOldLineE
+    );
+    let pointBinLineOE = GeometryUtils.getDistance(
+      pointNewLineB,
+      pointOldLineE
+    );
 
     if (pointAinLineOE < 1 + deviation) {
       return 0;
@@ -1125,7 +1181,6 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     if (pointBinLineOE < 1 + deviation) {
       return 1;
     }
-
 
     // if (thisLine.geometry.type === "Geometry"){
     // if (intersectionCAwithOD.x && intersectionCAwithOD.y
@@ -1160,12 +1215,10 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
 
     debugger;
     return false;
-
   };
 
   // шукає наступну лінію, наступну точку
   const findNextLine = (object, thisLine, linePoint) => {
-
     for (let i = 0; i < object.children.length; i++) {
       let line = object.children[i];
       let p = false;
@@ -1175,11 +1228,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
       if (line !== thisLine) {
         // if (line.geometry.type === 'Geometry') {
         index = closestPoint(points, linePoint);
-        p = isPoint(
-          linePoint,
-          entrainment,
-          points[index]
-        );
+        p = isPoint(linePoint, entrainment, points[index]);
         if (p) {
           return {
             newFindLinePoint: [points[1], points[0]],
@@ -1202,9 +1251,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     }
   };
 
-  const nextPoint = (object, linePoint = null,
-    thisLine = null) => {
-
+  const nextPoint = (object, linePoint = null, thisLine = null) => {
     // let newFindLinePoint = [];
     let lineCheker = 0;
     let wayPoint = findWayPoint(thisLine);
@@ -1214,7 +1261,6 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     }
 
     for (let i = 0; i < object.children.length; i++) {
-
       // let p = false;
       // let index = 0;
       // object.children.forEach((line) => {
@@ -1269,7 +1315,9 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
           let collisionPointsInThisLine = [];
           for (let j = 0; j < line.userData.collisionPointsInf.length; j++) {
             if (collisionPoints.includes(line.userData.collisionPointsInf[j])) {
-              collisionPointsInThisLine.push(line.userData.collisionPointsInf[j]);
+              collisionPointsInThisLine.push(
+                line.userData.collisionPointsInf[j]
+              );
             }
           }
 
@@ -1288,7 +1336,6 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
             return;
           }
 
-
           let closesPoint = null;
           let findPoint = [];
           if (collisionPointsInThisLine.length === 1) {
@@ -1298,15 +1345,21 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
             // console.log ('Stop!!!');
             // debugger;
             // let findPoint = [];
-            collisionPointsInThisLine.forEach((point) => {
+            collisionPointsInThisLine.forEach(point => {
               findPoint.push(point.point);
             });
-            closesPoint = collisionPointsInThisLine[closestPoint(findPoint, linePoint)];
+            closesPoint =
+              collisionPointsInThisLine[closestPoint(findPoint, linePoint)];
             // debugger;
           }
           if (closesPoint) {
-            if (closesPoint.weDoneWithThisPoint && !closesPoint.startFromThisPoint) {
-              console.log('точкки пішли по другому кругу.... значить щось пішло не так');
+            if (
+              closesPoint.weDoneWithThisPoint &&
+              !closesPoint.startFromThisPoint
+            ) {
+              console.log(
+                'точкки пішли по другому кругу.... значить щось пішло не так'
+              );
               // return;
             }
             if (startFreeSpaceLengt !== freeSpace.length) {
@@ -1334,8 +1387,10 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
                 } else if (entities[1] === line) {
                   thisLine = entities[0];
                 } else {
-                  console.log("чувак тут задниця... розумієш в одній точкі має зустрітись лише два обєкта, " +
-                    "але якщо ти бачеш це повідомлення то тут мінімум три... короче я хз, але тут явно щось пішло не так");
+                  console.log(
+                    'чувак тут задниця... розумієш в одній точкі має зустрітись лише два обєкта, ' +
+                      'але якщо ти бачеш це повідомлення то тут мінімум три... короче я хз, але тут явно щось пішло не так'
+                  );
                   // debugger;
                 }
                 freeSpace.push(thisLine);
@@ -1345,25 +1400,42 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
                 wayPoint = findWayPoint(thisLine);
 
                 collisionPointsInThisLine = [];
-                for (let j = 0; j < thisLine.userData.collisionPointsInf.length; j++) {
-                  if (collisionPoints.includes(thisLine.userData.collisionPointsInf[j])) {
-                    collisionPointsInThisLine.push(thisLine.userData.collisionPointsInf[j]);
+                for (
+                  let j = 0;
+                  j < thisLine.userData.collisionPointsInf.length;
+                  j++
+                ) {
+                  if (
+                    collisionPoints.includes(
+                      thisLine.userData.collisionPointsInf[j]
+                    )
+                  ) {
+                    collisionPointsInThisLine.push(
+                      thisLine.userData.collisionPointsInf[j]
+                    );
                   }
                 }
                 // console.log (collisionPointsInThisLine);
                 // if (collisionPointsInThisLine.length === 1) {
                 let pointIndex;
                 if (newFindLinePoint[index] !== closesPoint) {
-                  pointIndex = searchTrueNextPoint(thisLine, linePoint, nextPointLine, closesPoint, oldLine);
+                  pointIndex = searchTrueNextPoint(
+                    thisLine,
+                    linePoint,
+                    nextPointLine,
+                    closesPoint,
+                    oldLine
+                  );
                   // todo тут має бути результат функциї // searchTrueNextPoint (thisLine, linePoint)
                 } else {
-
                   console.log('прийшов час подивитись сюди');
                   debugger;
                 }
 
                 if (collisionPointsInThisLine.length > 1) {
-                  console.log("от ми нарешті і дійшли до ліній на яких декілька важливих точок");
+                  console.log(
+                    'от ми нарешті і дійшли до ліній на яких декілька важливих точок'
+                  );
                   // перше що реалізовуємо перевірку чи є точки між тою звідки ідемо(тікуща точка перетену) і точка куди ідемо (wayPoint[pointIndex])
                   //  якщо є повторюємо все що було в цьому форі з позиції скакаємо з цієї лінії на іншу
                   let lengthToWayPoint = [];
@@ -1371,10 +1443,18 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
                   let intersectPointWayPoint = null;
                   debugger;
                   if (pointIndex !== false) {
-                    lengthToWayPoint.push(GeometryUtils.getDistance(closesPoint.point, wayPoint[pointIndex]));
+                    lengthToWayPoint.push(
+                      GeometryUtils.getDistance(
+                        closesPoint.point,
+                        wayPoint[pointIndex]
+                      )
+                    );
                     for (let i = 0; i < collisionPointsInThisLine.length; i++) {
                       const collPoint = collisionPointsInThisLine;
-                      const collPointWayPoint = GeometryUtils.getDistance(collPoint.point, wayPoint[pointIndex]);
+                      const collPointWayPoint = GeometryUtils.getDistance(
+                        collPoint.point,
+                        wayPoint[pointIndex]
+                      );
                       if (collPointWayPoint < lengthToWayPoint[0]) {
                         lengthToWayPoint.push(collPoint);
                         if (collPointWayPoint > intersectPointWayPoint) {
@@ -1383,16 +1463,17 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
                         }
                       }
                     }
-                    collisionPointsInThisLine.forEach((collPoint) => {
-                    });
-                    console.log(lengthToWayPoint)
+                    collisionPointsInThisLine.forEach(collPoint => {});
+                    console.log(lengthToWayPoint);
                     if (lengthToWayPoint.length > 1) {
-
-
                       if (freeSpace.includes(thisLine)) {
                         freeSpace.push(thisLine);
                       }
-                      nextPointLine = findNextLine(object, thisLine, wayPoint[pointIndex]);
+                      nextPointLine = findNextLine(
+                        object,
+                        thisLine,
+                        wayPoint[pointIndex]
+                      );
                       oldLine = thisLine;
                       entities = newLineClosesPoint.entities;
                       if (entities[0] === oldLine) {
@@ -1400,8 +1481,10 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
                       } else if (entities[1] === oldLine) {
                         thisLine = entities[0];
                       } else {
-                        console.log("чувак тут задниця... розумієш в одній точкі має зустрітись лише два обєкта, " +
-                          "але якщо ти бачеш це повідомлення то тут мінімум три... короче я хз, але тут явно щось пішло не так");
+                        console.log(
+                          'чувак тут задниця... розумієш в одній точкі має зустрітись лише два обєкта, ' +
+                            'але якщо ти бачеш це повідомлення то тут мінімум три... короче я хз, але тут явно щось пішло не так'
+                        );
                         // debugger;
                       }
                       freeSpace.push(thisLine);
@@ -1415,15 +1498,20 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
                       }
 
                       newLineClosesPoint.weDoneWithThisPoint = true;
-                      pointIndex = searchTrueNextPoint(thisLine, linePoint, nextPointLine, newLineClosesPoint, oldLine)
+                      pointIndex = searchTrueNextPoint(
+                        thisLine,
+                        linePoint,
+                        nextPointLine,
+                        newLineClosesPoint,
+                        oldLine
+                      );
                       wayPoint = findWayPoint(thisLine);
-                      console.log("якщо воно зараз прям запрацює буде круто");
+                      console.log('якщо воно зараз прям запрацює буде круто');
                       debugger;
                     }
                     debugger;
                   }
                 }
-
 
                 if (pointIndex !== false) {
                   startFreeSpaceLengt -= 1;
@@ -1493,9 +1581,11 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
               linePoint = wayPoint[1];
             } else if (wayPoint[1] === linePoint) {
               linePoint = wayPoint[0];
-              console.log("Ну привіт. як твої справи? звісто ти можеш і відповісти але я всерівно того не бачу." +
-                "Як би там не було, я не знаю навіщо ти зараз це читаєш, але знай ти натрапив на фукцию де я мучався не одну годину," +
-                "все працюй далі... тут більше нічого не буде.... перпендикулярну парадігму тобі в чай.... ");
+              console.log(
+                'Ну привіт. як твої справи? звісто ти можеш і відповісти але я всерівно того не бачу.' +
+                  'Як би там не було, я не знаю навіщо ти зараз це читаєш, але знай ти натрапив на фукцию де я мучався не одну годину,' +
+                  'все працюй далі... тут більше нічого не буде.... перпендикулярну парадігму тобі в чай.... '
+              );
               // let testPoint = findNextLine(object, thisLine, wayPoint[0]);
               return;
               // debugger;
@@ -1541,20 +1631,18 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     // });
   };
 
-
   function delay(ms) {
     return new Promise(resolve => {
       setTimeout(() => {
         resolve(true);
-      }, ms)
-    })
+      }, ms);
+    });
   }
-
 
   const testMyFunktion = (collisionAllPoints, collisionPoints) => {
     //todo step 1 - mark line with collisionPoints
-    collisionAllPoints.forEach((point) => {
-      point.entities.forEach((line) => {
+    collisionAllPoints.forEach(point => {
+      point.entities.forEach(line => {
         if (!line.userData.collisionPointsInf) {
           line.userData.collisionPointsInf = [];
         }
@@ -1566,8 +1654,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
 
     //todo step 2 -
 
-    collisionPoints.forEach((point) => {
-
+    collisionPoints.forEach(point => {
       // let point = collisionPoints[43];
       // if (!point.weDoneWithThisPoint) {
       //   point.startFromThisPoint = true;
@@ -1596,14 +1683,11 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
         //   await delay(150);
         // });
 
-
         // todo розділ обєктів по масивах, розкомітити в кінці коли все буде працювати
         // freeSpacesAll.push(freeSpace);
         // freeSpace = [];
       }
-
     }); // collisionPoints.forEach( (point)
-
 
     const drawLine = async freeSpaces => {
       // freeSpace.forEach(line => {
@@ -1611,27 +1695,19 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
       //   for (let i = 0; i<freeSpacesAll.length; i++){
       //     let freeSpaces = freeSpacesAll[i];
 
-
       for (let j = 0; j < freeSpaces.length; j++) {
         let line = freeSpace[j];
         // debugger;
-        line.material.color.set(new THREE.Color(0xFF0000));
+        line.material.color.set(new THREE.Color(0xff0000));
         render(editor);
         await delay(50);
       }
-
 
       // }
     };
     // debugger;
     drawLine(freeSpace);
-
-
   };
-
-
-
-
 
   testMyFunktion(collisionAllPoints, collisionPoints, objects);
 
@@ -1644,9 +1720,9 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   //   });
   // });
 
-
-
-  collisionPoints = GeometryUtils.filterCollisionPointsWithSharedEntities(collisionPoints)
+  collisionPoints = GeometryUtils.filterCollisionPointsWithSharedEntities(
+    collisionPoints
+  );
 
   // console.error('collisionPoints', collisionPoints)
 
@@ -1853,7 +1929,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     )}" temp="293.15" rs="0.13" rel_img="SvgjsImage1092" rel_id="3" rel="max"></bcprop>
   </g>
   ${(!svgForFlixo &&
-      `<g id="collisions">` +
+    `<g id="collisions">` +
       collisionPoints
         .map(collisionPoint => {
           let dot = '';
@@ -1864,9 +1940,9 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
             `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(
               collisionPoint.point.y / 1000
             ).toFixed(4)}" r="${
-            collisionPoint.processed ? '0.0005' : '0.0005'
+              collisionPoint.processed ? '0.0005' : '0.0005'
             }" style="fill:rgb(${
-            collisionPoint.processed ? '255,200,200' : '200,200,255'
+              collisionPoint.processed ? '255,200,200' : '200,200,255'
             }); stroke:black;stroke-width:0.00001" />` + dot
           );
         })
@@ -2105,7 +2181,7 @@ const sendToFlixo = svg => {
 
 const fixSceneAfterImport = scene => {
   scene.children.forEach(object => {
-    object.traverse(function (child) {
+    object.traverse(function(child) {
       if (child.geometry instanceof THREE.CircleGeometry) {
         // remove zero vertex from arc with coordinates (0,0,0) (points to center)
         let zeroVertex = child.geometry.vertices[0];

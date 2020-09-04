@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import PanelObjectsComponent from './panelObjectsComponent';
+
 import {
   toggleVisible,
   combineEdgeModels,
