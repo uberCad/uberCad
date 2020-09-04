@@ -13,7 +13,7 @@
     "immutability-helper": "^3.0.1",
     "kmeans-js": "^0.1.2",
     "lodash": "^4.17.5",
-    "node-sass": "^4.13.0",
+    "node-sass": "^4.13.1",
     "npm-run-all": "^4.1.5",
     "prop-types": "^15.6.1",
     "react": "^16.12.0",
