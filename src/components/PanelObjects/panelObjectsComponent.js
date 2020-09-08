@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import './PanelObjects.css';
-import sceneService from '../../services/sceneService';
-import MaterialComponent from '../Material/materrialComponentContainer';
-import Calculate from '../CalculatePrice/calculatePriceComponentContainer';
-import AddToBD from '../AddToBD/addElementToDBContainer';
 import { FormattedMessage } from 'react-intl';
+
+import sceneService from '../../services/sceneService';
+
+import MaterialComponent from '../Material/materrialComponentContainer';
+import Calculate from './CalculatePrice/container';
+import AddToBD from '../AddToBD/container';
+
+import './PanelObjects.css';
 
 export default class PanelObjectsComponent extends Component {
   constructor(props) {
@@ -105,6 +108,7 @@ export default class PanelObjectsComponent extends Component {
         }
       });
     });
+    console.log(3453453, currentSnapshot)
     this.setState({
       show: !this.state.show,
       objName: object.name,

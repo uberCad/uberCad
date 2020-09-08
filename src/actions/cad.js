@@ -178,8 +178,7 @@ export const drawDxf = (
 
 export const cadClick = (event, editor) => {
   return dispatch => {
-    const { scene, camera, tool, renderer, activeEntities } = editor;
-    console.log('________Scene________', scene, activeEntities);
+    const { scene, camera, tool, renderer } = editor;
     // todo в HelpLayerService і переробити з використанням changeArcGeometry
     const controls = editor.cadCanvas.getControls();
     controls.addEventListener('change', () => {
@@ -189,24 +188,9 @@ export const cadClick = (event, editor) => {
       }
     });
     switch (tool) {
-      // case TOOL_UNDO:
-      //   console.log(32423)
-      //   dispatch({
-      //     type: CAD_UNDO,
-      //     payload: {
-      //       renderer
-      //     }
-      //   });
-      //   break;
       case TOOL_POINT:
         {
           let clickResult = sceneService.onClick(event, scene, camera);
-          console.log(
-            `Click position [${clickResult.point.x.toFixed(
-              4
-            )}, ${clickResult.point.y.toFixed(4)}]`,
-            clickResult
-          );
 
           let payload = {
             ...clickResult,
@@ -324,13 +308,13 @@ export const cadClick = (event, editor) => {
 
       case TOOL_MEASUREMENT:
         {
-          let clickResult = sceneService.onClick(event, scene, camera);
-          console.log(
-            `Click position [${clickResult.point.x.toFixed(
-              4
-            )}, ${clickResult.point.y.toFixed(4)}]`,
-            clickResult
-          );
+          // let clickResult = sceneService.onClick(event, scene, camera);
+          // console.log(
+          //   `Click position [${clickResult.point.x.toFixed(
+          //     4
+          //   )}, ${clickResult.point.y.toFixed(4)}]`,
+          //   clickResult
+          // );
         }
         break;
 
@@ -1263,12 +1247,12 @@ export const onDoubleClick = (event, editor) => {
       case TOOL_POINT:
         if (!editor.editMode.isEdit) {
           let clickResult = sceneService.onClick(event, scene, camera);
-          console.log(
-            `DOUBLE Click position [${clickResult.point.x.toFixed(
-              4
-            )}, ${clickResult.point.y.toFixed(4)}]`,
-            clickResult
-          );
+          // console.log(
+          //   `DOUBLE Click position [${clickResult.point.x.toFixed(
+          //     4
+          //   )}, ${clickResult.point.y.toFixed(4)}]`,
+          //   clickResult
+          // );
 
           if (clickResult.activeEntities.length) {
             console.log('has active entities');
@@ -1360,12 +1344,6 @@ export const pasteClick = editor => {
 const facetBorderRadiusClick = (editor, event) => {
   let { scene, camera } = editor;
   let clickResult = sceneService.onClick(event, scene, camera);
-  console.log(
-    `Click position [${clickResult.point.x.toFixed(
-      4
-    )}, ${clickResult.point.y.toFixed(4)}]`,
-    clickResult
-  );
   let payload = {
     ...clickResult,
     object: null

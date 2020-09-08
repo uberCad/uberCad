@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './Sidebar.css';
 import ActiveEntities from '../ActiveEntities/activeEntitiesComponentContainer';
 import PanelLayers from '../PanelLayers/panelLayersComponentContainer';
-import PanelObjects from '../PanelObjects/panelObjectsComponentContainer';
+import PanelObjects from '../PanelObjects/container';
 import PanelSnapshots from '../PanelSnapshots/panelSnapshotsComponentContainer';
 import PanelEdit from '../PanelEdit/panelEditComponentContainer';
 import PanelInfo from '../PanelInfo/panelInfoComponentContainer';

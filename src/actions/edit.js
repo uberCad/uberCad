@@ -23,7 +23,6 @@ import { activePoint, disablePoint, movePointInfo } from './pointInfo';
 import GeometryUtils from '../services/GeometryUtils';
 import helpLayerService from '../services/helpLayerService';
 
-
 export const EDIT_IS_EDIT = 'EDIT_IS_EDIT';
 export const EDIT_CANCEL = 'EDIT_CANCEL';
 export const EDIT_SAVE = 'EDIT_SAVE';
@@ -71,14 +70,17 @@ export const EDIT_SCALE_CHANGE = 'EDIT_SCALE_CHANGE';
 
 export const isEdit = (option, editor, object = {}) => {
   let activeLine = {};
-  let { scene, camera, renderer } = editor;
+  const { scene, camera, renderer } = editor;
   object.userData.parentName = object.parent.name;
   const beforeEdit = JSON.stringify(object);
   if (option) {
     scene.getObjectByName('HelpLayer').children = [];
-    let bgColor = new THREE.Color(0xaaaaaa);
-    let objColor = new THREE.Color(0x00ff00);
-    setColor(scene, bgColor, object.id, objColor);
+    setColor(
+      scene,
+      new THREE.Color(0xaaaaaa),
+      object.id,
+      new THREE.Color(0x00ff00)
+    );
   } else {
     setOriginalColor(scene);
   }
@@ -88,6 +90,7 @@ export const isEdit = (option, editor, object = {}) => {
     object.name = 'ActiveLine';
     addHelpPoints(object, scene, rPoint);
   }
+  console.log('_________isEdit_________')
   renderer.render(scene, camera);
   return dispatch =>
     dispatch({
@@ -115,6 +118,7 @@ export const cancelEdit = (editor, editObject, backUp) => {
   sceneService.fixSceneAfterImport(editor.scene);
   GeometryUtils.fixObjectsPaths(editor.scene);
   setOriginalColor(editor.scene);
+  console.log('____________cancelEdit_________')
   editor.renderer.render(editor.scene, editor.camera);
   return dispatch => {
     disablePoint()(dispatch);
@@ -157,6 +161,7 @@ export const saveEdit = editor => {
   editor.scene.getObjectByName('HelpLayer').children = [];
   setOriginalColor(editor.scene);
   editor.renderer.render(editor.scene, editor.camera);
+  console.log('____________saveEdit_________')
   return dispatch => {
     disablePoint()(dispatch);
     dispatch({
@@ -195,13 +200,16 @@ export const saveEdit = editor => {
 };
 
 export const selectPoint = (lines, event, editor) => {
-  let { scene, camera } = editor;
-  let clickResult = sceneService.onClick(event, scene, camera);
-  let mousePoint = {
-    x: clickResult.point.x,
-    y: clickResult.point.y
-  };
-  const selectPointIndex = startPointIndex(lines, mousePoint, editor);
+  const { scene, camera } = editor;
+  const clickResult = sceneService.onClick(event, scene, camera);
+  const selectPointIndex = startPointIndex(
+    lines,
+    {
+      x: clickResult.point.x,
+      y: clickResult.point.y
+    },
+    editor
+  );
 
   // todo це тимчаасове рішення з змінною ліній в editor.editMode.activeLine
   lines.forEach(line => {
@@ -215,6 +223,7 @@ export const selectPoint = (lines, event, editor) => {
         line.geometry.parameters.thetaStart;
     }
   });
+  console.log('____________selectPoint_________')
   return dispatch => {
     activePoint()(dispatch);
     dispatch({
@@ -238,7 +247,7 @@ export const movePoint = (lines, index, event, editor) => {
     // debugger;
     // distanceToClosestLine = GeometryUtils.distanceToEntity(point,activeEntities[0]);
     lines.forEach(line => {
-      line.name = 'NewObjectLine'
+      line.name = 'NewObjectLine';
     });
     activeEntities.forEach(entity => {
       let distance = GeometryUtils.distanceToEntity(point, activeEntities[0]);
@@ -272,23 +281,26 @@ export const movePoint = (lines, index, event, editor) => {
     if (closestLine) {
       let newPointInLine = {
         position: {}
-      }
+      };
       // debugger;
-      helpLayerService.positionInLine(editor,
-        closestLine.geometry.vertices, point, newPointInLine);
+      helpLayerService.positionInLine(
+        editor,
+        closestLine.geometry.vertices,
+        point,
+        newPointInLine
+      );
       if (newPointInLine.position.x) {
-
-
         // перевірка на переин обєкту який я таскаю і батьківського обєкту closestLine з перевіркою відстані між point і crossing
         crossing = newPointInLine.position;
-
-
-
-
       }
     }
   } else {
-    crossing = crossingPoint(point, closestLine, activeEntities, camera.top / 70);
+    crossing = crossingPoint(
+      point,
+      closestLine,
+      activeEntities,
+      camera.top / 70
+    );
   }
   // debugger;
   // if (crossing.x === NaN || crossing.y === NaN){
@@ -296,7 +308,7 @@ export const movePoint = (lines, index, event, editor) => {
   // }
   const pointCnange = crossing ? crossing : point;
   changeGeometry(lines, index, pointCnange, scene, editor);
-
+  console.log('__________movePoint________')
   cadCanvas.render();
   // renderer.render(scene, camera);
   // debugger;
@@ -312,6 +324,7 @@ export const movePoint = (lines, index, event, editor) => {
 };
 
 export const savePoint = () => {
+  console.log('____________savePoint_________')
   return dispatch => {
     disablePoint()(dispatch);
     dispatch({
@@ -323,6 +336,7 @@ export const savePoint = () => {
 
 //* Create new line
 export const newLine = () => {
+  console.log('_________newLine________')
   return dispatch => {
     dispatch({
       type: EDIT_NEW_LINE,
@@ -332,8 +346,9 @@ export const newLine = () => {
 };
 
 export const cancelNewLine = editor => {
-  let { scene, camera, renderer } = editor;
+  const { scene, camera, renderer } = editor;
   const line = scene.getObjectByName('newLine');
+  console.log('____________cancelNewLine_________')
   if (line) {
     line.parent.remove(line);
     renderer.render(scene, camera);
@@ -362,6 +377,7 @@ export const firstPoint = (event, editor) => {
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   const firstPoint = crossing ? crossing : mousePoint;
 
+  console.log('_________firstPoint________')
   return dispatch => {
     dispatch({
       type: EDIT_LINE_FIRST_POINT,
@@ -386,6 +402,7 @@ export const startNewLine = (event, editor, copyPoint) => {
     };
   }
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
+  console.log('_________startNewLine________')
   return dispatch => {
     crossing
       ? movePointInfo(event, 'Crossing first')(dispatch)
@@ -429,9 +446,12 @@ export const drawLine = (event, editor, parent, copyPoint) => {
     changeGeometry([changeLine], [1], secondPoint, scene, editor);
   } else {
     const line = createLine(editMode.newLineFirst, secondPoint);
-    line.userData.originalColor = parent.children.length ? parent.children[0].userData.originalColor : 0x808000;
+    line.userData.originalColor = parent.children.length
+      ? parent.children[0].userData.originalColor
+      : 0x808000;
     parent.add(line);
   }
+  console.log('_________drawLine________')
   renderer.render(scene, camera);
   return dispatch => {
     crossing
@@ -447,6 +467,7 @@ export const saveNewLine = editor => {
   if (line) {
     line.name = '';
   }
+  console.log('___________  saveNewLine  _________')
   return dispatch => {
     disablePoint()(dispatch);
     dispatch({
@@ -461,6 +482,7 @@ export const saveNewLine = editor => {
 
 //* Create new curve
 export const newCurve = () => {
+  console.log('_________newCurve________')
   return dispatch => {
     dispatch({
       type: EDIT_NEW_CURVE,
@@ -476,6 +498,7 @@ export const cancelNewCurve = editor => {
   if (line) {
     line.parent.remove(line);
   }
+  console.log('___________  cancelNewCurve  _________')
   renderer.render(scene, camera);
   return dispatch => {
     disablePoint()(dispatch);
@@ -511,6 +534,7 @@ export const centerPoint = (event, editor, copyPoint) => {
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   const firstPoint = crossing ? crossing : mousePoint;
 
+  console.log('___________  centerPoint  _________')
   return dispatch => {
     dispatch({
       type: EDIT_CURVE_CENTER_POINT,
@@ -535,6 +559,7 @@ export const centerCurve = (event, editor, copyPoint) => {
     };
   }
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
+  console.log('___________  centerCurve  _________')
   return dispatch => {
     crossing
       ? movePointInfo(event, 'Crossing center')(dispatch)
@@ -561,9 +586,9 @@ export const radius = (event, editor, copyPoint) => {
   const start = !crossing ? mousePoint : crossing;
   let radius = Math.sqrt(
     (editMode.newCurveCenter.x - start.x) *
-    (editMode.newCurveCenter.x - start.x) +
-    (editMode.newCurveCenter.y - start.y) *
-    (editMode.newCurveCenter.y - start.y)
+      (editMode.newCurveCenter.x - start.x) +
+      (editMode.newCurveCenter.y - start.y) *
+        (editMode.newCurveCenter.y - start.y)
   );
   let helpLine = helpArc(radius);
   helpLine.position.x = editMode.newCurveCenter.x;
@@ -571,6 +596,7 @@ export const radius = (event, editor, copyPoint) => {
   const oldHelpLine = scene.getObjectByName('helpLine');
   if (oldHelpLine) oldHelpLine.parent.remove(oldHelpLine);
   scene.getObjectByName('HelpLayer').add(helpLine);
+  console.log('______________radius_____________')
   renderer.render(scene, camera);
   return dispatch => {
     crossing
@@ -584,6 +610,7 @@ export const radius = (event, editor, copyPoint) => {
 };
 
 export const thetaStart = editor => {
+  console.log('___________  thetaStart  _________')
   return dispatch => {
     dispatch({
       type: EDIT_THETA_START,
@@ -607,13 +634,13 @@ export const thetaLength = (event, editor, parent, curveParam) => {
   let clickResult = sceneService.onClick(event, scene, camera);
   let mousePoint = curveParam
     ? {
-      x: curveParam.thetaLength.x,
-      y: curveParam.thetaLength.y
-    }
+        x: curveParam.thetaLength.x,
+        y: curveParam.thetaLength.y
+      }
     : {
-      x: clickResult.point.x,
-      y: clickResult.point.y
-    };
+        x: clickResult.point.x,
+        y: clickResult.point.y
+      };
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
   const length = !crossing ? mousePoint : crossing;
   const t = editThetaLenght(length, oldLine);
@@ -632,6 +659,7 @@ export const thetaLength = (event, editor, parent, curveParam) => {
   line.userData.originalColor = parent.children[0].userData.originalColor;
   parent.add(line);
 
+  console.log('______________thetaLength_____________')
   renderer.render(scene, camera);
   return dispatch => {
     crossing
@@ -651,6 +679,7 @@ export const saveNewCurve = editor => {
     line.name = '';
   }
   scene.getObjectByName('HelpLayer').children = [];
+  console.log('______________ saveNewCurve _____________')
   renderer.render(scene, camera);
   return dispatch => {
     disablePoint()(dispatch);
@@ -672,6 +701,7 @@ export const deleteLine = (editor, line) => {
   let { scene, camera, renderer } = editor;
   line.parent.remove(line);
   scene.getObjectByName('HelpLayer').children = [];
+  console.log('______________deleteLine_____________')
   renderer.render(scene, camera);
   return dispatch => {
     disablePoint()(dispatch);
@@ -687,6 +717,7 @@ export const cloneObject = (editor, object) => {
   const cloneObject = clone(object);
   let objects = scene.getObjectByName('Objects');
   objects.add(cloneObject);
+  console.log('______________cloneObject_____________')
   renderer.render(scene, camera);
   return dispatch => {
     dispatch({
@@ -711,6 +742,7 @@ export const setClone = (event, editor) => {
     p.y - editor.editMode.clone.point.y,
     0
   );
+  console.log('______________setClone_____________')
   renderer.render(scene, camera);
   return dispatch => {
     crossing
@@ -731,6 +763,7 @@ export const selectClonePoint = (event, editor) => {
     y: clickResult.point.y
   };
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
+  console.log('______________selectClonePoint_____________')
   return dispatch => {
     crossing
       ? movePointInfo(event, 'Crossing point')(dispatch)
@@ -746,6 +779,7 @@ export const clonePoint = (event, editor) => {
     y: clickResult.point.y,
     z: 0
   };
+  console.log('___________  clonePoint  _________')
   return dispatch => {
     dispatch({
       type: EDIT_CLONE_POINT,
@@ -755,6 +789,7 @@ export const clonePoint = (event, editor) => {
 };
 
 export const cloneActive = active => {
+  console.log('___________  cloneActive  _________')
   return dispatch => {
     dispatch({
       type: EDIT_CLONE_ACTIVE,
@@ -765,6 +800,7 @@ export const cloneActive = active => {
 
 export const saveClone = object => {
   fixPosition(object);
+  console.log('___________  saveClone  _________')
   return dispatch => {
     disablePoint()(dispatch);
     dispatch({
@@ -786,6 +822,7 @@ export const cancelClone = (editor, cloneObject) => {
     cloneObject.parent.remove(cloneObject);
     renderer.render(scene, camera);
   }
+  console.log('___________  cancelClone  _________')
   return dispatch => {
     disablePoint()(dispatch);
     dispatch({
@@ -805,6 +842,7 @@ export const mirror = (object, editor, option) => {
   let { scene, camera, renderer } = editor;
   const editObject = mirrorObject(object, option);
   renderer.render(scene, camera);
+  console.log('___________  mirror  _________')
   return dispatch => {
     dispatch({
       type: EDIT_MIRROR,
@@ -816,6 +854,7 @@ export const mirror = (object, editor, option) => {
 };
 
 export const moveActive = object => {
+  console.log('___________  moveActive  _________')
   return dispatch => {
     dispatch({
       type: EDIT_MOVE_OBJECT_ACTIVE,
@@ -828,6 +867,7 @@ export const moveActive = object => {
 };
 
 export const cancelMove = () => {
+  console.log('___________  cancelMove  _________')
   return dispatch => {
     disablePoint()(dispatch);
     dispatch({
@@ -851,6 +891,7 @@ export const selectMovePoint = (event, editor) => {
     y: clickResult.point.y
   };
   const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
+  console.log('___________  selectMovePoint  _________')
   return dispatch => {
     crossing
       ? movePointInfo(event, 'Crossing point')(dispatch)
@@ -866,16 +907,22 @@ export const moveObjectPoint = (event, editor) => {
     y: clickResult.point.y,
     z: 0
   };
+  const previousScene = scene.clone();
+  console.log('___________  moveObjectPoint  _________')
   return dispatch => {
     dispatch({
       type: EDIT_MOVE_OBJECT_POINT,
-      payload: { point }
+      payload: {
+        point,
+        previousScene
+      }
     });
   };
 };
 
 export const disableMovePoint = object => {
   fixPosition(object);
+  console.log('___________  disableMovePoint  _________')
   return dispatch => {
     disablePoint()(dispatch);
     dispatch({
@@ -900,7 +947,8 @@ export const moveObject = (event, editor) => {
     p.y - editor.editMode.move.point.y,
     0
   );
-  renderer.render(scene, camera);
+ console.log('___________  moveObject  _________')
+ renderer.render(scene, camera);
   return dispatch => {
     crossing
       ? movePointInfo(event, 'Crossing point')(dispatch)
@@ -909,9 +957,10 @@ export const moveObject = (event, editor) => {
 };
 
 export const ungroup = (editor, object) => {
-  let { scene, camera, renderer } = editor;
-  let layers = scene.getObjectByName('Layers');
+  const { scene, camera, renderer } = editor;
+  const previousScene = scene.clone();
   let parent;
+  const layers = scene.getObjectByName('Layers');
   layers.children.forEach(item => {
     if (item.name === object.name) {
       parent = item;
@@ -921,24 +970,25 @@ export const ungroup = (editor, object) => {
     layers.add(object);
   } else {
     while (object.children.length) {
-      const line = object.children.pop();
-      parent.add(line);
+      parent.add(object.children.pop());
     }
     object.parent.remove(object);
   }
   setOriginalColor(scene);
+  console.log('___________  ungroup  _________')
   renderer.render(scene, camera);
   return dispatch =>
     dispatch({
       type: EDIT_UNGROUP,
       payload: {
-        scene
+        scene,
+        previousScene
       }
     });
 };
 
 export const rotationActive = (active, rotationObject = null) => {
-  debugger;
+  console.log('___________  rotationActive  _________')
   return dispatch => {
     dispatch({
       type: EDIT_ROTATION_AVTIVE,
@@ -989,6 +1039,7 @@ export const rotationAngle = (angle, object, editor) => {
       children.geometry.computeBoundingSphere();
     }
   });
+  console.log('___________  rotationAngle  _________')
   renderer.render(scene, camera);
   return dispatch => {
     dispatch({
@@ -1001,6 +1052,7 @@ export const rotationAngle = (angle, object, editor) => {
 };
 
 export const rotationSave = () => {
+  console.log('___________  rotationSave  _________')
   return dispatch => {
     dispatch({
       type: EDIT_ROTATION_SAVE,
@@ -1013,6 +1065,7 @@ export const rotationSave = () => {
 };
 
 export const scaleActive = scaleObject => {
+  console.log('___________  scaleActive  _________')
   return dispatch => {
     dispatch({
       type: EDIT_SCALE_AVTIVE,
@@ -1025,6 +1078,7 @@ export const scaleActive = scaleObject => {
 };
 
 export const scaleSave = () => {
+  console.log('___________  scaleSave  _________')
   return dispatch => {
     dispatch({
       type: EDIT_SCALE_SAVE,
@@ -1038,6 +1092,7 @@ export const scaleSave = () => {
 };
 
 export const scaleChange = scale => {
+  console.log('___________  scaleChange  _________')
   return dispatch => {
     dispatch({
       type: EDIT_SCALE_CHANGE,
@@ -1063,13 +1118,14 @@ export const setScale = (scale, object, editor) => {
   let box1 = new THREE.BoxHelper(sceneOject, 0x222222);
   sceneOject.position.set(
     box0.geometry.boundingSphere.center.x -
-    box1.geometry.boundingSphere.center.x,
+      box1.geometry.boundingSphere.center.x,
     box0.geometry.boundingSphere.center.y -
-    box1.geometry.boundingSphere.center.y,
+      box1.geometry.boundingSphere.center.y,
     box0.geometry.boundingSphere.center.z -
-    box1.geometry.boundingSphere.center.z
+      box1.geometry.boundingSphere.center.z
   );
   fixPosition(sceneOject);
+  console.log('___________  setScale  _________')
   renderer.render(scene, camera);
   return dispatch => {
     dispatch({
@@ -1086,15 +1142,19 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
   // модуль пошуку найдовшої лінії з масиву ліній
   newObjectLines.forEach(line => {
     // debugger;
-    if (line.geometry.type === "Geometry") {
+    if (line.geometry.type === 'Geometry') {
       // debugger;
       if (!longestLine) {
         longestLine = line;
-        longestLineLength = GeometryUtils.getDistance(line.geometry.vertices[0],
-          line.geometry.vertices[line.geometry.vertices.length - 1]);
+        longestLineLength = GeometryUtils.getDistance(
+          line.geometry.vertices[0],
+          line.geometry.vertices[line.geometry.vertices.length - 1]
+        );
       }
-      let thisLineLength = GeometryUtils.getDistance(line.geometry.vertices[0],
-        line.geometry.vertices[line.geometry.vertices.length - 1]);
+      let thisLineLength = GeometryUtils.getDistance(
+        line.geometry.vertices[0],
+        line.geometry.vertices[line.geometry.vertices.length - 1]
+      );
       if (thisLineLength > longestLineLength) {
         longestLine = line;
         longestLineLength = thisLineLength;
@@ -1107,7 +1167,10 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
   // let info = GeometryUtils.getObjectInfo(newObjectLines[0].parent);
 
   let { camera, scene, renderer } = editor;
-  let res = GeometryUtils.getRegionClusters(newObjectLines[0].parent.userData.edgeModel.regions[0].path, 5);
+  let res = GeometryUtils.getRegionClusters(
+    newObjectLines[0].parent.userData.edgeModel.regions[0].path,
+    5
+  );
 
   let maxDistance = 0;
   let points = [];
@@ -1116,7 +1179,8 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
     for (let j = i + 1; j < res.centroids.length; j++) {
       let thisDistance = GeometryUtils.getDistance(
         { x: res.centroids[i][0], y: res.centroids[i][1] },
-        { x: res.centroids[j][0], y: res.centroids[j][1] });
+        { x: res.centroids[j][0], y: res.centroids[j][1] }
+      );
       if (thisDistance > maxDistance) {
         maxDistance = thisDistance;
         points[0] = { x: res.centroids[i][0], y: res.centroids[i][1] };
@@ -1124,7 +1188,6 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
       }
     }
   }
-
 
   let helpLayer = scene.getObjectByName('HelpLayer');
   let pointGeometry = new THREE.CircleGeometry(
@@ -1149,8 +1212,8 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
   point2.position.y = points[1].y;
   helpLayer.add(point);
   helpLayer.add(point2);
+  console.log('___________  dovetailPointSearch  _________')
   renderer.render(scene, camera);
-
 
   // знаходимо кут повороту
   // використовуючи rotationAngle повертаємо так щоб лінія з точок points була вертикальною.
@@ -1159,11 +1222,8 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
   // вирівнємо фігуру так щоб верхня лінія була горизонтальною
   // шукаємо паралельну лінію і приблизно такої ж дліни на нижньому контурі
 
-
-
   // GeometryUtils.getDistance
   debugger;
-
 
   // пошук точок і ліній на верхній горизонтальній стороні
   let boundingBox = GeometryUtils.getBoundingBox(newObjectLines[0].parent);
@@ -1219,20 +1279,20 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
         linesInBoxSideMax.y = point.y;
       }
     }
-
   });
 
-
   // добавить проверку направления центра мас (от крайньой точке к крайньой точке)
-
 
   //порівняння лінії яка утворюється між крайними точками які лежать на горизонтальній стороні баундін бокса з бічною стороною
 
   // фіксація як точку привязки центр лінії яку знайшли вище
   // debugger;
-  if (!linesInBoxSideMin.x || !linesInBoxSideMax.x
-    || !linesInBoxSideMin.y || !linesInBoxSideMax.y
-    || boundingBox.width > boundingBox.height
+  if (
+    !linesInBoxSideMin.x ||
+    !linesInBoxSideMax.x ||
+    !linesInBoxSideMin.y ||
+    !linesInBoxSideMax.y ||
+    boundingBox.width > boundingBox.height
   ) {
     dovetail.x = boundingBox.center.x;
     dovetail.y = boundingBox.center.y;

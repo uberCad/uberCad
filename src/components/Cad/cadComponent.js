@@ -36,7 +36,6 @@ export default class CadComponent extends Component {
         snapshotId ? `/snapshot/${snapshotId}` : `/project/file/${projectId}`
       )
       .then(data => {
-        console.log('_________START_POINT________');
         this.container.id = 'sceneID'; // todo тут костиль
         if (snapshotId) {
           this.props.drawDxf(null, this.container, data);

@@ -209,7 +209,18 @@ const cad = (state = initialState, action) => {
       console.log(5);
       return {
         ...state,
-        scene: action.payload.scene
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory,
+          {
+            scene: action.payload.previousScene
+          }
+        ],
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        scene: update(state.scene, { $set: action.payload.scene })
       };
 
     case CAD_SELECT_LINE:
@@ -219,6 +230,7 @@ const cad = (state = initialState, action) => {
       };
 
     case EDIT_MOVE_OBJECT_ACTIVE:
+      console.log(1)
       return update(state, {
         editMode: {
           move: {
@@ -232,6 +244,7 @@ const cad = (state = initialState, action) => {
         }
       });
     case EDIT_MOVE_OBJECT_CANCEL:
+      console.log(2)
       return update(state, {
         editMode: {
           move: {
@@ -240,16 +253,30 @@ const cad = (state = initialState, action) => {
         }
       });
     case EDIT_MOVE_OBJECT_POINT:
-      return update(state, {
-        editMode: {
+      console.log(3, state.sceneChildrenHistory)
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory,
+          {
+            scene: action.payload.previousScene
+          }
+        ],
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        editMode: update(state.editMode, {
           move: {
             point: {
               $set: action.payload.point
             }
           }
-        }
-      });
+        })
+      };
     case EDIT_MOVE_DISABLE_POINT:
+      console.log(4)
       return update(state, {
         editMode: {
           move: {
@@ -523,7 +550,7 @@ const cad = (state = initialState, action) => {
       });
 
     case EDIT_IS_EDIT:
-      console.log(4);
+      console.log(4, '_________EDIT_IS_EDIT________');
       return update(state, {
         editMode: {
           isEdit: {
@@ -613,10 +640,12 @@ const cad = (state = initialState, action) => {
         })
       };
     case CAD_UNDO:
+      console.log('______UNDO1______')
       if (
         state.sceneChildrenHistory.length &&
         state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
       ) {
+        console.log('______UNDO2______')
         // set previous version of state and decrease counter
         action.payload.renderer.render(
           state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
@@ -686,17 +715,6 @@ const cad = (state = initialState, action) => {
           $set: [...state.activeEntities]
         })
       };
-
-      // return update(state, {
-      //   scene: {
-      //     children: {
-      //       $set: [...state.scene.children]
-      //     }
-      //   },
-      //   activeEntities: {
-      //     $set: [...state.activeEntities]
-      //   }
-      // });
     case CAD_GROUP_ENTITIES:
       console.log(6);
       return update(state, {

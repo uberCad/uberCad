@@ -11,13 +11,18 @@ import {
 } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 
-import Api from '../../services/apiService';
-import Scene from '../../services/sceneService';
-import GeometryUtils from '../../services/GeometryUtils';
+import Api from '../../../services/apiService';
+import Scene from '../../../services/sceneService';
+import GeometryUtils from '../../../services/GeometryUtils';
 
-import MaterialComponent from '../Material/materrialComponentContainer';
+import MaterialComponent from '../../Material/materrialComponentContainer';
+import ButtonIcon from '../../atoms/button-icon';
 
 import './addElementToDB.css';
+
+const images = {
+  btnAddToDB: require('../../../assets/images/panel/add-element.svg')
+};
 
 // TODO: delete it if we don't need it anymore
 // import { drawDxf } from '../../actions/cad';
@@ -48,7 +53,8 @@ export default class addElementToDB extends Component {
     let target = this.props.activeObject.userData;
     this.setState({ error: '' });
     target.title = this.props.activeObject.name
-      ? this.props.activeObject.name : '';
+      ? this.props.activeObject.name
+      : '';
 
     if (!target.material) {
       target.material = {};
@@ -77,7 +83,7 @@ export default class addElementToDB extends Component {
   categoryСonstructor = categoryFromDB => {
     let allCategories = [];
     let parent_keys = [];
-    categoryFromDB.forEach((category) => {
+    categoryFromDB.forEach(category => {
       for (let i = 0; i < parent_keys.length; i++) {
         if (parent_keys[i] === category.parent_key) {
           return;
@@ -213,10 +219,11 @@ export default class addElementToDB extends Component {
           defaultMessage="Calculate price"
         >
           {title => (
-            <button
-              onClick={this.handleShow}
+            <ButtonIcon
+              id={'btn-addToDB'}
               title={title}
-              className="btn-addToDB"
+              src={images.btnAddToDB}
+              onClick={this.handleShow}
             />
           )}
         </FormattedMessage>
@@ -290,10 +297,10 @@ export default class addElementToDB extends Component {
                       <option></option>
                       {this.state.category
                         ? this.state.category.map(category => (
-                          <option key={category._key} value={category._key}>
-                            {category.title}
-                          </option>
-                        ))
+                            <option key={category._key} value={category._key}>
+                              {category.title}
+                            </option>
+                          ))
                         : null}
                     </FormControl>
                   </FormGroup>
