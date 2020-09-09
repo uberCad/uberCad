@@ -830,61 +830,66 @@ const circleHelpPoint = (arc, scene) => {
   }
 };
 
-const crossingPoint = (pointMouse, closestLine, activeEntities, entrainment = 0.05) => {
+const crossingPoint = (
+  pointMouse,
+  closestLine,
+  activeEntities,
+  entrainment = 0.05
+) => {
   try {
-    if (activeEntities.length > 0 && pointMouse) {
+    if (activeEntities && activeEntities.length > 0 && pointMouse) {
       entrainment *= 10;
       let line;
-      activeEntities.forEach((entity) => {
-        if (
-          !line &&
-          entity.name !== 'ActiveLine' &&
-          entity.name !== 'NewObjectLine' &&
-          entity.name !== 'point1' &&
-          entity.name !== 'point2' &&
-          entity.name !== 'pointCenter' &&
-          entity.name !== 'pointGeometryCenter' &&
-          entity.name !== 'Center' &&
-          entity.name !== 'Start' &&
-          entity.name !== 'End' &&
-          entity.name !== 'Radius' &&
-          entity.name !== 'newLine' &&
-          entity.name !== 'helpLine'
-        ) {
-          line = entity;
-          //todo подальші операції треба робити для всих ліній (line має бути масивом), бо актів лайн може зацепити декілька ліній а чиплятись до тої до якої менша відстань
-        }
-      });
-      line = closestLine ? closestLine : line;
+      if (closestLine) {
+        line = closestLine;
+      } else {
+        activeEntities.forEach(entity => {
+          if (
+            !line &&
+            entity.name !== 'ActiveLine' &&
+            entity.name !== 'NewObjectLine' &&
+            entity.name !== 'point1' &&
+            entity.name !== 'point2' &&
+            entity.name !== 'pointCenter' &&
+            entity.name !== 'pointGeometryCenter' &&
+            entity.name !== 'Center' &&
+            entity.name !== 'Start' &&
+            entity.name !== 'End' &&
+            entity.name !== 'Radius' &&
+            entity.name !== 'newLine' &&
+            entity.name !== 'helpLine'
+          ) {
+            line = entity;
+            //todo подальші операції треба робити для всих ліній (line має бути масивом), бо актів лайн може зацепити декілька ліній а чиплятись до тої до якої менша відстань
+          }
+        });
+      }
       if (line) {
         if (line.geometry.type === 'Geometry') {
-          let index = closestPoint(line.geometry.vertices, pointMouse);
-          let p = isPoint(
-            pointMouse,
-            entrainment,
-            line.geometry.vertices[index]
-          );
-          if (p)
+          const index = closestPoint(line.geometry.vertices, pointMouse);
+          if (isPoint(pointMouse, entrainment, line.geometry.vertices[index]))
             return {
               x: line.geometry.vertices[index].x,
               y: line.geometry.vertices[index].y
             };
         } else if (line.geometry.type === 'CircleGeometry') {
-          let point0 = {};
-          let point1 = {};
-          point0.x = line.geometry.vertices[0].x + line.position.x;
-          point0.y = line.geometry.vertices[0].y + line.position.y;
-          point1.x =
-            line.geometry.vertices[line.geometry.vertices.length - 1].x +
-            line.position.x;
-          point1.y =
-            line.geometry.vertices[line.geometry.vertices.length - 1].y +
-            line.position.y;
-          let points = [point0, point1];
+          const points = [
+            {
+              x: line.geometry.vertices[0].x + line.position.x,
+              y: line.geometry.vertices[0].y + line.position.y
+            },
+            {
+              x:
+                line.geometry.vertices[line.geometry.vertices.length - 1].x +
+                line.position.x,
+              y:
+                line.geometry.vertices[line.geometry.vertices.length - 1].y +
+                line.position.y
+            }
+          ];
 
-          let index = closestPoint(points, pointMouse);
-          let p = isPoint(pointMouse, entrainment, points[index]);
-          if (p)
+          const index = closestPoint(points, pointMouse);
+          if (isPoint(pointMouse, entrainment, points[index]))
             return {
               x: points[index].x,
               y: points[index].y
@@ -985,8 +990,8 @@ const fixPosition = object => {
         vertex.z = vertex.z + object.position.z;
       });
       line.geometry.verticesNeedUpdate = true;
-      line.computeLineDistances();
-      line.geometry.computeBoundingSphere();
+      line.computeLineDistances(); // recalculation needed for line to render properly.
+      line.geometry.computeBoundingSphere(); // recalculation for project
     } else if (line.geometry instanceof THREE.CircleGeometry) {
       line.position.set(
         line.position.x + object.position.x,

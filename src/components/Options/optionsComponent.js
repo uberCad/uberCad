@@ -466,7 +466,6 @@ export default class OptionsComponent extends Component {
     tool: PropTypes.string.isRequired,
     editMode: PropTypes.object,
     editor: PropTypes.object.isRequired,
-
     project: PropTypes.object.isRequired,
 
     selectMode: PropTypes.string.isRequired,

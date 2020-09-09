@@ -34,6 +34,7 @@ export const toggleVisible = (layer, visible, editor) => {
       type: CAD_TOGGLE_VISIBLE_LAYER,
       payload: {
         layer,
+        scene,
         previousScene
       }
     });

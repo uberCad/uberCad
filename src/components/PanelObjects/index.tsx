@@ -139,6 +139,20 @@ const PanelObjects: React.FC<Props> = (props: Props) => {
     setCurrentSnapshot(null);
   };
 
+  // useEffect(() => {
+  //   console.log('Effect');
+  //   props.snapshots.map(item => {
+  //     currentSnapshot = item.objects
+  //       .filter(obj => obj.title === objectName)
+  //       .map(obj => {
+  //         return {
+  //           titleSnapshot: item.title,
+  //           objectKey: obj._key
+  //         };
+  //       });
+  //   });
+  // }, [currentSnapshot, objectName, props.snapshots]);
+
   return (
     <PanelWrapper id="panel-layers">
       {/* <div id="panel-layers"> */}

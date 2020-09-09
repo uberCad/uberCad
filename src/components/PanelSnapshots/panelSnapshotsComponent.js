@@ -86,12 +86,15 @@ export default class PanelSnapshotsComponent extends Component {
   };
 
   render() {
-    const snapshots = this.props.project.snapshots;
+    let snapshots;
+    if (this.props.project) {
+      snapshots = this.props.project.snapshots;
+    }
 
     return (
       <div id="snapshots">
         <div className="content">
-          {snapshots.length ? (
+          {snapshots && snapshots.length ? (
             snapshots.map(
               snapshot =>
                 snapshot && (

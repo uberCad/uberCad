@@ -307,15 +307,13 @@ export const cadClick = (event, editor) => {
         break;
 
       case TOOL_MEASUREMENT:
-        {
-          // let clickResult = sceneService.onClick(event, scene, camera);
-          // console.log(
-          //   `Click position [${clickResult.point.x.toFixed(
-          //     4
-          //   )}, ${clickResult.point.y.toFixed(4)}]`,
-          //   clickResult
-          // );
-        }
+        // let clickResult = sceneService.onClick(event, scene, camera);
+        // console.log(
+        //   `Click position [${clickResult.point.x.toFixed(
+        //     4
+        //   )}, ${clickResult.point.y.toFixed(4)}]`,
+        //   clickResult
+        // );
         break;
 
       case MOVE_NEW_OBJECT:
@@ -352,17 +350,6 @@ export const onMouseDown = (event, editor) => {
         moveObjectPoint(event, editor)(dispatch);
       }
       switch (tool) {
-        // TODO: set here later
-        // case TOOL_UNDO:
-        //   console.log(32423)
-        //   dispatch({
-        //     type: CAD_UNDO,
-        //     payload: {
-        //       renderer
-        //     }
-        //   });
-        //   break;
-
         case TOOL_NEW_CURVE:
           editor.editMode.isNewCurve = true;
           if (editor.editMode.isNewCurve) {
@@ -806,29 +793,10 @@ export const onMouseUp = (event, editor) => {
 
     //move object
     if (editor.editMode.move.active && editor.editMode.move.point) {
-      disableMovePoint(editor.editMode.move.moveObject)(dispatch);
+      disableMovePoint(editor.editMode.move.moveObject, editor.scene)(dispatch);
     }
     console.log(tool);
     switch (tool) {
-      // case TOOL_UNDO:
-      //   dispatch({
-      //     type: CAD_UNDO,
-      //     payload: {
-      //       renderer,
-      //       camera
-      //     }
-      //   });
-      //   break;
-      // case TOOL_REDO:
-      //   dispatch({
-      //     type: CAD_REDO,
-      //     payload: {
-      //       renderer,
-      //       camera
-      //     }
-      //   });
-      //   break;
-
       case TOOL_SELECT:
         // end select
         if (editor.selection.active) {
@@ -906,16 +874,6 @@ export const onMouseMove = (event, editor) => {
     }
 
     switch (tool) {
-      // TODO: set here later
-      // case TOOL_UNDO:
-      //   console.log(32423)
-      //   dispatch({
-      //     type: CAD_UNDO,
-      //     payload: {
-      //       renderer
-      //     }
-      //   });
-      //   break;
       case TOOL_SELECT:
         if (editor.selection.active) {
           selectionUpdate(event, editor)(dispatch);
@@ -1233,17 +1191,6 @@ export const onDoubleClick = (event, editor) => {
     // console.warn('Double click: TODO recursive select entities')
 
     switch (tool) {
-      // TODO: set here later
-      // case TOOL_UNDO:
-      //   console.log(32423)
-      //   dispatch({
-      //     type: CAD_UNDO,
-      //     payload: {
-      //       renderer
-      //     }
-      //   });
-      //   break;
-
       case TOOL_POINT:
         if (!editor.editMode.isEdit) {
           let clickResult = sceneService.onClick(event, scene, camera);

@@ -15,6 +15,8 @@ import {
   CAD_SELECT_LINE
 } from '../actions/cad';
 
+import { MATERIAL_SET } from '../actions/materials';
+
 import { SNAPSHOT_ADD, SNAPSHOT_LOAD_SCENE } from '../actions/panelSnapshots';
 
 import {
@@ -49,6 +51,7 @@ import {
   EDIT_ROTATION_ANGLE,
   EDIT_ROTATION_SAVE,
   EDIT_SCALE_AVTIVE,
+  EDIT_SCALE,
   EDIT_SCALE_SAVE,
   EDIT_SCALE_CHANGE
 } from '../actions/edit';
@@ -63,6 +66,7 @@ import { SNAPSHOT_LOAD_OBJECT } from '../actions/panelObjects';
 let initialState = {
   scene: null,
   sceneChildrenHistory: [],
+  currentScene: null,
   activeSceneChildren: {
     canRedo: false,
     counter: 0,
@@ -182,15 +186,28 @@ const cad = (state = initialState, action) => {
       });
 
     case EDIT_ROTATION_ANGLE:
-      return update(state, {
-        editMode: {
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory,
+          {
+            scene: action.payload.previousScene
+          }
+        ],
+        currentScene: action.payload.scene,
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        editMode: update(state.editMode, {
           rotation: {
             angle: {
               $set: action.payload.angle
             }
           }
-        }
-      });
+        })
+      };
     case EDIT_ROTATION_SAVE:
       return update(state, {
         editMode: {
@@ -215,12 +232,50 @@ const cad = (state = initialState, action) => {
             scene: action.payload.previousScene
           }
         ],
+        currentScene: action.payload.scene,
         activeSceneChildren: {
           canUndo: true,
           counter: state.activeSceneChildren.counter + 1,
           canRedo: false
         },
         scene: update(state.scene, { $set: action.payload.scene })
+      };
+    case MATERIAL_SET:
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory,
+          {
+            scene: action.payload.previousScene
+          }
+        ],
+        currentScene: action.payload.scene,
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        scene: update(state.scene, { $set: action.payload.scene })
+      };
+    case EDIT_SCALE:
+      // set current version of state and increase counter
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory,
+          {
+            scene: action.payload.previousScene
+          }
+        ],
+        currentScene: action.payload.scene,
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        scene: update(state.scene, {
+          $set: action.payload.scene
+        })
       };
 
     case CAD_SELECT_LINE:
@@ -230,7 +285,7 @@ const cad = (state = initialState, action) => {
       };
 
     case EDIT_MOVE_OBJECT_ACTIVE:
-      console.log(1)
+      console.log(1);
       return update(state, {
         editMode: {
           move: {
@@ -244,7 +299,7 @@ const cad = (state = initialState, action) => {
         }
       });
     case EDIT_MOVE_OBJECT_CANCEL:
-      console.log(2)
+      console.log(2);
       return update(state, {
         editMode: {
           move: {
@@ -253,7 +308,19 @@ const cad = (state = initialState, action) => {
         }
       });
     case EDIT_MOVE_OBJECT_POINT:
-      console.log(3, state.sceneChildrenHistory)
+      console.log(3, state.sceneChildrenHistory);
+      return {
+        ...state,
+        editMode: update(state.editMode, {
+          move: {
+            point: {
+              $set: action.payload.point
+            }
+          }
+        })
+      };
+    case EDIT_MOVE_DISABLE_POINT:
+      console.log(4);
       return {
         ...state,
         sceneChildrenHistory: [
@@ -262,6 +329,7 @@ const cad = (state = initialState, action) => {
             scene: action.payload.previousScene
           }
         ],
+        currentScene: action.payload.scene,
         activeSceneChildren: {
           canUndo: true,
           counter: state.activeSceneChildren.counter + 1,
@@ -275,26 +343,27 @@ const cad = (state = initialState, action) => {
           }
         })
       };
-    case EDIT_MOVE_DISABLE_POINT:
-      console.log(4)
-      return update(state, {
-        editMode: {
-          move: {
-            point: {
-              $set: action.payload.point
-            }
-          }
-        }
-      });
-
     case EDIT_MIRROR:
-      return update(state, {
-        editMode: {
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory,
+          {
+            scene: action.payload.previousScene
+          }
+        ],
+        currentScene: action.payload.scene,
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        editMode: update(state.editMode, {
           editObject: {
             $set: action.payload.editObject
           }
-        }
-      });
+        })
+      };
     case EDIT_CLONE_CANCEL:
       return update(state, {
         editMode: {
@@ -593,7 +662,9 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         scene: action.payload.scene,
+        currentScene: action.payload.scene,
         sceneChildrenHistory: [],
+        sceneElementBeforeRotation: action.payload.scene,
         activeSceneChildren: {
           canRedo: false,
           counter: 0,
@@ -628,6 +699,7 @@ const cad = (state = initialState, action) => {
             scene: action.payload.previousScene
           }
         ],
+        currentScene: action.payload.scene,
         activeSceneChildren: {
           canUndo: true,
           counter: state.activeSceneChildren.counter + 1,
@@ -640,12 +712,11 @@ const cad = (state = initialState, action) => {
         })
       };
     case CAD_UNDO:
-      console.log('______UNDO1______')
       if (
         state.sceneChildrenHistory.length &&
+        state.sceneChildrenHistory.length > 1 &&
         state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
       ) {
-        console.log('______UNDO2______')
         // set previous version of state and decrease counter
         action.payload.renderer.render(
           state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
@@ -658,16 +729,18 @@ const cad = (state = initialState, action) => {
             canUndo: state.activeSceneChildren.counter - 1 !== 0,
             counter: state.activeSceneChildren.counter - 1,
             canRedo: true
-          },
-          scene:
-            state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
-              .scene
+          }
+          // TODO: check if we don't need to save scene in this position
+          // scene:
+          //   state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
+          //     .scene
         };
       }
       return state;
     case CAD_REDO:
       if (
         state.sceneChildrenHistory.length &&
+        state.sceneChildrenHistory.length > 1 &&
         state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
       ) {
         // set next version of state and increase counter
@@ -683,11 +756,27 @@ const cad = (state = initialState, action) => {
             counter: state.activeSceneChildren.counter + 1,
             canRedo:
               state.activeSceneChildren.counter + 1 <
-              state.sceneChildrenHistory.length
-          },
-          scene:
-            state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
-              .scene
+              state.sceneChildrenHistory.length + 1
+          }
+          // TODO: check if we don't need to save scene in this position
+          // scene:
+          //   state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
+          //     .scene
+        };
+      } else if (state.activeSceneChildren.canRedo) {
+        // make redo to current scene
+        action.payload.renderer.render(
+          state.currentScene,
+          action.payload.camera
+        );
+        return {
+          ...state,
+          activeSceneChildren: {
+            canUndo: true,
+            counter: state.sceneChildrenHistory.length,
+            canRedo: false
+          }
+          // scene: state.currentScene
         };
       }
       return state;
@@ -701,6 +790,7 @@ const cad = (state = initialState, action) => {
             scene: action.payload.previousScene
           }
         ],
+        currentScene: action.payload.scene,
         activeSceneChildren: {
           canUndo: true,
           counter: state.activeSceneChildren.counter + 1,

@@ -3,7 +3,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import thunk from 'redux-thunk';
 import reducers from './reducers';
-import { optionsReducer } from './store/options/reducer';
+// import { optionsReducer } from './store/options/reducer';
 import { reducer as formReducer } from 'redux-form';
 
 const rootPersistConfig = {
@@ -16,6 +16,9 @@ const cadPersistConfig = {
   key: 'cad',
   storage: storage,
   blacklist: [
+    'sceneChildrenHistory',
+    'activeSceneChildren',
+    'currentScene',
     'scene',
     'camera',
     'renderer',
@@ -37,7 +40,7 @@ const persistedReducer = persistReducer(
   rootPersistConfig,
   combineReducers({
     ...reducers,
-    options: optionsReducer,
+    // options: optionsReducer,
     form: formReducer,
     cad: persistReducer(cadPersistConfig, reducers.cad),
     sidebar: persistReducer(sidebarPersistConfig, reducers.sidebar)

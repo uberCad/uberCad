@@ -73,6 +73,7 @@ export const showAll = editor => {
       type: CAD_SHOW_ALL,
       payload: {
         activeEntities: editor.activeEntities,
+        scene: editor.scene,
         previousScene
       }
     });
