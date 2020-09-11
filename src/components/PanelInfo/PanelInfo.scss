@@ -1,7 +1,10 @@
 @import "../../variables.scss";
 #panel-info {
   height: 100%;
-  padding: 0 5px;
+  //padding: 0 5px;
+  padding: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
 
   .content {
     height: calc(100% - #{$sidebar-toolbar-size});

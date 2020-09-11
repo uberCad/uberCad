@@ -46,32 +46,34 @@ export const calculate = scene => {
     });
     return dispatch => {
       dispatch(spinnerShow());
-      Api.post(`/calculate/${CALCULATION_REGION}`, { data: infoPrice }).then(res => {
-        //done
-        res.forEach((item, i) => {
-          if (item.price) {
+      Api.post(`/calculate/${CALCULATION_REGION}`, { data: infoPrice }).then(
+        res => {
+          //done
+          res.forEach((item, i) => {
+            if (item.price) {
               polyamideObjects[i].userData.price = item.price;
-          }
-          if (item.price10000 && item.price30000 && item.price50000) {
+            }
+            if (item.price10000 && item.price30000 && item.price50000) {
               polyamideObjects[i].userData.price10000 = item.price10000;
               polyamideObjects[i].userData.price30000 = item.price30000;
               polyamideObjects[i].userData.price50000 = item.price50000;
-          }
-          polyamideObjects[i].userData.minOrderQty = Number(
-            item.minOrderQty.replace(/\s+/g, '').replace(/,/g, '.')
-          );
-        });
-        dispatch(spinnerHide());
-        dispatch({
-          type: CALCULATE,
-          payload: {
-            error,
-            prices: res,
-            polyamideObjects,
-            info: infoPrice
-          }
-        });
-      });
+            }
+            polyamideObjects[i].userData.minOrderQty = Number(
+              item.minOrderQty.replace(/\s+/g, '').replace(/,/g, '.')
+            );
+          });
+          dispatch(spinnerHide());
+          dispatch({
+            type: CALCULATE,
+            payload: {
+              error,
+              prices: res,
+              polyamideObjects,
+              info: infoPrice
+            }
+          });
+        }
+      );
     };
   } else {
     return dispatch => {
@@ -109,11 +111,7 @@ export const order = (orderObjects, contactInformation) => {
       dispatch(spinnerHide());
       dispatch(calculateHide());
       dispatch(
-        modalShow(
-          'Order',
-          res.message,
-          `${process.env.PUBLIC_URL}/${res.link}`
-        )
+        modalShow('Order', res.message, `${process.env.PUBLIC_URL}/${res.link}`)
       );
       dispatch({
         type: CALCULATE_ORDER

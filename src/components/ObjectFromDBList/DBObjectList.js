@@ -13,10 +13,11 @@ import {
 import { FormattedMessage } from 'react-intl';
 import { drawDxf } from '../../actions/cad';
 import { parseDxf } from '../../services/dxfService';
-import './DBObjectList.css'
+import './DBObjectList.css';
 import Api from '../../services/apiService';
 import sceneService from '../../services/sceneService';
 import * as THREE from '../../extend/THREE';
+import consoleUtils from '../../services/consoleUtils';
 
 export default class DBObjectList extends Component {
 
@@ -87,15 +88,14 @@ export default class DBObjectList extends Component {
     }
   };
 
-  getObject = (event) => {
-    let {currentTarget} = event;
-    let way = currentTarget? currentTarget.value:0;
-    Api.get(`/store/category/`+way) //done
+  getObject = event => {
+    let { currentTarget } = event;
+    let way = currentTarget ? currentTarget.value : 0;
+    Api.get(`/store/category/` + way) //done
       .then(ObjectFromDB => {
         this.setState({
-          ObjectFromDB: ObjectFromDB,
+          ObjectFromDB: ObjectFromDB
         });
-        console.log(ObjectFromDB);
       })
   };
 
@@ -106,18 +106,18 @@ export default class DBObjectList extends Component {
   };
 
   choose = event => {
-    let {currentTarget} = event;
+    let { currentTarget } = event;
     let editor = this.props.editor;
     let { scene, camera, renderer } = editor;
 
-    Api.get(`/store/part/`+currentTarget.value) //done
+    Api.get(`/store/part/` + currentTarget.value) //done
       .then(loadObject => {
         let loader = new THREE.ObjectLoader();
         let object = loader.parse(loadObject.object);
         sceneService.fixSceneAfterImport(object);
         object.name = loadObject.title;
-        scene.getObjectByName("Objects").add(object);
-        console.log(object)
+        scene.getObjectByName('Objects').add(object);
+        console.log(object);
         this.handleClose();
 
         editor.editMode.activeLine.lines = object.children;
@@ -130,8 +130,8 @@ export default class DBObjectList extends Component {
 
   render() {
     return (
-      <div >
-        <div onClick={this.handleShow}>
+      <div>
+        <div onClick={this.handleShow} className= "li-Header">
           <FormattedMessage id="header.store" defaultMessage="Store" />
         </div>
 
@@ -168,7 +168,18 @@ export default class DBObjectList extends Component {
               {/*</FormGroup>*/}
             {/*</Form>*/}
 
-            <ListGroup componentClass="ul" className="materials-list">
+            <ListGroup componentClass="ul" className="db-objects-list">
+              {
+                this.state.ObjectFromDB.category ?
+                  this.state.ObjectFromDB.category.map(object => (
+                    <li
+                      className="list-group-flush"
+                      value={object.parent_key}
+                      onClick={this.getObject}
+                        key={object.parent_key}
+                    >
+                      <h4 value={object.parent_key}>UP</h4>
+                    </li>)): null}
               {
                 this.state.ObjectFromDB.subCategories ?
                   this.state.ObjectFromDB.subCategories.map(object => (
@@ -176,30 +187,29 @@ export default class DBObjectList extends Component {
                     className="list-group-flush"
                     value={object._key}
                     onClick={this.getObject}
-                    key = {object._key}
+                      key={object._key}
                   >
-                    <h4 value={object._key}>{object.title}</h4>
-                    <span>Type: Folder</span>
-                  </li>)
-                  ) : null
-              }
-              {
-                this.state.ObjectFromDB.parts ? this.state.ObjectFromDB.parts.map(object => (
-                <li
+                      <h4 value={object._key}>{object.title}</h4>
+                      <span>Type: Folder</span>
+                  </li>)): null}
+              {this.state.ObjectFromDB.parts
+                ? this.state.ObjectFromDB.parts.map(object => (
+                    <li
                 className="list-group-flush"
                 value={object._key}
                 onClick={this.choose}
                 key = {object._key}
                 >
                 <h4 value={object._key}>{object.title} {object._key}</h4>
-                  <span>Width: {object.width}</span>
-                  <span>height: {object.height}</span>
-                </li>)) : null
-              }
-
+                      <span className="svgIcon col-sm-4 .col-md-4 .col-xs-4" >
+                        {consoleUtils.getSvg(object.svgIcon)}
+                        </span>
+                      <span>Width: {object.width}</span>
+                      <span>height: {object.height}</span>
+                    </li>
+                  ))
+                : null}
             </ListGroup>
-
-            {/*todo а тут уже і вправду баг.... розібратись з відкриттям об'єкту з пк*/}
             <Form
               onSubmit={event => {
                 event.preventDefault();
@@ -225,7 +235,7 @@ export default class DBObjectList extends Component {
                       placeholder={placeholder}
                       onChange={this.handleChange}
                       // onClick = {this.tester}
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={e => e.stopPropagation()}
                     />
                   )}
                 </FormattedMessage>
@@ -240,7 +250,16 @@ export default class DBObjectList extends Component {
               <HelpBlock className="warning">{this.state.error}</HelpBlock>
             )}
             <FormattedMessage id="addObject.open" defaultMessage="Open">
-              {value => <Button href = {!this.props.editor.scene? "/cad/editObjectElement":""} onClick= {this.addObject}>{value}</Button>}
+              {value => (
+                <Button
+                  href={
+                    !this.props.editor.scene ? '/cad/editObjectElement' : ''
+                  }
+                  onClick={this.addObject}
+                >
+                  {value}
+                </Button>
+              )}
             </FormattedMessage>
             <FormattedMessage id="btn.cancel" defaultMessage="Close">
               {value => <Button onClick={this.handleClose}>{value}</Button>}

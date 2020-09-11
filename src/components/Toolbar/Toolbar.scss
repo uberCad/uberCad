@@ -8,6 +8,8 @@
   height: calc(100% - #{$header-height + $options-height});
   background: url("bars.png") no-repeat top center $blue;
   padding-top: 27px;
+  padding-left: 3px;
+  padding-right: 3px;
   z-index: 10;
 
   //box-shadow: red 0 0 20px;

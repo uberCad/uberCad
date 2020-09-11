@@ -28,8 +28,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    loadObjectFromDB: function() {
-    },
+    loadObjectFromDB: function() {},
     getObjectFromDB: function(id) {
       getObjectFromDB(id)(dispatch);
     },

@@ -1,72 +1,49 @@
-.data-projects {
-  margin: 30px;
-  padding: 0;
-  font-family: 'Verdana', sans-serif;
-  font-size: 16px;
-  color: #999999;
-  box-shadow: 0 0 50px rgb(241, 241, 241);
+@import "../../variables.scss";
+ul.db-objects-list {
+  margin: 0;
+  padding: 10px 0;
+  list-style: none;
 
-  .table-row {
-    border-bottom: 1px dashed #e6eaec;
-    padding: 10px 0;
-    margin: 0 !important;
+  li {
+    padding: 5px 0 5px 70px;
+    min-height: 60px;
+    height: inherit;
+    transition: All 0.3s;
+    position: relative;
+    cursor: pointer;
 
-    .table-data.title {
-      word-wrap: break-word;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
     }
-  }
 
-  .table-row:hover {
-    background-color: #f8f8f8;
-  }
+    h4 {
+      text-align: left;
+      margin: 0 0 5px 0;
+      padding: 0;
+    }
 
-  .table-head {
-    padding: 10px 0 0 0;
-    margin: 0 !important;
-    text-transform: uppercase;
-    background-color: #f9fafb;
-    box-shadow: 0 0 24px rgba(153, 153, 153, 0.2);
-    line-height: 15px;
-    height: 50px;
+    span {
+      color: gray;
+      font-style: italic;
+      margin-right: 5px;
 
-    .table-head-name {
-      &:first-child {
-        padding-left: 25px;
+      &.svgIcon {
+        border-radius: 5px;
+        width: 50px;
+        height: 50px;
+        display: block;
+        position: absolute;
+        left: 10px;
+        top: 5px;
+        box-shadow: lightgray 3px 3px 6px;
       }
-
-      span {
-        cursor: pointer;
+      svg {
+        max-height: 50px;
       }
     }
-
-    .table-head-name i {
-      margin-top: -5px;
-      text-transform: lowercase;
-      font-size: 10px;
-      color: #cccccc;
-    }
   }
-
-  .table-data:first-child {
-    padding-left: 25px;
-  }
-
-  .table-data i {
-    font-size: 24px;
-    color: #33ccff;
-  }
-
-  .icon {
-    text-align: center;
-  }
-
-  .table-data p {
-    font-size: 12px;
-    color: #cccccc;
-  }
-
+}
+.li-Header {
+  padding: 10px;
 }
 
-.store {
-  float: left;
-}
