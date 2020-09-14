@@ -47,6 +47,7 @@ export const EDIT_DELETE_LINE = 'EDIT_DELETE_LINE';
 
 export const EDIT_CLONE_ACTIVE = 'EDIT_CLONE_ACTIVE';
 export const EDIT_CLONE_POINT = 'EDIT_CLONE_POINT';
+export const CREATE_CLONE_OBJECT = 'CREATE_CLONE_OBJECT';
 export const EDIT_CLONE_OBJECT = 'EDIT_CLONE_OBJECT';
 export const EDIT_CLONE_SAVE = 'EDIT_CLONE_SAVE';
 export const EDIT_CLONE_CANCEL = 'EDIT_CLONE_CANCEL';
@@ -202,6 +203,7 @@ export const saveEdit = editor => {
 
 export const selectPoint = (lines, event, editor) => {
   const { scene, camera } = editor;
+  // const previousScene = scene.clone();
   const clickResult = sceneService.onClick(event, scene, camera);
   const selectPointIndex = startPointIndex(
     lines,
@@ -229,13 +231,17 @@ export const selectPoint = (lines, event, editor) => {
     activePoint()(dispatch);
     dispatch({
       type: EDIT_SELECT_POINT,
-      payload: { selectPointIndex }
+      payload: {
+        selectPointIndex
+        // previousScene,
+        // scene
+      }
     });
   };
 };
 
 export const movePoint = (lines, index, event, editor) => {
-  const { scene, camera, cadCanvas } = editor;
+  const { scene, camera, renderer } = editor;
   const clickResult = sceneService.onClick(event, scene, camera);
   const point = {
     x: clickResult.point.x,
@@ -251,6 +257,7 @@ export const movePoint = (lines, index, event, editor) => {
     });
     activeEntities.forEach(entity => {
       const distance = GeometryUtils.distanceToEntity(point, activeEntities[0]);
+      // пошук прямих поручі і точки на них на базі crossingPoint і helpLayerService.positionInLine
       if (
         (!distanceToClosestLine || distanceToClosestLine > distance) &&
         entity.name !== 'ActiveLine' &&
@@ -270,7 +277,6 @@ export const movePoint = (lines, index, event, editor) => {
         closestLine = entity;
       }
     });
-    // пошук прямих поручі і точки на них на базі crossingPoint і helpLayerService.positionInLine
   }
 
   let crossing = false;
@@ -301,27 +307,34 @@ export const movePoint = (lines, index, event, editor) => {
   }
   const pointCnange = crossing ? crossing : point;
   changeGeometry(lines, index, pointCnange, scene, editor);
-  console.log('__________ movePoint ________');
-  cadCanvas.render();
-  // renderer.render(scene, camera);
+  // cadCanvas.render();
+  renderer.render(scene, camera);
   return dispatch => {
     crossing
       ? movePointInfo(event, 'Crossing point')(dispatch)
       : disablePoint()(dispatch);
     dispatch({
-      type: EDIT_MOVE_POINT,
-      payload: {}
+      type: EDIT_MOVE_POINT
     });
   };
 };
 
-export const savePoint = () => {
-  console.log('____________ savePoint _________');
+export const savePoint = ({ scene, activeEntities }) => {
+  console.log('____________ savePoint _________', activeEntities);
+  const previousScene = scene.clone();
   return dispatch => {
     disablePoint()(dispatch);
     dispatch({
       type: EDIT_SAVE_POINT,
-      payload: { index: null }
+      payload: {
+        index: null,
+        undoData: {
+          mode: 'lineMove',
+          ids: [...activeEntities.map(el => el.userData.id)]
+        },
+        previousScene,
+        scene
+      }
     });
   };
 };
@@ -359,10 +372,10 @@ export const cancelNewLine = editor => {
 
 export const firstPoint = (event, editor) => {
   editor.editMode.isNewLine = true;
-  // debugger;
-  let { scene, camera } = editor;
-  let clickResult = sceneService.onClick(event, scene, camera);
-  let mousePoint = {
+  const { scene, camera } = editor;
+  const previousScene = scene.clone();
+  const clickResult = sceneService.onClick(event, scene, camera);
+  const mousePoint = {
     x: clickResult.point.x,
     y: clickResult.point.y
   };
@@ -373,27 +386,25 @@ export const firstPoint = (event, editor) => {
   return dispatch => {
     dispatch({
       type: EDIT_LINE_FIRST_POINT,
-      payload: { firstPoint }
+      payload: {
+        firstPoint,
+        previousScene,
+        scene
+      }
     });
   };
 };
 
 export const startNewLine = (event, editor, copyPoint) => {
-  let { scene, camera } = editor;
-  let mousePoint;
-  let clickResult = sceneService.onClick(event, scene, camera);
-  if (!copyPoint) {
-    mousePoint = {
-      x: clickResult.point.x,
-      y: clickResult.point.y
-    };
-  } else {
-    mousePoint = {
-      x: copyPoint.x,
-      y: copyPoint.y
-    };
-  }
-  const crossing = crossingPoint(mousePoint, clickResult.activeEntities);
+  const { scene, camera } = editor;
+  const clickResult = sceneService.onClick(event, scene, camera);
+  const crossing = crossingPoint(
+    {
+      x: !copyPoint ? clickResult.point.x : copyPoint.x,
+      y: !copyPoint ? clickResult.point.y : copyPoint.y
+    },
+    clickResult.activeEntities
+  );
   console.log('_________startNewLine________');
   return dispatch => {
     crossing
@@ -705,16 +716,21 @@ export const deleteLine = (editor, line) => {
 };
 
 export const cloneObject = (editor, object) => {
-  let { scene, camera, renderer } = editor;
+  const { scene, camera, renderer } = editor;
+  const previousScene = scene.clone();
   const cloneObject = clone(object);
-  let objects = scene.getObjectByName('Objects');
+  const objects = scene.getObjectByName('Objects');
   objects.add(cloneObject);
   console.log('______________cloneObject_____________');
   renderer.render(scene, camera);
   return dispatch => {
     dispatch({
-      type: EDIT_CLONE_OBJECT,
-      payload: { cloneObject }
+      type: CREATE_CLONE_OBJECT,
+      payload: {
+        cloneObject,
+        previousScene,
+        scene
+      }
     });
   };
 };
@@ -1257,7 +1273,6 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
   // шукаємо паралельну лінію і приблизно такої ж дліни на нижньому контурі
 
   // GeometryUtils.getDistance
-  debugger;
 
   // пошук точок і ліній на верхній горизонтальній стороні
   let boundingBox = GeometryUtils.getBoundingBox(newObjectLines[0].parent);

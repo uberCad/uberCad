@@ -18,6 +18,7 @@ import {
   scaleChange,
   setScale
 } from '../../actions/edit';
+import { disablePoint } from '../../actions/pointInfo';
 
 import { copyClick, pasteClick, redo, undo } from '../../actions/cad';
 import { addSnapshot } from '../../actions/panelSnapshots';
@@ -54,7 +55,11 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
     setSelectMode: mode => {
+      disablePoint()(dispatch);
       dispatch(setSelectMode(mode));
+      dispatch({
+        type: `${mode}_CLEAR`
+      });
     },
     setSingleLayerSelect: value => dispatch(setSingleLayerSelect(value)),
     setThreshold: value => dispatch(setThreshold(value)),

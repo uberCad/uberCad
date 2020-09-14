@@ -15,6 +15,8 @@ import {
   CAD_SELECT_LINE
 } from '../actions/cad';
 
+import { setGeometryForObjectWithHelpOfHelpPoints } from '../services/editObject';
+
 import { MATERIAL_SET } from '../actions/materials';
 
 import { SNAPSHOT_ADD, SNAPSHOT_LOAD_SCENE } from '../actions/panelSnapshots';
@@ -37,6 +39,7 @@ import {
   EDIT_NEW_CURVE_SAVE,
   EDIT_DELETE_LINE,
   EDIT_CLONE_OBJECT,
+  CREATE_CLONE_OBJECT,
   EDIT_CLONE_ACTIVE,
   EDIT_CLONE_POINT,
   EDIT_CLONE_SAVE,
@@ -400,6 +403,29 @@ const cad = (state = initialState, action) => {
           }
         }
       });
+    case CREATE_CLONE_OBJECT:
+      return {
+        ...state,
+        // sceneChildrenHistory: [
+        //   ...state.sceneChildrenHistory,
+        //   {
+        //     scene: action.payload.previousScene
+        //   }
+        // ],
+        // currentScene: action.payload.scene,
+        // activeSceneChildren: {
+        //   canUndo: true,
+        //   counter: state.activeSceneChildren.counter + 1,
+        //   canRedo: false
+        // },
+        editMode: update(state.editMode, {
+          clone: {
+            cloneObject: {
+              $set: action.payload.cloneObject
+            }
+          }
+        })
+      };
     case EDIT_CLONE_OBJECT:
       return update(state, {
         editMode: {
@@ -514,13 +540,26 @@ const cad = (state = initialState, action) => {
         }
       });
     case EDIT_LINE_FIRST_POINT:
-      return update(state, {
-        editMode: {
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory,
+          {
+            scene: action.payload.previousScene
+          }
+        ],
+        currentScene: action.payload.scene,
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        editMode: update(state.editMode, {
           newLineFirst: {
             $set: action.payload.firstPoint
           }
-        }
-      });
+        })
+      };
     case EDIT_CANCEL_NEW_LINE:
       return update(state, {
         editMode: {
@@ -573,13 +612,27 @@ const cad = (state = initialState, action) => {
       });
 
     case EDIT_SAVE_POINT:
-      return update(state, {
-        editMode: {
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory,
+          {
+            scene: action.payload.previousScene,
+            ...action.payload.undoData
+          }
+        ],
+        currentScene: action.payload.scene,
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        editMode: update(state.editMode, {
           selectPointIndex: {
             $set: action.payload.index
           }
-        }
-      });
+        })
+      };
     case EDIT_CANCEL:
       return update(state, {
         editMode: {
@@ -593,14 +646,26 @@ const cad = (state = initialState, action) => {
         }
       });
     case EDIT_SELECT_POINT:
-      return update(state, {
-        editMode: {
+      return {
+        ...state,
+        // sceneChildrenHistory: [
+        //   ...state.sceneChildrenHistory,
+        //   {
+        //     scene: action.payload.previousScene
+        //   }
+        // ],
+        // currentScene: action.payload.scene,
+        // activeSceneChildren: {
+        //   canUndo: true,
+        //   counter: state.activeSceneChildren.counter + 1,
+        //   canRedo: false
+        // },
+        editMode: update(state.editMode, {
           selectPointIndex: {
             $set: action.payload.selectPointIndex
           }
-        }
-      });
-
+        })
+      };
     case CAD_EDITMODE_SET_ACTIVE_LINE:
       return update(state, {
         editMode: {
@@ -712,12 +777,21 @@ const cad = (state = initialState, action) => {
         })
       };
     case CAD_UNDO:
+      console.log('___________UNDO____________', state.activeSceneChildren.counter, state.sceneChildrenHistory);
       if (
         state.sceneChildrenHistory.length &&
         state.sceneChildrenHistory.length > 1 &&
         state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
       ) {
         // set previous version of state and decrease counter
+        if (
+          state.sceneChildrenHistory[state.activeSceneChildren.counter - 1].mode
+        ) {
+          setGeometryForObjectWithHelpOfHelpPoints(
+            state.sceneChildrenHistory[state.activeSceneChildren.counter - 1],
+            state.scene
+          );
+        }
         action.payload.renderer.render(
           state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
             .scene,
@@ -744,6 +818,14 @@ const cad = (state = initialState, action) => {
         state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
       ) {
         // set next version of state and increase counter
+        if (
+          state.sceneChildrenHistory[state.activeSceneChildren.counter + 1].mode
+        ) {
+          setGeometryForObjectWithHelpOfHelpPoints(
+            state.sceneChildrenHistory[state.activeSceneChildren.counter + 1],
+            state.scene
+          );
+        }
         action.payload.renderer.render(
           state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
             .scene,

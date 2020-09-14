@@ -15,17 +15,13 @@ import Measurement from './Measurement/measurementComponent';
 import Line from './Line/lineComponent';
 // import FormattedInput from '../atoms/formatted-input';
 
-export const SELECT_MODE_NEW = 'SELECT_MODE_NEW';
-export const SELECT_MODE_ADD = 'SELECT_MODE_ADD';
-export const SELECT_MODE_SUB = 'SELECT_MODE_SUB';
-export const SELECT_MODE_INTERSECT = 'SELECT_MODE_INTERSECT';
-export const DEFAULT_THRESHOLD = 0.0001;
+import { SelectNewTypes } from '../../store/options/types';
 
 // const inputs = [
 //   {
 //     id: 'mode-new',
 //     type: 'radio',
-//     value: SELECT_MODE_NEW,
+//     value: SelectNewTypes.NEW,
 //     formattedMessageId: 'options.inputTitleSelection',
 //     message: 'New selection',
 //     theme: {
@@ -37,7 +33,7 @@ export const DEFAULT_THRESHOLD = 0.0001;
 //   {
 //     id: 'mode-add',
 //     type: 'radio',
-//     value: SELECT_MODE_ADD,
+//     value: SelectNewTypes.ADD,
 //     formattedMessageId: 'options.inputTitleAddSelection',
 //     message: 'Add to selection (... + Shift)',
 //     theme: {
@@ -49,7 +45,7 @@ export const DEFAULT_THRESHOLD = 0.0001;
 //   {
 //     id: 'mode-sub',
 //     type: 'radio',
-//     value: SELECT_MODE_SUB,
+//     value: SelectNewTypes.SUB,
 //     formattedMessageId: 'options.inputTitleSubtract',
 //     message: 'Subtract from selection (... + Alt)',
 //     theme: {
@@ -61,7 +57,7 @@ export const DEFAULT_THRESHOLD = 0.0001;
 //   {
 //     id: 'mode-intersect',
 //     type: 'radio',
-//     value: SELECT_MODE_INTERSECT,
+//     value: SelectNewTypes.INTERSECT,
 //     formattedMessageId: 'options.inputTitleIntersect',
 //     message: 'Intersect with selection (... + Alt + Shift)',
 //     theme: {
@@ -225,13 +221,21 @@ export default class OptionsComponent extends Component {
             className="img undo"
             src={images.undo}
             alt="undo"
-            onClick={() => this.props.undo(renderer, camera)}
+            onClick={event => {
+              event.stopPropagation();
+              event.preventDefault();
+              this.props.undo(renderer, camera);
+            }}
           />
           <img
             className="img"
             src={images.redo}
             alt="redo"
-            onClick={() => this.props.redo(renderer, camera)}
+            onClick={event => {
+              event.stopPropagation();
+              event.preventDefault();
+              this.props.redo(renderer, camera);
+            }}
           />
         </div>
         {(tool === TOOL_POINT || tool === TOOL_SELECT) && (
@@ -264,8 +268,8 @@ export default class OptionsComponent extends Component {
                       type="radio"
                       className="mode-new"
                       title={value}
-                      value={SELECT_MODE_NEW}
-                      checked={selectMode === SELECT_MODE_NEW}
+                      value={SelectNewTypes.NEW}
+                      checked={selectMode === SelectNewTypes.NEW}
                       onChange={this.onChangeMode}
                     />
                   )}
@@ -281,8 +285,8 @@ export default class OptionsComponent extends Component {
                       type="radio"
                       className="mode-add"
                       title={value}
-                      value={SELECT_MODE_ADD}
-                      checked={selectMode === SELECT_MODE_ADD}
+                      value={SelectNewTypes.ADD}
+                      checked={selectMode === SelectNewTypes.ADD}
                       onChange={this.onChangeMode}
                     />
                   )}
@@ -298,8 +302,8 @@ export default class OptionsComponent extends Component {
                       className="mode-sub"
                       type="radio"
                       title={value}
-                      value={SELECT_MODE_SUB}
-                      checked={selectMode === SELECT_MODE_SUB}
+                      value={SelectNewTypes.SUB}
+                      checked={selectMode === SelectNewTypes.SUB}
                       onChange={this.onChangeMode}
                     />
                   )}
@@ -315,8 +319,8 @@ export default class OptionsComponent extends Component {
                       type="radio"
                       className="mode-intersect"
                       title={value}
-                      value={SELECT_MODE_INTERSECT}
-                      checked={selectMode === SELECT_MODE_INTERSECT}
+                      value={SelectNewTypes.INTERSECT}
+                      checked={selectMode === SelectNewTypes.INTERSECT}
                       onChange={this.onChangeMode}
                     />
                   )}
@@ -432,16 +436,16 @@ export default class OptionsComponent extends Component {
           </ul>
         )}
 
-        {tool === TOOL_MEASUREMENT && (
+        {tool === TOOL_MEASUREMENT && selectMode && (
           <Measurement
             measurementMode={selectMode}
             setSelectMode={this.props.setSelectMode}
           />
         )}
-
-        {tool === TOOL_LINE && (
+        {tool === TOOL_LINE && selectMode && (
           <Line
             lineMode={selectMode}
+            measurementMode={selectMode}
             setSelectMode={this.props.setSelectMode}
           />
         )}
@@ -487,6 +491,7 @@ export default class OptionsComponent extends Component {
     setScale: PropTypes.func,
     copyClick: PropTypes.func,
     pasteClick: PropTypes.func,
+    saveSnap: PropTypes.func,
     undo: PropTypes.func,
     redo: PropTypes.func
   };

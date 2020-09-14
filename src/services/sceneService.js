@@ -1,16 +1,12 @@
+import axios from 'axios';
+
 import * as THREE from '../extend/THREE';
 import ArrayUtils from './arrayUtils';
 import GeometryUtils from './GeometryUtils';
 import ConsoleUtils from './consoleUtils';
 import HelpLayerService from './helpLayerService';
 import ToastService from './ToastService';
-import {
-  SELECT_MODE_NEW,
-  SELECT_MODE_ADD,
-  SELECT_MODE_SUB,
-  SELECT_MODE_INTERSECT
-} from '../components/Options/optionsComponent';
-import axios from 'axios';
+import { SelectNewTypes } from '../store/options/types';
 import { MEASUREMENT_ANGLE, MEASUREMENT_RADIAL } from '../actions/measurement';
 import {
   LINE_PARALLEL,
@@ -131,22 +127,22 @@ const doSelection = (selectResultAll, editor) => {
     case MEASUREMENT_ANGLE:
       editor.activeEntities = selectResult;
       break;
-    case SELECT_MODE_NEW:
+    case SelectNewTypes.NEW:
       editor.activeEntities = selectResult;
       break;
-    case SELECT_MODE_ADD:
+    case SelectNewTypes.ADD:
       editor.activeEntities = ArrayUtils.union(
         editor.activeEntities,
         selectResult
       );
       break;
-    case SELECT_MODE_SUB:
+    case SelectNewTypes.SUB:
       editor.activeEntities = ArrayUtils.subtract(
         editor.activeEntities,
         selectResult
       );
       break;
-    case SELECT_MODE_INTERSECT:
+    case SelectNewTypes.INTERSECT:
       editor.activeEntities = ArrayUtils.intersection(
         editor.activeEntities,
         selectResult

@@ -2,8 +2,8 @@ import * as THREE from '../extend/THREE';
 import GeometryUtils from '../services/GeometryUtils';
 import helpLayerService from './helpLayerService';
 
-const setColor = function (entity, bgColor, objId, objColor) {
-  entity.children.forEach(function (entity) {
+const setColor = (entity, bgColor, objId, objColor) => {
+  entity.children.forEach(function(entity) {
     if (entity.children.length > 0) {
       setColor(entity, bgColor, objId, objColor);
     } else {
@@ -25,7 +25,7 @@ const setColor = function (entity, bgColor, objId, objColor) {
 };
 
 const setOriginalColor = entity => {
-  entity.children.forEach(function (entity) {
+  entity.children.forEach(function(entity) {
     if (entity.children.length > 0) {
       setOriginalColor(entity);
     } else {
@@ -169,56 +169,53 @@ const getScale = camera => {
 };
 
 const unselectLine = (lines, scene) => {
-  // debugger;
   scene.getObjectByName('HelpLayer').children = [];
   lines.forEach(line => {
     if (line.userData.lastoriginalColor) {
-      line.name = '';
       line.material.color = line.userData.lastoriginalColor.clone();
       delete line.userData.lastoriginalColor;
-    } else if (line.userData.originalColor) {
-      line.name = '';
+    } else if (
+      line.userData.originalColor &&
+      line.userData.originalColor.clone
+    ) {
       line.material.color = line.userData.originalColor.clone();
       delete line.userData.originalColor;
     } else {
-      line.name = '';
       line.material.color.set(0x00ff00);
     }
+    line.name = '';
   });
   return {};
 };
 
 const closestPoint = (arr, c) => {
-  let index;
-  arr.forEach(function (item) {
-    item.distance = Math.sqrt(
-      (item.x - c.x) * (item.x - c.x) + (item.y - c.y) * (item.y - c.y)
-    );
-  });
-  let compare = (a, b) => {
-    if (a.distance > b.distance) return 1;
-    if (a.distance < b.distance) return -1;
-  };
-  let arrSorted = arr.slice().sort(compare);
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i].distance === arrSorted[0].distance) {
-      index = i;
-    }
-  }
-  return index;
+  const arrSorted = arr
+    .map(item => {
+      item.distance = Math.sqrt(
+        (item.x - c.x) * (item.x - c.x) + (item.y - c.y) * (item.y - c.y)
+      );
+      return item;
+    })
+    .slice()
+    .sort((a, b) => {
+      if (a.distance > b.distance) return 1;
+      if (a.distance < b.distance) return -1;
+      return 0;
+    });
+  return arr.findIndex(el => el.distance === arrSorted[0].distance);
 };
 
 const isPoint = (a, r, rCenter) => {
-  let rXy = Math.sqrt(
+  const rXy = Math.sqrt(
     (rCenter.x - a.x) * (rCenter.x - a.x) +
-    (rCenter.y - a.y) * (rCenter.y - a.y)
+      (rCenter.y - a.y) * (rCenter.y - a.y)
   );
   return rXy <= r;
 };
 
 const startPointIndex = (line, mousePoint, editor) => {
   // todo скоріше за все буде спільним куском і для кругів
-  let activeEntities = editor.activeEntities;
+  // let activeEntities = editor.activeEntities;
   let helpPointsPosition = [];
 
   let isSelectPoint = false;
@@ -226,15 +223,15 @@ const startPointIndex = (line, mousePoint, editor) => {
 
   editor.editMode.activeLine = [];
 
-  let { scene, camera } = editor;
-  let scale = camera.top / 50;
-  let helpLayer = scene.getObjectByName('HelpLayer');
+  const { scene, camera } = editor;
+  const scale = camera.top / 50;
+  const helpLayer = scene.getObjectByName('HelpLayer');
 
   if (
     helpLayer.children[helpLayer.children.length - 1] &&
     editor.activeEntities.length !== 1 &&
     String(helpLayer.children[helpLayer.children.length - 1].name) ===
-    'pointGeometryCenter'
+      'pointGeometryCenter'
   ) {
     isSelectPoint = isPoint(
       helpLayer.children[helpLayer.children.length - 1].position,
@@ -245,9 +242,9 @@ const startPointIndex = (line, mousePoint, editor) => {
   }
   if (!!isSelectPoint === true) {
     index[0] = helpLayer.children.length - 1;
-    editor.editMode.activeLine = activeEntities;
+    editor.editMode.activeLine = editor.activeEntities;
   } else {
-    activeEntities.forEach(line => {
+    editor.activeEntities.forEach(line => {
       let helpPoints = line.userData.helpPoints;
       // if(isSelectPoint == false){
       if (line.geometry.type === 'Geometry') {
@@ -274,32 +271,31 @@ const startPointIndex = (line, mousePoint, editor) => {
         // }
       } else if (line.geometry.type === 'CircleGeometry') {
         // todo CircleGeometry
-        let rPosition = line.position;
-        let thetaStart = {
-          x: line.geometry.vertices[0].x + rPosition.x,
-          y: line.geometry.vertices[0].y + rPosition.y
-        };
-        let thetaLength = {
-          x:
-            line.geometry.vertices[line.geometry.vertices.length - 1].x +
-            rPosition.x,
-          y:
-            line.geometry.vertices[line.geometry.vertices.length - 1].y +
-            rPosition.y
-        };
-        let radius = {
-          x:
-            line.geometry.vertices[(line.geometry.vertices.length - 1) / 2].x +
-            rPosition.x,
-          y:
-            line.geometry.vertices[(line.geometry.vertices.length - 1) / 2].y +
-            rPosition.y
-        };
-        let arrPoint = [];
-        // debugger;
-
-        arrPoint.push(rPosition, thetaStart, thetaLength, radius);
-        let temporaryIndex = closestPoint(arrPoint, mousePoint);
+        const rPosition = line.position;
+        const arrPoint = [
+          line.position,
+          {
+            x: line.geometry.vertices[0].x + rPosition.x,
+            y: line.geometry.vertices[0].y + rPosition.y
+          },
+          {
+            x:
+              line.geometry.vertices[line.geometry.vertices.length - 1].x +
+              rPosition.x,
+            y:
+              line.geometry.vertices[line.geometry.vertices.length - 1].y +
+              rPosition.y
+          },
+          {
+            x:
+              line.geometry.vertices[(line.geometry.vertices.length - 1) / 2]
+                .x + rPosition.x,
+            y:
+              line.geometry.vertices[(line.geometry.vertices.length - 1) / 2]
+                .y + rPosition.y
+          }
+        ];
+        const temporaryIndex = closestPoint(arrPoint, mousePoint);
         const isSelectPoint = isPoint(
           arrPoint[temporaryIndex],
           scale,
@@ -312,7 +308,6 @@ const startPointIndex = (line, mousePoint, editor) => {
           } else {
             index = [temporaryIndex];
             editor.editMode.activeLine = [line];
-            return index.length ? index : null;
           }
         }
       }
@@ -321,152 +316,175 @@ const startPointIndex = (line, mousePoint, editor) => {
   return index.length ? index : null;
 };
 
-const changeGeometry = (lines, index, point, scene, editor) => {
-  if (lines.length && lines.length === index.length) {
+const setGeometryForObjectWithHelpOfHelpPoints = (
+  previousScene,
+  currentScene
+) => {
+  console.log(
+    'setGeometryForObjectWithHelpOfHelpPoints',
+    previousScene,
+    currentScene
+  );
+  let lines = previousScene.scene.children[0].children[2].children.filter(
+    lines => previousScene.ids.find(id => id === lines.userData.id)
+  );
+  console.log('lines1', lines);
+  // lines = currentScene.children[0].children[2].children.filter(
+  //   (lines, index) => previousScene.ids.find(id => id === lines.userData.id)
+  // );
+  // console.log('lines4', lines);
+  console.log(previousScene.scene.getObjectByName('cap', true));
+  lines.forEach(line => {
+    line.geometry.verticesNeedUpdate = true;
+    if (line.userData.helpPoints) {
+      // const points = [
+      //   new THREE.Line(line.userData.helpPoints.point1),
+      //   new THREE.Line(line.userData.helpPoints.point2.geometry, line.userData.helpPoints.point2.material),
+      //   new THREE.Line(line.userData.helpPoints.pointCenter.geometry, line.userData.helpPoints.pointCenter.material),
+      // ];
+      console.log(line, line.userData.helpPoints)
+      // if (indexesOfLines[i] === 2) {
+      // const changeX = point.x - points[2].position.x;
+      // const changeY = point.y - points[2].position.y;
+      console.log(line.geometry.vertices)
+      line.geometry.vertices[0].x = line.userData.helpPoints.point1.object.matrix[12];
+      line.geometry.vertices[0].y = line.userData.helpPoints.point1.object.matrix[13];
+      line.geometry.vertices[1].x = line.userData.helpPoints.point2.object.matrix[12];
+      line.geometry.vertices[1].y = line.userData.helpPoints.point2.object.matrix[13];
+      // line.geometry.vertices[0].y = point.y;
+      // } else {
+      //   console.log('line.geometry.vertices', line.geometry.vertices);
+      //   line.geometry.vertices[indexesOfLines[i]].x = point.x;
+      //   line.geometry.vertices[indexesOfLines[i]].y = point.y;
+      // }
+      // if (points[0] && points[1]) {
+      //   points.forEach((point, index) => {
+      //     point.position.x =
+      //       index !== 2
+      //         ? line.geometry.vertices[index].x
+      //         : (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
+      //     point.position.y =
+      //       index !== 2
+      //         ? line.geometry.vertices[index].y
+      //         : (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
+      //   });
+      // }
+    } else {
+      // if (indexesOfLines[i] !== 2) {
+      //   line.geometry.vertices[indexesOfLines[i]].x = point.x;
+      //   line.geometry.vertices[indexesOfLines[i]].y = point.y;
+      // }
+    }
+    line.computeLineDistances();
+    line.geometry.computeBoundingSphere();
+  });
+};
+
+const changeGeometry = (lines, indexesOfLines, point, scene, editor) => {
+  if (lines.length && lines.length === indexesOfLines.length) {
     lines.forEach((line, i) => {
-      let points = false;
       if (line.geometry.type === 'Geometry') {
         line.geometry.verticesNeedUpdate = true;
         if (line.userData.helpPoints) {
-          points = true;
-        }
-        if (points) {
-          let point1 = line.userData.helpPoints.point1;
-          let point2 = line.userData.helpPoints.point2;
-          let point3 = line.userData.helpPoints.pointCenter;
-          if (index[i] === 2) {
-            let changeX = point.x - point3.position.x;
-            let changeY = point.y - point3.position.y;
-            line.geometry.vertices[0].x += changeX;
-            line.geometry.vertices[0].y += changeY;
-            line.geometry.vertices[1].x += changeX;
-            line.geometry.vertices[1].y += changeY;
+          const points = [
+            line.userData.helpPoints.point1,
+            line.userData.helpPoints.point2,
+            line.userData.helpPoints.pointCenter
+          ];
+          console.log(
+            'What is index',
+            indexesOfLines,
+            line,
+            i,
+            line.userData.helpPoints
+          );
+          if (indexesOfLines[i] === 2) {
+            const changeX = point.x - points[2].position.x;
+            const changeY = point.y - points[2].position.y;
+            line.geometry.vertices.forEach(pointVertices => {
+              pointVertices.x += changeX;
+              pointVertices.y += changeY;
+            });
           } else {
-            line.geometry.vertices[index[i]].x = point.x;
-            line.geometry.vertices[index[i]].y = point.y;
+            console.log('line.geometry.vertices', line.geometry.vertices);
+            line.geometry.vertices[indexesOfLines[i]].x = point.x;
+            line.geometry.vertices[indexesOfLines[i]].y = point.y;
           }
-          if (point1 && point2) {
-            point1.position.x = line.geometry.vertices[0].x;
-            point1.position.y = line.geometry.vertices[0].y;
-            point2.position.x = line.geometry.vertices[1].x;
-            point2.position.y = line.geometry.vertices[1].y;
-            point3.position.x =
-              (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
-            point3.position.y =
-              (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
+          if (points[0] && points[1]) {
+            points.forEach((point, index) => {
+              point.position.x =
+                index !== 2
+                  ? line.geometry.vertices[index].x
+                  : (line.geometry.vertices[1].x +
+                      line.geometry.vertices[0].x) /
+                    2;
+              point.position.y =
+                index !== 2
+                  ? line.geometry.vertices[index].y
+                  : (line.geometry.vertices[1].y +
+                      line.geometry.vertices[0].y) /
+                    2;
+            });
           }
         } else {
-          if (index[i] !== 2) {
-            line.geometry.vertices[index[i]].x = point.x;
-            line.geometry.vertices[index[i]].y = point.y;
+          if (indexesOfLines[i] !== 2) {
+            line.geometry.vertices[indexesOfLines[i]].x = point.x;
+            line.geometry.vertices[indexesOfLines[i]].y = point.y;
           }
         }
-        // if (index[i] === 2) {
-        //   let changeX = point.x - point3.position.x;
-        //   let changeY = point.y - point3.position.y;
-        //   line.geometry.vertices[0].x += changeX;
-        //   line.geometry.vertices[0].y += changeY;
-        //   line.geometry.vertices[1].x += changeX;
-        //   line.geometry.vertices[1].y += changeY;
-        // } else {
-        //   line.geometry.vertices[index[i]].x = point.x;
-        //   line.geometry.vertices[index[i]].y = point.y;
-        // }
         line.computeLineDistances();
         line.geometry.computeBoundingSphere();
-        // if (point1 && point2) {
-        //   point1.position.x = line.geometry.vertices[0].x;
-        //   point1.position.y = line.geometry.vertices[0].y;
-        //   point2.position.x = line.geometry.vertices[1].x;
-        //   point2.position.y = line.geometry.vertices[1].y;
-        //   point3.position.x =
-        //     (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
-        //   point3.position.y =
-        //     (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
-        // }
       } else if (line.geometry.type === 'CircleGeometry') {
-        let helpRad = 1e-3;
-        let checkHelpPoint = line.userData.helpPoints;
-        let selectLines = [];
+        console.log('CircleGeometry', 3422);
+        const helpRad = 1e-3;
+        const checkHelpPoint = line.userData.helpPoints;
+        const selectLines = [];
+        const checkPoints = [
+          {
+            index: 0,
+            type: 'pointStart'
+          },
+          {
+            index: 1,
+            type: 'pointStart'
+          },
+          {
+            index: 0,
+            type: 'pointEnd'
+          },
+          {
+            index: 1,
+            type: 'pointEnd'
+          }
+        ];
         editor.activeEntities.forEach(checkLine => {
+          console.log('activeEntities', 4533);
           if (checkLine.geometry.type === 'Geometry') {
-            if (
-              (checkLine.geometry.vertices[0].x -
-                checkHelpPoint.pointStart.position.x) *
-              (checkLine.geometry.vertices[0].x -
-                checkHelpPoint.pointStart.position.x) <
-              helpRad &&
-              (checkLine.geometry.vertices[0].y -
-                checkHelpPoint.pointStart.position.y) *
-              (checkLine.geometry.vertices[0].y -
-                checkHelpPoint.pointStart.position.y) <
-              helpRad
-            ) {
-              // debugger;
-              selectLines[selectLines.length] = [
-                [checkLine],
-                [0],
-                line.userData.helpPoints.pointStart.position
-              ];
-              // changeGeometry ([checkLine], [0], line.userData.helpPoints.pointStart.position, scene);
-            } else if (
-              (checkLine.geometry.vertices[1].x -
-                checkHelpPoint.pointStart.position.x) *
-              (checkLine.geometry.vertices[1].x -
-                checkHelpPoint.pointStart.position.x) <
-              helpRad &&
-              (checkLine.geometry.vertices[1].y -
-                checkHelpPoint.pointStart.position.y) *
-              (checkLine.geometry.vertices[1].y -
-                checkHelpPoint.pointStart.position.y) <
-              helpRad
-            ) {
-              // debugger;
-              selectLines[selectLines.length] = [
-                [checkLine],
-                [1],
-                line.userData.helpPoints.pointStart.position
-              ];
-              // changeGeometry ([checkLine], [1], line.userData.helpPoints.pointStart.position, scene);
-            } else if (
-              (checkLine.geometry.vertices[0].x -
-                checkHelpPoint.pointEnd.position.x) *
-              (checkLine.geometry.vertices[0].x -
-                checkHelpPoint.pointEnd.position.x) <
-              helpRad &&
-              (checkLine.geometry.vertices[0].y -
-                checkHelpPoint.pointEnd.position.y) *
-              (checkLine.geometry.vertices[0].y -
-                checkHelpPoint.pointEnd.position.y) <
-              helpRad
-            ) {
-              // debugger;
-              selectLines[selectLines.length] = [
-                [checkLine],
-                [0],
-                line.userData.helpPoints.pointEnd.position
-              ];
-              // changeGeometry ([checkLine], [0], line.userData.helpPoints.pointEnd.position, scene);
-            } else if (
-              (checkLine.geometry.vertices[1].x -
-                checkHelpPoint.pointEnd.position.x) *
-              (checkLine.geometry.vertices[1].x -
-                checkHelpPoint.pointEnd.position.x) <
-              helpRad &&
-              (checkLine.geometry.vertices[1].y -
-                checkHelpPoint.pointEnd.position.y) *
-              (checkLine.geometry.vertices[1].y -
-                checkHelpPoint.pointEnd.position.y) <
-              helpRad
-            ) {
-              // debugger;
-              selectLines[selectLines.length] = [
-                [checkLine],
-                [1],
-                line.userData.helpPoints.pointEnd.position
-              ];
-              // changeGeometry ([checkLine], [1], line.userData.helpPoints.pointEnd.position, scene);
-            }
+            console.log('Geometry', 5644);
+            checkPoints.find(checkPoint => {
+              if (
+                (checkLine.geometry.vertices[checkPoint.index].x -
+                  checkHelpPoint[checkPoint.type].position.x) *
+                  (checkLine.geometry.vertices[checkPoint.index].x -
+                    checkHelpPoint[checkPoint.type].position.x) <
+                  helpRad &&
+                (checkLine.geometry.vertices[checkPoint.index].y -
+                  checkHelpPoint[checkPoint.type].position.y) *
+                  (checkLine.geometry.vertices[checkPoint.index].y -
+                    checkHelpPoint[checkPoint.type].position.y) <
+                  helpRad
+              ) {
+                // debugger;
+                return (selectLines[selectLines.length] = [
+                  [checkLine],
+                  [checkPoint.index],
+                  line.userData.helpPoints[checkPoint.type].position
+                ]);
+                // changeGeometry ([checkLine], [checkPoint.index], line.userData.helpPoints[checkPoint.type].position, scene);
+              } else {
+                return false;
+              }
+            });
 
             // line.userData.helpPoints.pointStart.position;
             // line.userData.helpPoints.pointEnd.position;
@@ -487,24 +505,24 @@ const changeGeometry = (lines, index, point, scene, editor) => {
 
         line.userData.helpGeometry = changedGeometry;
 
-        if (index[i] === 0) {
+        if (indexesOfLines[i] === 0) {
           // *index === 0 move center arc
           // центр круга
           line.position.x = point.x;
           line.position.y = point.y;
         } else {
-          if (index[i] === 1) {
+          if (indexesOfLines[i] === 1) {
             changedGeometry = editThetaStart(point, line);
 
             changedGeometry.radius = radiusArc(point, line);
             line.userData.helpGeometry = changedGeometry;
-          } else if (index[i] === 2) {
+          } else if (indexesOfLines[i] === 2) {
             // end
             changedGeometry = editThetaLenght(point, line);
 
             changedGeometry.radius = radiusArc(point, line);
             line.userData.helpGeometry = changedGeometry;
-          } else if (index[i] === 3) {
+          } else if (indexesOfLines[i] === 3) {
             //центр дуги
             // *index === 3 change radius arc
             changedGeometry.radius = radiusArc(point, line);
@@ -514,6 +532,7 @@ const changeGeometry = (lines, index, point, scene, editor) => {
           line.geometry = changeArcGeometry(line.geometry, changedGeometry);
         }
         circleHelpPoint(line, scene);
+        console.log('Show me selectLines', selectLines);
         if (selectLines) {
           selectLines.forEach(line =>
             changeGeometry(line[0], line[1], line[2], scene, editor)
@@ -525,59 +544,52 @@ const changeGeometry = (lines, index, point, scene, editor) => {
     //   // todo  для декількох ліній
   } else if (
     lines.length &&
-    (index.length === 1 || index === 'MOVE_NEW_OBJECT')
+    (indexesOfLines.length === 1 || indexesOfLines === 'MOVE_NEW_OBJECT')
   ) {
-    let helpLayer = scene.getObjectByName('HelpLayer');
+    const helpLayer = scene.getObjectByName('HelpLayer');
     let pointGeometryCenter = helpLayer.children[helpLayer.children.length - 1];
-    if (index === 'MOVE_NEW_OBJECT') {
+    if (indexesOfLines === 'MOVE_NEW_OBJECT') {
       pointGeometryCenter = {};
-      pointGeometryCenter.position = {};
-      // let activeEntitiesBoundingBox = GeometryUtils.getBoundingBox(lines);
-      // pointGeometryCenter.position.x = activeEntitiesBoundingBox.center.x;
-      // pointGeometryCenter.position.y = activeEntitiesBoundingBox.center.y;
-      pointGeometryCenter.position.x = editor.editMode.dovetail.x;
-      pointGeometryCenter.position.y = editor.editMode.dovetail.y;
+      pointGeometryCenter.position = {
+        x: editor.editMode.dovetail.x,
+        y: editor.editMode.dovetail.y
+      };
     }
 
-    if (index === 'MOVE_NEW_OBJECT' || pointGeometryCenter.userData.groupMove) {
+    if (
+      indexesOfLines === 'MOVE_NEW_OBJECT' ||
+      pointGeometryCenter.userData.groupMove
+    ) {
       lines.forEach(line => {
-        if (
-          line.geometry instanceof THREE.CircleGeometry
-        ) {
+        if (line.geometry instanceof THREE.CircleGeometry) {
           // debugger;
         }
-        let changeX = point.x - pointGeometryCenter.position.x;
-        let changeY = point.y - pointGeometryCenter.position.y;
+        const changeX = point.x - pointGeometryCenter.position.x;
+        const changeY = point.y - pointGeometryCenter.position.y;
 
         // todo circle helpPoint group move
 
         if (line.geometry.type === 'Geometry') {
           line.geometry.verticesNeedUpdate = true;
-          if (index === 'MOVE_NEW_OBJECT') {
+          if (indexesOfLines === 'MOVE_NEW_OBJECT') {
             line.geometry.vertices.forEach(pointVertices => {
               pointVertices.x += changeX;
               pointVertices.y += changeY;
             });
-            // line.geometry.vertices[0].x += changeX;
-            // line.geometry.vertices[0].y += changeY;
-            // line.geometry.vertices[1].x += changeX;
-            // line.geometry.vertices[1].y += changeY;
           } else {
-            let point1 = line.userData.helpPoints.point1;
-            let point2 = line.userData.helpPoints.point2;
-            let point3 = line.userData.helpPoints.pointCenter;
-            if (point1.userData.groupMove) {
-              line.geometry.vertices[0].x += changeX;
-              line.geometry.vertices[0].y += changeY;
-              point1.position.x = line.geometry.vertices[0].x;
-              point1.position.y = line.geometry.vertices[0].y;
-            }
-            if (point2.userData.groupMove) {
-              line.geometry.vertices[1].x += changeX;
-              line.geometry.vertices[1].y += changeY;
-              point2.position.x = line.geometry.vertices[1].x;
-              point2.position.y = line.geometry.vertices[1].y;
-            }
+            const points = [
+              line.userData.helpPoints.point1,
+              line.userData.helpPoints.point2
+            ];
+            points.forEach((point, index) => {
+              if (point.userData.groupMove) {
+                line.geometry.vertices[index].x += changeX;
+                line.geometry.vertices[index].y += changeY;
+                point.position.x = line.geometry.vertices[index].x;
+                point.position.y = line.geometry.vertices[index].y;
+              }
+            });
+            const point3 = line.userData.helpPoints.pointCenter;
             point3.position.x =
               (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
             point3.position.y =
@@ -588,14 +600,13 @@ const changeGeometry = (lines, index, point, scene, editor) => {
         } else if (line.geometry.type === 'CircleGeometry') {
           line.position.x += changeX;
           line.position.y += changeY;
-          if (index !== 'MOVE_NEW_OBJECT') {
+          if (indexesOfLines !== 'MOVE_NEW_OBJECT') {
             circleHelpPoint(line, scene);
           }
         }
       });
-      // pointGeometryCenter.position.x = point.x;
-      // pointGeometryCenter.position.y = point.y;
-      // debugger;
+      pointGeometryCenter.position.x = point.x;
+      pointGeometryCenter.position.y = point.y;
     }
   }
 };
@@ -604,7 +615,7 @@ const changeArcGeometry = (arcGeometry, parameters) => {
   if (arcGeometry[0] !== 'copy') {
     arcGeometry.dispose();
   }
-  let geometry = new THREE.CircleGeometry(
+  const geometry = new THREE.CircleGeometry(
     parameters.radius,
     32,
     parameters.thetaStart,
@@ -617,7 +628,7 @@ const changeArcGeometry = (arcGeometry, parameters) => {
 const radiusArc = (point, line) =>
   Math.sqrt(
     (line.position.x - point.x) * (line.position.x - point.x) +
-    (line.position.y - point.y) * (line.position.y - point.y)
+      (line.position.y - point.y) * (line.position.y - point.y)
   );
 
 const editThetaLenght = (mousePoint, line) => {
@@ -696,15 +707,15 @@ const editThetaLenght = (mousePoint, line) => {
   result =
     deltaLength < 0
       ? {
-        ...result,
-        thetaStart: start1 + deltaLength,
-        thetaLength: -deltaLength
-      }
+          ...result,
+          thetaStart: start1 + deltaLength,
+          thetaLength: -deltaLength
+        }
       : {
-        ...result,
-        thetaStart: start1,
-        thetaLength: deltaLength
-      };
+          ...result,
+          thetaStart: start1,
+          thetaLength: deltaLength
+        };
   // start < 0
   result.thetaStart =
     result.thetaStart < 0 ? result.thetaStart + 2 * Math.PI : result.thetaStart;
@@ -761,15 +772,15 @@ const editThetaStart = (mousePoint, line) => {
   result =
     deltaLength < 0
       ? {
-        ...result,
-        thetaStart: q + deltaLength,
-        thetaLength: -deltaLength
-      }
+          ...result,
+          thetaStart: q + deltaLength,
+          thetaLength: -deltaLength
+        }
       : {
-        ...result,
-        thetaStart: q,
-        thetaLength: deltaLength
-      };
+          ...result,
+          thetaStart: q,
+          thetaLength: deltaLength
+        };
 
   // start < 0
   result.thetaStart =
@@ -1042,7 +1053,7 @@ const mirrorObject = (object, option) => {
 const rotationPoint = (vertex, center, angle) => {
   const r = Math.sqrt(
     (vertex.x - center.x) * (vertex.x - center.x) +
-    (vertex.y - center.y) * (vertex.y - center.y)
+      (vertex.y - center.y) * (vertex.y - center.y)
   );
   const alpha = circleIntersectionAngle(vertex, center) + angle;
   vertex.x = r * Math.cos(alpha) + center.x;
@@ -1091,6 +1102,7 @@ export {
   getScale,
   unselectLine,
   startPointIndex,
+  setGeometryForObjectWithHelpOfHelpPoints,
   changeGeometry,
   crossingPoint,
   createLine,

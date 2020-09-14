@@ -8,9 +8,7 @@ import {
   TOOL_MEASUREMENT,
   TOOL_NEW_CURVE,
   TOOL_POINT,
-  // TOOL_REDO,
   TOOL_SELECT,
-  // TOOL_UNDO,
   TOOL_FACET
 } from '../components/Toolbar/toolbarComponent';
 import {
@@ -190,14 +188,12 @@ export const cadClick = (event, editor) => {
     switch (tool) {
       case TOOL_POINT:
         {
-          let clickResult = sceneService.onClick(event, scene, camera);
-
-          let payload = {
+          const clickResult = sceneService.onClick(event, scene, camera);
+          const payload = {
             ...clickResult,
             object: null
           };
-
-          let selectResult = clickResult.activeEntities;
+          const selectResult = clickResult.activeEntities;
           // $scope.editor.lastClickResult.activeEntities = ArrayUtils.clone(clickResult.activeEntities);
 
           if (selectResult.length) {
@@ -208,17 +204,13 @@ export const cadClick = (event, editor) => {
           }
 
           if (!editor.editMode.isEdit) {
-            let activeEntities = sceneService.doSelection(selectResult, editor);
             dispatch({
               type: CAD_DO_SELECTION,
               payload: {
-                activeEntities
+                activeEntities: sceneService.doSelection(selectResult, editor)
               }
             });
           } else {
-            console.log('Start the party');
-            console.log(editor.editMode);
-            console.log(selectResult);
             if (
               selectResult.length &&
               selectResult[0].parent.name === editor.editMode.editObject.name &&
@@ -231,20 +223,16 @@ export const cadClick = (event, editor) => {
                 !editor.editMode.activeLine.length ||
                 selectResult[0].id !== editor.editMode.activeLine[0].id
               ) {
-                let activeEntities = sceneService.doSelection(
-                  selectResult,
-                  editor
-                );
                 dispatch({
                   type: CAD_DO_SELECTION,
                   payload: {
-                    activeEntities
+                    activeEntities: sceneService.doSelection(
+                      selectResult,
+                      editor
+                    )
                   }
                 });
-
-                // console.log("we need more console.log or cad active entities");
-                const rPoint = getScale(camera);
-                addHelpPoints(editor, scene, rPoint);
+                addHelpPoints(editor, scene, getScale(camera));
 
                 // todo костиль від 16.03.20
                 if (editor.activeEntities.length) {
@@ -258,16 +246,11 @@ export const cadClick = (event, editor) => {
                 renderer.render(scene, camera);
               }
             } else {
-              //unselect activeLine line
+              // Unselect activeLine line
               if (editor.activeEntities.length) {
-                let point = {
-                  x: clickResult.point.x,
-                  y: clickResult.point.y
-                };
-
                 // todo перевірка для всих хелппоінтів
                 let isSelectPoint = false;
-                let helpLayer = scene.getObjectByName('HelpLayer');
+                const helpLayer = scene.getObjectByName('HelpLayer');
                 if (helpLayer.children.length) {
                   helpLayer.children.forEach(testPoint => {
                     if (
@@ -278,7 +261,10 @@ export const cadClick = (event, editor) => {
                         isSelectPoint = isPoint(
                           testPoint.position,
                           testPoint.geometry.parameters.radius,
-                          point
+                          {
+                            x: clickResult.point.x,
+                            y: clickResult.point.y
+                          }
                         );
                       }
                     }
@@ -296,9 +282,7 @@ export const cadClick = (event, editor) => {
                 }
               }
             }
-            //todo закінчуючи туточки
           }
-
           dispatch({
             type: CAD_CLICK,
             payload
@@ -788,8 +772,12 @@ export const onMouseDown = (event, editor) => {
 };
 
 export const onMouseUp = (event, editor) => {
+  if (event.target.className.match('img')) {
+  console.log([event.target])
+    return dispatch => {};
+  }
   return dispatch => {
-    let { tool } = editor;
+    const { tool } = editor;
 
     //move object
     if (editor.editMode.move.active && editor.editMode.move.point) {
@@ -844,7 +832,8 @@ export const onMouseUp = (event, editor) => {
           editor.editMode.activeLine.length
         ) {
           // do edit here
-          savePoint(editor.editMode.selectPointIndex)(dispatch);
+          // savePoint(editor.editMode.selectPointIndex)(dispatch);
+          savePoint(editor)(dispatch);
         }
         break;
       default:
@@ -937,7 +926,6 @@ export const onMouseMove = (event, editor) => {
         }
 
         // todo розібратись з куском кода вище і нище, розібратись з новими лініями які паралельні і перпендикулярні
-        // if (editor.tool === TOOL_LINE) {
         switch (editor.options.selectMode) {
           case LINE_TWO_POINT:
             !editor.editMode.newLineFirst
@@ -991,7 +979,7 @@ export const onMouseMove = (event, editor) => {
 
             break;
           default: {
-            console.error(
+            console.warn(
               `Unknown editor.options.selectMode = ${editor.options.selectMode}`
             );
           }

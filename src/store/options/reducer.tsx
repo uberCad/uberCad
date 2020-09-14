@@ -1,22 +1,27 @@
 import { createReducer } from 'typesafe-actions';
-import { OptionsState, OptionsTypes } from './types';
+import {
+  OptionsState,
+  OptionsTypes,
+  SelectNewTypes,
+  DEFAULT_THRESHOLD
+} from './types';
 
 const initialState: OptionsState = {
-  selectMode: 'wadawd',
+  selectMode: SelectNewTypes.NEW,
   singleLayerSelect: true,
-  threshold: 0.0001
+  threshold: DEFAULT_THRESHOLD
 };
 
 export const optionsReducer = createReducer<OptionsState>(initialState)
-  .handleAction(OptionsTypes.OPTIONS_SELECT_MODE, (state, action) => ({
+  .handleAction(OptionsTypes.SELECT_MODE, (state, action) => ({
     ...state,
-    selectMode: action.payload.mode
+    selectMode: action.payload.value
   }))
-  .handleAction(OptionsTypes.OPTIONS_SINGLE_LAYER_SELECT, (state, action) => ({
+  .handleAction(OptionsTypes.SINGLE_LAYER_SELECT, (state, action) => ({
     ...state,
     singleLayerSelect: action.payload.value
   }))
-  .handleAction(OptionsTypes.OPTIONS_SET_THRESHOLD, (state, action) => ({
+  .handleAction(OptionsTypes.SET_THRESHOLD, (state, action) => ({
     ...state,
     threshold: action.payload.value
   }));

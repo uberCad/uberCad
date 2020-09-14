@@ -41,7 +41,6 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
     });
     editor.editMode.activeLine.lines = [];
   }
-
   if (data) {
     createLineTypeShaders(data);
 
@@ -235,6 +234,11 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
     camera.updateProjectionMatrix();
     this.render();
   };
+  // TODO: create functionality for multiple objects
+  scene.children[0].children[2].children.forEach((line, index) => {
+    line.userData.id = `${line.id}/${index}`;
+  });
+  console.log('ADD PERSONAL ID FOR EACH ELEMENTS', scene);
 
   function addContainer(name) {
     let container = new THREE.Object3D();
