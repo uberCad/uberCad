@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import sceneService from '../../services/sceneService';
@@ -40,23 +40,15 @@ export interface IProps {
   snapshots: Array<ISnapshot>;
 }
 
-interface ICurrentSnapshot {
-  titleSnapshot: string;
-  objectKey: string;
-}
-
 type Props = IProps & IDispatchProps;
 
 const PanelObjects: React.FC<Props> = (props: Props) => {
-  const [isShow, setIsShow] = useState<boolean>(false);
-  const [currentSnapshot, setCurrentSnapshot] = useState<Array<
-    ICurrentSnapshot
-  > | null>(null);
-  const [objectName, setObjectName] = useState<string | undefined>('');
-  const [objectId, setObjectId] = useState<number>(0);
-
   const { scene } = props.editor;
-  const [objects] = useState(scene ? sceneService.getObjects(scene) : null);
+
+  const [objectId, setObjectId] = useState<number>(props.activeObject?.id);
+  const [objects, setObjects] = useState(
+    scene ? sceneService.getObjects(scene) : null
+  );
 
   const onChangeVisible = (event: React.FormEvent): void => {
     if (scene) {
@@ -70,14 +62,10 @@ const PanelObjects: React.FC<Props> = (props: Props) => {
     }
   };
 
-  const edit = (event: React.FormEvent): void => {
+  const edit = (event: React.FormEvent, id: number): void => {
     event.stopPropagation();
     if (scene && objectId !== 0) {
-      props.isEdit(
-        !props.editor.isEdit,
-        props.editor,
-        scene.getObjectById(objectId)
-      );
+      props.isEdit(!props.editor.isEdit, props.editor, scene.getObjectById(id));
     }
   };
 
@@ -95,84 +83,21 @@ const PanelObjects: React.FC<Props> = (props: Props) => {
       return;
     }
     const object = scene.getObjectById(id);
+    setObjectId(id);
     props.toggleObject(
       props.editor,
       object !== props.activeObject ? object : null
     );
   };
 
-  const toggleShow = (event: React.MouseEvent): void => {
-    event.stopPropagation();
-    const objectName = scene.getObjectById(objectId)?.name;
-
-    const currentSnapshot: Array<ICurrentSnapshot> = [];
-    props.snapshots.forEach(item => {
-      item.objects.forEach(obj => {
-        if (obj.title === objectName) {
-          currentSnapshot.push({
-            titleSnapshot: item.title,
-            objectKey: obj._key
-          });
-        }
-      });
-    });
-    setIsShow(!isShow);
-    setObjectName(objectName);
-    setCurrentSnapshot(currentSnapshot);
-  };
-
-  const loadObjectSnapshot = (event: React.MouseEvent): void => {
-    event.stopPropagation();
-    let confirm;
-    if (props.isChanged) {
-      confirm = window.confirm(
-        'Document is not saved. You will lost the changes if you load this snapshot.'
-      );
-    }
-    if (!props.isChanged || confirm) {
-      props.loadObjectSnapshot(
-        String(event.currentTarget['dataset'].key),
-        props.editor.cadCanvas
-      );
-    }
-    setIsShow(false);
-    setCurrentSnapshot(null);
-  };
-
-  // useEffect(() => {
-  //   console.log('Effect');
-  //   props.snapshots.map(item => {
-  //     currentSnapshot = item.objects
-  //       .filter(obj => obj.title === objectName)
-  //       .map(obj => {
-  //         return {
-  //           titleSnapshot: item.title,
-  //           objectKey: obj._key
-  //         };
-  //       });
-  //   });
-  // }, [currentSnapshot, objectName, props.snapshots]);
+  useEffect(() => {
+    setObjects(scene ? sceneService.getObjects(scene) : null);
+  }, [scene]);
 
   return (
     <PanelWrapper id="panel-layers">
       {/* <div id="panel-layers"> */}
       <div className="content">
-        {isShow && (
-          <div className={`object-snapshot ${isShow ? 'show' : ''}`}>
-            <h4>{`"${objectName}" snapshots:`}</h4>
-            <ul>
-              {currentSnapshot?.map((snap, idx) => (
-                <li
-                  key={idx}
-                  data-key={snap.objectKey}
-                  onClick={loadObjectSnapshot}
-                >
-                  {snap.titleSnapshot}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
         {objects ? (
           objects.children.map((object, idx) => (
             <div
@@ -198,12 +123,12 @@ const PanelObjects: React.FC<Props> = (props: Props) => {
                 )}
               </FormattedMessage>
               {object.name}
-              <span
+              {/* <span
                 className="directions"
                 onClick={toggleShow}
                 data-id={object.id}
                 title="Load object snapshots"
-              />
+              /> */}
               <span>{object.children.length}</span>
             </div>
           ))
@@ -249,7 +174,7 @@ const PanelObjects: React.FC<Props> = (props: Props) => {
             src={images.btnEdit}
             onClick={event => {
               setObjectId(props.activeObject.id);
-              edit(event);
+              edit(event, props.activeObject.id);
             }}
           />
         )}

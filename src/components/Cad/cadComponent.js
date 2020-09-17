@@ -13,6 +13,7 @@ import PointInfoComponent from '../PointInfo/pointInfoComponentContainer';
 
 import './Cad.css';
 
+let map = {};
 export default class CadComponent extends Component {
   constructor(props) {
     super(props);
@@ -89,6 +90,21 @@ export default class CadComponent extends Component {
     } else {
       window.onbeforeunload = null;
     }
+    document.body.onkeydown = (e => {
+      map[e.keyCode] = e.type === 'keydown';
+      if ((map[16] || map[17] || map[90]) && Object.keys(map).length <= 3) {
+        if (map[16] && map[17] && map[90]) {
+          this.redo();
+          map = {};
+        } else if (map[90] && map[17]) {
+          this.undo();
+          map = {};
+        }
+      } else {
+        map = {};
+      }
+      return e;
+    }).bind(this);
 
     return (
       <div
@@ -115,6 +131,14 @@ export default class CadComponent extends Component {
       </div>
     );
   }
+
+  undo = event => {
+    this.props.undo();
+  };
+
+  redo = event => {
+    this.props.redo();
+  };
 
   onClick = event => {
     this.props.onClick(event, this.props.editor);
@@ -150,6 +174,8 @@ export default class CadComponent extends Component {
     spinnerHide: PropTypes.func,
     drawDxf: PropTypes.func,
     onClick: PropTypes.func,
+    undo: PropTypes.func,
+    redo: PropTypes.func,
     onDoubleClick: PropTypes.func,
     onMouseDown: PropTypes.func,
     onMouseMove: PropTypes.func,

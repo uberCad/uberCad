@@ -73,8 +73,10 @@ export const EDIT_SCALE_CHANGE = 'EDIT_SCALE_CHANGE';
 export const isEdit = (option, editor, object = {}) => {
   let activeLine = {};
   const { scene, camera, renderer } = editor;
+  const previousScene = scene.clone();
   object.userData.parentName = object.parent.name;
   const beforeEdit = JSON.stringify(object);
+  console.log(option, object)
   if (option) {
     scene.getObjectByName('HelpLayer').children = [];
     setColor(
@@ -102,6 +104,7 @@ export const isEdit = (option, editor, object = {}) => {
         beforeEdit: beforeEdit,
         editObject: object,
         scene: editor.scene,
+        previousScene,
         isChanged: true,
         activeLine
       }
@@ -203,7 +206,6 @@ export const saveEdit = editor => {
 
 export const selectPoint = (lines, event, editor) => {
   const { scene, camera } = editor;
-  // const previousScene = scene.clone();
   const clickResult = sceneService.onClick(event, scene, camera);
   const selectPointIndex = startPointIndex(
     lines,
@@ -233,8 +235,6 @@ export const selectPoint = (lines, event, editor) => {
       type: EDIT_SELECT_POINT,
       payload: {
         selectPointIndex
-        // previousScene,
-        // scene
       }
     });
   };
@@ -330,7 +330,13 @@ export const savePoint = ({ scene, activeEntities }) => {
         index: null,
         undoData: {
           mode: 'lineMove',
-          ids: [...activeEntities.map(el => el.userData.id)]
+          ids: [
+            ...activeEntities.map(el => ({
+              nameObject: el.parent.parent.name,
+              nameGroup: el.parent.name,
+              id: el.userData.id
+            }))
+          ]
         },
         previousScene,
         scene

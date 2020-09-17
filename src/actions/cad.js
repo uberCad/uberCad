@@ -772,8 +772,7 @@ export const onMouseDown = (event, editor) => {
 };
 
 export const onMouseUp = (event, editor) => {
-  if (event.target.className.match('img')) {
-  console.log([event.target])
+  if (event.target.nodeName !== 'CANVAS') {
     return dispatch => {};
   }
   return dispatch => {

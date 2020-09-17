@@ -192,7 +192,12 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         sceneChildrenHistory: [
-          ...state.sceneChildrenHistory,
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
           {
             scene: action.payload.previousScene
           }
@@ -230,7 +235,12 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         sceneChildrenHistory: [
-          ...state.sceneChildrenHistory,
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
           {
             scene: action.payload.previousScene
           }
@@ -247,7 +257,12 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         sceneChildrenHistory: [
-          ...state.sceneChildrenHistory,
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
           {
             scene: action.payload.previousScene
           }
@@ -265,7 +280,12 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         sceneChildrenHistory: [
-          ...state.sceneChildrenHistory,
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
           {
             scene: action.payload.previousScene
           }
@@ -327,7 +347,12 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         sceneChildrenHistory: [
-          ...state.sceneChildrenHistory,
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
           {
             scene: action.payload.previousScene
           }
@@ -350,7 +375,12 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         sceneChildrenHistory: [
-          ...state.sceneChildrenHistory,
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
           {
             scene: action.payload.previousScene
           }
@@ -407,7 +437,10 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         // sceneChildrenHistory: [
-        //   ...state.sceneChildrenHistory,
+        //   ...state.sceneChildrenHistory.slice(
+        //   0,
+        //   state.activeSceneChildren.counter
+        // ),
         //   {
         //     scene: action.payload.previousScene
         //   }
@@ -543,7 +576,12 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         sceneChildrenHistory: [
-          ...state.sceneChildrenHistory,
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
           {
             scene: action.payload.previousScene
           }
@@ -615,7 +653,12 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         sceneChildrenHistory: [
-          ...state.sceneChildrenHistory,
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
           {
             scene: action.payload.previousScene,
             ...action.payload.undoData
@@ -648,18 +691,6 @@ const cad = (state = initialState, action) => {
     case EDIT_SELECT_POINT:
       return {
         ...state,
-        // sceneChildrenHistory: [
-        //   ...state.sceneChildrenHistory,
-        //   {
-        //     scene: action.payload.previousScene
-        //   }
-        // ],
-        // currentScene: action.payload.scene,
-        // activeSceneChildren: {
-        //   canUndo: true,
-        //   counter: state.activeSceneChildren.counter + 1,
-        //   canRedo: false
-        // },
         editMode: update(state.editMode, {
           selectPointIndex: {
             $set: action.payload.selectPointIndex
@@ -685,8 +716,27 @@ const cad = (state = initialState, action) => {
 
     case EDIT_IS_EDIT:
       console.log(4, '_________EDIT_IS_EDIT________');
-      return update(state, {
-        editMode: {
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter
+          ),
+          {
+            scene: action.payload.previousScene
+          }
+        ],
+        currentScene: action.payload.scene,
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        scene: update(state.scene, {
+          $set: action.payload.scene
+        }),
+        editMode: update(state.editMode, {
           isEdit: {
             $set: action.payload.isEdit
           },
@@ -699,14 +749,11 @@ const cad = (state = initialState, action) => {
           activeLine: {
             $set: action.payload.activeLine
           }
-        },
-        scene: {
-          $set: action.payload.scene
-        },
-        isChanged: {
+        }),
+        isChanged: update(state.isChanged, {
           $set: action.payload.isChanged
-        }
-      });
+        })
+      };
     case SNAPSHOT_LOAD_SCENE:
       console.log(3);
       return {
@@ -728,7 +775,7 @@ const cad = (state = initialState, action) => {
         ...state,
         scene: action.payload.scene,
         currentScene: action.payload.scene,
-        sceneChildrenHistory: [],
+        sceneChildrenHistory: [action.payload.scene.clone()],
         sceneElementBeforeRotation: action.payload.scene,
         activeSceneChildren: {
           canRedo: false,
@@ -759,7 +806,12 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         sceneChildrenHistory: [
-          ...state.sceneChildrenHistory,
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
           {
             scene: action.payload.previousScene
           }
@@ -777,7 +829,11 @@ const cad = (state = initialState, action) => {
         })
       };
     case CAD_UNDO:
-      console.log('___________UNDO____________', state.activeSceneChildren.counter, state.sceneChildrenHistory);
+      console.log(
+        '___________UNDO____________',
+        state.activeSceneChildren.counter,
+        state.sceneChildrenHistory
+      );
       if (
         state.sceneChildrenHistory.length &&
         state.sceneChildrenHistory.length > 1 &&
@@ -792,10 +848,13 @@ const cad = (state = initialState, action) => {
             state.scene
           );
         }
-        action.payload.renderer.render(
+        const renderer = action.payload.renderer
+          ? action.payload.renderer
+          : state.cadCanvas.renderer;
+        renderer.render(
           state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
             .scene,
-          action.payload.camera
+          action.payload.camera ? action.payload.camera : state.camera
         );
         return {
           ...state,
@@ -812,6 +871,11 @@ const cad = (state = initialState, action) => {
       }
       return state;
     case CAD_REDO:
+      console.log(
+        '___________REDO____________',
+        state.activeSceneChildren.counter,
+        state.sceneChildrenHistory
+      );
       if (
         state.sceneChildrenHistory.length &&
         state.sceneChildrenHistory.length > 1 &&
@@ -826,10 +890,13 @@ const cad = (state = initialState, action) => {
             state.scene
           );
         }
-        action.payload.renderer.render(
+        const renderer = action.payload.renderer
+          ? action.payload.renderer
+          : state.cadCanvas.renderer;
+        renderer.render(
           state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
             .scene,
-          action.payload.camera
+          action.payload.camera ? action.payload.camera : state.camera
         );
         return {
           ...state,
@@ -847,9 +914,12 @@ const cad = (state = initialState, action) => {
         };
       } else if (state.activeSceneChildren.canRedo) {
         // make redo to current scene
-        action.payload.renderer.render(
+        const renderer = action.payload.renderer
+          ? action.payload.renderer
+          : state.cadCanvas.renderer;
+        renderer.render(
           state.currentScene,
-          action.payload.camera
+          action.payload.camera ? action.payload.camera : state.camera
         );
         return {
           ...state,
@@ -867,7 +937,12 @@ const cad = (state = initialState, action) => {
       return {
         ...state,
         sceneChildrenHistory: [
-          ...state.sceneChildrenHistory,
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
           {
             scene: action.payload.previousScene
           }

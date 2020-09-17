@@ -325,15 +325,15 @@ const setGeometryForObjectWithHelpOfHelpPoints = (
     previousScene,
     currentScene
   );
-  let lines = previousScene.scene.children[0].children[2].children.filter(
-    lines => previousScene.ids.find(id => id === lines.userData.id)
-  );
-  console.log('lines1', lines);
-  // lines = currentScene.children[0].children[2].children.filter(
-  //   (lines, index) => previousScene.ids.find(id => id === lines.userData.id)
-  // );
-  // console.log('lines4', lines);
-  console.log(previousScene.scene.getObjectByName('cap', true));
+  const lines = [];
+  previousScene.ids.forEach(lineInfo => {
+    lines.push(
+      previousScene.scene.children
+        .find(object => object.name === lineInfo.nameObject)
+        .children.find(group => group.name === lineInfo.nameGroup)
+        .children.find(line => lineInfo.id === line.userData.id)
+    );
+  });
   lines.forEach(line => {
     line.geometry.verticesNeedUpdate = true;
     if (line.userData.helpPoints) {
@@ -342,33 +342,41 @@ const setGeometryForObjectWithHelpOfHelpPoints = (
       //   new THREE.Line(line.userData.helpPoints.point2.geometry, line.userData.helpPoints.point2.material),
       //   new THREE.Line(line.userData.helpPoints.pointCenter.geometry, line.userData.helpPoints.pointCenter.material),
       // ];
-      console.log(line, line.userData.helpPoints)
-      // if (indexesOfLines[i] === 2) {
-      // const changeX = point.x - points[2].position.x;
-      // const changeY = point.y - points[2].position.y;
-      console.log(line.geometry.vertices)
-      line.geometry.vertices[0].x = line.userData.helpPoints.point1.object.matrix[12];
-      line.geometry.vertices[0].y = line.userData.helpPoints.point1.object.matrix[13];
-      line.geometry.vertices[1].x = line.userData.helpPoints.point2.object.matrix[12];
-      line.geometry.vertices[1].y = line.userData.helpPoints.point2.object.matrix[13];
-      // line.geometry.vertices[0].y = point.y;
-      // } else {
-      //   console.log('line.geometry.vertices', line.geometry.vertices);
-      //   line.geometry.vertices[indexesOfLines[i]].x = point.x;
-      //   line.geometry.vertices[indexesOfLines[i]].y = point.y;
-      // }
-      // if (points[0] && points[1]) {
-      //   points.forEach((point, index) => {
-      //     point.position.x =
-      //       index !== 2
-      //         ? line.geometry.vertices[index].x
-      //         : (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
-      //     point.position.y =
-      //       index !== 2
-      //         ? line.geometry.vertices[index].y
-      //         : (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
-      //   });
-      // }
+      if (line.geometry.type === 'Geometry') {
+        console.log(line, line.geometry.type, line.userData.helpPoints);
+        // if (indexesOfLines[i] === 2) {
+        // const changeX = point.x - points[2].position.x;
+        // const changeY = point.y - points[2].position.y;
+        console.log(line.geometry.vertices);
+        line.geometry.vertices[0].x =
+          line.userData.helpPoints.point1.object.matrix[12];
+        line.geometry.vertices[0].y =
+          line.userData.helpPoints.point1.object.matrix[13];
+        line.geometry.vertices[1].x =
+          line.userData.helpPoints.point2.object.matrix[12];
+        line.geometry.vertices[1].y =
+          line.userData.helpPoints.point2.object.matrix[13];
+        // line.geometry.vertices[0].y = point.y;
+        // } else {
+        //   console.log('line.geometry.vertices', line.geometry.vertices);
+        //   line.geometry.vertices[indexesOfLines[i]].x = point.x;
+        //   line.geometry.vertices[indexesOfLines[i]].y = point.y;
+        // }
+        // if (points[0] && points[1]) {
+        //   points.forEach((point, index) => {
+        //     point.position.x =
+        //       index !== 2
+        //         ? line.geometry.vertices[index].x
+        //         : (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
+        //     point.position.y =
+        //       index !== 2
+        //         ? line.geometry.vertices[index].y
+        //         : (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
+        //   });
+        // }
+      } else if (line.geometry.type === 'CircleGeometry') {
+        console.log(324234, line.userData.helpPoints)
+      }
     } else {
       // if (indexesOfLines[i] !== 2) {
       //   line.geometry.vertices[indexesOfLines[i]].x = point.x;
@@ -391,13 +399,6 @@ const changeGeometry = (lines, indexesOfLines, point, scene, editor) => {
             line.userData.helpPoints.point2,
             line.userData.helpPoints.pointCenter
           ];
-          console.log(
-            'What is index',
-            indexesOfLines,
-            line,
-            i,
-            line.userData.helpPoints
-          );
           if (indexesOfLines[i] === 2) {
             const changeX = point.x - points[2].position.x;
             const changeY = point.y - points[2].position.y;
