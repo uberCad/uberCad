@@ -87,15 +87,11 @@ export default class OptionsComponent extends Component {
   };
 
   cancelEdit = () => {
-    this.props.cancelEdit(
-      this.props.editor,
-      this.props.editMode.editObject,
-      this.props.editMode.beforeEdit
-    );
+    this.props.cancelEdit(this.props.editor, this.props.editMode);
   };
 
   saveEdit = () => {
-    this.props.saveEdit(this.props.editor);
+    this.props.saveEdit(this.props.editor, this.props.editMode);
   };
 
   saveSnap = () => {

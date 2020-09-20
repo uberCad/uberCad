@@ -90,7 +90,7 @@ export default class CadComponent extends Component {
     } else {
       window.onbeforeunload = null;
     }
-    document.body.onkeydown = (e => {
+    document.body.onkeydown = e => {
       map[e.keyCode] = e.type === 'keydown';
       if ((map[16] || map[17] || map[90]) && Object.keys(map).length <= 3) {
         if (map[16] && map[17] && map[90]) {
@@ -104,7 +104,7 @@ export default class CadComponent extends Component {
         map = {};
       }
       return e;
-    }).bind(this);
+    };
 
     return (
       <div

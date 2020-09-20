@@ -1,5 +1,6 @@
 import update from 'immutability-helper';
 
+import * as THREE from '../extend/THREE';
 import {
   CAD_DRAW_DXF,
   CAD_DO_SELECTION,
@@ -15,22 +16,27 @@ import {
   CAD_SELECT_LINE
 } from '../actions/cad';
 
-import { setGeometryForObjectWithHelpOfHelpPoints } from '../services/editObject';
+import {
+  setGeometryForObjectWithHelpOfHelpPoints,
+  setOriginalColor,
+  setColor,
+  getScale,
+  addHelpPoints
+} from '../services/editObject';
+import GeometryUtils from '../services/GeometryUtils';
+import sceneService from '../services/sceneService';
 
 import { MATERIAL_SET } from '../actions/materials';
 
 import { SNAPSHOT_ADD, SNAPSHOT_LOAD_SCENE } from '../actions/panelSnapshots';
 
 import {
-  EDIT_IS_EDIT,
   EDIT_SELECT_POINT,
-  EDIT_CANCEL,
   EDIT_SAVE_POINT,
   EDIT_NEW_LINE,
   EDIT_CANCEL_NEW_LINE,
   EDIT_LINE_FIRST_POINT,
   EDIT_NEW_LINE_SAVE,
-  EDIT_SAVE,
   EDIT_NEW_CURVE,
   EDIT_CANCEL_NEW_CURVE,
   EDIT_CURVE_CENTER_POINT,
@@ -58,6 +64,11 @@ import {
   EDIT_SCALE_SAVE,
   EDIT_SCALE_CHANGE
 } from '../actions/edit';
+import {
+  EDIT_IS_EDIT,
+  EDIT_CANCEL,
+  EDIT_SAVE
+} from '../actions/editorActions/edit';
 
 import {
   POINT_INFO_ACTIVE,
@@ -676,18 +687,6 @@ const cad = (state = initialState, action) => {
           }
         })
       };
-    case EDIT_CANCEL:
-      return update(state, {
-        editMode: {
-          $set: action.payload.editMode
-        }
-      });
-    case EDIT_SAVE:
-      return update(state, {
-        editMode: {
-          $set: action.payload.editMode
-        }
-      });
     case EDIT_SELECT_POINT:
       return {
         ...state,
@@ -714,17 +713,76 @@ const cad = (state = initialState, action) => {
         }
       });
 
-    case EDIT_IS_EDIT:
-      console.log(4, '_________EDIT_IS_EDIT________');
+    case EDIT_CANCEL: {
+      // Find index of first element with 'isEdit' event from end
+      const indexSlice =
+        state.sceneChildrenHistory.length === 2
+          ? 1
+          : state.sceneChildrenHistory.length -
+            (Array.from(state.sceneChildrenHistory)
+              .reverse()
+              .findIndex(history => history.mode === 'isEdit') +
+              1);
+      const sceneChildrenHistory = [
+        ...state.sceneChildrenHistory.slice(0, indexSlice)
+      ];
+      return {
+        ...state,
+        sceneChildrenHistory,
+        currentScene: sceneChildrenHistory.pop().scene,
+        activeSceneChildren: {
+          canUndo: true,
+          counter: indexSlice - 1,
+          canRedo: false
+        },
+        editMode: update(state.editMode, {
+          $set: action.payload.editMode
+        })
+      };
+    }
+    case EDIT_SAVE:
       return {
         ...state,
         sceneChildrenHistory: [
           ...state.sceneChildrenHistory.slice(
             0,
-            state.activeSceneChildren.counter
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
           ),
           {
-            scene: action.payload.previousScene
+            scene: action.payload.previousScene,
+            mode: 'saveEdit',
+            ...action.payload.undoData
+          }
+        ],
+        currentScene: action.payload.scene,
+        activeSceneChildren: {
+          canUndo: true,
+          counter: state.activeSceneChildren.counter + 1,
+          canRedo: false
+        },
+        editMode: update(state.editMode, {
+          $set: action.payload.editMode
+        })
+      };
+    case EDIT_IS_EDIT:
+      return {
+        ...state,
+        sceneChildrenHistory: [
+          ...state.sceneChildrenHistory.slice(
+            0,
+            state.activeSceneChildren.counter > 0
+              ? state.activeSceneChildren.counter
+              : 1
+          ),
+          {
+            scene: action.payload.previousScene,
+            mode: 'isEdit',
+            isEdit: action.payload.isEdit,
+            beforeEdit: action.payload.beforeEdit,
+            editObject: action.payload.editObject,
+            activeLine: action.payload.activeLine
           }
         ],
         currentScene: action.payload.scene,
@@ -769,23 +827,39 @@ const cad = (state = initialState, action) => {
         objectsIds: action.payload.objectsIds,
         isChanged: action.payload.isChanged
       };
-    case CAD_DRAW_DXF:
+    case CAD_DRAW_DXF: {
       console.log(1);
+      const firstScene = action.payload.scene.clone();
       return {
         ...state,
         scene: action.payload.scene,
         currentScene: action.payload.scene,
-        sceneChildrenHistory: [action.payload.scene.clone()],
+        sceneChildrenHistory: [
+          {
+            scene: firstScene,
+            mode: 'firstElement',
+            undoData: {
+              objects: firstScene.children[0].children.map(group => ({
+                groupName: group.name,
+                children: group.children.map(el => ({
+                  vertices: JSON.stringify(el.geometry.vertices),
+                  id: el.userData.id
+                }))
+              }))
+            }
+          }
+        ],
         sceneElementBeforeRotation: action.payload.scene,
         activeSceneChildren: {
           canRedo: false,
-          counter: 0,
+          counter: 1,
           canUndo: false
         },
         camera: action.payload.camera,
         renderer: action.payload.renderer,
         cadCanvas: action.payload.cadCanvas
       };
+    }
     case CAD_DO_SELECTION:
       return update(state, {
         activeEntities: {
@@ -835,38 +909,135 @@ const cad = (state = initialState, action) => {
         state.sceneChildrenHistory
       );
       if (
-        state.sceneChildrenHistory.length &&
         state.sceneChildrenHistory.length > 1 &&
         state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
       ) {
         // set previous version of state and decrease counter
-        if (
-          state.sceneChildrenHistory[state.activeSceneChildren.counter - 1].mode
-        ) {
-          setGeometryForObjectWithHelpOfHelpPoints(
-            state.sceneChildrenHistory[state.activeSceneChildren.counter - 1],
-            state.scene
-          );
+        const { mode, scene } = state.sceneChildrenHistory[
+          state.activeSceneChildren.counter - 1
+        ];
+        let additionalData = {};
+        switch (mode) {
+          case 'firstElement':
+          case 'lineMove':
+            setGeometryForObjectWithHelpOfHelpPoints(
+              state.sceneChildrenHistory[state.activeSceneChildren.counter - 1],
+              scene,
+              state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
+                .mode
+            );
+            break;
+          case 'saveEdit':
+          case 'cancelEdit':
+            {
+              const object =
+                state.sceneChildrenHistory[
+                  state.activeSceneChildren.counter - 1
+                ].editObject;
+              console.log(object.userData);
+              object.userData.parentName = object.parent.name;
+              scene.getObjectByName('HelpLayer').children = [];
+              setColor(
+                scene,
+                new THREE.Color(0xaaaaaa),
+                object.id,
+                new THREE.Color(0x00ff00)
+              );
+              if (object instanceof THREE.Line) {
+                const rPoint = getScale(state.camera);
+                object.name = 'ActiveLine';
+                addHelpPoints(object, scene, rPoint);
+              }
+              additionalData = {
+                editMode: {
+                  isEdit: false,
+                  beforeEdit: {},
+                  editObject: {},
+                  activeLine: {},
+                  selectPointIndex: null,
+                  clone: {
+                    active: false,
+                    point: null,
+                    cloneObject: null
+                  },
+                  move: {
+                    active: false,
+                    point: null,
+                    moveObject: null
+                  },
+                  rotation: {
+                    active: false,
+                    rotationObject: null,
+                    angle: 0
+                  },
+                  scale: {
+                    active: false,
+                    scaleObject: null,
+                    scale: 1
+                  }
+                }
+              };
+            }
+            break;
+          case 'isEdit':
+            {
+              const {
+                editObject,
+                beforeEdit,
+                activeLine,
+                isEdit
+              } = state.sceneChildrenHistory[
+                state.activeSceneChildren.counter - 1
+              ];
+              if (beforeEdit && !editObject.metadata) {
+                const object = new THREE.ObjectLoader().parse(
+                  JSON.parse(beforeEdit)
+                );
+                editObject.parent.remove(editObject);
+                state.scene
+                  .getObjectByName(object.userData.parentName)
+                  .add(object);
+              }
+              scene.getObjectByName('HelpLayer').children = [];
+              sceneService.fixSceneAfterImport(scene);
+              GeometryUtils.fixObjectsPaths(scene);
+
+              setOriginalColor(scene);
+              additionalData = {
+                editMode: {
+                  isEdit,
+                  beforeEdit,
+                  editObject,
+                  isChanged: true,
+                  activeLine
+                }
+              };
+            }
+            break;
+          default:
+            break;
         }
+
         const renderer = action.payload.renderer
           ? action.payload.renderer
           : state.cadCanvas.renderer;
         renderer.render(
-          state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
-            .scene,
+          scene,
           action.payload.camera ? action.payload.camera : state.camera
         );
         return {
           ...state,
+          ...additionalData,
           activeSceneChildren: {
             canUndo: state.activeSceneChildren.counter - 1 !== 0,
             counter: state.activeSceneChildren.counter - 1,
             canRedo: true
-          }
+          },
+          editMode: update(state.editMode, {
+            $merge: { ...additionalData.editMode }
+          }),
           // TODO: check if we don't need to save scene in this position
-          // scene:
-          //   state.sceneChildrenHistory[state.activeSceneChildren.counter - 1]
-          //     .scene
+          scene: scene
         };
       }
       return state;
@@ -882,20 +1053,113 @@ const cad = (state = initialState, action) => {
         state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
       ) {
         // set next version of state and increase counter
-        if (
-          state.sceneChildrenHistory[state.activeSceneChildren.counter + 1].mode
-        ) {
-          setGeometryForObjectWithHelpOfHelpPoints(
-            state.sceneChildrenHistory[state.activeSceneChildren.counter + 1],
-            state.scene
-          );
+        const { mode, scene } = state.sceneChildrenHistory[
+          state.activeSceneChildren.counter + 1
+        ];
+        let additionalData = {};
+
+        switch (mode) {
+          case 'lineMove':
+            setGeometryForObjectWithHelpOfHelpPoints(
+              state.sceneChildrenHistory[state.activeSceneChildren.counter + 1],
+              scene
+            );
+            break;
+          case 'isEdit':
+            {
+              const object =
+                state.sceneChildrenHistory[
+                  state.activeSceneChildren.counter + 1
+                ].editObject;
+              object.userData.parentName = object.parent.name;
+              scene.getObjectByName('HelpLayer').children = [];
+              setColor(
+                scene,
+                new THREE.Color(0xaaaaaa),
+                object.id,
+                new THREE.Color(0x00ff00)
+              );
+              if (object instanceof THREE.Line) {
+                const rPoint = getScale(state.camera);
+                object.name = 'ActiveLine';
+                addHelpPoints(object, scene, rPoint);
+              }
+              additionalData = {
+                editMode: {
+                  isEdit: false,
+                  beforeEdit: {},
+                  editObject: {},
+                  activeLine: {},
+                  selectPointIndex: null,
+                  clone: {
+                    active: false,
+                    point: null,
+                    cloneObject: null
+                  },
+                  move: {
+                    active: false,
+                    point: null,
+                    moveObject: null
+                  },
+                  rotation: {
+                    active: false,
+                    rotationObject: null,
+                    angle: 0
+                  },
+                  scale: {
+                    active: false,
+                    scaleObject: null,
+                    scale: 1
+                  }
+                }
+              };
+            }
+            break;
+          case 'saveEdit':
+          case 'cancelEdit':
+            {
+              const {
+                editObject,
+                beforeEdit,
+                activeLine,
+                isEdit
+              } = state.sceneChildrenHistory[
+                state.activeSceneChildren.counter + 1
+              ];
+              if (beforeEdit && !editObject.metadata) {
+                const object = new THREE.ObjectLoader().parse(
+                  JSON.parse(beforeEdit)
+                );
+                editObject.parent.remove(editObject);
+                state.scene
+                  .getObjectByName(object.userData.parentName)
+                  .add(object);
+              }
+              scene.getObjectByName('HelpLayer').children = [];
+              sceneService.fixSceneAfterImport(scene);
+              GeometryUtils.fixObjectsPaths(scene);
+
+              setOriginalColor(scene);
+              additionalData = {
+                editMode: {
+                  isEdit,
+                  beforeEdit,
+                  editObject,
+                  isChanged: true,
+                  activeLine
+                }
+              };
+            }
+            break;
+          default:
+            break;
         }
+
         const renderer = action.payload.renderer
           ? action.payload.renderer
           : state.cadCanvas.renderer;
         renderer.render(
-          state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
-            .scene,
+          scene,
           action.payload.camera ? action.payload.camera : state.camera
         );
         return {
@@ -906,11 +1170,14 @@ const cad = (state = initialState, action) => {
             canRedo:
               state.activeSceneChildren.counter + 1 <
               state.sceneChildrenHistory.length + 1
-          }
+          },
+          editMode: update(state.editMode, {
+            $merge: {
+              ...additionalData.editMode
+            }
+          }),
           // TODO: check if we don't need to save scene in this position
-          // scene:
-          //   state.sceneChildrenHistory[state.activeSceneChildren.counter + 1]
-          //     .scene
+          scene: scene
         };
       } else if (state.activeSceneChildren.canRedo) {
         // make redo to current scene
@@ -927,8 +1194,8 @@ const cad = (state = initialState, action) => {
             canUndo: true,
             counter: state.sceneChildrenHistory.length,
             canRedo: false
-          }
-          // scene: state.currentScene
+          },
+          scene: state.currentScene
         };
       }
       return state;

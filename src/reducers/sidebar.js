@@ -3,7 +3,7 @@ import update from 'immutability-helper';
 import { SIDEBAR_TOGGLE, TOGGLE_TAB } from '../actions/sidebar';
 import { PANEL_OBJECTS_TOGGLE } from '../actions/panelObjects';
 import { LOCALE_SET } from '../actions/locale';
-import { EDIT_IS_EDIT } from '../actions/edit';
+import { EDIT_IS_EDIT } from '../actions/editorActions/edit';
 import { MATERIAL_SET } from '../actions/materials';
 import { PANEL_LAYERS_TOGGLE } from '../actions/panelLayers';
 

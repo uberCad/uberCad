@@ -1,6 +1,5 @@
 import * as THREE from '../extend/THREE';
 import {
-  setColor,
   setOriginalColor,
   startPointIndex,
   changeGeometry,
@@ -13,19 +12,14 @@ import {
   clone,
   fixPosition,
   mirrorObject,
-  getScale,
-  addHelpPoints,
   rotationPoint,
   changeArcGeometry
 } from '../services/editObject';
-import sceneService from '../services/sceneService';
 import { activePoint, disablePoint, movePointInfo } from './pointInfo';
+import sceneService from '../services/sceneService';
 import GeometryUtils from '../services/GeometryUtils';
 import helpLayerService from '../services/helpLayerService';
 
-export const EDIT_IS_EDIT = 'EDIT_IS_EDIT';
-export const EDIT_CANCEL = 'EDIT_CANCEL';
-export const EDIT_SAVE = 'EDIT_SAVE';
 export const EDIT_SELECT_POINT = 'EDIT_SELECT_POINT';
 export const EDIT_MOVE_POINT = 'EDIT_MOVE_POINT';
 export const EDIT_SAVE_POINT = 'EDIT_SAVE_POINT';
@@ -69,140 +63,6 @@ export const EDIT_SCALE_AVTIVE = 'EDIT_SCALE_AVTIVE';
 export const EDIT_SCALE = 'EDIT_SCALE';
 export const EDIT_SCALE_SAVE = 'EDIT_SCALE_SAVE';
 export const EDIT_SCALE_CHANGE = 'EDIT_SCALE_CHANGE';
-
-export const isEdit = (option, editor, object = {}) => {
-  let activeLine = {};
-  const { scene, camera, renderer } = editor;
-  const previousScene = scene.clone();
-  object.userData.parentName = object.parent.name;
-  const beforeEdit = JSON.stringify(object);
-  console.log(option, object)
-  if (option) {
-    scene.getObjectByName('HelpLayer').children = [];
-    setColor(
-      scene,
-      new THREE.Color(0xaaaaaa),
-      object.id,
-      new THREE.Color(0x00ff00)
-    );
-  } else {
-    setOriginalColor(scene);
-  }
-  if (object instanceof THREE.Line) {
-    activeLine = object;
-    const rPoint = getScale(camera);
-    object.name = 'ActiveLine';
-    addHelpPoints(object, scene, rPoint);
-  }
-  console.log('_________isEdit_________');
-  renderer.render(scene, camera);
-  return dispatch =>
-    dispatch({
-      type: EDIT_IS_EDIT,
-      payload: {
-        isEdit: option,
-        beforeEdit: beforeEdit,
-        editObject: object,
-        scene: editor.scene,
-        previousScene,
-        isChanged: true,
-        activeLine
-      }
-    });
-};
-
-export const cancelEdit = (editor, editObject, backUp) => {
-  console.log('editObject', editObject);
-  if (backUp && !editObject.metadata) {
-    // for developer after save/restart, editObject === json object
-    const object = new THREE.ObjectLoader().parse(JSON.parse(backUp));
-    editObject.parent.remove(editObject);
-    editor.scene.getObjectByName(object.userData.parentName).add(object);
-  }
-  editor.scene.getObjectByName('HelpLayer').children = [];
-  sceneService.fixSceneAfterImport(editor.scene);
-  GeometryUtils.fixObjectsPaths(editor.scene);
-  setOriginalColor(editor.scene);
-  console.log('____________cancelEdit_________');
-  editor.renderer.render(editor.scene, editor.camera);
-  return dispatch => {
-    disablePoint()(dispatch);
-    dispatch({
-      type: EDIT_CANCEL,
-      payload: {
-        editMode: {
-          isEdit: false,
-          beforeEdit: {},
-          editObject: {},
-          activeLine: {},
-          selectPointIndex: null,
-          clone: {
-            active: false,
-            point: null,
-            cloneObject: null
-          },
-          move: {
-            active: false,
-            point: null,
-            moveObject: null
-          },
-          rotation: {
-            active: false,
-            rotationObject: null,
-            angle: 0
-          },
-          scale: {
-            active: false,
-            scaleObject: null,
-            scale: 1
-          }
-        }
-      }
-    });
-  };
-};
-
-export const saveEdit = editor => {
-  editor.scene.getObjectByName('HelpLayer').children = [];
-  setOriginalColor(editor.scene);
-  editor.renderer.render(editor.scene, editor.camera);
-  console.log('____________saveEdit_________');
-  return dispatch => {
-    disablePoint()(dispatch);
-    dispatch({
-      type: EDIT_SAVE,
-      payload: {
-        editMode: {
-          isEdit: false,
-          beforeEdit: {},
-          editObject: {},
-          activeLine: {},
-          selectPointIndex: null,
-          clone: {
-            active: false,
-            point: null,
-            cloneObject: null
-          },
-          move: {
-            active: false,
-            point: null,
-            moveObject: null
-          },
-          rotation: {
-            active: false,
-            rotationObject: null,
-            angle: 0
-          },
-          scale: {
-            active: false,
-            scaleObject: null,
-            scale: 1
-          }
-        }
-      }
-    });
-  };
-};
 
 export const selectPoint = (lines, event, editor) => {
   const { scene, camera } = editor;
@@ -938,31 +798,9 @@ export const moveObjectPoint = (event, editor) => {
 };
 
 export const disableMovePoint = (object, scene) => {
-  console.log(object.position);
-  // object.children.forEach(line => {
-  //   if (line.geometry instanceof THREE.Geometry) {
-  //     line.geometry.vertices.forEach(vertex => {
-  //       vertex.x = vertex.x + object.position.x;
-  //       vertex.y = vertex.y + object.position.y;
-  //       vertex.z = vertex.z + object.position.z;
-  //     });
-  //     line.geometry.verticesNeedUpdate = true;
-  //     line.computeLineDistances(); // recalculation needed for line to render properly.
-  //     line.geometry.computeBoundingSphere(); // recalculation for project
-  //   } else if (line.geometry instanceof THREE.CircleGeometry) {
-  //     line.position.set(
-  //       line.position.x + object.position.x,
-  //       line.position.y + object.position.y,
-  //       line.position.z + object.position.z
-  //     );
-  //   }
-  // });
-  const previousScene = scene.clone();
-  // sceneService.fixSceneAfterImport(previousScene);
-  // GeometryUtils.fixObjectsPaths(previousScene);
-  // object.position.set(0, 0, 0);
-  fixPosition(object);
   console.log('___________  disableMovePoint  _________');
+  const previousScene = scene.clone();
+  fixPosition(object);
   return dispatch => {
     disablePoint()(dispatch);
     dispatch({
@@ -976,10 +814,9 @@ export const disableMovePoint = (object, scene) => {
   };
 };
 
-// let moveTimeout = null
 export const moveObject = (event, editor) => {
+  console.log('___________  moveObject  _________');
   const { scene, camera, renderer } = editor;
-  // const previousScene = scene.clone;
   const clickResult = sceneService.onClick(event, scene, camera);
   const mousePoint = {
     x: clickResult.point.x,
@@ -992,18 +829,8 @@ export const moveObject = (event, editor) => {
     p.y - editor.editMode.move.point.y,
     0
   );
-  console.log('___________  moveObject  _________');
   renderer.render(scene, camera);
   return dispatch => {
-    // clearTimeout(moveTimeout);
-    // moveTimeout = setTimeout(() => {
-    //   dispatch({
-    //     type: 'FIX_SCENE',
-    //     payload: {
-    //       previousScene
-    //     }
-    //   });
-    // }, 400);
     crossing
       ? movePointInfo(event, 'Crossing point')(dispatch)
       : movePointInfo(event, 'Select paste point')(dispatch);

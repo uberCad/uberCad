@@ -1,5 +1,5 @@
 import * as THREE from '../extend/THREE';
-import GeometryUtils from '../services/GeometryUtils';
+import GeometryUtils from './GeometryUtils';
 import helpLayerService from './helpLayerService';
 
 const setColor = (entity, bgColor, objId, objColor) => {
@@ -318,13 +318,34 @@ const startPointIndex = (line, mousePoint, editor) => {
 
 const setGeometryForObjectWithHelpOfHelpPoints = (
   previousScene,
-  currentScene
+  currentScene,
+  mode
 ) => {
   console.log(
     'setGeometryForObjectWithHelpOfHelpPoints',
     previousScene,
     currentScene
   );
+  // TODO: create better solution
+  if (mode === 'firstElement') {
+    return previousScene.scene.children[0].children.forEach(
+      (group, groupIndex) => {
+        group.children.forEach((line, lineIndex) => {
+          const vertices = JSON.parse(
+            previousScene.undoData.objects[groupIndex].children[lineIndex]
+              .vertices
+          );
+          line.geometry.verticesNeedUpdate = true;
+          line.geometry.vertices.forEach((vertice, index) => {
+            vertice.x = vertices[index].x;
+            vertice.y = vertices[index].y;
+          });
+          line.computeLineDistances();
+          line.geometry.computeBoundingSphere();
+        });
+      }
+    );
+  }
   const lines = [];
   previousScene.ids.forEach(lineInfo => {
     lines.push(
@@ -336,52 +357,16 @@ const setGeometryForObjectWithHelpOfHelpPoints = (
   });
   lines.forEach(line => {
     line.geometry.verticesNeedUpdate = true;
-    if (line.userData.helpPoints) {
-      // const points = [
-      //   new THREE.Line(line.userData.helpPoints.point1),
-      //   new THREE.Line(line.userData.helpPoints.point2.geometry, line.userData.helpPoints.point2.material),
-      //   new THREE.Line(line.userData.helpPoints.pointCenter.geometry, line.userData.helpPoints.pointCenter.material),
-      // ];
-      if (line.geometry.type === 'Geometry') {
-        console.log(line, line.geometry.type, line.userData.helpPoints);
-        // if (indexesOfLines[i] === 2) {
-        // const changeX = point.x - points[2].position.x;
-        // const changeY = point.y - points[2].position.y;
-        console.log(line.geometry.vertices);
-        line.geometry.vertices[0].x =
-          line.userData.helpPoints.point1.object.matrix[12];
-        line.geometry.vertices[0].y =
-          line.userData.helpPoints.point1.object.matrix[13];
-        line.geometry.vertices[1].x =
-          line.userData.helpPoints.point2.object.matrix[12];
-        line.geometry.vertices[1].y =
-          line.userData.helpPoints.point2.object.matrix[13];
-        // line.geometry.vertices[0].y = point.y;
-        // } else {
-        //   console.log('line.geometry.vertices', line.geometry.vertices);
-        //   line.geometry.vertices[indexesOfLines[i]].x = point.x;
-        //   line.geometry.vertices[indexesOfLines[i]].y = point.y;
-        // }
-        // if (points[0] && points[1]) {
-        //   points.forEach((point, index) => {
-        //     point.position.x =
-        //       index !== 2
-        //         ? line.geometry.vertices[index].x
-        //         : (line.geometry.vertices[1].x + line.geometry.vertices[0].x) / 2;
-        //     point.position.y =
-        //       index !== 2
-        //         ? line.geometry.vertices[index].y
-        //         : (line.geometry.vertices[1].y + line.geometry.vertices[0].y) / 2;
-        //   });
-        // }
-      } else if (line.geometry.type === 'CircleGeometry') {
-        console.log(324234, line.userData.helpPoints)
-      }
-    } else {
-      // if (indexesOfLines[i] !== 2) {
-      //   line.geometry.vertices[indexesOfLines[i]].x = point.x;
-      //   line.geometry.vertices[indexesOfLines[i]].y = point.y;
-      // }
+    if (line.userData.helpPoints && line.geometry.type === 'Geometry') {
+      // TODO: find better solution to take position from matrix
+      line.geometry.vertices[0].x =
+        line.userData.helpPoints.point1.object.matrix[12];
+      line.geometry.vertices[0].y =
+        line.userData.helpPoints.point1.object.matrix[13];
+      line.geometry.vertices[1].x =
+        line.userData.helpPoints.point2.object.matrix[12];
+      line.geometry.vertices[1].y =
+        line.userData.helpPoints.point2.object.matrix[13];
     }
     line.computeLineDistances();
     line.geometry.computeBoundingSphere();

@@ -12,7 +12,8 @@ import {
   loadObjectSnapshot
 } from '../../actions/panelObjects';
 import { showAll } from '../../actions/activeEntities';
-import { isEdit, ungroup } from '../../actions/edit';
+import { ungroup } from '../../actions/edit';
+import { isEdit } from '../../actions/editorActions/edit';
 
 const mapStateToProps = (state, ownProps): IProps => {
   return {

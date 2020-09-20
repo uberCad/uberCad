@@ -8,16 +8,15 @@ import {
 } from '../../store/options/action';
 
 import {
-  cancelEdit,
   cancelNewCurve,
   cancelNewLine,
   rotationAngle,
-  saveEdit,
   saveNewCurve,
   saveNewLine,
   scaleChange,
   setScale
 } from '../../actions/edit';
+import { cancelEdit, saveEdit } from '../../actions/editorActions/edit';
 import { disablePoint } from '../../actions/pointInfo';
 
 import { copyClick, pasteClick, redo, undo } from '../../actions/cad';
@@ -63,11 +62,11 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
     },
     setSingleLayerSelect: value => dispatch(setSingleLayerSelect(value)),
     setThreshold: value => dispatch(setThreshold(value)),
-    cancelEdit: function(editor, editObject, backup) {
-      cancelEdit(editor, editObject, backup)(dispatch);
+    cancelEdit: (editor, editMode) => {
+      cancelEdit(editor, editMode)(dispatch);
     },
-    saveEdit: function(editor) {
-      saveEdit(editor)(dispatch);
+    saveEdit: (editor, editMode) => {
+      saveEdit(editor, editMode)(dispatch);
     },
     saveSnap: function(snapshot, projectKey) {
       addSnapshot(snapshot, projectKey)(dispatch);
