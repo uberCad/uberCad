@@ -1094,7 +1094,7 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
   // модуль пошуку найдовшої лінії з масиву ліній
   newObjectLines.forEach(line =>{
     // debugger;
-  if( line.geometry.type = "Geometry") {
+  if( line.geometry.type === "Geometry") {
     // debugger;
     if (!longestLine) {
       longestLine = line;

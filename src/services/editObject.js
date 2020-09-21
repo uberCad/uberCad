@@ -607,8 +607,8 @@ let changeGeometry = (lines, index, point, scene, editor) => {
           }
         }
       });
-      // pointGeometryCenter.position.x = point.x;
-      // pointGeometryCenter.position.y = point.y;
+      pointGeometryCenter.position.x = point.x;
+      pointGeometryCenter.position.y = point.y;
       // debugger;
     }
   }

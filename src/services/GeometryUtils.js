@@ -3,8 +3,12 @@ import * as KMeans from '../../node_modules/kmeans-js/kMeans';
 import sceneService from './sceneService';
 import Path from '../classes/Path';
 import arrayUtils from './arrayUtils';
+import { thetaStart } from '../actions/edit';
+import helpLayerService from './helpLayerService';
+import {changeArcGeometry as changGeomEditObj,
+  circleIntersectionAngle as circlInterAngle} from '../services/editObject';
 
-let buildEdgeModel = (object, threshold = 0.000001) => {
+let buildEdgeModel = (object, threshold = 0.000001, mode) => {
   // skip zero length lines
   let entities = skipZeroLines([...object.children], threshold);
   let vertices = getVertices(entities);
@@ -63,7 +67,7 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
         entityToCheck.geometry instanceof THREE.CircleGeometry
       ) {
         // arc to arc
-        let intersectionResult = arcsIntersect(entity, entityToCheck);
+        let intersectionResult = arcsIntersect(entity, entityToCheck, mode);
         if (intersectionResult) {
           // alert('ARC INTERSECTION!!! YEAH!!!');
 
@@ -217,16 +221,22 @@ let buildEdgeModel = (object, threshold = 0.000001) => {
         enumerable: false,
         writable: true
       });
-      path.push(...buildChain(vertices, startVertex, threshold));
-      // let path = new Path(buildChain(vertices, startVertex, threshold))
+      let resBuildChain = buildChain(vertices, startVertex, threshold, mode);
+      // debugger;
+      console.log (resBuildChain);
+      // debugger;
+      if (resBuildChain) {
+        path.push(...resBuildChain);
+        // let path = new Path(buildChain(vertices, startVertex, threshold))
 
-      let area = pathArea(path);
-      regions.push({
-        path,
-        area,
-        areaAbsolute: area,
-        boundingBox: buildBoundingBox(path)
-      });
+        let area = pathArea(path);
+        regions.push({
+          path,
+          area,
+          areaAbsolute: area,
+          boundingBox: buildBoundingBox(path)
+        });
+      }
     }
 
     // console.log('entities', entities.length);
@@ -368,6 +378,7 @@ let buildChain = (
   vertices,
   startVertex,
   threshold = 0.000001,
+  mode = 'standart',
   vertex,
   path = []
 ) => {
@@ -426,7 +437,7 @@ let buildChain = (
     }
   });
 
-  if (minDistance.distance > threshold) {
+  if (minDistance.distance > threshold && mode !== 'Free space') {
     let error = new Error('Interruption detected. Operation canceled');
     error.userData = {
       error: 'interruption',
@@ -453,6 +464,7 @@ let buildChain = (
     vertices.filter(v => v !== anotherVertex && v !== nearestVertex),
     startVertex,
     threshold,
+    mode,
     nearestVertex,
     path
   );
@@ -1004,7 +1016,7 @@ let lineArcIntersect = (line, arc, threshold = 0) => {
   return false;
 };
 
-let arcsIntersect = (arc1, arc2) => {
+let arcsIntersect = (arc1, arc2, mode) => {
   // http://www.ambrsoft.com/TrigoCalc/Circles2/circle2intersection/CircleCircleIntersection.htm
 
   let x1 = arc1.position.x; // a
@@ -1156,7 +1168,9 @@ let arcsIntersect = (arc1, arc2) => {
     // let y = ((b - d) * (r1 * r1 - r2 * r2)) / (2 * (Math.pow(c - a, 2) + Math.pow(d - b, 2))) - (d + b) / 2;
     // console.log({x, y});
     // TODO handle arcs tagnency
-    window.alert('arcs tagnency. How to handle?');
+    if (mode !== 'Free space') {
+      window.alert('arcs tagnency. How to handle?');
+    }
     // calculate tangency point
   } else {
     // console.warn('no intersection');
@@ -1387,6 +1401,7 @@ let distanceToEntity = (vertex, entity) => {
   }
 };
 
+// todo дубль функциї   circleIntersectionAngle as circlInterAngle} from '../services/editObject';
 function circleIntersectionAngle(vertex, circle, radius) {
   let projectionLine = Math.abs(vertex.x - circle.x);
   let angle = Math.acos(projectionLine / radius);
@@ -3413,7 +3428,112 @@ function filterSelfIntersectingPaths(paths = []) {
   return result;
 }
 
+let newCurve = (center, radius, startPoint, endPoint) =>{
+        let curveParam = {
+          newCurveCenter: center,
+          thetaStart: circlInterAngle(
+            startPoint,
+            center
+          ),
+          thetaLength:
+            2 *
+            Math.acos(
+              getDistance (center, {
+                x: (startPoint.x + endPoint.x) / 2,
+                y: (startPoint.y + endPoint.y) / 2
+              }) /
+              radius
+            ),
+          radius: radius
+        };
+        let materialLine = new THREE.LineBasicMaterial({
+          color: 0x00ff00
+        });
+        let changedGeometry = {
+          radius: curveParam.radius,
+          thetaStart: curveParam.thetaStart,
+          thetaLength: curveParam.thetaLength
+        };
+        let copyCircleGeometry = changGeomEditObj(
+          { 0: 'copy' },
+          changedGeometry
+        );
+        let copyCircle = new THREE.Line(
+          copyCircleGeometry,
+          materialLine
+        );
+        copyCircle.position.x = center.x;
+        copyCircle.position.y = center.y;
+
+        let pointCircleEnd = {
+          x:
+            copyCircle.position.x +
+            copyCircle.geometry.vertices[
+            copyCircle.geometry.vertices.length - 1
+              ].x,
+          y:
+            copyCircle.position.y +
+            copyCircle.geometry.vertices[
+            copyCircle.geometry.vertices.length - 1
+              ].y
+        };
+        let pointCircleStart = {
+          x:
+            copyCircle.position.x +
+            copyCircle.geometry.vertices[0].x,
+          y:
+            copyCircle.position.y +
+            copyCircle.geometry.vertices[0].y
+        };
+        let endA = helpLayerService.lengthLine(
+          startPoint,
+          pointCircleEnd
+        );
+        let startA = helpLayerService.lengthLine(
+          startPoint,
+          pointCircleStart
+        );
+        let endC = helpLayerService.lengthLine(
+          endPoint,
+          pointCircleEnd
+        );
+        let startC = helpLayerService.lengthLine(
+          endPoint,
+          pointCircleStart
+        );
+
+        if (
+          !(startA < 1e-3 && endC < 1e-3) ||
+          (endA < 1e-3 && startC < 1e-3)
+        ) {
+          // debugger;
+          changedGeometry = {
+            radius: curveParam.radius,
+            thetaStart: circlInterAngle(
+              endPoint,
+              center
+            ),
+            thetaLength: curveParam.thetaLength
+          };
+          copyCircleGeometry = changGeomEditObj(
+            { 0: 'copy' },
+            changedGeometry
+          );
+          copyCircle = new THREE.Line(
+            copyCircleGeometry,
+            materialLine
+          );
+          copyCircle.position.x = curveParam.newCurveCenter.x;
+          copyCircle.position.y = curveParam.newCurveCenter.y;
+        }
+
+        copyCircle.userData.originalColor = 0x808000;
+        return copyCircle;
+}
+
 export default {
+  newCurve,
+  entitiesIntersectInfo,
   distanceToLine,
   distanceToArc,
   skipZeroLines,
