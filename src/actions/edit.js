@@ -434,9 +434,9 @@ export const drawLine = (event, editor, parent, copyPoint) => {
   } else {
     const line = createLine(editMode.newLineFirst, secondPoint);
     if (parent.children.length) {
-      line.userData.originalColor = parent.children[0].userData.originalColor;
+      line.userData.originalColor = parent.children[0].userData.originalColor.clone();
     } else {
-      line.userData.originalColor = 0x808000;
+      line.userData.originalColor.set(new THREE.Color(0x808000));
     }
     parent.add(line);
   }
@@ -637,7 +637,7 @@ export const thetaLength = (event, editor, parent, curveParam) => {
     : editMode.newCurveCenter.y;
 
   if (oldLine && oldLine.parent) oldLine.parent.remove(oldLine);
-  line.userData.originalColor = parent.children[0].userData.originalColor;
+  line.userData.originalColor = parent.children[0].userData.originalColor.clone();
   parent.add(line);
 
   renderer.render(scene, camera);

@@ -607,9 +607,9 @@ export const onMouseDown = (event, editor) => {
 
                     if (parent.children.length) {
                       copyCircle.userData.originalColor =
-                        parent.children[0].userData.originalColor;
+                        parent.children[0].userData.originalColor.clone();
                     } else {
-                      copyCircle.userData.originalColor = 0x808000;
+                      copyCircle.userData.originalColor.set(new THREE.Color(0x808000));
                     }
                     parent.add(copyCircle);
 
@@ -725,9 +725,9 @@ export const onMouseDown = (event, editor) => {
                       );
                       if (parent.children.length) {
                         newFacetLine.userData.originalColor =
-                          parent.children[0].userData.originalColor;
+                          parent.children[0].userData.originalColor.clone();
                       } else {
-                        newFacetLine.userData.originalColor = 0x808000;
+                        newFacetLine.userData.originalColor.set(new THREE.Color(0x808000));
                       }
                       parent.add(newFacetLine);
 
@@ -1423,9 +1423,9 @@ let copyPaste = (editor, copyPasteMode) => {
             );
             if (parent.children.length) {
               copyLine.userData.originalColor =
-                parent.children[0].userData.originalColor;
+                parent.children[0].userData.originalColor.clone();
             } else {
-              copyLine.userData.originalColor = 0x808000;
+              copyLine.userData.originalColor.set(new THREE.Color(0x808000));
             }
             parent.add(copyLine);
           } else if (line.geometry.type === 'CircleGeometry') {
@@ -1444,9 +1444,9 @@ let copyPaste = (editor, copyPasteMode) => {
             copyCircle.position.y = line.position.y - changeGeometry.y;
             if (parent.children.length) {
               copyCircle.userData.originalColor =
-                parent.children[0].userData.originalColor;
+                parent.children[0].userData.originalColor.clone();
             } else {
-              copyCircle.userData.originalColor = 0x808000;
+              copyCircle.userData.originalColor.set(new THREE.Color(0x808000));
             }
             parent.add(copyCircle);
           }

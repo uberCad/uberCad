@@ -3,7 +3,6 @@ import * as KMeans from '../../node_modules/kmeans-js/kMeans';
 import sceneService from './sceneService';
 import Path from '../classes/Path';
 import arrayUtils from './arrayUtils';
-import { thetaStart } from '../actions/edit';
 import helpLayerService from './helpLayerService';
 import {changeArcGeometry as changGeomEditObj,
   circleIntersectionAngle as circlInterAngle} from '../services/editObject';
@@ -203,6 +202,7 @@ let buildEdgeModel = (object, threshold = 0.000001, mode) => {
     if (prevEntitiesCount !== entities.length) {
       prevEntitiesCount = entities.length;
     } else {
+      debugger;
       let error = new Error('Not all entities in use!');
       error.userData = {
         error: 'unused entities',
@@ -1224,7 +1224,7 @@ let getVertices = (entities, allVertices = false) => {
   return vertices;
 };
 
-let distanceToLine = (vertex, line) => {
+let distanceToLine = (vertex, line, method = 0) => {
   // debugger;
   // за схожим принципом вираховуємо відстань до найближчого баундінг боса обєкта, потім до найближчої лінії
   // calculate distance to finite line segment
@@ -1234,8 +1234,30 @@ let distanceToLine = (vertex, line) => {
   let x2 = line.geometry.vertices[1].x;
   let y2 = line.geometry.vertices[1].y;
 
-  return distanceToLineSegment(x1, y1, x2, y2, vertex.x, vertex.y);
-
+  let distanceToLine = distanceToLineSegment(x1, y1, x2, y2, vertex.x, vertex.y);
+  if(method === 0) {
+    return distanceToLine;
+  } else if(method === 1) {
+    if (distanceToLine === 0){
+      // debugger;
+      let lineLength = getDistance (line.geometry.vertices[0],
+        line.geometry.vertices[1]);
+      let distanceToPoint0 = getDistance (line.geometry.vertices[0], vertex);
+      let distanceToPoint1 = getDistance (vertex, line.geometry.vertices[1]);
+      if (lineLength - distanceToPoint0 - distanceToPoint1 < 0.00001){
+        return distanceToLine;
+      } else {
+        debugger;
+        if (distanceToPoint0 > distanceToPoint1){
+          return distanceToPoint1;
+        } else {
+          return distanceToPoint0;
+        }
+      }
+    } else {
+      return distanceToLine;
+    }
+  }
   // old version calculates distance to infinite line in both directions.
 
   // //line equation y = mx + b
@@ -3005,53 +3027,55 @@ let getThermalPoints = scene => {
       object.userData.edgeModel.regions
     ) {
       let region = object.userData.edgeModel.regions[0];
-      let { boundingBox } = region;
+      if (region) {
+        let { boundingBox } = region;
 
-      if (!leftTop || !leftBottom || !rightTop || !rightBottom) {
-        leftTop = {
-          boundingBox,
-          region
-        };
-        leftBottom = {
-          boundingBox,
-          region
-        };
-        rightTop = {
-          boundingBox,
-          region
-        };
-        rightBottom = {
-          boundingBox,
-          region
-        };
-      }
-      if (
-        boundingBox.x1 <= leftTop.boundingBox.x1 &&
-        boundingBox.y1 <= leftTop.boundingBox.y1
-      ) {
-        leftTop.boundingBox = boundingBox;
-        leftTop.region = region;
-      }
-      if (
-        boundingBox.x1 <= leftBottom.boundingBox.x1 &&
-        boundingBox.y2 >= leftBottom.boundingBox.y2
-      ) {
-        leftBottom.boundingBox = boundingBox;
-        leftBottom.region = region;
-      }
-      if (
-        boundingBox.x2 >= rightTop.boundingBox.x2 &&
-        boundingBox.y1 <= rightTop.boundingBox.y1
-      ) {
-        rightTop.boundingBox = boundingBox;
-        rightTop.region = region;
-      }
-      if (
-        boundingBox.x2 >= rightBottom.boundingBox.x2 &&
-        boundingBox.y2 >= rightBottom.boundingBox.y2
-      ) {
-        rightBottom.boundingBox = boundingBox;
-        rightBottom.region = region;
+        if (!leftTop || !leftBottom || !rightTop || !rightBottom) {
+          leftTop = {
+            boundingBox,
+            region
+          };
+          leftBottom = {
+            boundingBox,
+            region
+          };
+          rightTop = {
+            boundingBox,
+            region
+          };
+          rightBottom = {
+            boundingBox,
+            region
+          };
+        }
+        if (
+          boundingBox.x1 <= leftTop.boundingBox.x1 &&
+          boundingBox.y1 <= leftTop.boundingBox.y1
+        ) {
+          leftTop.boundingBox = boundingBox;
+          leftTop.region = region;
+        }
+        if (
+          boundingBox.x1 <= leftBottom.boundingBox.x1 &&
+          boundingBox.y2 >= leftBottom.boundingBox.y2
+        ) {
+          leftBottom.boundingBox = boundingBox;
+          leftBottom.region = region;
+        }
+        if (
+          boundingBox.x2 >= rightTop.boundingBox.x2 &&
+          boundingBox.y1 <= rightTop.boundingBox.y1
+        ) {
+          rightTop.boundingBox = boundingBox;
+          rightTop.region = region;
+        }
+        if (
+          boundingBox.x2 >= rightBottom.boundingBox.x2 &&
+          boundingBox.y2 >= rightBottom.boundingBox.y2
+        ) {
+          rightBottom.boundingBox = boundingBox;
+          rightBottom.region = region;
+        }
       }
     }
   });
@@ -3526,8 +3550,8 @@ let newCurve = (center, radius, startPoint, endPoint) =>{
           copyCircle.position.x = curveParam.newCurveCenter.x;
           copyCircle.position.y = curveParam.newCurveCenter.y;
         }
-
-        copyCircle.userData.originalColor = 0x808000;
+        // debugger;
+        copyCircle.userData.originalColor = copyCircle.material.color.clone();
         return copyCircle;
 }
 

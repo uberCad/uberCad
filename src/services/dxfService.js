@@ -37,7 +37,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
     : addContainer('newLineLayer');
   if (editor) {
     editor.activeEntities.forEach(line => {
-      line.material.color = line.userData.originalColor;
+      line.material.color = line.userData.originalColor.clone();
     });
     editor.editMode.activeLine.lines = [];
   }

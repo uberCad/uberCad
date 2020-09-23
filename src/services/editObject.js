@@ -183,6 +183,11 @@ let unselectLine = (lines, scene) => {
       delete line.userData.lastoriginalColor;
     } else if (line.userData.originalColor) {
       line.name = '';
+      // todo тут латка, костиль, баг треба знайти
+      if (typeof (line.userData.originalColor) !== 'object'){
+        // debugger;
+        line.userData.originalColor = new THREE.Color(0x000000);
+      }
       line.material.color = line.userData.originalColor.clone();
       delete line.userData.originalColor;
     } else {
