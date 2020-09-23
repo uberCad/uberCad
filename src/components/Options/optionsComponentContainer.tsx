@@ -71,9 +71,6 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
     saveSnap: function(snapshot, projectKey) {
       addSnapshot(snapshot, projectKey)(dispatch);
     },
-    saveSnap: function(snapshot, projectKey, fastSave) {
-      addSnapshot(snapshot, projectKey, fastSave)(dispatch);
-    },
     cancelNewLine: function(editor) {
       cancelNewLine(editor)(dispatch);
     },

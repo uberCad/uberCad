@@ -525,8 +525,6 @@ export default class OptionsComponent extends Component {
     editor: PropTypes.object.isRequired,
     project: PropTypes.object.isRequired,
 
-    project: PropTypes.object.isRequired,
-
     selectMode: PropTypes.string.isRequired,
     singleLayerSelect: PropTypes.bool.isRequired,
     threshold: PropTypes.number.isRequired,
