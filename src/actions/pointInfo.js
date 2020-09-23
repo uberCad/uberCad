@@ -15,18 +15,15 @@ export const activePoint = () => {
 };
 
 export const movePointInfo = (event, msg) => {
-  const point = {
-    x: event.pageX,
-    y: event.pageY
-  };
+  // TODO: why do we need that?
   return dispatch =>
     dispatch({
       type: POINT_INFO_MOVE,
       payload: {
         style: {
           display: 'block',
-          left: `${point.x + 20}px`,
-          top: `${point.y + 20}px`,
+          left: `${event.pageX + 20}px`,
+          top: `${event.pageY + 20}px`,
           padding: '0',
           color: 'black'
         },

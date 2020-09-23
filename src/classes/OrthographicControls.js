@@ -63,12 +63,11 @@ export class OrthographicControls extends EventDispatcher {
 
       // right
       case 2:
-        {
-          // event.preventDefault();
-          this.handleMouseDownPan(event);
-
-          this.#state = this.STATE.PAN;
-        }
+        // event.preventDefault();
+        this.handleMouseDownPan(event);
+        this.#state = this.STATE.PAN;
+        break;
+      default:
         break;
     }
 
@@ -84,6 +83,8 @@ export class OrthographicControls extends EventDispatcher {
 
       case this.STATE.PAN:
         this.handleMouseMovePan(event);
+        break;
+      default:
         break;
     }
   }

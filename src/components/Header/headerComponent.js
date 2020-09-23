@@ -79,7 +79,7 @@ export default class HeaderComponent extends Component {
         let fileReader = new FileReader();
         let container = document.getElementById('sceneID');
         let editor = this.props.editor;
-        fileReader.onload = function() {
+        fileReader.onload = function () {
           let fileText = fileReader.result;
           drawDxf(parseDxf(fileText), container, null, editor);
           let { scene, camera, renderer } = editor;
@@ -135,7 +135,7 @@ export default class HeaderComponent extends Component {
   // };
 
   render() {
-    const { objects } = this.props;
+    // const { objects } = this.props;
     return (
       <Navbar className="nav-head header" collapseOnSelect fluid>
         <Navbar.Header>
@@ -152,7 +152,7 @@ export default class HeaderComponent extends Component {
         </Navbar.Header>
         <Navbar.Collapse>
           <Nav className="nav-group">
-            <NavItem href={`${process.env.PUBLIC_URL}/`} className= "li-Header">
+            <NavItem href={`${process.env.PUBLIC_URL}/`} className="li-Header">
               <FormattedMessage
                 id="header.projects"
                 defaultMessage="Projects!"
@@ -166,7 +166,7 @@ export default class HeaderComponent extends Component {
               <DBObjectList />
             </NavItem>
 
-            <NavItem href={`${process.env.PUBLIC_URL}/demo`} className= "li-Header">
+            <NavItem href={`${process.env.PUBLIC_URL}/demo`} className="li-Header">
               <FormattedMessage
                 id="header.creators"
                 defaultMessage="Creators"

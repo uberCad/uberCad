@@ -589,9 +589,13 @@ let getCollisionPoints = (objects, threshold = 0.000001) => {
     // console.log('outer region', object.userData.edgeModel.regions[0].path, objectOuterEntities);
 
     // filter, to process collided objects once
+    console.log('in object', object);
     objects
       .filter(obj => {
         return (
+
+
+          // todo перша приблуда яку треба юзати при переміщені об'єкта при вставкі isBoundingBoxesCollide
           !obj.userData.checkedIntersection &&
           isBoundingBoxesCollide(
             object.userData.edgeModel.regions[0].boundingBox,
@@ -1207,6 +1211,8 @@ let getVertices = (entities, allVertices = false) => {
 };
 
 let distanceToLine = (vertex, line) => {
+  // debugger;
+  // за схожим принципом вираховуємо відстань до найближчого баундінг боса обєкта, потім до найближчої лінії
   // calculate distance to finite line segment
 
   let x1 = line.geometry.vertices[0].x;
@@ -1776,6 +1782,7 @@ let filterCollisionPoints = (collisionPoints, threshold = 0.000001) => {
   let goodCp = [];
 
   collisionPoints.forEach(collisionPoint => {
+    // debugger;
     collisionPoint.entities.forEach(entity => {
       for (let isLast = 0; isLast <= 1; isLast++) {
         // only first and last vertex need
@@ -2045,6 +2052,8 @@ let getCollisionPointBranches = (
   parentBranch = null
 ) => {
   // collisionPoint.processed = true;
+
+  //todo туточки строіться branches, а знього збирається paths. Для того щоб розібратись з paths треба розковиряти цю функцию
 
   if (deep > 0) {
     // debugger;
@@ -2770,22 +2779,22 @@ function entityIntersectArea(entity, area) {
   // alert('Unexpected geometry @ThreeDxf.entityIntersectArea()');
 }
 
-function getRegionClusters(path) {
+function getRegionClusters(path, amount = 3) {
   let data = path.map(dot => {
     return [dot.x, dot.y];
   });
 
   let km = new KMeans({
-    K: 3
+    K: amount
   });
 
-  km.maxIterations = 300;
+  km.maxIterations = amount>3? amount * 100 : 300;
 
   km.cluster(data);
   while (km.step()) {
     km.findClosestCentroids();
     km.moveCentroids();
-    if (km.hasConverged() || km.currentIteration > 300) {
+    if (km.hasConverged() || km.currentIteration > km.maxIterations) {
       break;
     }
   }
@@ -3271,8 +3280,8 @@ let getBoundingBox = objects => {
       height = finalBoundingBox.max.y - finalBoundingBox.min.y;
 
     return {
-      min: boundingBoxes.min,
-      max: boundingBoxes.max,
+      min: finalBoundingBox.min,
+      max: finalBoundingBox.max,
       center,
       width,
       height,
@@ -3446,7 +3455,9 @@ export default {
   getSerialVerticesFromOrderedEntities,
   getArcBoundingBox,
   getBoundingBox,
+  buildBoundingBox,
   computeBoundingBoxAdditionalInfo,
   getPathVariants,
-  filterSelfIntersectingPaths
+  filterSelfIntersectingPaths,
+  getRegionClusters
 };

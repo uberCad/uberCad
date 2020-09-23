@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import CalculatePriceComponent from './calculatePriceComponent';
-import { calculate, calculateHide, order } from '../../actions/calculate';
+import { calculate, calculateHide, order } from '../../../actions/calculate';
 
 const mapStateToProps = (state, ownProps) => {
   return {

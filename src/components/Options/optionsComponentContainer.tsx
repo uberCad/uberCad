@@ -1,24 +1,25 @@
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 import OptionsComponent from './optionsComponent';
 import {
   setSelectMode,
   setSingleLayerSelect,
   setThreshold
-} from '../../actions/options';
+} from '../../store/options/action';
 
 import {
-  cancelEdit,
   cancelNewCurve,
   cancelNewLine,
   rotationAngle,
-  saveEdit,
   saveNewCurve,
   saveNewLine,
   scaleChange,
   setScale
 } from '../../actions/edit';
+import { cancelEdit, saveEdit } from '../../actions/editorActions/edit';
+import { disablePoint } from '../../actions/pointInfo';
 
-import { copyClick, pasteClick } from '../../actions/cad';
+import { copyClick, pasteClick, redo, undo } from '../../actions/cad';
 import { addSnapshot } from '../../actions/panelSnapshots';
 
 // todo mapStateToProps об'являється двічі тут і в .\src\components\ActiveEntities\activeEntitiesComponentContainer.js
@@ -50,24 +51,25 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    setSelectMode: function(mode) {
-      setSelectMode(mode)(dispatch);
+    setSelectMode: mode => {
+      disablePoint()(dispatch);
+      dispatch(setSelectMode(mode));
+      dispatch({
+        type: `${mode}_CLEAR`
+      });
     },
-
-    setSingleLayerSelect: function(value) {
-      setSingleLayerSelect(value)(dispatch);
+    setSingleLayerSelect: value => dispatch(setSingleLayerSelect(value)),
+    setThreshold: value => dispatch(setThreshold(value)),
+    cancelEdit: (editor, editMode) => {
+      cancelEdit(editor, editMode)(dispatch);
     },
-
-    setThreshold: function(value) {
-      setThreshold(value)(dispatch);
+    saveEdit: (editor, editMode) => {
+      saveEdit(editor, editMode)(dispatch);
     },
-    cancelEdit: function(editor, editObject, backup) {
-      cancelEdit(editor, editObject, backup)(dispatch);
-    },
-    saveEdit: function(editor) {
-      saveEdit(editor)(dispatch);
+    saveSnap: function(snapshot, projectKey) {
+      addSnapshot(snapshot, projectKey)(dispatch);
     },
     saveSnap: function(snapshot, projectKey, fastSave) {
       addSnapshot(snapshot, projectKey, fastSave)(dispatch);
@@ -94,11 +96,18 @@ const mapDispatchToProps = dispatch => {
       setScale(scale, scaleObject, editor)(dispatch);
     },
 
-    copyClick: function(editor, event) {
-      copyClick(editor, event);
+    copyClick: function(editor) {
+      copyClick(editor);
     },
-    pasteClick: function(editor, event) {
-      pasteClick(editor, event);
+    pasteClick: function(editor) {
+      pasteClick(editor);
+    },
+
+    undo(renderer, camera) {
+      undo(renderer, camera)(dispatch);
+    },
+    redo(renderer, camera) {
+      redo(renderer, camera)(dispatch);
     }
   };
 };

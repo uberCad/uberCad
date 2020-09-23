@@ -4,7 +4,6 @@ import Api from '../services/apiService';
 
 import { spinnerShow, spinnerHide } from './spinner';
 import * as THREE from '../extend/THREE';
-import React from 'react';
 // import { modalShow } from './modal';
 
 export const ADD_ELEMENT_TO_DB = 'ADD_ELEMENT_TO_DB';

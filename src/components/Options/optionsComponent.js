@@ -13,12 +13,65 @@ import { FormattedMessage } from 'react-intl';
 
 import Measurement from './Measurement/measurementComponent';
 import Line from './Line/lineComponent';
+// import FormattedInput from '../atoms/formatted-input';
 
-export const SELECT_MODE_NEW = 'SELECT_MODE_NEW';
-export const SELECT_MODE_ADD = 'SELECT_MODE_ADD';
-export const SELECT_MODE_SUB = 'SELECT_MODE_SUB';
-export const SELECT_MODE_INTERSECT = 'SELECT_MODE_INTERSECT';
-export const DEFAULT_THRESHOLD = 0.0001;
+import { SelectNewTypes } from '../../store/options/types';
+
+// const inputs = [
+//   {
+//     id: 'mode-new',
+//     type: 'radio',
+//     value: SelectNewTypes.NEW,
+//     formattedMessageId: 'options.inputTitleSelection',
+//     message: 'New selection',
+//     theme: {
+//       backgroundPosition: '-4px -2px',
+//       width: '22px',
+//       height: '22px'
+//     }
+//   },
+//   {
+//     id: 'mode-add',
+//     type: 'radio',
+//     value: SelectNewTypes.ADD,
+//     formattedMessageId: 'options.inputTitleAddSelection',
+//     message: 'Add to selection (... + Shift)',
+//     theme: {
+//       backgroundPosition: '-27px -2px',
+//       width: '22px',
+//       height: '22px'
+//     }
+//   },
+//   {
+//     id: 'mode-sub',
+//     type: 'radio',
+//     value: SelectNewTypes.SUB,
+//     formattedMessageId: 'options.inputTitleSubtract',
+//     message: 'Subtract from selection (... + Alt)',
+//     theme: {
+//       backgroundPosition: '-51px -2px',
+//       width: '22px',
+//       height: '22px'
+//     }
+//   },
+//   {
+//     id: 'mode-intersect',
+//     type: 'radio',
+//     value: SelectNewTypes.INTERSECT,
+//     formattedMessageId: 'options.inputTitleIntersect',
+//     message: 'Intersect with selection (... + Alt + Shift)',
+//     theme: {
+//       backgroundPosition: '-75px -2px',
+//       width: '22px',
+//       height: '22px'
+//     }
+//   }
+// ];
+
+const images = {
+  undo: require('../../assets/images/redo.svg'),
+  redo: require('../../assets/images/redo.svg')
+};
 
 export default class OptionsComponent extends Component {
   onChangeMode = ({ currentTarget: { value } }) => {
@@ -34,15 +87,67 @@ export default class OptionsComponent extends Component {
   };
 
   cancelEdit = () => {
-    this.props.cancelEdit(
-      this.props.editor,
-      this.props.editMode.editObject,
-      this.props.editMode.beforeEdit
-    );
+    this.props.cancelEdit(this.props.editor, this.props.editMode);
   };
 
   saveEdit = () => {
-    this.props.saveEdit(this.props.editor);
+    this.props.saveEdit(this.props.editor, this.props.editMode);
+  };
+
+  saveSnap = () => {
+    const href = window.location.href;
+    let snapPosInHref = null;
+    for (let i = 0; i < href.length - 1; i++) {
+      if (href[i] === '/') {
+        snapPosInHref = i;
+      }
+    }
+    let snapNum = '';
+    for (let i = snapPosInHref; i < href.length; i++) {
+      if (href[i] !== '/') {
+        snapNum += href[i];
+      }
+    }
+    let title = '';
+    let snapshots = this.props.project.snapshots;
+    for (let i = 0; i < snapshots.length; i++) {
+      if (snapshots[i]._key === snapNum) {
+        title = snapshots[i].title;
+      }
+    }
+    if (title === '') {
+      title = 'Snapshot';
+    } else if (
+      title.length > 17 &&
+      title[title.length - 3] === ':' &&
+      title[title.length - 6] === ' ' &&
+      title[title.length - 9] === '/' &&
+      title[title.length - 12] === '/' &&
+      title[title.length - 15] === '0' &&
+      title[title.length - 16] === '2' &&
+      title[title.length - 17] === ' '
+    ) {
+      const titleWithDate = '' + title;
+      title = '';
+      for (let i = 0; i < titleWithDate.length - 17; i++) {
+        title += titleWithDate[i];
+      }
+    }
+    const data = new Date();
+    const year = data.getFullYear();
+    const month =
+      1 + data.getMonth() > 9
+        ? 1 + data.getMonth()
+        : '0' + (1 + data.getMonth());
+    const date = data.getDate() > 9 ? data.getDate() : '0' + data.getDate();
+    const hours = data.getHours() > 9 ? data.getHours() : '0' + data.getHours();
+    const minutes =
+      data.getMinutes() > 9 ? data.getMinutes() : '0' + data.getMinutes();
+    const snapshot = {
+      title: `${title} ${year}/${month}/${date} ${hours}:${minutes}`,
+      scene: this.props.scene
+    };
+    this.props.saveSnap(snapshot, this.props.project._key, true);
   };
 
   saveSnap = () => {
@@ -157,18 +262,55 @@ export default class OptionsComponent extends Component {
       singleLayerSelect,
       threshold
     } = this.props;
+    const { renderer, camera } = this.props.editor;
 
     return (
       <div id="options">
-        <button className="save-Snap" onClick={this.saveSnap}>
+        <button className="save-snap" onClick={this.saveSnap}>
           Save snapshot
         </button>
+        <div className="undo-redo-container">
+          <img
+            className="img undo"
+            src={images.undo}
+            alt="undo"
+            onClick={event => {
+              event.stopPropagation();
+              event.preventDefault();
+              this.props.undo(renderer, camera);
+            }}
+          />
+          <img
+            className="img"
+            src={images.redo}
+            alt="redo"
+            onClick={event => {
+              event.stopPropagation();
+              event.preventDefault();
+              this.props.redo(renderer, camera);
+            }}
+          />
+        </div>
         {(tool === TOOL_POINT || tool === TOOL_SELECT) && (
           <ul className="list-group">
             <li>
               <FormattedMessage id="options.modeLabel" defaultMessage="Mode">
                 {value => <label>{value}:</label>}
               </FormattedMessage>
+              {/* {inputs.map(input => {
+                return (value => (
+                  <FormattedInput
+                    id={input.id}
+                    type={input.type}
+                    title={value}
+                    value={input.value}
+                    checked={selectMode === input.value}
+                    formattedMessageId={input.formattedMessageId}
+                    defaultMessage={input.defaultMessage}
+                    onChange={this.onChangeMode}
+                  />
+                ))();
+              })} */}
               <label>
                 <FormattedMessage
                   id="options.inputTitleSelection"
@@ -179,8 +321,8 @@ export default class OptionsComponent extends Component {
                       type="radio"
                       className="mode-new"
                       title={value}
-                      value={SELECT_MODE_NEW}
-                      checked={selectMode === SELECT_MODE_NEW}
+                      value={SelectNewTypes.NEW}
+                      checked={selectMode === SelectNewTypes.NEW}
                       onChange={this.onChangeMode}
                     />
                   )}
@@ -196,8 +338,8 @@ export default class OptionsComponent extends Component {
                       type="radio"
                       className="mode-add"
                       title={value}
-                      value={SELECT_MODE_ADD}
-                      checked={selectMode === SELECT_MODE_ADD}
+                      value={SelectNewTypes.ADD}
+                      checked={selectMode === SelectNewTypes.ADD}
                       onChange={this.onChangeMode}
                     />
                   )}
@@ -210,11 +352,11 @@ export default class OptionsComponent extends Component {
                 >
                   {value => (
                     <input
-                      type="radio"
                       className="mode-sub"
+                      type="radio"
                       title={value}
-                      value={SELECT_MODE_SUB}
-                      checked={selectMode === SELECT_MODE_SUB}
+                      value={SelectNewTypes.SUB}
+                      checked={selectMode === SelectNewTypes.SUB}
                       onChange={this.onChangeMode}
                     />
                   )}
@@ -230,8 +372,8 @@ export default class OptionsComponent extends Component {
                       type="radio"
                       className="mode-intersect"
                       title={value}
-                      value={SELECT_MODE_INTERSECT}
-                      checked={selectMode === SELECT_MODE_INTERSECT}
+                      value={SelectNewTypes.INTERSECT}
+                      checked={selectMode === SelectNewTypes.INTERSECT}
                       onChange={this.onChangeMode}
                     />
                   )}
@@ -347,16 +489,16 @@ export default class OptionsComponent extends Component {
           </ul>
         )}
 
-        {tool === TOOL_MEASUREMENT && (
+        {tool === TOOL_MEASUREMENT && selectMode && (
           <Measurement
             measurementMode={selectMode}
             setSelectMode={this.props.setSelectMode}
           />
         )}
-
-        {tool === TOOL_LINE && (
+        {tool === TOOL_LINE && selectMode && (
           <Line
             lineMode={selectMode}
+            measurementMode={selectMode}
             setSelectMode={this.props.setSelectMode}
           />
         )}
@@ -381,6 +523,7 @@ export default class OptionsComponent extends Component {
     tool: PropTypes.string.isRequired,
     editMode: PropTypes.object,
     editor: PropTypes.object.isRequired,
+    project: PropTypes.object.isRequired,
 
     project: PropTypes.object.isRequired,
 
@@ -402,6 +545,9 @@ export default class OptionsComponent extends Component {
     scaleChange: PropTypes.func,
     setScale: PropTypes.func,
     copyClick: PropTypes.func,
-    pasteClick: PropTypes.func
+    pasteClick: PropTypes.func,
+    saveSnap: PropTypes.func,
+    undo: PropTypes.func,
+    redo: PropTypes.func
   };
 }

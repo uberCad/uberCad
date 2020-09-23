@@ -32,7 +32,7 @@ THREE.Math.polar = function(point, distance, angle) {
  * @param bulge - a value indicating how much to curve
  * @param segments - number of segments between the two given points
  */
-let BulgeGeometry = function(startPoint, endPoint, bulge, segments) {
+const BulgeGeometry = (startPoint, endPoint, bulge, segments) => {
   let vertex, i, center, p0, p1, angle, radius, startAngle, thetaAngle;
 
   THREE.Geometry.call(this);

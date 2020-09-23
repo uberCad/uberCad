@@ -11,6 +11,7 @@ export const SNAPSHOT_DELETE = 'SNAPSHOT_DELETE';
 export const addSnapshot = (snapshot, projectKey) => {
   return dispatch => {
     dispatch(spinnerShow());
+    console.log(snapshot, projectKey)
     snapshotService
       .createSnapshot(snapshot, projectKey)
       .then(res => {
@@ -39,7 +40,9 @@ export const addSnapshot = (snapshot, projectKey) => {
 export const loadSnapshot = (snapshotKey, cadCanvas) => {
   return dispatch => {
     dispatch(spinnerShow());
+    console.log('______LOAD______', snapshotKey)
     snapshotService.getSnapshotScene(snapshotKey).then(snapshot => {
+      console.log('________SNAPSHOT______', snapshot)
       dispatch(spinnerHide());
       let loader = new THREE.ObjectLoader();
       const scene = cadCanvas.getScene();

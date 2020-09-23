@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import UserService from '../../services/UserService';
+// TODO: delete it if not needed
+// import UserService from '../../services/UserService';
 import {
   Row,
   Col,
@@ -11,7 +12,7 @@ import {
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import {API_HOST} from "../../config";
+import { API_HOST } from "../../config";
 
 export default class UserLoginComponent extends Component {
   constructor(props) {
@@ -25,9 +26,11 @@ export default class UserLoginComponent extends Component {
 
   componentDidMount() {
     const { token, username } = this.props.match.params;
+    console.log('login:componentDidMount()', { token, username }, this.props.match.params);
+
     if (token && username) {
-        this.props.setToken(username, token, this.props.history);
-        this.props.history.push(`${process.env.PUBLIC_URL}/`);
+      this.props.setToken(username, token, this.props.history);
+      this.props.history.push(`${process.env.PUBLIC_URL}/`);
     }
   }
 

@@ -9,14 +9,24 @@ import {
   HelpBlock,
   Modal
 } from 'react-bootstrap';
-import './addElementToDB.css';
 import { FormattedMessage } from 'react-intl';
-import Scene from '../../services/sceneService';
-import { drawDxf } from '../../actions/cad';
-import { parseDxf } from '../../services/dxfService';
-import MaterialComponent from '../Material/materrialComponentContainer';
-import GeometryUtils from '../../services/GeometryUtils';
-import Api from '../../services/apiService';
+
+import Api from '../../../services/apiService';
+import Scene from '../../../services/sceneService';
+import GeometryUtils from '../../../services/GeometryUtils';
+
+import MaterialComponent from '../../Material/materrialComponentContainer';
+import ButtonIcon from '../../atoms/button-icon';
+
+import './addElementToDB.css';
+
+const images = {
+  btnAddToDB: require('../../../assets/images/panel/add-element.svg')
+};
+
+// TODO: delete it if we don't need it anymore
+// import { drawDxf } from '../../actions/cad';
+// import { parseDxf } from '../../services/dxfService';
 
 export default class addElementToDB extends Component {
   constructor(props) {
@@ -43,7 +53,8 @@ export default class addElementToDB extends Component {
     let target = this.props.activeObject.userData;
     this.setState({ error: '' });
     target.title = this.props.activeObject.name
-      ? this.props.activeObject.name : '';
+      ? this.props.activeObject.name
+      : '';
 
     if (!target.material) {
       target.material = {};
@@ -72,7 +83,7 @@ export default class addElementToDB extends Component {
   categoryСonstructor = categoryFromDB => {
     let allCategories = [];
     let parent_keys = [];
-    categoryFromDB.forEach((category) => {
+    categoryFromDB.forEach(category => {
       for (let i = 0; i < parent_keys.length; i++) {
         if (parent_keys[i] === category.parent_key) {
           return;
@@ -101,13 +112,13 @@ export default class addElementToDB extends Component {
   ) => {
     categoryFromDB.forEach(category => {
       // only '==' not '===' - different value types
-      if (thisParentKey == category.parent_key) {
+      if (String(thisParentKey) === String(category.parent_key)) {
         for (let j = 0; j < ind; j++) {
           category.title = '-' + category.title;
         }
         allCategories.push(category);
         for (let i = 0; i < parent_keys.length; i++) {
-          if (parent_keys[i] == category._key) {
+          if (String(parent_keys[i]) === String(category._key)) {
             this.recursiveStructuring(
               categoryFromDB,
               allCategories,
@@ -208,10 +219,11 @@ export default class addElementToDB extends Component {
           defaultMessage="Calculate price"
         >
           {title => (
-            <button
-              onClick={this.handleShow}
+            <ButtonIcon
+              id={'btn-addToDB'}
               title={title}
-              className="btn-addToDB"
+              src={images.btnAddToDB}
+              onClick={this.handleShow}
             />
           )}
         </FormattedMessage>
