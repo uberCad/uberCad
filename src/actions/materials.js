@@ -20,13 +20,18 @@ export const setMaterial = (material, object, editor) => {
   object.userData.material = material;
 
   addMaterialBackgroundShape(object, editor);
-  let { scene, camera, renderer } = editor;
+  const { scene, camera, renderer } = editor;
+  const previousScene = scene.clone();
   renderer.render(scene, camera);
 
   return dispatch => {
     dispatch({
       type: MATERIAL_SET,
-      payload: { object }
+      payload: {
+        object,
+        previousScene,
+        scene
+      }
     });
   };
 };

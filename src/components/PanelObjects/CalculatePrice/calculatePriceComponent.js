@@ -3,8 +3,13 @@ import PropTypes from 'prop-types';
 import { Button, Modal } from 'react-bootstrap';
 import './CalculatePrice.css';
 import { FormattedMessage } from 'react-intl';
-import Scene from '../../services/sceneService';
-import OrderForm from '../OrderForm/orderFormComponent';
+import Scene from '../../../services/sceneService';
+import OrderForm from '../../OrderForm/orderFormComponent';
+
+import ButtonIcon from '../../atoms/button-icon';
+const images = {
+  btnCalc: require('../../../assets/images/panel/calculator.svg')
+};
 
 export default class CalculatePriceComponent extends Component {
   calculate = () => {
@@ -56,10 +61,11 @@ export default class CalculatePriceComponent extends Component {
           defaultMessage="Calculate price"
         >
           {title => (
-            <button
-              onClick={this.calculate}
+            <ButtonIcon
+              id={'btn-calc'}
               title={title}
-              className="btn-calc"
+              src={images.btnCalc}
+              onClick={this.calculat}
             />
           )}
         </FormattedMessage>

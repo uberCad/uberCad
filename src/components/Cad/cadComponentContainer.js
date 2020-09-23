@@ -10,6 +10,7 @@ import {
   onMouseMove,
   onMouseDown
 } from '../../actions/cad';
+import { redo, undo } from '../../actions/cad';
 import { spinnerShow, spinnerHide } from '../../actions/spinner';
 
 const mapStateToProps = (state, ownProps) => {
@@ -83,6 +84,13 @@ const mapDispatchToProps = dispatch => {
 
     toggleChanged: isChanged => {
       toggleChanged(isChanged)(dispatch);
+    },
+
+    undo(renderer, camera) {
+      undo(renderer, camera)(dispatch);
+    },
+    redo(renderer, camera) {
+      redo(renderer, camera)(dispatch);
     }
   };
 };

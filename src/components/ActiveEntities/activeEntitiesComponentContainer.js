@@ -7,7 +7,7 @@ import {
   showAll,
   groupEntities
 } from '../../actions/activeEntities';
-import { isEdit } from '../../actions/edit';
+import { isEdit } from '../../actions/editorActions/edit';
 
 const mapStateToProps = (state, ownProps) => {
   return {

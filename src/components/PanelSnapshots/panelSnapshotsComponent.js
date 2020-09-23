@@ -86,27 +86,33 @@ export default class PanelSnapshotsComponent extends Component {
   };
 
   render() {
-    const snapshots = this.props.project.snapshots;
+    let snapshots;
+    if (this.props.project) {
+      snapshots = this.props.project.snapshots;
+    }
 
     return (
       <div id="snapshots">
         <div className="content">
-          {snapshots.length ? (
-            snapshots.map(snapshot => (
-              <div
-                className="item"
-                key={snapshot._key}
-                data-key={snapshot._key}
-                onClick={this.loadSnapshot}
-              >
-                {snapshot.title}
-                <button
-                  className="un-select"
-                  data-key={snapshot._key}
-                  onClick={this.deleteSnapshot}
-                />
-              </div>
-            ))
+          {snapshots && snapshots.length ? (
+            snapshots.map(
+              snapshot =>
+                snapshot && (
+                  <div
+                    className="item"
+                    key={snapshot._key}
+                    data-key={snapshot._key}
+                    onClick={this.loadSnapshot}
+                  >
+                    {snapshot.title}
+                    <button
+                      className="un-select"
+                      data-key={snapshot._key}
+                      onClick={this.deleteSnapshot}
+                    />
+                  </div>
+                )
+            )
           ) : (
             <FormattedMessage
               id="panelSnapshots.noSnapshot"

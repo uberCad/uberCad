@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import throttle from 'lodash/throttle';
 import PropTypes from 'prop-types';
-import Api from '../../services/apiService';
+
+import api from '../../services/apiService';
 import { parseDxf } from '../../services/dxfService';
+
 import Toolbar from '../Toolbar/toolbarComponentContainer';
 import Options from '../Options/optionsComponentContainer';
 import Sidebar from '../Sidebar/sidebarComponentContainer';
@@ -11,6 +13,7 @@ import PointInfoComponent from '../PointInfo/pointInfoComponentContainer';
 
 import './Cad.css';
 
+let map = {};
 export default class CadComponent extends Component {
   constructor(props) {
     super(props);
@@ -22,21 +25,17 @@ export default class CadComponent extends Component {
   componentDidMount() {
     const { projectId, snapshotId } = this.props.match.params;
     this.props.spinnerShow();
+    // if (projectId === 'editObjectElement') {
+    // this.props.drawDxf(null, this.container, null);
+    // в this.props.drawDxf(null, this.container, null); треба подавати або елемент з БД
+    // або загружаємий файл з ПК для створеннм нової сцени і редагування об'єкта
+    // todo тут має підгружатись алемент з бібліотеки або загружаємий елемент, важливо!!!
+    // }
 
-    // console.log(projectId);
-    // console.log(snapshotId);
-    // console.log(this.props);
-    if (projectId === 'editObjectElement') {
-      // this.props.drawDxf(null, this.container, null);
-      // в this.props.drawDxf(null, this.container, null); треба подавати або елемент з БД
-      // або загружаємий файл з ПК для створеннм нової сцени і редагування об'єкта
-      // todo тут має підгружатись алемент з бібліотеки або загружаємий елемент, важливо!!!
-    }
-
-    Api.get(
-      //done
-      snapshotId ? `/snapshot/${snapshotId}` : `/project/file/${projectId}`
-    )
+    api
+      .get(
+        snapshotId ? `/snapshot/${snapshotId}` : `/project/file/${projectId}`
+      )
       .then(data => {
         this.container.id = 'sceneID'; // todo тут костиль
         if (snapshotId) {
@@ -56,11 +55,11 @@ export default class CadComponent extends Component {
   }
 
   resizeWindow = () => {
-    let width = this.container.clientWidth;
-    let height = this.container.clientHeight;
-
     try {
-      this.props.editor.cadCanvas.resize(width, height);
+      this.props.editor.cadCanvas.resize(
+        this.container.clientWidth,
+        this.container.clientHeigh
+      );
     } catch (e) {
       console.error(e, 'CadComponent resize problem');
     }
@@ -78,7 +77,7 @@ export default class CadComponent extends Component {
   render() {
     if (this.props.isChanged) {
       window.onbeforeunload = function(evt) {
-        let message =
+        const message =
           'Document is not saved. You will lost the changes if you leave the page.';
         if (typeof evt === 'undefined') {
           evt = window.event;
@@ -91,6 +90,21 @@ export default class CadComponent extends Component {
     } else {
       window.onbeforeunload = null;
     }
+    document.body.onkeydown = e => {
+      map[e.keyCode] = e.type === 'keydown';
+      if ((map[16] || map[17] || map[90]) && Object.keys(map).length <= 3) {
+        if (map[16] && map[17] && map[90]) {
+          this.redo();
+          map = {};
+        } else if (map[90] && map[17]) {
+          this.undo();
+          map = {};
+        }
+      } else {
+        map = {};
+      }
+      return e;
+    };
 
     return (
       <div
@@ -117,6 +131,14 @@ export default class CadComponent extends Component {
       </div>
     );
   }
+
+  undo = event => {
+    this.props.undo();
+  };
+
+  redo = event => {
+    this.props.redo();
+  };
 
   onClick = event => {
     this.props.onClick(event, this.props.editor);
@@ -152,6 +174,8 @@ export default class CadComponent extends Component {
     spinnerHide: PropTypes.func,
     drawDxf: PropTypes.func,
     onClick: PropTypes.func,
+    undo: PropTypes.func,
+    redo: PropTypes.func,
     onDoubleClick: PropTypes.func,
     onMouseDown: PropTypes.func,
     onMouseMove: PropTypes.func,
