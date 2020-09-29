@@ -1,6 +1,7 @@
 import * as THREE from '../extend/THREE';
 
 import sceneService from '../services/sceneService';
+import edgeService from '../services/edgeService';
 import snapshotService from '../services/snapshotService';
 import GeometryUtils from '../services/GeometryUtils';
 import consoleUtils from '../services/consoleUtils';
@@ -44,7 +45,7 @@ export const toggleVisible = (layer, visible, editor) => {
 
 export const combineEdgeModels = editor => {
   return dispatch => {
-    let { svg } = sceneService.combineEdgeModels(editor, true);
+    let { svg } = edgeService.combineEdgeModels(editor, true);
     try {
       consoleUtils.previewObjectInConsole(svg);
       // sceneService.sendToFlixo(svg);
