@@ -1,3 +1,4 @@
+import * as uuid from 'uuid';
 import * as THREE from '../extend/THREE';
 import * as KMeans from '../../node_modules/kmeans-js/kMeans';
 import sceneService from './sceneService';
@@ -202,7 +203,6 @@ let buildEdgeModel = (object, threshold = 0.000001, mode) => {
     if (prevEntitiesCount !== entities.length) {
       prevEntitiesCount = entities.length;
     } else {
-      debugger;
       let error = new Error('Not all entities in use!');
       error.userData = {
         error: 'unused entities',
@@ -222,9 +222,6 @@ let buildEdgeModel = (object, threshold = 0.000001, mode) => {
         writable: true
       });
       let resBuildChain = buildChain(vertices, startVertex, threshold, mode);
-      // debugger;
-      console.log (resBuildChain);
-      // debugger;
       if (resBuildChain) {
         path.push(...resBuildChain);
         // let path = new Path(buildChain(vertices, startVertex, threshold))
@@ -3452,7 +3449,7 @@ function filterSelfIntersectingPaths(paths = []) {
   return result;
 }
 
-let newCurve = (center, radius, startPoint, endPoint) =>{
+const newCurve = (center, radius, startPoint, endPoint) =>{
         let curveParam = {
           newCurveCenter: center,
           thetaStart: circlInterAngle(
@@ -3552,6 +3549,7 @@ let newCurve = (center, radius, startPoint, endPoint) =>{
         }
         // debugger;
         copyCircle.userData.originalColor = copyCircle.material.color.clone();
+        copyCircle.userData.id = uuid.v4();
         return copyCircle;
 }
 

@@ -11,6 +11,11 @@ import {
 import './Material.css';
 import { FormattedMessage } from 'react-intl';
 
+import ButtonIcon from '../atoms/button-icon';
+const images = {
+  addMaterial: require('../../assets/images/panel/set-material.svg')
+};
+
 export default class MaterialComponent extends Component {
   constructor(props) {
     super(props);
@@ -25,8 +30,10 @@ export default class MaterialComponent extends Component {
     this.setState({ show: false });
 
     // todo КОСТИЛІЩЕ.... ну або подивись можливо можна упростити процес
-    if (this.props.activeObject.userData.material &&
-      !this.props.activeObject.userData.material.name) {
+    if (
+      this.props.activeObject.userData.material &&
+      !this.props.activeObject.userData.material.name
+    ) {
       this.props.activeObject.userData.material.name = 'Chose material';
     }
     if (this.props.onClose) {
@@ -96,10 +103,11 @@ export default class MaterialComponent extends Component {
           defaultMessage="Set material"
         >
           {title => (
-            <button
-              onClick={this.handleShow}
+            <ButtonIcon
+              id={'add-material'}
               title={title}
-              className="add-material"
+              src={images.addMaterial}
+              onClick={this.handleShow}
             />
           )}
         </FormattedMessage>

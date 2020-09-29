@@ -1,15 +1,18 @@
+import * as uuid from 'uuid';
 import DxfParser from 'dxf-parser';
-import * as THREE from '../extend/THREE';
-import sceneService from './sceneService';
-import GeometryUtils from './GeometryUtils';
-import Stats from 'stats.js';
-import { OrthographicControls } from '../classes/OrthographicControls';
 import throttle from 'lodash/throttle';
 
-export function parseDxf(dxf) {
-  let parser = new DxfParser();
+import Stats from 'stats.js';
+import * as THREE from '../extend/THREE';
+
+import sceneService from './sceneService';
+import GeometryUtils from './GeometryUtils';
+import { OrthographicControls } from '../classes/OrthographicControls';
+
+export const parseDxf = dxf => {
+  const parser = new DxfParser();
   return parser.parseSync(dxf);
-}
+};
 
 /**
  * Viewer class for a dxf object.
@@ -21,27 +24,21 @@ export function parseDxf(dxf) {
  */
 export function Viewer(data = null, container, snapshot = null, font, editor) {
   let scene = editor ? editor.scene : new THREE.Scene();
-  let check = name => {
-    for (let i = 0; i <= editor.scene.children.length; i++) {
-      if (editor.scene.children[i].name == name) {
-        return editor.scene.children[i];
-      }
-    }
+  const check = name =>
+    editor.scene.children.find(object => object.name === name);
+
+  const entities = {
+    Layers: editor ? check('Layers') : addContainer('Layers'),
+    Objects: editor ? check('Objects') : addContainer('Objects'),
+    HelpLayer: editor ? check('HelpLayer') : addContainer('HelpLayer'),
+    newLineLayer: editor ? check('newLineLayer') : addContainer('newLineLayer')
   };
-  let layersEntity = editor ? check('Layers') : addContainer('Layers');
-  let objectsEntity = editor ? check('Objects') : addContainer('Objects');
-  let helpLayer = editor ? check('HelpLayer') : addContainer('HelpLayer');
-  // todo питання під ким має бути newLineLayer
-  let newLineLayer = editor
-    ? check('newLineLayer')
-    : addContainer('newLineLayer');
   if (editor) {
     editor.activeEntities.forEach(line => {
       line.material.color = line.userData.originalColor.clone();
     });
     editor.editMode.activeLine.lines = [];
   }
-
   if (data) {
     createLineTypeShaders(data);
 
@@ -91,7 +88,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
     let activeLine = editor ? editor.editMode.activeLine.lines : [];
     Object.keys(data.tables.layer.layers).forEach(layerName => {
       let layer = layers[layerName];
-      layersEntity.add(layer);
+      entities.Layers.add(layer);
       console.log(layer);
       layer.children.forEach(line => {
         activeLine[activeLine.length] = line;
@@ -100,31 +97,31 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   }
 
   if (snapshot) {
-    scene.remove(layersEntity); //empty layers container
-    let loader = new THREE.ObjectLoader();
+    scene.remove(entities.Layers); //empty layers container
+    const loader = new THREE.ObjectLoader();
 
     //hack for LegacyJSONLoader
     //todo rewrite import/export, and make internal format specification
     window.THREE = THREE;
-    layersEntity = loader.parse(JSON.parse(snapshot.layers));
-    sceneService.fixSceneAfterImport(layersEntity);
-    scene.add(layersEntity);
+    entities.Layers = loader.parse(JSON.parse(snapshot.layers));
+    sceneService.fixSceneAfterImport(entities.Layers);
+    scene.add(entities.Layers);
 
     snapshot.objects.forEach(item => {
       const object = loader.parse(JSON.parse(item.parameters));
       sceneService.fixSceneAfterImport(object);
-      objectsEntity.add(object);
+      entities.Objects.add(object);
     });
 
     GeometryUtils.fixObjectsPaths(scene);
   }
 
   // Create scene from dxf object (data)
-  let dims = {
+  const dims = {
     min: { x: false, y: false, z: false },
     max: { x: false, y: false, z: false }
   };
-  let bbox = new THREE.Box3().setFromObject(scene);
+  const bbox = new THREE.Box3().setFromObject(scene);
   if (bbox.min.x && (dims.min.x === false || dims.min.x > bbox.min.x))
     dims.min.x = bbox.min.x;
   if (bbox.min.y && (dims.min.y === false || dims.min.y > bbox.min.y))
@@ -138,30 +135,32 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   if (bbox.max.z && (dims.max.z === false || dims.max.z < bbox.max.z))
     dims.max.z = bbox.max.z;
 
-  let width = container.clientWidth;
-  let height = container.clientHeight;
-  let aspectRatio = width / height;
+  const aspectRatio = container.clientWidth / container.clientHeight;
 
-  let upperRightCorner = { x: dims.max.x, y: dims.max.y };
-  let lowerLeftCorner = { x: dims.min.x, y: dims.min.y };
+  const upperRightCorner = {
+    x: dims.max.x,
+    y: dims.max.y
+  };
+  const lowerLeftCorner = {
+    x: dims.min.x,
+    y: dims.min.y
+  };
 
   // Figure out the current viewport extents
   let vpWidth = upperRightCorner.x - lowerLeftCorner.x;
   let vpHeight = upperRightCorner.y - lowerLeftCorner.y;
-  let center = {
+  const center = {
     x: vpWidth / 2 + lowerLeftCorner.x,
     y: vpHeight / 2 + lowerLeftCorner.y
-  };
-
+  }
   // Fit all objects into current ThreeDXF viewer
-  let extentsAspectRatio = Math.abs(vpWidth / vpHeight);
-  if (aspectRatio > extentsAspectRatio) {
+  if (aspectRatio > Math.abs(vpWidth / vpHeight)) {
     vpWidth = vpHeight * aspectRatio;
   } else {
     vpHeight = vpWidth / aspectRatio;
   }
 
-  let viewPort = {
+  const viewPort = {
     bottom: -vpHeight / 2,
     left: -vpWidth / 2,
     top: vpHeight / 2,
@@ -184,27 +183,23 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   camera.position.x = viewPort.center.x;
   camera.position.y = viewPort.center.y;
 
-  // let renderer = (this.renderer = new THREE.WebGLRenderer());
-  let renderer = (this.renderer = new THREE.WebGLRenderer({
-    antialias: true,
+  const renderer = (this.renderer = new THREE.WebGLRenderer({
+    antialias: true
   }));
 
-
-  renderer.setSize(width, height);
+  renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.setClearColor(0xfffffff, 1);
 
   let controls = new OrthographicControls(camera, container);
 
-  this.render = function() {
-    renderer.render(scene, camera);
-  };
+  this.render = () => renderer.render(scene, camera);
 
   if (process.env.NODE_ENV === 'development') {
-    var stats = new Stats();
+    const stats = new Stats();
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(stats.dom);
 
-    this.render = function() {
+    this.render = () => {
       stats.begin();
       renderer.render(scene, camera);
       stats.end();
@@ -218,12 +213,9 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
 
   this.getControls = () => controls;
 
-  this.resize = function(width, height) {
-    let originalWidth = renderer.domElement.width;
-    let originalHeight = renderer.domElement.height;
-
-    let hscale = width / originalWidth;
-    let vscale = height / originalHeight;
+  this.resize = (width, height) => {
+    const hscale = width / renderer.domElement.width;
+    const vscale = height / renderer.domElement.height;
 
     camera.top = vscale * camera.top;
     camera.bottom = vscale * camera.bottom;
@@ -236,8 +228,17 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
     this.render();
   };
 
+  // Set uniq ids for all
+  scene.children.forEach(object => {
+    object.children.forEach(group => {
+      group.children.forEach(line => (line.userData.id = uuid.v4()));
+    });
+  });
+
+  console.log('___________SCENE_________', 1, scene);
+
   function addContainer(name) {
-    let container = new THREE.Object3D();
+    const container = new THREE.Object3D();
     container.name = name;
     container.userData['container'] = true;
     scene.add(container);
@@ -293,19 +294,17 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   }
 
   function drawEllipse(entity, data) {
-    let color = getColor(entity, data);
-
-    let xrad = Math.sqrt(
+    const xrad = Math.sqrt(
       Math.pow(entity.majorAxisEndPoint.x, 2) +
         Math.pow(entity.majorAxisEndPoint.y, 2)
     );
-    let yrad = xrad * entity.axisRatio;
-    let rotation = Math.atan2(
+    const yrad = xrad * entity.axisRatio;
+    const rotation = Math.atan2(
       entity.majorAxisEndPoint.y,
       entity.majorAxisEndPoint.x
     );
 
-    let curve = new THREE.EllipseCurve(
+    const curve = new THREE.EllipseCurve(
       entity.center.x,
       entity.center.y,
       xrad,
@@ -316,12 +315,14 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
       rotation
     );
 
-    let points = curve.getPoints(50);
-    let geometry = new THREE.BufferGeometry().setFromPoints(points);
-    let material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
-
     // Create the final object to add to the scene
-    return new THREE.Line(geometry, material);
+    return new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(curve.getPoints(50)),
+      new THREE.LineBasicMaterial({
+        linewidth: 1,
+        color: getColor(entity, data)
+      })
+    );
   }
 
   function drawMtext(entity, data) {
@@ -408,9 +409,9 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   function drawSpline(entity, data) {
     let color = getColor(entity, data);
 
-    let points = entity.controlPoints.map(function(vec) {
-      return new THREE.Vector2(vec.x, vec.y);
-    });
+    const points = entity.controlPoints.map(
+      vec => new THREE.Vector2(vec.x, vec.y)
+    );
 
     let interpolatedPoints = [];
     let curve;
@@ -837,7 +838,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
       color = data.tables.layer.layers[entity.layer].color;
     }
 
-    if (color == null || color === 0xffffff) {
+    if (!color || color === 0xffffff) {
       color = 0x000000;
     }
     return color;
@@ -936,8 +937,9 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   };
   this.getCamera = () => camera;
   this.getRenderer = () => renderer;
-  this.getLayers = () => layersEntity;
-  this.getObjects = () => objectsEntity;
-  this.getHelpLayer = () => helpLayer;
-  this.getNewLineLayer = () => newLineLayer;
+  this.getEntity = entityName => entities[entityName];
+  this.getLayers = () => entities.Layers;
+  this.getObjects = () => entities.Objects;
+  this.getHelpLayer = () => entities.HelpLayer;
+  this.getNewLineLayer = () => entities.newLineLayer;
 }

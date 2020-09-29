@@ -1,5 +1,10 @@
 import { connect } from 'react-redux';
-import PanelObjectsComponent from './panelObjectsComponent';
+import { Dispatch } from 'redux';
+
+import PanelObjects, { IDispatchProps, IProps } from './index';
+// import { IDispatchProps, IProps } from './index';
+// import PanelObjects from './panelObjectsComponent';
+
 import {
   toggleVisible,
   combineEdgeModels,
@@ -7,9 +12,10 @@ import {
   loadObjectSnapshot
 } from '../../actions/panelObjects';
 import { showAll } from '../../actions/activeEntities';
-import { isEdit, ungroup } from '../../actions/edit';
+import { ungroup } from '../../actions/edit';
+import { isEdit } from '../../actions/editorActions/edit';
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state, ownProps): IProps => {
   return {
     snapshots: state.project.project.snapshots,
     lang: state.locale.lang,
@@ -29,33 +35,30 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => {
   return {
-    toggleVisible: function(entity, visible, editor) {
+    toggleVisible(visible, editor, entity) {
       toggleVisible(entity, visible, editor)(dispatch);
     },
-    combineEdgeModels: function(editor) {
+    combineEdgeModels(editor) {
       combineEdgeModels(editor)(dispatch);
     },
-    showAll: function(editor) {
+    showAll(editor) {
       showAll(editor)(dispatch);
     },
-    isEdit: function(option, editor, object) {
+    isEdit(option, editor, object) {
       isEdit(option, editor, object)(dispatch);
     },
-    toggleObject: function(editor, object) {
+    toggleObject(editor, object) {
       toggleObject(editor, object)(dispatch);
     },
-    loadObjectSnapshot: function(key, cadCanvas) {
+    loadObjectSnapshot(key, cadCanvas) {
       loadObjectSnapshot(key, cadCanvas)(dispatch);
     },
-    ungroup: function(editor, object) {
+    ungroup(editor, object) {
       ungroup(editor, object)(dispatch);
     }
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PanelObjectsComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(PanelObjects);

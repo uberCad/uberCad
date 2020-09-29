@@ -227,7 +227,7 @@ export default class ProjectComponent extends Component {
                 </Col>
                 <Col xs={3} className="table-data title">
                   <Col xs={10} className="cont">
-                    {i !== this.state.snapshotId && (
+                    {i !== this.state.snapshotId && snapshot && (
                       <Link
                         className="table-data link"
                         to={`${process.env.PUBLIC_URL}/cad/${project._key}/${snapshot._key}`}
