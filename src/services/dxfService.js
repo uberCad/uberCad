@@ -149,7 +149,10 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   // Figure out the current viewport extents
   let vpWidth = upperRightCorner.x - lowerLeftCorner.x;
   let vpHeight = upperRightCorner.y - lowerLeftCorner.y;
-
+  const center = {
+    x: vpWidth / 2 + lowerLeftCorner.x,
+    y: vpHeight / 2 + lowerLeftCorner.y
+  }
   // Fit all objects into current ThreeDXF viewer
   if (aspectRatio > Math.abs(vpWidth / vpHeight)) {
     vpWidth = vpHeight * aspectRatio;
@@ -163,8 +166,8 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
     top: vpHeight / 2,
     right: vpWidth / 2,
     center: {
-      x: vpWidth / 2 + lowerLeftCorner.x,
-      y: vpHeight / 2 + lowerLeftCorner.y
+      x: center.x,
+      y: center.y
     }
   };
 

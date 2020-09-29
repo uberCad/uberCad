@@ -876,7 +876,7 @@ const cad = (state = initialState, action) => {
         }
       });
     case CAD_TOGGLE_VISIBLE_LAYER:
-      debugger;
+      // debugger;
       // set current version of state and increase counter
       return {
         ...state,
