@@ -683,7 +683,7 @@ const createObject = (editor, name, entities,
           );
 
           // let size = GeometryUtils.calcSize(entities)
-          // console.log(`object area: ${GeometryUtils.calcArea(entities).toFixed(4)}\nLength: ${GeometryUtils.calcLength(entities).toFixed(4)}\nSize:\n\tWidth: ${size.x.toFixed(4)}\n\tHeight: ${size.y.toFixed(4)}`)
+          // // console.log(`object area: ${GeometryUtils.calcArea(entities).toFixed(4)}\nLength: ${GeometryUtils.calcLength(entities).toFixed(4)}\nSize:\n\tWidth: ${size.x.toFixed(4)}\n\tHeight: ${size.y.toFixed(4)}`)
           // ConsoleUtils.previewObjectInConsole(object)
         } catch (e) {
           console.warn('BUILD EDGE MODEL IN threeDXF');
@@ -2465,14 +2465,14 @@ let skive = (object, cutPointIndex, colPoint, threshold = 0.001) => {
     //   || GeometryUtils.getDistance(thisLinePoints[1], nextLinePoints[1]) < threshold){
     //   pointIndex = 0;
     // } else {
-    //   console.log ('точка перетену або ерор');
+    //   // console.log ('точка перетену або ерор');
     //   debugger;
     // }
 
     object.forEach((line, i) => {
       let collisionPoints = line.userData.collisionPointsInf;
       if (collisionPoints) {
-        console.log(line.userData.collisionPointsInf);
+        // console.log(line.userData.collisionPointsInf);
         let lineIndex = null;
         let linePoints = findWayPoint(line);
         for (let j = 0; j < object.length; j++) {
@@ -2511,7 +2511,7 @@ let skive = (object, cutPointIndex, colPoint, threshold = 0.001) => {
             }
           } else {
             collisionPoints.forEach((point, pointIndex) => {
-              console.log(collisionPoints);
+              // console.log(collisionPoints);
               point.entities.forEach(searchLine => {
                 if (searchLine !== line) {
                   if (object.includes(searchLine)) {
@@ -2559,7 +2559,7 @@ let skive = (object, cutPointIndex, colPoint, threshold = 0.001) => {
               });
               let distance = Math.min(...distanceToCirclePoints);
               pointIndex = distanceToCirclePoints.indexOf(distance);
-              console.log(distance);
+              // console.log(distance);
               if (pointIndex !== 0 && pointIndex !== line.geometry.vertices.length - 1) {
                 let newChangeLine = lineIndex === 0 ? GeometryUtils.newCurve(line.position,
                   line.geometry.parameters.radius, circlePoints[0],
@@ -2615,7 +2615,7 @@ let skive = (object, cutPointIndex, colPoint, threshold = 0.001) => {
   //     if (line !== thisLine) {
   //
   //       nextLinePoints = findWayPoint(line);
-  //       console.log(GeometryUtils.linesIntersect(nextLinePoints[0], nextLinePoints[1], thisLinePoints[0], thisLinePoints[1]));
+  //       // console.log(GeometryUtils.linesIntersect(nextLinePoints[0], nextLinePoints[1], thisLinePoints[0], thisLinePoints[1]));
   //       // debugger;
   //
   //       if (GeometryUtils.getDistance(thisLinePoints[0], nextLinePoints[0]) < threshold
@@ -2679,13 +2679,13 @@ let skive = (object, cutPointIndex, colPoint, threshold = 0.001) => {
   //         } else {
   //           debugger;
   //         }
-  //         console.log(GeometryUtils.linesIntersect(nextLinePoints[0], nextLinePoints[1], thisLinePoints[0], thisLinePoints[1]));
+  //         // console.log(GeometryUtils.linesIntersect(nextLinePoints[0], nextLinePoints[1], thisLinePoints[0], thisLinePoints[1]));
   //         debugger;
   //         thisLine = line;
   //         thisLinePoints = nextLinePoints;
   //       } else {
   //         nextLinePoints = findWayPoint(line);
-  //         console.log(thisLine.userData.collisionPointsInf);
+  //         // console.log(thisLine.userData.collisionPointsInf);
   //         // if (line.geometry.type === 'Geometry') {
   //         if (thisLine.userData.collisionPointsInf) {
   //           // if (line.userData.collisionPointsInf){
@@ -2723,7 +2723,7 @@ let skive = (object, cutPointIndex, colPoint, threshold = 0.001) => {
   //         thisLine = line;
   //         thisLinePoints = nextLinePoints;
   //         debugger;
-  //         console.log('точка перетену або ерор');
+  //         // console.log('точка перетену або ерор');
   //         debugger;
   //       }
   //
@@ -2753,15 +2753,15 @@ let searchLineWithPoint = (line, point, threshold) =>{
   // let linePoints;
   if (line.geometry.type === 'Geometry') {
           line.userData.newLines.forEach(uDLine => {
-            console.log(GeometryUtils.distanceToLine(point.point, uDLine));
+            // console.log(GeometryUtils.distanceToLine(point.point, uDLine));
             if (GeometryUtils.distanceToLine(point.point, uDLine) < 0.1 * threshold) {
               lineWithPoint = uDLine;
             }
           });
       if (GeometryUtils.distanceToLine(point.point, lineWithPoint) > threshold) {
         // такого не має бути
-        console.log(GeometryUtils.distanceToLine(point.point, lineWithPoint));
-        console.log(GeometryUtils.distanceToLine(point.point, line));
+        // console.log(GeometryUtils.distanceToLine(point.point, lineWithPoint));
+        // console.log(GeometryUtils.distanceToLine(point.point, line));
         debugger;
         return;
       }
@@ -2795,9 +2795,9 @@ let searchLineWithPoint = (line, point, threshold) =>{
     });
     if (GeometryUtils.distanceToArc(point.point, lineWithPoint) > threshold) {
       // такого не має бути
-      console.log(GeometryUtils.distanceToArc(point.point, lineWithPoint));
-      console.log(GeometryUtils.distanceToArc(point.point, line));
-      debugger;
+      // console.log(GeometryUtils.distanceToArc(point.point, lineWithPoint));
+      // console.log(GeometryUtils.distanceToArc(point.point, line));
+      // debugger;
       return;
     }
   }
@@ -3048,7 +3048,7 @@ let findWayPoint = (line, closesPoint = null, mode = 'normal')=>{
   }
   return points;
 };
-
+// TODO: delete it if we don't needed
 // let cutLine = (line, pointStart, cutPoint) => {
 //   let newLine = [];
 //   // console.log(line);
@@ -3315,7 +3315,11 @@ export default {
   highlightEntities,
   recursiveSelect,
   selectInFrustum,
+  findWayPoint,
+  drawLine,
+  searchLineWithPoint,
   render,
+  skive,
   entityIterator,
   setPointOfInterest,
   showAll,
@@ -3323,7 +3327,6 @@ export default {
   createObject,
   getObjects,
   getLayers,
-  combineEdgeModels,
   fixSceneAfterImport,
   sendToFlixo,
   someSvg,

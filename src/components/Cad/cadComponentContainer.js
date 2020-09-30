@@ -50,7 +50,7 @@ const mapDispatchToProps = dispatch => {
       fetchProject(id)(dispatch);
     },
 
-    spinnerShow: function() {
+    spinnerShow() {
       spinnerShow()(dispatch);
     },
 

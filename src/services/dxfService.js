@@ -152,7 +152,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   const center = {
     x: vpWidth / 2 + lowerLeftCorner.x,
     y: vpHeight / 2 + lowerLeftCorner.y
-  }
+  };
   // Fit all objects into current ThreeDXF viewer
   if (aspectRatio > Math.abs(vpWidth / vpHeight)) {
     vpWidth = vpHeight * aspectRatio;
@@ -216,7 +216,6 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   this.resize = (width, height) => {
     const hscale = width / renderer.domElement.width;
     const vscale = height / renderer.domElement.height;
-
     camera.top = vscale * camera.top;
     camera.bottom = vscale * camera.bottom;
     camera.left = hscale * camera.left;
