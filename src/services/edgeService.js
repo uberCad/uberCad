@@ -1025,7 +1025,7 @@ let searchTrueNextPoint = (
     if (GeometryUtils.getDistance(closesPoint.point, point_A_newObject) < 0.01){
       console.log (GeometryUtils.getDistance(closesPoint.point, point_A_newObject));
       newLine = findNextLine (lines_nextObject[0].parent, lines_nextObject[0], point_A_newObject);
-      let wayPointNewLine = findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+      let wayPointNewLine = sceneService.findWayPoint(newLine.line, closesPoint.point, 'serch_way');
       pointNewLineA = HelpLayerService.foundNewPoint(
         pointO[0],
         wayPointNewLine[newLine.index===0? 1:0],
@@ -1039,7 +1039,7 @@ let searchTrueNextPoint = (
     if (GeometryUtils.getDistance(closesPoint.point, point_B_newObject) < 0.01){
       console.log (GeometryUtils.getDistance(closesPoint.point, point_B_newObject));
       newLine = findNextLine (lines_nextObject[1].parent, lines_nextObject[1], point_B_newObject);
-      let wayPointNewLine = findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+      let wayPointNewLine = sceneService.findWayPoint(newLine.line, closesPoint.point, 'serch_way');
       pointNewLineB = HelpLayerService.foundNewPoint(
         pointO[0],
         wayPointNewLine[newLine.index===0? 1:0],
@@ -1054,7 +1054,7 @@ let searchTrueNextPoint = (
     if (GeometryUtils.getDistance(closesPoint.point, point_D_nextPointOldObject) < 0.01){
       console.log (GeometryUtils.getDistance(closesPoint.point, point_D_nextPointOldObject));
       newLine = findNextLine (nextLine_oldObject.parent, nextLine_oldObject, point_D_nextPointOldObject);
-      let wayPointNewLine = findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+      let wayPointNewLine = sceneService.findWayPoint(newLine.line, closesPoint.point, 'serch_way');
       pointNextLineOldObjectD = HelpLayerService.foundNewPoint(
         pointO[0],
         wayPointNewLine[newLine.index===0? 1:0],
@@ -1067,7 +1067,7 @@ let searchTrueNextPoint = (
     }
     if (GeometryUtils.getDistance(closesPoint.point, point_E_oldLine) < 0.01){
       newLine = findNextLine (oldLine.parent, oldLine, point_E_oldLine);
-      let wayPointNewLine = findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+      let wayPointNewLine = sceneService.findWayPoint(newLine.line, closesPoint.point, 'serch_way');
       pointOldLineE = HelpLayerService.foundNewPoint(
         pointO[0],
         wayPointNewLine[newLine.index===0? 1:0],
@@ -1087,7 +1087,7 @@ let searchTrueNextPoint = (
     helpLayer.add(helpPointE);
     helpLayer.add(helpPointO);
 
-    render(editor);
+    sceneService.render(editor);
     pointAinLineOD = GeometryUtils.getDistance(
       pointNewLineA,
       pointNextLineOldObjectD
@@ -1852,7 +1852,7 @@ const testMyFunktion = (
         [point.point]
       ));
       // render(editor);
-      render(editor);
+      sceneService.render(editor);
       // debugger;
 
       pointStartIndex.forEach(index => {
