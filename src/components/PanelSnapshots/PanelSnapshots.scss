@@ -18,6 +18,10 @@
         background-color: rgba(0,0,0,0.1);
       }
 
+      &.active {
+        background-color: #c1c1c1;
+      }
+
       input[type=checkbox] {
         float: right;
         margin-right: 4px;
