@@ -1459,13 +1459,6 @@ let searchTrueNextPoint = (editor, collisionPoints, oldLine, closesPoint,
   //   // debugger;
   // }
 
-  // todo  первервірка точки перетину точки наступної і тікущої
-  let pointNextLineOldObjectD = HelpLayerService.foundNewPoint(
-    pointO[0],
-    point_D_nextPointOldObject,
-    5
-  );
-
   // todo добавити/змінити на точку на наступній лінії
   let pointNewLineA = HelpLayerService.foundNewPoint(
     pointO[0],
@@ -1477,6 +1470,13 @@ let searchTrueNextPoint = (editor, collisionPoints, oldLine, closesPoint,
     pointO[0],
     point_B_newObject,
     4
+  );
+
+  // todo  первервірка точки перетину точки наступної і тікущої
+  let pointNextLineOldObjectD = HelpLayerService.foundNewPoint(
+    pointO[0],
+    point_D_nextPointOldObject,
+    5
   );
 
   let pointOldLineE = HelpLayerService.foundNewPoint(
@@ -1593,6 +1593,96 @@ let searchTrueNextPoint = (editor, collisionPoints, oldLine, closesPoint,
     pointAinLineOE, pointBinLineOE);
   // console.log (minDistance);
   if (minDistance > 1.5) {
+
+    let newLine;
+    if (GeometryUtils.getDistance(closesPoint.point, point_A_newObject) < 0.01){
+      console.log (GeometryUtils.getDistance(closesPoint.point, point_A_newObject));
+      newLine = findNextLine (lines_nextObject[0].parent, lines_nextObject[0], point_A_newObject);
+      let wayPointNewLine = findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+      pointNewLineA = HelpLayerService.foundNewPoint(
+        pointO[0],
+        wayPointNewLine[newLine.index===0? 1:0],
+        4
+      );
+      helpPointA = helpLayerService.positionInLine(
+        editor,
+        [pointNewLineA]
+      );
+    }
+    if (GeometryUtils.getDistance(closesPoint.point, point_B_newObject) < 0.01){
+      console.log (GeometryUtils.getDistance(closesPoint.point, point_B_newObject));
+      newLine = findNextLine (lines_nextObject[1].parent, lines_nextObject[1], point_B_newObject);
+      let wayPointNewLine = findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+      pointNewLineB = HelpLayerService.foundNewPoint(
+        pointO[0],
+        wayPointNewLine[newLine.index===0? 1:0],
+        4
+      );
+
+      helpPointB = helpLayerService.positionInLine(
+        editor,
+        [pointNewLineB]
+      );
+    }
+    if (GeometryUtils.getDistance(closesPoint.point, point_D_nextPointOldObject) < 0.01){
+      console.log (GeometryUtils.getDistance(closesPoint.point, point_D_nextPointOldObject));
+      newLine = findNextLine (nextLine_oldObject.parent, nextLine_oldObject, point_D_nextPointOldObject);
+      let wayPointNewLine = findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+      pointNextLineOldObjectD = HelpLayerService.foundNewPoint(
+        pointO[0],
+        wayPointNewLine[newLine.index===0? 1:0],
+        5
+      );
+      helpPointD = helpLayerService.positionInLine(
+        editor,
+        [pointNextLineOldObjectD]
+      );
+    }
+    if (GeometryUtils.getDistance(closesPoint.point, point_E_oldLine) < 0.01){
+      newLine = findNextLine (oldLine.parent, oldLine, point_E_oldLine);
+      let wayPointNewLine = findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+      pointOldLineE = HelpLayerService.foundNewPoint(
+        pointO[0],
+        wayPointNewLine[newLine.index===0? 1:0],
+        5
+      );
+      helpPointE = helpLayerService.positionInLine(
+        editor,
+        [pointOldLineE]
+      );
+    }
+
+    debugger;
+    helpLayer.children = [];
+    helpLayer.add(helpPointA);
+    helpLayer.add(helpPointB);
+    helpLayer.add(helpPointD);
+    helpLayer.add(helpPointE);
+    helpLayer.add(helpPointO);
+
+    render(editor);
+    pointAinLineOD = GeometryUtils.getDistance(
+      pointNewLineA,
+      pointNextLineOldObjectD
+    );
+    pointBinLineOD = GeometryUtils.getDistance(
+      pointNewLineB,
+      pointNextLineOldObjectD
+    );
+    pointAinLineOE = GeometryUtils.getDistance(
+      pointNewLineA,
+      pointOldLineE
+    );
+    pointBinLineOE = GeometryUtils.getDistance(
+      pointNewLineB,
+      pointOldLineE
+    );
+    minDistance = Math.min(pointAinLineOD, pointBinLineOD,
+      pointAinLineOE, pointBinLineOE);
+    console.log (minDistance);
+    if (minDistance > 1.5) {
+      debugger;
+    }
     debugger;
   }
 
@@ -1686,8 +1776,7 @@ let searchTrueNextPoint = (editor, collisionPoints, oldLine, closesPoint,
 
 };
 
-const findNextLine = (object, thisLine, linePoint, entrainment) => {
-  // debugger;
+const findNextLine = (object, thisLine, linePoint, entrainment = 0.001) => {
   for (let i = 0; i < object.children.length; i++) {
     let line = object.children[i];
     let p = false;
@@ -2464,7 +2553,7 @@ const testMyFunktion = (editor, collisionPoints, collisionAllPoints,
   // create free space objects
   freeSpacesAll.forEach((lineGroup, i) => {
     // debugger;
-    if (lineGroup[1].length < 5 || i === 12) {
+    if (lineGroup[1].length < 5 || i === 12 || i === 16) {
       console.log('skip ' + i + ' object');
       // debugger;
     } else {
