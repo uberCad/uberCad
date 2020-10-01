@@ -27,7 +27,6 @@ export const toggleObject = (editor, object) => {
 
 export const toggleVisible = (layer, visible, editor) => {
   return dispatch => {
-    debugger;
     const { scene } = editor;
     const previousScene = scene.clone();
     layer.visible = visible;

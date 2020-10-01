@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import PanelObjects, { IDispatchProps, IProps } from './index';
-import { spinnerShow } from '../../actions/spinner';
+// import { spinnerShow } from '../../actions/spinner';
 
 import {
   toggleVisible,
@@ -40,9 +40,11 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => {
       toggleVisible(entity, visible, editor)(dispatch);
     },
     combineEdgeModels(editor) {
-      spinnerShow('edgeModel')(dispatch)?.then(() =>
-        combineEdgeModels(editor)(dispatch)
-      );
+      /* tslint:disable */
+      // spinnerShow('edgeModel')(dispatch)?.then(() =>
+      combineEdgeModels(editor)(dispatch)
+      // );
+      /* tslint:enable */
     },
     showAll(editor) {
       showAll(editor)(dispatch);

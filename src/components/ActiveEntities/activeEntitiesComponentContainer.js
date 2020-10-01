@@ -38,8 +38,8 @@ const mapDispatchToProps = dispatch => {
     selectEntity: function(idx, activeEntities, editor) {
       selectEntity(idx, activeEntities, editor)(dispatch);
     },
-    showAll: function(editor) {
-      showAll(editor)(dispatch);
+    showAll(editor) {
+      showAll(editor, 'activeEntities')(dispatch);
     },
     groupEntities: function(editor) {
       groupEntities(editor)(dispatch);
