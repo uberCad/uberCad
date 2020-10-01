@@ -1815,7 +1815,7 @@ const nextPoint = (editor, object, linePoint = null,
                    freeSpace, entrainment, threshold) => {
 
   // debugger;
-  let lineCheker = 0;
+  // let lineCheker = 0;
   let wayPoint = findWayPoint(thisLine);
   let startFreeSpaceLengt = freeSpace.length;
   if (!linePoint) {
@@ -1945,20 +1945,20 @@ const nextPoint = (editor, object, linePoint = null,
             checkPoint = true;
             thisLine = line;
 
-            if (freeSpace.includes(thisLine)) {
-              debugger;
-              lineCheker += 1;
-            } else {
-              lineCheker = 0;
-            }
-            if (lineCheker > 5) {
-              if (pieceOfFreeSpace[0].includes(thisLine)) {
-                console.log('закольцована полость');
-              } else {
-                console.log('лінії вийшли за тереторію кола');
-              }
-              return;
-            }
+            // if (freeSpace.includes(thisLine)) {
+            //   debugger;
+            //   lineCheker += 1;
+            // } else {
+            //   lineCheker = 0;
+            // }
+            // if (lineCheker > 5) {
+            //   if (pieceOfFreeSpace[0].includes(thisLine)) {
+            //     console.log('закольцована полость');
+            //   } else {
+            //     console.log('лінії вийшли за тереторію кола');
+            //   }
+            //   return;
+            // }
 
             if (!pieceOfFreeSpace[0].includes(thisLine)) {
               // thisLine.userData.weDoneWithThisLine = true;
@@ -1989,20 +1989,20 @@ const nextPoint = (editor, object, linePoint = null,
               render(editor);
               // debugger;
 
-              if (freeSpace.includes(thisLine)) {
-                lineCheker += 1;
-              } else {
-                // debugger;
-                lineCheker = 0;
-              }
-              if (lineCheker > 5) {
-                if (pieceOfFreeSpace[0].includes(thisLine)) {
-                  console.log('закольцована полость');
-                } else {
-                  console.log('лінії вийшли за тереторію кола');
-                }
-                return;
-              }
+              // if (freeSpace.includes(thisLine)) {
+              //   lineCheker += 1;
+              // } else {
+              //   // debugger;
+              //   lineCheker = 0;
+              // }
+              // if (lineCheker > 5) {
+              //   if (pieceOfFreeSpace[0].includes(thisLine)) {
+              //     console.log('закольцована полость');
+              //   } else {
+              //     console.log('лінії вийшли за тереторію кола');
+              //   }
+              //   return;
+              // }
               if (!pieceOfFreeSpace[0].includes(thisLine)) {
                 // thisLine.userData.weDoneWithThisLine = true;
                 freeSpace.push(thisLine);
@@ -2553,7 +2553,7 @@ const testMyFunktion = (editor, collisionPoints, collisionAllPoints,
   // create free space objects
   freeSpacesAll.forEach((lineGroup, i) => {
     // debugger;
-    if (lineGroup[1].length < 5 || i === 12 || i === 16) {
+    if (lineGroup[1].length < 5 || i === 14) {
       console.log('skip ' + i + ' object');
       // debugger;
     } else {
@@ -2561,7 +2561,7 @@ const testMyFunktion = (editor, collisionPoints, collisionAllPoints,
         editor,
         'freeSpaceZone №' + i,
         lineGroup[1],
-        0.01,
+        0.001,
         'Free space'
       );
       console.log('done with ' + i + ' object');
