@@ -46,14 +46,19 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
         GeometryUtils.getDistance(point.point, linePoints[1]) > threshold
       ) {
         if (lineWithPoint.geometry.type === 'Geometry') {
-          if (GeometryUtils.distanceToLine(point.point, lineWithPoint) > threshold) {
+          if (
+            GeometryUtils.distanceToLine(point.point, lineWithPoint) > threshold
+          ) {
             // console.log(GeometryUtils.distanceToLine(point.point, lineWithPoint));
-            console.log('треба дивитись до функцію переноса точок перетину і ліній або дописувати доп алгоритм')
+            console.log(
+              'треба дивитись до функцію переноса точок перетину і ліній або дописувати доп алгоритм'
+            );
             // debugger;
           }
           newLines = [
-            createLine( linePoints[0], point.point),
-            createLine(point.point, linePoints[1])];
+            createLine(linePoints[0], point.point),
+            createLine(point.point, linePoints[1])
+          ];
 
           // lineWithPoint.geometry.vertices[0].x = point.point.x;
           // lineWithPoint.geometry.vertices[0].y = point.point.y;
@@ -69,11 +74,14 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
           let pointIndex;
           lineWithPoint.userData.reCreate = true;
           lineWithPoint.geometry.vertices.forEach((verticesPoint, i) => {
-            circlePoints [i] = {
+            circlePoints[i] = {
               x: verticesPoint.x + lineWithPoint.position.x,
               y: verticesPoint.y + lineWithPoint.position.y
-            }
-            distanceToCirclePoints[i] = GeometryUtils.getDistance(point.point, circlePoints [i]);
+            };
+            distanceToCirclePoints[i] = GeometryUtils.getDistance(
+              point.point,
+              circlePoints[i]
+            );
           });
           let distance = Math.min(...distanceToCirclePoints);
           pointIndex = distanceToCirclePoints.indexOf(distance);
@@ -247,11 +255,13 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   collisionPoints = GeometryUtils.filterCollisionPoints(collisionPoints);
 
   // пошук точкок які знаходяться на відстані менше ніж 0.01 від інших ліній
-  collisionPoints.forEach( (point, pointInd) =>{
+  collisionPoints.forEach((point, pointInd) => {
     if (!point.needDelete) {
       collisionPoints.forEach((checkPoint, pointInd) => {
-        if (point !== checkPoint &&
-          GeometryUtils.getDistance(checkPoint.point, point.point) < 0.01) {
+        if (
+          point !== checkPoint &&
+          GeometryUtils.getDistance(checkPoint.point, point.point) < 0.01
+        ) {
           checkPoint.needDelete = true;
           checkPoint.entities.forEach(line => {
             if (!point.entities.includes(line)) {
@@ -270,15 +280,15 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
 
   // видалення точок які знаходяться в притул до інших
   let lineIndex = 0;
-  console.log (collisionPoints.length);
+  console.log(collisionPoints.length);
   do {
-    if (collisionPoints[lineIndex].needDelete){
-      collisionPoints.splice(lineIndex,1);
+    if (collisionPoints[lineIndex].needDelete) {
+      collisionPoints.splice(lineIndex, 1);
     } else {
       lineIndex += 1;
     }
-  } while (lineIndex < collisionPoints.length)
-  console.log (collisionPoints.length);
+  } while (lineIndex < collisionPoints.length);
+  console.log(collisionPoints.length);
 
   // пошук ліній які торкаються знайдених точок перетину
   collisionPoints.forEach(point => {
@@ -307,7 +317,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
 
   // фільтр на повтор ліній в параметрах точці перетину
   collisionPoints.forEach(point => {
-    point.entities.forEach((line, i) =>{
+    point.entities.forEach((line, i) => {
       if (point.entities[i] !== null) {
         point.entities.forEach((checkLine, j) => {
           if (i !== j && line === checkLine) {
@@ -318,16 +328,16 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     });
     let nullIndex = 0;
     do {
-      if (point.entities[nullIndex] === null){
-        point.entities.splice(nullIndex,1);
+      if (point.entities[nullIndex] === null) {
+        point.entities.splice(nullIndex, 1);
       } else {
         nullIndex += 1;
       }
-    } while (nullIndex < point.entities.length)
+    } while (nullIndex < point.entities.length);
   });
 
   // розділення ліній по точка перетину
-  collisionPoints.forEach( (point, pointInd) =>{
+  collisionPoints.forEach((point, pointInd) => {
     lineDivision(editor, point, collisionPoints, 0.001);
   });
 
@@ -348,7 +358,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
 
   // фільтр на повтор ліній в параметрах точці перетину
   collisionPoints.forEach(point => {
-    point.entities.forEach((line, i) =>{
+    point.entities.forEach((line, i) => {
       if (point.entities[i] !== null) {
         point.entities.forEach((checkLine, j) => {
           if (i !== j && line === checkLine) {
@@ -359,12 +369,12 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     });
     let nullIndex = 0;
     do {
-      if (point.entities[nullIndex] === null){
-        point.entities.splice(nullIndex,1);
+      if (point.entities[nullIndex] === null) {
+        point.entities.splice(nullIndex, 1);
       } else {
         nullIndex += 1;
       }
-    } while (nullIndex < point.entities.length)
+    } while (nullIndex < point.entities.length);
   });
 
   // видалення ліній які були розділені з об'єкту
@@ -384,12 +394,18 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   collisionPoints.forEach(point => {
     helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
     sceneService.render(editor);
-    console.log (point);
+    console.log(point);
     // debugger;
   });
   sceneService.render(editor);
 
-  testMyFunktion(editor, collisionPoints, collisionAllPoints, objects, threshold);
+  testMyFunktion(
+    editor,
+    collisionPoints,
+    collisionAllPoints,
+    objects,
+    threshold
+  );
 
   sceneService.render(editor);
 
@@ -1099,63 +1115,93 @@ let searchTrueNextPoint = (
   );
   // console.log (minDistance);
   if (minDistance > 1.5) {
-
     let newLine;
-    if (GeometryUtils.getDistance(closesPoint.point, point_A_newObject) < 0.01){
-      console.log (GeometryUtils.getDistance(closesPoint.point, point_A_newObject));
-      newLine = findNextLine (lines_nextObject[0].parent, lines_nextObject[0], point_A_newObject);
-      let wayPointNewLine = sceneService.findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+    if (
+      GeometryUtils.getDistance(closesPoint.point, point_A_newObject) < 0.01
+    ) {
+      console.log(
+        GeometryUtils.getDistance(closesPoint.point, point_A_newObject)
+      );
+      newLine = findNextLine(
+        lines_nextObject[0].parent,
+        lines_nextObject[0],
+        point_A_newObject
+      );
+      let wayPointNewLine = sceneService.findWayPoint(
+        newLine.line,
+        closesPoint.point,
+        'serch_way'
+      );
       pointNewLineA = HelpLayerService.foundNewPoint(
         pointO[0],
-        wayPointNewLine[newLine.index===0? 1:0],
+        wayPointNewLine[newLine.index === 0 ? 1 : 0],
         4
       );
-      helpPointA = helpLayerService.positionInLine(
-        editor,
-        [pointNewLineA]
-      );
+      helpPointA = helpLayerService.positionInLine(editor, [pointNewLineA]);
     }
-    if (GeometryUtils.getDistance(closesPoint.point, point_B_newObject) < 0.01){
-      console.log (GeometryUtils.getDistance(closesPoint.point, point_B_newObject));
-      newLine = findNextLine (lines_nextObject[1].parent, lines_nextObject[1], point_B_newObject);
-      let wayPointNewLine = sceneService.findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+    if (
+      GeometryUtils.getDistance(closesPoint.point, point_B_newObject) < 0.01
+    ) {
+      console.log(
+        GeometryUtils.getDistance(closesPoint.point, point_B_newObject)
+      );
+      newLine = findNextLine(
+        lines_nextObject[1].parent,
+        lines_nextObject[1],
+        point_B_newObject
+      );
+      let wayPointNewLine = sceneService.findWayPoint(
+        newLine.line,
+        closesPoint.point,
+        'serch_way'
+      );
       pointNewLineB = HelpLayerService.foundNewPoint(
         pointO[0],
-        wayPointNewLine[newLine.index===0? 1:0],
+        wayPointNewLine[newLine.index === 0 ? 1 : 0],
         4
       );
 
-      helpPointB = helpLayerService.positionInLine(
-        editor,
-        [pointNewLineB]
-      );
+      helpPointB = helpLayerService.positionInLine(editor, [pointNewLineB]);
     }
-    if (GeometryUtils.getDistance(closesPoint.point, point_D_nextPointOldObject) < 0.01){
-      console.log (GeometryUtils.getDistance(closesPoint.point, point_D_nextPointOldObject));
-      newLine = findNextLine (nextLine_oldObject.parent, nextLine_oldObject, point_D_nextPointOldObject);
-      let wayPointNewLine = sceneService.findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+    if (
+      GeometryUtils.getDistance(closesPoint.point, point_D_nextPointOldObject) <
+      0.01
+    ) {
+      console.log(
+        GeometryUtils.getDistance(closesPoint.point, point_D_nextPointOldObject)
+      );
+      newLine = findNextLine(
+        nextLine_oldObject.parent,
+        nextLine_oldObject,
+        point_D_nextPointOldObject
+      );
+      let wayPointNewLine = sceneService.findWayPoint(
+        newLine.line,
+        closesPoint.point,
+        'serch_way'
+      );
       pointNextLineOldObjectD = HelpLayerService.foundNewPoint(
         pointO[0],
-        wayPointNewLine[newLine.index===0? 1:0],
+        wayPointNewLine[newLine.index === 0 ? 1 : 0],
         5
       );
-      helpPointD = helpLayerService.positionInLine(
-        editor,
-        [pointNextLineOldObjectD]
-      );
+      helpPointD = helpLayerService.positionInLine(editor, [
+        pointNextLineOldObjectD
+      ]);
     }
-    if (GeometryUtils.getDistance(closesPoint.point, point_E_oldLine) < 0.01){
-      newLine = findNextLine (oldLine.parent, oldLine, point_E_oldLine);
-      let wayPointNewLine = sceneService.findWayPoint(newLine.line, closesPoint.point, 'serch_way');
+    if (GeometryUtils.getDistance(closesPoint.point, point_E_oldLine) < 0.01) {
+      newLine = findNextLine(oldLine.parent, oldLine, point_E_oldLine);
+      let wayPointNewLine = sceneService.findWayPoint(
+        newLine.line,
+        closesPoint.point,
+        'serch_way'
+      );
       pointOldLineE = HelpLayerService.foundNewPoint(
         pointO[0],
-        wayPointNewLine[newLine.index===0? 1:0],
+        wayPointNewLine[newLine.index === 0 ? 1 : 0],
         5
       );
-      helpPointE = helpLayerService.positionInLine(
-        editor,
-        [pointOldLineE]
-      );
+      helpPointE = helpLayerService.positionInLine(editor, [pointOldLineE]);
     }
 
     debugger;
@@ -1175,17 +1221,15 @@ let searchTrueNextPoint = (
       pointNewLineB,
       pointNextLineOldObjectD
     );
-    pointAinLineOE = GeometryUtils.getDistance(
-      pointNewLineA,
-      pointOldLineE
+    pointAinLineOE = GeometryUtils.getDistance(pointNewLineA, pointOldLineE);
+    pointBinLineOE = GeometryUtils.getDistance(pointNewLineB, pointOldLineE);
+    minDistance = Math.min(
+      pointAinLineOD,
+      pointBinLineOD,
+      pointAinLineOE,
+      pointBinLineOE
     );
-    pointBinLineOE = GeometryUtils.getDistance(
-      pointNewLineB,
-      pointOldLineE
-    );
-    minDistance = Math.min(pointAinLineOD, pointBinLineOD,
-      pointAinLineOE, pointBinLineOE);
-    console.log (minDistance);
+    console.log(minDistance);
     if (minDistance > 1.5) {
       debugger;
     }
@@ -1288,15 +1332,9 @@ let searchTrueNextPoint = (
   // return index;
 
   return false;
-
 };
 
-const findNextLine = (
-  object,
-  thisLine,
-  linePoint,
-  entrainment = 0.001
-) => {
+const findNextLine = (object, thisLine, linePoint, entrainment = 0.001) => {
   for (let i = 0; i < object.children.length; i++) {
     let line = object.children[i];
     let p = false;
@@ -1358,7 +1396,7 @@ const nextPoint = (
     }
   }
   let collisionPointsInThisLine = [];
-  console.log (object.name);
+  console.log(object.name);
   let nextPointLine;
 
   if (!pieceOfFreeSpace[0].includes(thisLine)) {
@@ -1366,7 +1404,7 @@ const nextPoint = (
     pieceOfFreeSpace[0].push(thisLine);
   } else {
     // return;
-    console.log ('диви сюди')
+    console.log('диви сюди');
     debugger;
     return;
   }
@@ -1419,7 +1457,7 @@ const nextPoint = (
       let index = nextPointLine.index;
 
       if (pieceOfFreeSpace[0].includes(line)) {
-        console.log (pieceOfFreeSpace[0].indexOf (line));
+        console.log(pieceOfFreeSpace[0].indexOf(line));
         pieceOfFreeSpace[0] = [];
         debugger;
         // todo сюди можливо ще треба буде глянути
@@ -1451,7 +1489,7 @@ const nextPoint = (
         }
 
         // // переір точок і ліній з відмічянням їх на сцені
-        console.log (collisionPointsInThisLine);
+        console.log(collisionPointsInThisLine);
         collisionPointsInThisLine.forEach(point => {
           helpLayer.children = [];
           helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
@@ -1460,16 +1498,17 @@ const nextPoint = (
           // todo костиль. звідки у нього ростуть ноги було б непогано розібратись
           //  в point.entities має бути мінімум і в ідеалі 4 лінії, якщо більше...
           //  ну може бути в теорії, але менше ніяк...
-          if (point.entities.length < 4){
+          if (point.entities.length < 4) {
             let objects = editor.scene.getObjectByName('Objects');
-            objects.children.forEach(object =>{
-              object.children.forEach(line =>{
+            objects.children.forEach(object => {
+              object.children.forEach(line => {
                 if (point.entities.includes(line)) {
                   let lineWay = sceneService.findWayPoint(line);
                   if (
-                    GeometryUtils.getDistance(lineWay[0], point.point) < 0.001 ||
+                    GeometryUtils.getDistance(lineWay[0], point.point) <
+                      0.001 ||
                     GeometryUtils.getDistance(lineWay[0], point.point) < 0.001
-                  ){
+                  ) {
                     point.entities.push(line);
                     debugger;
                   }
@@ -1478,7 +1517,6 @@ const nextPoint = (
             });
             debugger;
           }
-
 
           // point.entities.forEach(line => {
           //     line.material.color.set(new THREE.Color(0x0000ff)); // синій
@@ -1664,7 +1702,9 @@ const nextPoint = (
               // похуду це піде в утіль, але спершу тести і перечитка коду
               if (collisionPointsInThisLine.length > 1) {
                 debugger;
-                console.log("от ми нарешті і дійшли до ліній на яких декілька важливих точок");
+                console.log(
+                  'от ми нарешті і дійшли до ліній на яких декілька важливих точок'
+                );
                 //   // перше що реалізовуємо перевірку чи є точки між тою звідки ідемо(тікуща точка перетену) і точка куди ідемо (wayPoint[pointIndex])
                 //   //  якщо є повторюємо все що було в цьому форі з позиції скакаємо з цієї лінії на іншу
                 //   let lengthToWayPoint = [];
@@ -1803,11 +1843,11 @@ const nextPoint = (
             }
           }
         } else {
-          console.log (pieceOfFreeSpace);
-          console.log (thisLine);
-          console.log (collisionPoints);
+          console.log(pieceOfFreeSpace);
+          console.log(thisLine);
+          console.log(collisionPoints);
           // console.log (collisionPoints);
-          debugger
+          debugger;
           // якщо ти тут посуті це ошибка коду.
         }
 
@@ -1931,7 +1971,7 @@ const testMyFunktion = (
   helpLayer.children = [];
   // debugger;
 
-  collisionPoints.forEach( (point, i) => {
+  collisionPoints.forEach((point, i) => {
     //
     //   helpLayer.add(helpLayerService.positionInLine(
     //     editor,
@@ -1953,7 +1993,7 @@ const testMyFunktion = (
         pointStartIndex.push(testIndex);
       }
       testIndex += 1;
-    } while (point.entities[testIndex])
+    } while (point.entities[testIndex]);
     // debugger;
     if (pointStartIndex.length > 0) {
       // todo так як ми розділили лінії на точках перетину, з'являється резон
@@ -1965,10 +2005,7 @@ const testMyFunktion = (
 
       console.log(i);
       helpLayer.children = [];
-      helpLayer.add(helpLayerService.positionInLine(
-        editor,
-        [point.point]
-      ));
+      helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
       // render(editor);
       sceneService.render(editor);
       // debugger;
@@ -1976,10 +2013,18 @@ const testMyFunktion = (
       pointStartIndex.forEach(index => {
         if (!point.entities[index].userData.weDoneWithThisLine) {
           freeSpacesAll[freeSpacesAll.length] = [[], []];
-          nextPoint(editor, point.entities[index].parent, null,
-            point.entities[index], point,
-            freeSpacesAll[freeSpacesAll.length - 1], collisionPoints,
-            freeSpace, entrainment, threshold);
+          nextPoint(
+            editor,
+            point.entities[index].parent,
+            null,
+            point.entities[index],
+            point,
+            freeSpacesAll[freeSpacesAll.length - 1],
+            collisionPoints,
+            freeSpace,
+            entrainment,
+            threshold
+          );
         }
       });
       // debugger;
@@ -2010,17 +2055,17 @@ const testMyFunktion = (
       let thisLineWayPoint = sceneService.findWayPoint(lines[objLength - 1]);
       if (
         GeometryUtils.getDistance(lastPoint[0], thisLineWayPoint[0]) <
-        10 * threshold ||
+          10 * threshold ||
         GeometryUtils.getDistance(lastPoint[0], thisLineWayPoint[1]) <
-        10 * threshold
+          10 * threshold
       ) {
         startPoint = lastPoint[1];
         thisPoint = lastPoint[0];
       } else if (
         GeometryUtils.getDistance(lastPoint[1], thisLineWayPoint[0]) <
-        10 * threshold ||
+          10 * threshold ||
         GeometryUtils.getDistance(lastPoint[1], thisLineWayPoint[1]) <
-        10 * threshold
+          10 * threshold
       ) {
         startPoint = lastPoint[0];
         thisPoint = lastPoint[1];
@@ -2030,17 +2075,17 @@ const testMyFunktion = (
         thisLineWayPoint = sceneService.findWayPoint(lines[objLength - 1]);
         if (
           GeometryUtils.getDistance(lastPoint[0], thisLineWayPoint[0]) <
-          10 * threshold ||
+            10 * threshold ||
           GeometryUtils.getDistance(lastPoint[0], thisLineWayPoint[1]) <
-          10 * threshold
+            10 * threshold
         ) {
           startPoint = lastPoint[1];
           thisPoint = lastPoint[0];
         } else if (
           GeometryUtils.getDistance(lastPoint[1], thisLineWayPoint[0]) <
-          10 * threshold ||
+            10 * threshold ||
           GeometryUtils.getDistance(lastPoint[1], thisLineWayPoint[1]) <
-          10 * threshold
+            10 * threshold
         ) {
           startPoint = lastPoint[0];
           thisPoint = lastPoint[1];
@@ -2067,17 +2112,19 @@ const testMyFunktion = (
             colPoint.forEach(point => {
               if (
                 GeometryUtils.getDistance(point.point, thisLineWayPoint[0]) <
-                threshold ||
+                  threshold ||
                 GeometryUtils.getDistance(point.point, thisLineWayPoint[1]) <
-                threshold
+                  threshold
               ) {
                 firstPointIndex = i;
               }
               if (colPointThisLine) {
                 colPointThisLine.forEach(pointThisLine => {
                   if (
-                    GeometryUtils.getDistance(point.point, pointThisLine.point) <
-                    threshold
+                    GeometryUtils.getDistance(
+                      point.point,
+                      pointThisLine.point
+                    ) < threshold
                   ) {
                     firstPointIndex = i;
                   }
@@ -2146,7 +2193,6 @@ const testMyFunktion = (
   //  перевіряти чи лінія закольцовалась, якщо ні спробувати найти точку
   //  в якій закольцовується) від 21.09.2020
 
-
   // debugger;
   // create free space objects
   freeSpacesAll.forEach((lineGroup, i) => {
@@ -2177,7 +2223,6 @@ const testMyFunktion = (
   //
   // recolor find free Space
   // drawLine (freeSpace, editor);
-
 };
 
 // let cutLine = (line, pointStart, cutPoint) => {
