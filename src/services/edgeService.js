@@ -1239,34 +1239,37 @@ let searchTrueNextPoint = (
   let nextLine;
   if (pointAinLineOE === minDistance) {
     // // debugger;
-    lines_nextObject[0].material.color.set(new THREE.Color(0x00ff00));
-    lines_nextObject[1].material.color.set(new THREE.Color(0xff0000));
     helpPointA.material.color.set(new THREE.Color(0xffdc00));
+    // lines_nextObject[0].material.color.set(new THREE.Color(0x00ff00));
+    // lines_nextObject[1].material.color.set(new THREE.Color(0xff0000));
     nextLine = lines_nextObject[0];
   }
   if (pointBinLineOE === minDistance) {
     // // debugger;
-    lines_nextObject[1].material.color.set(new THREE.Color(0x00ff00));
-    lines_nextObject[0].material.color.set(new THREE.Color(0xff0000));
     helpPointB.material.color.set(new THREE.Color(0xffdc00));
+    // lines_nextObject[1].material.color.set(new THREE.Color(0x00ff00));
+    // lines_nextObject[0].material.color.set(new THREE.Color(0xff0000));
     nextLine = lines_nextObject[1];
   }
-
   if (pointAinLineOD === minDistance) {
     // // debugger;
     helpPointB.material.color.set(new THREE.Color(0xffdc00));
-    lines_nextObject[1].material.color.set(new THREE.Color(0x00ff00));
-    lines_nextObject[0].material.color.set(new THREE.Color(0xff0000));
+    // lines_nextObject[1].material.color.set(new THREE.Color(0x00ff00));
+    // lines_nextObject[0].material.color.set(new THREE.Color(0xff0000));
     nextLine = lines_nextObject[1];
   }
   if (pointBinLineOD === minDistance) {
     // // debugger;
     helpPointA.material.color.set(new THREE.Color(0xffdc00));
-    lines_nextObject[0].material.color.set(new THREE.Color(0x00ff00));
-    lines_nextObject[1].material.color.set(new THREE.Color(0xff0000));
+    // lines_nextObject[0].material.color.set(new THREE.Color(0x00ff00));
+    // lines_nextObject[1].material.color.set(new THREE.Color(0xff0000));
     nextLine = lines_nextObject[0];
   }
-
+  lines_nextObject[0].material.color.set(new THREE.Color(0x00ff00));
+  lines_nextObject[1].material.color.set(new THREE.Color(0xff0000));
+  if (!nextLine) {
+    debugger
+  }
   nextLine.material.color.set(new THREE.Color(0x0000ff)); // синій
   sceneService.render(editor);
   nextLine.material.color.set(new THREE.Color(0xffaa00)); // синій
