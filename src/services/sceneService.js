@@ -726,7 +726,13 @@ const createObject = (
         });
 
         if (object.children.length) {
-          objectsContainer.add(object);
+          let region = object.userData.edgeModel.regions;
+          if (region.length === 1) {
+            if (region[0].area > 0.5) {
+              // console.log (object.userData.edgeModel.regions);
+              objectsContainer.add(object);
+            }
+          }
         } else {
           let error = new Error(
             usedEntities
