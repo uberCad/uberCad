@@ -858,8 +858,8 @@ const createSVG = (
             `<area value="${area}"></area>\n` +
             `</path>\n`
           );
-        } else if (object.name.indexOf('freeSpaceZone') == -1 ){
-          return object.userData.edgeModel.regions.map ( (regions, regIndex) => {
+        } else if (object.name.indexOf('freeSpaceZone') == -1) {
+          return object.userData.edgeModel.regions.map((regions, regIndex) => {
             if (regIndex !== 0) {
               let path = regions.path;
               let area = GeometryUtils.pathArea(regions.area);
