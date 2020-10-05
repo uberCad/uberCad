@@ -286,7 +286,7 @@ function getIntersections(vertex, objects, usedEntities, threshold = 0.000001) {
   try {
     intersections = intersections.filter(function(intersect) {
       if (usedEntities.length > 2 && usedEntities[0] === intersect.object) {
-        throw new Error('first loop detected');
+        throw 'first loop detected';
       }
 
       if (usedEntities.includes(intersect.object)) {

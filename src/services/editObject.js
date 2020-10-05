@@ -178,7 +178,7 @@ const unselectLine = (lines, scene) => {
       delete line.userData.lastoriginalColor;
     } else if (line.userData.originalColor) {
       // todo тут латка, костиль, баг треба знайти
-      if (typeof (line.userData.originalColor) !== 'object'){
+      if (typeof line.userData.originalColor !== 'object') {
         // debugger;
         line.userData.originalColor = new THREE.Color(0x000000);
       }
