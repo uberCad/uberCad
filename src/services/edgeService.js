@@ -317,13 +317,97 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
 
   // фільтр на повтор ліній в параметрах точці перетину
   collisionPoints.forEach(point => {
+    // костиль
+    let arr = [];
+    arr.push(...point.entities);
+    point.entities = arr;
+
     point.entities.forEach((line, i) => {
       if (point.entities[i] !== null) {
+        let wayPoint = sceneService.findWayPoint(line);
+
+        // фільтр на повтор ліній в параметрах точці перетину
         point.entities.forEach((checkLine, j) => {
           if (i !== j && line === checkLine) {
             point.entities[j] = null;
           }
         });
+
+        // костиль - перевірка відстанні ліній до точки перетину, фільтр зайвих ліній
+        if (point.entities[i] !== null) {
+          let distance;
+          if (line.geometry instanceof THREE.CircleGeometry) {
+            let circlePoints = [];
+            let distanceToCirclePoints = [];
+            line.geometry.vertices.forEach((verticesPoint, i) => {
+              circlePoints[i] = {
+                x: verticesPoint.x + line.position.x,
+                y: verticesPoint.y + line.position.y
+              };
+              distanceToCirclePoints[i] = GeometryUtils.getDistance(
+                point.point,
+                circlePoints[i]
+              );
+            });
+            distance = Math.min(...distanceToCirclePoints);
+          } else if (point.entities[i].geometry.type === 'Geometry') {
+            distance = GeometryUtils.distanceToLine(
+              point.point,
+              point.entities[i]
+            );
+          }
+          console.log(point.entities[i].geometry.type);
+          console.log(distance);
+          // debugger;
+          if (distance > 0.1) {
+            point.entities[i] = null;
+            // debugger;
+          }
+
+          // if (
+          //   GeometryUtils.getDistance(wayPoint[0], point.point) > 0.01 &&
+          //   GeometryUtils.getDistance(wayPoint[1], point.point) > 0.01
+          // ) {
+          //   point.entities[i] = null;
+          //   debugger;
+          // }
+        }
+
+        // фільтр нольових ліній
+        if (point.entities[i] !== null) {
+          if (GeometryUtils.getDistance(wayPoint[0], wayPoint[1]) < 0.001) {
+            console.log(GeometryUtils.getDistance(wayPoint[0], wayPoint[1]));
+            point.entities[i] = null;
+            debugger;
+          }
+        }
+
+        // if (point.entities[i] !== null) {
+        //   if (point.id === 141 || point.id === 141) {
+        //     let distance;
+        //     if (line.geometry instanceof THREE.CircleGeometry) {
+        //       let circlePoints = [];
+        //       let distanceToCirclePoints = [];
+        //       line.geometry.vertices.forEach((verticesPoint, i) => {
+        //         circlePoints[i] = {
+        //           x: verticesPoint.x + line.position.x,
+        //           y: verticesPoint.y + line.position.y
+        //         };
+        //         distanceToCirclePoints[i] = GeometryUtils.getDistance(
+        //           point.point,
+        //           circlePoints[i]
+        //         );
+        //       });
+        //       distance = Math.min(...distanceToCirclePoints);
+        //     } else if (point.entities[i].geometry.type === 'Geometry') {
+        //       distance = GeometryUtils.distanceToLine(point.point, point.entities[i]);
+        //     }
+        //     console.log(point.entities[i].geometry.type);
+        //     console.log(distance);
+        //     console.log(point);
+        //     debugger;
+        //   }
+        // }
       }
     });
     let nullIndex = 0;
@@ -357,25 +441,108 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   });
 
   // фільтр на повтор ліній в параметрах точці перетину
-  collisionPoints.forEach(point => {
-    point.entities.forEach((line, i) => {
-      if (point.entities[i] !== null) {
-        point.entities.forEach((checkLine, j) => {
-          if (i !== j && line === checkLine) {
-            point.entities[j] = null;
-          }
-        });
-      }
-    });
-    let nullIndex = 0;
-    do {
-      if (point.entities[nullIndex] === null) {
-        point.entities.splice(nullIndex, 1);
-      } else {
-        nullIndex += 1;
-      }
-    } while (nullIndex < point.entities.length);
-  });
+  // collisionPoints.forEach(point => {
+  //   point.entities.forEach((line, i) => {
+  //     if (point.entities[i] !== null) {
+  //       let wayPoint = sceneService.findWayPoint(line);
+  //
+  //       // фільтр на повтор ліній в параметрах точці перетину
+  //       point.entities.forEach((checkLine, j) => {
+  //         if (i !== j && line === checkLine) {
+  //           point.entities[j] = null;
+  //         }
+  //       });
+  //
+  //       // костиль - перевірка відстанні ліній до точки перетину, фільтр зайвих ліній
+  //       if (point.entities[i] !== null) {
+  //         let distance;
+  //         if (line.geometry instanceof THREE.CircleGeometry) {
+  //           let circlePoints = [];
+  //           let distanceToCirclePoints = [];
+  //           line.geometry.vertices.forEach((verticesPoint, i) => {
+  //             circlePoints[i] = {
+  //               x: verticesPoint.x + line.position.x,
+  //               y: verticesPoint.y + line.position.y
+  //             };
+  //             distanceToCirclePoints[i] = GeometryUtils.getDistance(
+  //               point.point,
+  //               circlePoints[i]
+  //             );
+  //           });
+  //           distance = Math.min(...distanceToCirclePoints);
+  //         } else if (point.entities[i].geometry.type === 'Geometry') {
+  //           distance = GeometryUtils.distanceToLine(point.point, point.entities[i]);
+  //         }
+  //         console.log(point.entities[i].geometry.type);
+  //         console.log(distance);
+  //         // debugger;
+  //         if (distance > 0.1) {
+  //           point.entities[i] = null;
+  //           // debugger;
+  //         }
+  //
+  //         // if (
+  //         //   GeometryUtils.getDistance(wayPoint[0], point.point) > 0.01 &&
+  //         //   GeometryUtils.getDistance(wayPoint[1], point.point) > 0.01
+  //         // ) {
+  //         //   point.entities[i] = null;
+  //         //   debugger;
+  //         // }
+  //       }
+  //
+  //       // фільтр нольових ліній
+  //       if (point.entities[i] !== null) {
+  //         if (GeometryUtils.getDistance(wayPoint[0], wayPoint[1]) < 0.001) {
+  //           console.log(GeometryUtils.getDistance(wayPoint[0], wayPoint[1]));
+  //           point.entities[i] = null;
+  //           debugger;
+  //         }
+  //       }
+  //
+  //       // фільтр на повтор ліній в параметрах точці перетину
+  //       point.entities.forEach((checkLine, j) => {
+  //         if (i !== j && line === checkLine) {
+  //           point.entities[j] = null;
+  //         }
+  //       });
+  //
+  //       // if (point.entities[i] !== null) {
+  //       //   if (point.id === 141 || point.id === 141) {
+  //       //     let distance;
+  //       //     if (line.geometry instanceof THREE.CircleGeometry) {
+  //       //       let circlePoints = [];
+  //       //       let distanceToCirclePoints = [];
+  //       //       line.geometry.vertices.forEach((verticesPoint, i) => {
+  //       //         circlePoints[i] = {
+  //       //           x: verticesPoint.x + line.position.x,
+  //       //           y: verticesPoint.y + line.position.y
+  //       //         };
+  //       //         distanceToCirclePoints[i] = GeometryUtils.getDistance(
+  //       //           point.point,
+  //       //           circlePoints[i]
+  //       //         );
+  //       //       });
+  //       //       distance = Math.min(...distanceToCirclePoints);
+  //       //     } else if (point.entities[i].geometry.type === 'Geometry') {
+  //       //       distance = GeometryUtils.distanceToLine(point.point, point.entities[i]);
+  //       //     }
+  //       //     console.log(point.entities[i].geometry.type);
+  //       //     console.log(distance);
+  //       //     console.log(point);
+  //       //     debugger;
+  //       //   }
+  //       // }
+  //     }
+  //   });
+  //   let nullIndex = 0;
+  //   do {
+  //     if (point.entities[nullIndex] === null) {
+  //       point.entities.splice(nullIndex, 1);
+  //     } else {
+  //       nullIndex += 1;
+  //     }
+  //   } while (nullIndex < point.entities.length);
+  // });
 
   // видалення ліній які були розділені з об'єкту
   objects.forEach(object => {
@@ -596,10 +763,7 @@ const createSVG = (
     `<?xml version="1.0" encoding="UTF-8"?>
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${(
         viewBox.width * mul
-      ).toFixed(4)}cm" height="${(viewBox.height * mul).toFixed(
-      4
-    )
-    }
+      ).toFixed(4)}cm" height="${(viewBox.height * mul).toFixed(4)}
     cm " transform='rotate(180)' viewBox="
     $ {
       viewBox.x.toFixed(4)
@@ -659,50 +823,50 @@ const createSVG = (
 
     objects
       .map((object, j) => {
-        console.log('__________________ MAP OBJECT SVG ____________________', object)
+        console.log(
+          '__________________ MAP OBJECT SVG ____________________',
+          object
+        );
         // if (
         //   object.name.indexOf('freeSpaceZone') !== -1 &&
         //   object.userData.edgeModel.regions[0]
         // ) {
-          // // // debugger;
-          console.log('__________________ TEST ____________________')
-          // console.log(objects);
-          console.log(object);
-          console.log(j);
-          // // // debugger;
-          let path = object.userData.edgeModel.regions[0].path;
-          let area = GeometryUtils.pathArea(
-            object.userData.edgeModel.regions[0].area
-          );
+        // // // debugger;
+        console.log('__________________ TEST ____________________');
+        // console.log(objects);
+        console.log(object);
+        console.log(j);
+        // // // debugger;
+        let path = object.userData.edgeModel.regions[0].path;
+        let area = GeometryUtils.pathArea(
+          object.userData.edgeModel.regions[0].area
+        );
 
-          let vertexList = [];
-          let last = path[path.length - 1];
-          let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
-            last.y / 1000
-          ).toFixed(4)}`;
-          let pathD = `M${lastVertex} L`;
+        let vertexList = [];
+        let last = path[path.length - 1];
+        let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
+          last.y / 1000
+        ).toFixed(4)}`;
+        let pathD = `M${lastVertex} L`;
 
-          path.forEach(v => {
-            let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(
-              4
-            )}`;
-            if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-              pathD += `${vertex} `;
-              lastVertex = vertex;
-              vertexList.push(vertex);
-            }
-            // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
-          });
-          return (
-            `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
-            `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
-            `<area value="${area}"></area>\n` +
-            `</path>\n`
-          );
+        path.forEach(v => {
+          let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
+          if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+            pathD += `${vertex} `;
+            lastVertex = vertex;
+            vertexList.push(vertex);
+          }
+          // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
+        });
+        return (
+          `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
+          `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
+          `<area value="${area}"></area>\n` +
+          `</path>\n`
+        );
         // }
       })
       .join('') +
-
     // objects
     //   .map((object, j) => object.userData.edgeModel.svgData.subRegionsPathD
     //       .map((pathD, idx) => {
@@ -718,35 +882,35 @@ const createSVG = (
     //     .join('') +
 
     // cavities
-      //   .map(pathData => {
-      //     // debugger;
-      //     let path = pathData.path;
-      //     let area = GeometryUtils.pathArea(pathData.path);
-      //
-      //     let vertexList = [];
-      //     let last = path[path.length - 1];
-      //     let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
-      //       last.y / 1000
-      //     ).toFixed(4)}`;
-      //     let pathD = `M${lastVertex} L`;
-      //
-      //     path.forEach(v => {
-      //       let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
-      //       if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-      //         pathD += `${vertex} `;
-      //         lastVertex = vertex;
-      //         vertexList.push(vertex);
-      //       }
-      //
-      //       // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
-      //     });
-      //     return (
-      //       `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
-      //       `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
-      //       `<area value="${area}"></area>\n` +
-      //       `</path>\n`
-      //     );
-      //   })
+    //   .map(pathData => {
+    //     // debugger;
+    //     let path = pathData.path;
+    //     let area = GeometryUtils.pathArea(pathData.path);
+    //
+    //     let vertexList = [];
+    //     let last = path[path.length - 1];
+    //     let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
+    //       last.y / 1000
+    //     ).toFixed(4)}`;
+    //     let pathD = `M${lastVertex} L`;
+    //
+    //     path.forEach(v => {
+    //       let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
+    //       if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+    //         pathD += `${vertex} `;
+    //         lastVertex = vertex;
+    //         vertexList.push(vertex);
+    //       }
+    //
+    //       // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
+    //     });
+    //     return (
+    //       `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
+    //       `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
+    //       `<area value="${area}"></area>\n` +
+    //       `</path>\n`
+    //     );
+    //   })
     `</g>
   <g id="temperature">
     <bcprop id="External" x="${(thermalPoints.cold1.x / 1000).toFixed(
@@ -970,7 +1134,7 @@ let searchTrueNextPoint = (
   lines_nextObject[1].userData.nextPointIndex =
     point_B_newObject === pointsWay_2_newObject[0] ? 0 : 1;
 
-  // // // debugger;
+  // debugger;
   oldLine.material.color.set(new THREE.Color(0x0000ff)); // синій
   nextLine_oldObject.material.color.set(new THREE.Color(0xaa00ff)); // фіолетовий
   lines_nextObject[0].material.color.set(new THREE.Color(0xffaa00)); // оранжевий
@@ -980,7 +1144,8 @@ let searchTrueNextPoint = (
   console.log(nextLine_oldObject);
   console.log(lines_nextObject[0]);
   console.log(lines_nextObject[1]);
-  // // // debugger;
+  sceneService.render(editor);
+  // debugger;
 
   let pointO = [closesPoint.point];
 
@@ -1104,7 +1269,7 @@ let searchTrueNextPoint = (
   helpLayer.add(helpPointD);
   console.log(helpPointD.position);
   sceneService.render(editor);
-  // // // debugger;
+  // debugger;
 
   // todo від 10.09.2020 подивитись до коректного визначення напрямку руху в старому об'єкті (інколи плутає напрямок звідки і куди
 
@@ -1298,15 +1463,11 @@ let searchTrueNextPoint = (
     lines_nextObject[1].material.color.set(new THREE.Color(0xff0000));
     nextLine = lines_nextObject[0];
   }
-  if (!nextLine) {
-    debugger;
-  }
-  nextLine.material.color.set(new THREE.Color(0x0000ff)); // синій
-  sceneService.render(editor);
-  nextLine.material.color.set(new THREE.Color(0xffaa00)); // синій
-  // // // debugger;
-
   if (nextLine) {
+    // nextLine.material.color.set(new THREE.Color(0x0000ff)); // синій
+    // sceneService.render(editor);
+    // nextLine.material.color.set(new THREE.Color(0xffaa00)); // синій
+    // debugger;
     nextLine.userData.collisionPointsInf.some(pointInNewLine => {
       if (pointInNewLine !== closesPoint) {
         // // debugger;
@@ -1528,7 +1689,15 @@ const nextPoint = (
           helpLayer.children = [];
           helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
           sceneService.render(editor);
-          // // debugger;
+          if (collisionPointsInThisLine.length > 1) {
+            // debugger;
+            point.entities.forEach(line => {
+              line.material.color.set(new THREE.Color(0x0000ff)); // синій
+              sceneService.render(editor);
+              line.material.color.set(new THREE.Color(0xffaa00)); // оранжевий
+              // debugger;
+            });
+          }
           // todo костиль. звідки у нього ростуть ноги було б непогано розібратись
           //  в point.entities має бути мінімум і в ідеалі 4 лінії, якщо більше...
           //  ну може бути в теорії, але менше ніяк...
@@ -1536,7 +1705,7 @@ const nextPoint = (
             let objects = editor.scene.getObjectByName('Objects');
             objects.children.forEach(object => {
               object.children.forEach(line => {
-                if (point.entities.includes(line)) {
+                if (!point.entities.includes(line)) {
                   let lineWay = sceneService.findWayPoint(line);
                   if (
                     GeometryUtils.getDistance(lineWay[0], point.point) <
@@ -2006,20 +2175,11 @@ const testMyFunktion = (
   // // debugger;
 
   collisionPoints.forEach((point, i) => {
-    //
-    //   helpLayer.add(helpLayerService.positionInLine(
-    //     editor,
-    //     [point.point]
-    //   ));
-    //   // console.log (point.entities);
-    //   render(editor);
-    //   // // debugger;
-    // });
-    // // debugger;
-    // let i = 3;
+    // let i = 4;
     // let point = collisionPoints[i];
+    // console.log (i);
+    // debugger;
 
-    // if (!point.weDoneWithThisPoint) {
     let pointStartIndex = [];
     let testIndex = 0;
     do {
@@ -2040,9 +2200,7 @@ const testMyFunktion = (
       console.log(i);
       helpLayer.children = [];
       helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
-      // render(editor);
       sceneService.render(editor);
-      // // debugger;
 
       pointStartIndex.forEach(index => {
         if (!point.entities[index].userData.weDoneWithThisLine) {
@@ -2061,7 +2219,6 @@ const testMyFunktion = (
           );
         }
       });
-      // // debugger;
       point.startFromThisPoint = false;
     }
   });
