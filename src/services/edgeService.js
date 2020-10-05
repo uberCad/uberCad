@@ -564,13 +564,13 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   });
   sceneService.render(editor);
 
-  // testMyFunktion(
-  //   editor,
-  //   collisionPoints,
-  //   collisionAllPoints,
-  //   objects,
-  //   threshold
-  // );
+  testMyFunktion(
+    editor,
+    collisionPoints,
+    collisionAllPoints,
+    objects,
+    threshold
+  );
 
   sceneService.render(editor);
 
@@ -761,22 +761,18 @@ const createSVG = (
 ) => {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>
-      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${(
-        viewBox.width * mul
-      ).toFixed(4)}cm" height="${(viewBox.height * mul).toFixed(4)}
-    cm " transform='rotate(180)' viewBox="
-    $ {
-      viewBox.x.toFixed(4)
-    }
-    $ {
-      viewBox.y.toFixed(
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${(
+      viewBox.width * mul
+    ).toFixed(4)}cm" transform="scale(1,-1)" height="${(
+      viewBox.height * mul
+    ).toFixed(4)}cm" viewBox="${viewBox.x.toFixed(4)} ${viewBox.y.toFixed(
       4
     )} ${viewBox.width.toFixed(4)} ${viewBox.height.toFixed(4)}">
-      <desc>
-        <schema desc="BuildingSVG" version="1.1"></schema>
-        <constr id="Dummy" scale="1"></constr>
-      </desc>
-      <g id="group_d">\n` +
+<desc>
+  <schema desc="BuildingSVG" version="1.1"></schema>
+  <constr id="Dummy" scale="1"></constr>
+</desc>
+<g id="group_d">\n` +
     // objects
     //   .map(object => {
     //     if (object.name.indexOf('freeSpaceZone') === -1) {
@@ -823,94 +819,79 @@ const createSVG = (
 
     objects
       .map((object, j) => {
-        console.log(
-          '__________________ MAP OBJECT SVG ____________________',
-          object
-        );
-        // if (
-        //   object.name.indexOf('freeSpaceZone') !== -1 &&
-        //   object.userData.edgeModel.regions[0]
-        // ) {
-        // // // debugger;
-        console.log('__________________ TEST ____________________');
-        // console.log(objects);
-        console.log(object);
-        console.log(j);
-        // // // debugger;
-        let path = object.userData.edgeModel.regions[0].path;
-        let area = GeometryUtils.pathArea(
-          object.userData.edgeModel.regions[0].area
-        );
+        if (
+          object.name.indexOf('freeSpaceZone') !== -1 &&
+          object.userData.edgeModel.regions[0]
+        ) {
+          // // debugger;
+          console.log(objects);
+          console.log(object);
+          console.log(j);
+          // // debugger;
+          let path = object.userData.edgeModel.regions[0].path;
+          let area = GeometryUtils.pathArea(
+            object.userData.edgeModel.regions[0].area
+          );
 
-        let vertexList = [];
-        let last = path[path.length - 1];
-        let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
-          last.y / 1000
-        ).toFixed(4)}`;
-        let pathD = `M${lastVertex} L`;
+          let vertexList = [];
+          let last = path[path.length - 1];
+          let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
+            last.y / 1000
+          ).toFixed(4)}`;
+          let pathD = `M${lastVertex} L`;
 
-        path.forEach(v => {
-          let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
-          if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-            pathD += `${vertex} `;
-            lastVertex = vertex;
-            vertexList.push(vertex);
-          }
-          // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
-        });
-        return (
-          `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
-          `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
-          `<area value="${area}"></area>\n` +
-          `</path>\n`
-        );
-        // }
+          path.forEach(v => {
+            let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(
+              4
+            )}`;
+            if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+              pathD += `${vertex} `;
+              lastVertex = vertex;
+              vertexList.push(vertex);
+            }
+
+            // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
+          });
+          return (
+            `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
+            `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
+            `<area value="${area}"></area>\n` +
+            `</path>\n`
+          );
+        }
       })
-      .join('') +
-    // objects
-    //   .map((object, j) => object.userData.edgeModel.svgData.subRegionsPathD
-    //       .map((pathD, idx) => {
-    //         return (
-    //           `<path d="${pathD} " style="fill:rgb(200,200,240);opacity:0.5; stroke:black;stroke-width:0.00001mm">\n` +
-    //           `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"/>\n` +
-    //           `<area value="${object.userData.edgeModel.regions[idx + 1].area / 1000000}" />\n` +
-    //           `</path>`
-    //         );
-    //       })
-    //       .join(''))
-    //     )
-    //     .join('') +
 
-    // cavities
-    //   .map(pathData => {
-    //     // debugger;
-    //     let path = pathData.path;
-    //     let area = GeometryUtils.pathArea(pathData.path);
-    //
-    //     let vertexList = [];
-    //     let last = path[path.length - 1];
-    //     let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
-    //       last.y / 1000
-    //     ).toFixed(4)}`;
-    //     let pathD = `M${lastVertex} L`;
-    //
-    //     path.forEach(v => {
-    //       let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
-    //       if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-    //         pathD += `${vertex} `;
-    //         lastVertex = vertex;
-    //         vertexList.push(vertex);
-    //       }
-    //
-    //       // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
-    //     });
-    //     return (
-    //       `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
-    //       `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
-    //       `<area value="${area}"></area>\n` +
-    //       `</path>\n`
-    //     );
-    //   })
+      // cavities
+      //   .map(pathData => {
+      //     debugger;
+      //     let path = pathData.path;
+      //     let area = GeometryUtils.pathArea(pathData.path);
+      //
+      //     let vertexList = [];
+      //     let last = path[path.length - 1];
+      //     let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
+      //       last.y / 1000
+      //     ).toFixed(4)}`;
+      //     let pathD = `M${lastVertex} L`;
+      //
+      //     path.forEach(v => {
+      //       let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
+      //       if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+      //         pathD += `${vertex} `;
+      //         lastVertex = vertex;
+      //         vertexList.push(vertex);
+      //       }
+      //
+      //       // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
+      //     });
+      //     return (
+      //       `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
+      //       `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
+      //       `<area value="${area}"></area>\n` +
+      //       `</path>\n`
+      //     );
+      //   })
+      .join('') +
     `</g>
   <g id="temperature">
     <bcprop id="External" x="${(thermalPoints.cold1.x / 1000).toFixed(
@@ -939,9 +920,9 @@ const createSVG = (
       collisionPoints
         .map(collisionPoint => {
           let dot = '';
-          // for (let i = 0; i <= collisionPoint.id; i++) {
-          //   // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
-          // }
+          for (let i = 0; i <= collisionPoint.id; i++) {
+            // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
+          }
           return (
             `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(
               collisionPoint.point.y / 1000
