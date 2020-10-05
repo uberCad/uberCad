@@ -799,6 +799,39 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
             `<area value="${area}"></area>\n` +
             `</path>\n`
           );
+        } else if (object.name.indexOf('freeSpaceZone') == -1 ){
+          return object.userData.edgeModel.regions.map ( (regions, regIndex) => {
+            if (regIndex !== 0) {
+              let path = regions.path;
+              let area = GeometryUtils.pathArea(regions.area);
+
+              let vertexList = [];
+              let last = path[path.length - 1];
+              let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
+                last.y / 1000
+              ).toFixed(4)}`;
+              let pathD = `M${lastVertex} L`;
+
+              path.forEach(v => {
+                let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(
+                  4
+                )}`;
+                if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+                  pathD += `${vertex} `;
+                  lastVertex = vertex;
+                  vertexList.push(vertex);
+                }
+
+                // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
+              });
+              return (
+                `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
+                `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
+                `<area value="${area}"></area>\n` +
+                `</path>\n`
+              );
+            }
+          });
         }
       })
 

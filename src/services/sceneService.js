@@ -727,8 +727,8 @@ const createObject = (
 
         if (object.children.length) {
           let region = object.userData.edgeModel.regions;
-          if (region.length === 1) {
-            if (region[0].area > 0.5) {
+          if (region.length === 1 || mode !== 'Free space') {
+            if (region[0].area > 0.5 || mode !== 'Free space') {
               // console.log (object.userData.edgeModel.regions);
               objectsContainer.add(object);
             }
