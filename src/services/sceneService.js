@@ -1223,6 +1223,16 @@ function delay(ms) {
   });
 }
 
+const createSVG = svg => {
+  return new Promise((resolve) => {
+    const csvContent = 'data:image/svg+xml;utf8,' + svg;
+
+    const encodedUri = encodeURI(csvContent);
+    window.open(encodedUri);
+    resolve();
+  });
+}
+
 let sendToFlixo = svg => {
   let options = {};
   options.headers = options.headers || {};
@@ -1513,6 +1523,7 @@ export default {
   getLayers,
   fixSceneAfterImport,
   sendToFlixo,
+  createSVG,
   someSvg,
   removeLineByName,
   getEntityNeighbours,
