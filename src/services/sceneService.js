@@ -1223,6 +1223,18 @@ function delay(ms) {
   });
 }
 
+const createSVG = svg => {
+  return new Promise(resolve => {
+    const svgContent = 'data:image/svg+xml;base64,' + window.btoa(svg);
+
+    const win = window.open();
+    win.document.write(
+      `<iframe src="${svgContent}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`
+    );
+    resolve();
+  });
+};
+
 let sendToFlixo = svg => {
   let options = {};
   options.headers = options.headers || {};
@@ -1513,6 +1525,7 @@ export default {
   getLayers,
   fixSceneAfterImport,
   sendToFlixo,
+  createSVG,
   someSvg,
   removeLineByName,
   getEntityNeighbours,

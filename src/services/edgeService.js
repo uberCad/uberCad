@@ -695,13 +695,11 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   // debugger;
   // console.warn('PATHS', paths, { branches }, { cavities });
 
-  let thermalPoints = GeometryUtils.getThermalPoints(scene);
-
-  let svg = createSVG(
+  const svg = createSVG(
     viewBox,
     mul,
     objects,
-    thermalPoints,
+    GeometryUtils.getThermalPoints(scene),
     svgForFlixo,
     collisionPoints
   );
@@ -760,18 +758,18 @@ const createSVG = (
 ) => {
   return (
     `<?xml version="1.0" encoding="UTF-8"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${(
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${(
       viewBox.width * mul
     ).toFixed(4)}cm" transform="scale(1,-1)" height="${(
       viewBox.height * mul
     ).toFixed(4)}cm" viewBox="${viewBox.x.toFixed(4)} ${viewBox.y.toFixed(
       4
     )} ${viewBox.width.toFixed(4)} ${viewBox.height.toFixed(4)}">
-<desc>
-  <schema desc="BuildingSVG" version="1.1"></schema>
-  <constr id="Dummy" scale="1"></constr>
-</desc>
-<g id="group_d">\n` +
+    <desc>
+      <schema desc="BuildingSVG" version="2"></schema>
+      <constr id="Dummy" scale="1"></constr>
+    </desc>
+    <g id="group_d">\n` +
     // objects
     //   .map(object => {
     //     if (object.name.indexOf('freeSpaceZone') === -1) {
@@ -925,28 +923,28 @@ const createSVG = (
       //   })
       .join('') +
     `</g>
-  <g id="temperature">
-    <bcprop id="External" x="${(thermalPoints.cold1.x / 1000).toFixed(
-      4
-    )}" y="${(thermalPoints.cold1.y / 1000).toFixed(
+    <g id="temperature">
+      <bcprop id="External" x="${(thermalPoints.cold1.x / 1000).toFixed(
+        4
+      )}" y="${(thermalPoints.cold1.y / 1000).toFixed(
       4
     )}" temp="273.15" rs="0.04" rel_img="SvgjsImage1089" rel_id="0" rel="min"></bcprop>
-    <bcprop id="External" x="${(thermalPoints.cold2.x / 1000).toFixed(
-      4
-    )}" y="${(thermalPoints.cold2.y / 1000).toFixed(
+      <bcprop id="External" x="${(thermalPoints.cold2.x / 1000).toFixed(
+        4
+      )}" y="${(thermalPoints.cold2.y / 1000).toFixed(
       4
     )}" temp="273.15" rs="0.04" rel_img="SvgjsImage1090" rel_id="1" rel="max"></bcprop>
-    <bcprop id="Interior" x="${(thermalPoints.hot1.x / 1000).toFixed(4)}" y="${(
-      thermalPoints.hot1.y / 1000
-    ).toFixed(
+      <bcprop id="Interior" x="${(thermalPoints.hot1.x / 1000).toFixed(
+        4
+      )}" y="${(thermalPoints.hot1.y / 1000).toFixed(
       4
     )}" temp="293.15" rs="0.13" rel_img="SvgjsImage1091" rel_id="2" rel="min"></bcprop>
-    <bcprop id="Interior" x="${(thermalPoints.hot2.x / 1000).toFixed(4)}" y="${(
-      thermalPoints.hot2.y / 1000
-    ).toFixed(
+      <bcprop id="Interior" x="${(thermalPoints.hot2.x / 1000).toFixed(
+        4
+      )}" y="${(thermalPoints.hot2.y / 1000).toFixed(
       4
     )}" temp="293.15" rs="0.13" rel_img="SvgjsImage1092" rel_id="3" rel="max"></bcprop>
-  </g>
+    </g>
   ${(!svgForFlixo &&
     `<g id="collisions">` +
       collisionPoints

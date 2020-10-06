@@ -45,18 +45,20 @@ export const toggleVisible = (layer, visible, editor) => {
 
 export const combineEdgeModels = editor => {
   return dispatch => {
-    let { svg } = edgeService.combineEdgeModels(editor, true);
+    const { svg } = edgeService.combineEdgeModels(editor, true);
     try {
-      consoleUtils.previewObjectInConsole(svg);
+      // consoleUtils.previewObjectInConsole(svg);
+      sceneService.createSVG(svg).then(() => {
+        dispatch({ type: SPINNER_HIDE });
+        dispatch({
+          type: CAD_COMBINE_EDGE_MODELS,
+          payload: {}
+        });
+      });
       // sceneService.sendToFlixo(svg);
     } catch (e) {
       console.error(e);
     }
-    dispatch({ type: SPINNER_HIDE })
-    dispatch({
-      type: CAD_COMBINE_EDGE_MODELS,
-      payload: {}
-    });
   };
 };
 
