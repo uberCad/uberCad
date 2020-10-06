@@ -767,7 +767,7 @@ const createSVG = (
       4
     )} ${viewBox.width.toFixed(4)} ${viewBox.height.toFixed(4)}">
     <desc>
-      <schema desc="BuildingSVG" version="1.1"></schema>
+      <schema desc="BuildingSVG" version="2"></schema>
       <constr id="Dummy" scale="1"></constr>
     </desc>
     <g id="group_d">\n` +
