@@ -728,10 +728,13 @@ const createObject = (
         if (object.children.length) {
           let region = object.userData.edgeModel.regions;
           if (region.length === 1 || mode !== 'Free space') {
-            if (region[0].area > 0.5 || mode !== 'Free space') {
-              // console.log (object.userData.edgeModel.regions);
+          //   if (region[0].area > 1 || mode !== 'Free space') {
+          //     console.log (object.name);
+              // console.log (object.userData.info.area.toFixed(4));
+              // console.log (object.children.length);
+              // debugger;
               objectsContainer.add(object);
-            }
+            // }
           }
         } else {
           let error = new Error(
