@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import './PanelSnapshots.css';
 import {
   Button,
   Modal,
@@ -10,7 +9,10 @@ import {
   FormControl,
   HelpBlock
 } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
+
+import './PanelSnapshots.css';
 
 export default class PanelSnapshotsComponent extends Component {
   constructor(props) {
@@ -96,21 +98,25 @@ export default class PanelSnapshotsComponent extends Component {
         <div className="content">
           {snapshots && snapshots.length ? (
             snapshots.map(
-              snapshot =>
+              (snapshot, index) =>
                 snapshot && (
-                  <div
-                    className="item"
-                    key={snapshot._key}
-                    data-key={snapshot._key}
-                    onClick={this.loadSnapshot}
+                  <Link
+                    key={`${snapshot._key}/${index}/${this.props.project._key}`}
+                    to={`${process.env.PUBLIC_URL}/cad/${this.props.project._key}/${snapshot._key}`}
                   >
-                    {snapshot.title}
-                    <button
-                      className="un-select"
+                    <div
+                      className={
+                        snapshot._key === window.location.href.split('/').pop()
+                          ? 'item active'
+                          : 'item'
+                      }
+                      key={snapshot._key}
                       data-key={snapshot._key}
-                      onClick={this.deleteSnapshot}
-                    />
-                  </div>
+                      onClick={this.loadSnapshot}
+                    >
+                      {snapshot.title}
+                    </div>
+                  </Link>
                 )
             )
           ) : (

@@ -315,9 +315,11 @@ export const drawLine = (event, editor, parent, copyPoint) => {
     changeGeometry([changeLine], [1], secondPoint, scene, editor);
   } else {
     const line = createLine(editMode.newLineFirst, secondPoint);
-    line.userData.originalColor = parent.children.length
-      ? parent.children[0].userData.originalColor
-      : 0x808000;
+    if (parent.children.length) {
+      line.userData.originalColor = parent.children[0].userData.originalColor.clone();
+    } else {
+      line.userData.originalColor.set(new THREE.Color(0x808000));
+    }
     parent.add(line);
   }
   console.log('_________drawLine________');
@@ -525,7 +527,7 @@ export const thetaLength = (event, editor, parent, curveParam) => {
     : editMode.newCurveCenter.y;
 
   if (oldLine && oldLine.parent) oldLine.parent.remove(oldLine);
-  line.userData.originalColor = parent.children[0].userData.originalColor;
+  line.userData.originalColor = parent.children[0].userData.originalColor.clone();
   parent.add(line);
 
   console.log('______________thetaLength_____________');
@@ -1048,6 +1050,7 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
   //todo вирівнювання кута обєкту за біччною стороною (найдовша лінія має статити вертикальною
   // TODO: delete it if no needed
   // let info = GeometryUtils.getObjectInfo(newObjectLines[0].parent);
+  // console.log (info);
 
   let { camera, scene, renderer } = editor;
   let res = GeometryUtils.getRegionClusters(
@@ -1182,6 +1185,4 @@ export const dovetailPointSearch = (editor, dovetail, newObjectLines) => {
     dovetail.x = (linesInBoxSideMin.x + linesInBoxSideMax.x) / 2;
     dovetail.y = (linesInBoxSideMin.y + linesInBoxSideMax.y) / 2;
   }
-  // debugger;
-  // }
 };

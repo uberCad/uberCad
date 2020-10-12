@@ -58,7 +58,7 @@ export default class CadComponent extends Component {
     try {
       this.props.editor.cadCanvas.resize(
         this.container.clientWidth,
-        this.container.clientHeigh
+        this.container.clientHeight
       );
     } catch (e) {
       console.error(e, 'CadComponent resize problem');

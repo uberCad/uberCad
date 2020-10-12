@@ -1,12 +1,14 @@
 import * as THREE from '../extend/THREE';
 
 import sceneService from '../services/sceneService';
+import edgeService from '../services/edgeService';
 import snapshotService from '../services/snapshotService';
 import GeometryUtils from '../services/GeometryUtils';
 import consoleUtils from '../services/consoleUtils';
 
 import { spinnerHide, spinnerShow } from './spinner';
 import { CAD_TOGGLE_VISIBLE_LAYER, CAD_COMBINE_EDGE_MODELS } from './cad';
+import { SPINNER_HIDE } from './spinner';
 
 export const PANEL_OBJECTS_TOGGLE = 'PANEL_OBJECTS_TOGGLE';
 export const SNAPSHOT_LOAD_OBJECT = 'SNAPSHOT_LOAD_OBJECT';
@@ -43,17 +45,20 @@ export const toggleVisible = (layer, visible, editor) => {
 
 export const combineEdgeModels = editor => {
   return dispatch => {
-    let { svg } = sceneService.combineEdgeModels(editor, true);
+    const { svg } = edgeService.combineEdgeModels(editor, true);
     try {
-      consoleUtils.previewObjectInConsole(svg);
+      // consoleUtils.previewObjectInConsole(svg);
+      sceneService.createSVG(svg).then(() => {
+        dispatch({ type: SPINNER_HIDE });
+        dispatch({
+          type: CAD_COMBINE_EDGE_MODELS,
+          payload: {}
+        });
+      });
       // sceneService.sendToFlixo(svg);
     } catch (e) {
       console.error(e);
     }
-    dispatch({
-      type: CAD_COMBINE_EDGE_MODELS,
-      payload: {}
-    });
   };
 };
 

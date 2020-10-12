@@ -1,3 +1,4 @@
+import * as uuid from 'uuid';
 import * as THREE from '../extend/THREE';
 import GeometryUtils from './GeometryUtils';
 import helpLayerService from './helpLayerService';
@@ -99,6 +100,7 @@ const addHelpPoints = (editor, scene) => {
           point2,
           pointCenter
         };
+        console.log('helppoint');
       } else if (object.geometry.type === 'CircleGeometry') {
         let pointCenter = new THREE.Line(pointGeometry, pointMaterial);
         let pointStart = new THREE.Line(pointGeometry, pointMaterial);
@@ -174,10 +176,12 @@ const unselectLine = (lines, scene) => {
     if (line.userData.lastoriginalColor) {
       line.material.color = line.userData.lastoriginalColor.clone();
       delete line.userData.lastoriginalColor;
-    } else if (
-      line.userData.originalColor &&
-      line.userData.originalColor.clone
-    ) {
+    } else if (line.userData.originalColor) {
+      // todo тут латка, костиль, баг треба знайти
+      if (typeof line.userData.originalColor !== 'object') {
+        // debugger;
+        line.userData.originalColor = new THREE.Color(0x000000);
+      }
       line.material.color = line.userData.originalColor.clone();
       delete line.userData.originalColor;
     } else {
@@ -914,6 +918,7 @@ const createLine = (point0, point1) => {
     let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
     let line = new THREE.Line(geometryLine, materialLine);
     line.name = 'newLine';
+    line.userData.id = uuid.v4();
     return line;
   } else {
     console.error(

@@ -254,17 +254,17 @@ let lengthNewLine = (editor, event) => {
     B - mousePoint
     h - height - BD
  */
-let positionInLine = (editor, lineWithPoint, pointB, point) => {
-  let { camera } = editor;
+const positionInLine = (editor, lineWithPoint, pointB, point) => {
+  const { camera } = editor;
   if (point) {
-    let pointA = lineWithPoint[0];
-    let pointC = lineWithPoint[1];
-    let lineAC = lengthLine(pointA, pointC);
-    let lineAB = lengthLine(pointA, pointB);
-    let lineBC = lengthLine(pointB, pointC);
-    let lineCD =
+    const pointA = lineWithPoint[0];
+    const pointC = lineWithPoint[1];
+    const lineAC = lengthLine(pointA, pointC);
+    const lineAB = lengthLine(pointA, pointB);
+    const lineBC = lengthLine(pointB, pointC);
+    const lineCD =
       (lineAC * lineAC - lineAB * lineAB + lineBC * lineBC) / (2 * lineAC);
-    let pointD = foundNewPoint(pointC, pointA, lineCD);
+    const pointD = foundNewPoint(pointC, pointA, lineCD);
 
     if (
       ((pointA.x <= pointD.x && pointC.x >= pointD.x) ||
@@ -276,25 +276,22 @@ let positionInLine = (editor, lineWithPoint, pointB, point) => {
       point.position.y = pointD.y;
     }
   } else {
-    let pointGeometry = new THREE.CircleGeometry(
+    const pointGeometry = new THREE.CircleGeometry(
       camera.top / 100,
       32,
       0,
       2 * Math.PI
     );
     pointGeometry.vertices.shift();
-    let centralLineColor = 0xff00ff;
-    let pointMaterial = new THREE.LineBasicMaterial({
-      color: centralLineColor,
+    const pointMaterial = new THREE.LineBasicMaterial({
+      color: 0xff00ff,
       opacity: 0.8,
       transparent: true
     });
     point = new THREE.Line(pointGeometry, pointMaterial);
-    // point.name = 'pointCurveCenter';
     point.position.x = lineWithPoint[0].x;
     point.position.y = lineWithPoint[0].y;
   }
-  // debugger;
   return point;
 };
 

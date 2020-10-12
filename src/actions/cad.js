@@ -129,23 +129,23 @@ export const drawDxf = (
   /**
    * init
    */
-  // TODO: delete it if no needed
-  // try {
-  //   // let editor = {
-  //   //     scene,
-  //   //     camera,
-  //   //     renderer,
-  //   //     cadCanvas,
-  //   //     options: {
-  //   //         threshold: 0.01,
-  //   //         selectMode: SELECT_MODE_NEW,
-  //   //         singleLayerSelect: true
-  //   //     }
-  //   // };
-  //   // testExample(editor);
-  // } catch (e) {
-  //   console.error(e);
-  // }
+// function tester TODO: delete when all will done
+  try {
+    // let editor = {
+    //     scene,
+    //     camera,
+    //     renderer,
+    //     cadCanvas,
+    //     options: {
+    //         threshold: 0.01,
+    //         selectMode: SELECT_MODE_NEW,
+    //         singleLayerSelect: true
+    //     }
+    // };
+    // testExample(editor);
+  } catch (e) {
+    console.error(e);
+  }
 
   return dispatch =>
     dispatch({
@@ -189,6 +189,13 @@ export const cadClick = (event, editor) => {
       case TOOL_POINT:
         {
           const clickResult = sceneService.onClick(event, scene, camera);
+          console.log(
+            `Click position [${clickResult.point.x.toFixed(
+              4
+            )}, ${clickResult.point.y.toFixed(4)}]`,
+            clickResult
+          );
+
           const payload = {
             ...clickResult,
             object: null
@@ -291,13 +298,13 @@ export const cadClick = (event, editor) => {
         break;
 
       case TOOL_MEASUREMENT:
-        // let clickResult = sceneService.onClick(event, scene, camera);
-        // console.log(
-        //   `Click position [${clickResult.point.x.toFixed(
-        //     4
-        //   )}, ${clickResult.point.y.toFixed(4)}]`,
-        //   clickResult
-        // );
+        let clickResult = sceneService.onClick(event, scene, camera);
+        console.log(
+          `Click position [${clickResult.point.x.toFixed(
+            4
+          )}, ${clickResult.point.y.toFixed(4)}]`,
+          clickResult
+        );
         break;
 
       case MOVE_NEW_OBJECT:
@@ -561,9 +568,9 @@ export const onMouseDown = (event, editor) => {
 
                   if (parent.children.length) {
                     copyCircle.userData.originalColor =
-                      parent.children[0].userData.originalColor;
+                      parent.children[0].userData.originalColor.clone();
                   } else {
-                    copyCircle.userData.originalColor = 0x808000;
+                    copyCircle.userData.originalColor.set(new THREE.Color(0x808000));
                   }
                   parent.add(copyCircle);
 
@@ -666,9 +673,9 @@ export const onMouseDown = (event, editor) => {
                     );
                     if (parent.children.length) {
                       newFacetLine.userData.originalColor =
-                        parent.children[0].userData.originalColor;
+                        parent.children[0].userData.originalColor.clone();
                     } else {
-                      newFacetLine.userData.originalColor = 0x808000;
+                      newFacetLine.userData.originalColor.set(new THREE.Color(0x808000));
                     }
                     parent.add(newFacetLine);
 
@@ -1359,9 +1366,9 @@ const copyPaste = (editor, copyPasteMode) => {
             );
             if (parent.children.length) {
               copyLine.userData.originalColor =
-                parent.children[0].userData.originalColor;
+                parent.children[0].userData.originalColor.clone();
             } else {
-              copyLine.userData.originalColor = 0x808000;
+              copyLine.userData.originalColor.set(new THREE.Color(0x808000));
             }
             parent.add(copyLine);
           } else if (line.geometry.type === 'CircleGeometry') {
@@ -1380,9 +1387,9 @@ const copyPaste = (editor, copyPasteMode) => {
             copyCircle.position.y = line.position.y - changeGeometry.y;
             if (parent.children.length) {
               copyCircle.userData.originalColor =
-                parent.children[0].userData.originalColor;
+                parent.children[0].userData.originalColor.clone();
             } else {
-              copyCircle.userData.originalColor = 0x808000;
+              copyCircle.userData.originalColor.set(new THREE.Color(0x808000));
             }
             parent.add(copyCircle);
           }
