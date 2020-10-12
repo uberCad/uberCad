@@ -10,7 +10,7 @@ import {
   circleIntersectionAngle as circlInterAngle
 } from '../services/editObject';
 
-let buildEdgeModel = (object, threshold = 0.000001, mode) => {
+let buildEdgeModel = (object, threshold = 0.000001, mode, index) => {
   // skip zero length lines
   let entities = skipZeroLines([...object.children], threshold);
   let vertices = getVertices(entities);
@@ -19,162 +19,164 @@ let buildEdgeModel = (object, threshold = 0.000001, mode) => {
   // check for intersections
   entities.forEach(entityToCheck => {
     delete entityToCheck.userData.noIntersections;
-
-    entities.forEach(entity => {
-      if (entity === entityToCheck || entity.userData.noIntersections) {
-        return;
-      }
-
-      if (
-        !(entity.geometry instanceof THREE.CircleGeometry) &&
-        !(entityToCheck.geometry instanceof THREE.CircleGeometry)
-      ) {
-        // line to line
-        const intersectionResult = linesIntersect(
-          entity.geometry.vertices[0],
-          entity.geometry.vertices[1],
-          entityToCheck.geometry.vertices[0],
-          entityToCheck.geometry.vertices[1],
-          0
-        );
-        if (intersectionResult && intersectionResult.isIntersects) {
-          if (
-            entity.geometry.vertices[0].distanceTo(
-              entityToCheck.geometry.vertices[0]
-            ) > threshold &&
-            entity.geometry.vertices[0].distanceTo(
-              entityToCheck.geometry.vertices[1]
-            ) > threshold &&
-            entity.geometry.vertices[1].distanceTo(
-              entityToCheck.geometry.vertices[0]
-            ) > threshold &&
-            entity.geometry.vertices[1].distanceTo(
-              entityToCheck.geometry.vertices[1]
-            ) > threshold
-          ) {
-            console.error('INTERSECTION', entityToCheck, entity);
-
-            let error = new Error('There are entities intersected in object');
-            error.userData = {
-              error: 'intersection',
-              type: 'line to line',
-              msg: 'There are entities intersected in object',
-              entities: [entityToCheck, entity]
-            };
-            throw error;
-          }
+    if (mode !== 'Free space') {
+      entities.forEach(entity => {
+        if (entity === entityToCheck || entity.userData.noIntersections) {
+          return;
         }
-      } else if (
-        entity.geometry instanceof THREE.CircleGeometry &&
-        entityToCheck.geometry instanceof THREE.CircleGeometry
-      ) {
-        // arc to arc
-        const intersectionResult = arcsIntersect(entity, entityToCheck, mode);
-        if (intersectionResult) {
-          // alert('ARC INTERSECTION!!! YEAH!!!');
 
-          const arc1v1 = new THREE.Vector3(0, 0, 0);
-          arc1v1.addVectors(
-            intersectionResult.arc1.geometry.vertices[0],
-            intersectionResult.arc1.position
+        if (
+          !(entity.geometry instanceof THREE.CircleGeometry) &&
+          !(entityToCheck.geometry instanceof THREE.CircleGeometry)
+        ) {
+          // line to line
+          const intersectionResult = linesIntersect(
+            entity.geometry.vertices[0],
+            entity.geometry.vertices[1],
+            entityToCheck.geometry.vertices[0],
+            entityToCheck.geometry.vertices[1],
+            0
           );
+          if (intersectionResult && intersectionResult.isIntersects) {
+            if (
+              entity.geometry.vertices[0].distanceTo(
+                entityToCheck.geometry.vertices[0]
+              ) > threshold &&
+              entity.geometry.vertices[0].distanceTo(
+                entityToCheck.geometry.vertices[1]
+              ) > threshold &&
+              entity.geometry.vertices[1].distanceTo(
+                entityToCheck.geometry.vertices[0]
+              ) > threshold &&
+              entity.geometry.vertices[1].distanceTo(
+                entityToCheck.geometry.vertices[1]
+              ) > threshold
+            ) {
+              console.error('INTERSECTION', entityToCheck, entity);
 
-          const arc1v2 = new THREE.Vector3(0, 0, 0);
-          arc1v2.addVectors(
-            intersectionResult.arc1.geometry.vertices[
+              let error = new Error('There are entities intersected in object');
+              error.userData = {
+                error: 'intersection',
+                type: 'line to line',
+                msg: 'There are entities intersected in object',
+                entities: [entityToCheck, entity]
+              };
+              throw error;
+            }
+          }
+        } else if (
+          entity.geometry instanceof THREE.CircleGeometry &&
+          entityToCheck.geometry instanceof THREE.CircleGeometry
+        ) {
+          // arc to arc
+          const intersectionResult = arcsIntersect(entity, entityToCheck, mode);
+          if (intersectionResult) {
+            // alert('ARC INTERSECTION!!! YEAH!!!');
+
+            const arc1v1 = new THREE.Vector3(0, 0, 0);
+            arc1v1.addVectors(
+              intersectionResult.arc1.geometry.vertices[0],
+              intersectionResult.arc1.position
+            );
+
+            const arc1v2 = new THREE.Vector3(0, 0, 0);
+            arc1v2.addVectors(
+              intersectionResult.arc1.geometry.vertices[
               intersectionResult.arc1.geometry.vertices.length - 1
-            ],
-            intersectionResult.arc1.position
-          );
+                ],
+              intersectionResult.arc1.position
+            );
 
-          const arc2v1 = new THREE.Vector3(0, 0, 0);
-          arc2v1.addVectors(
-            intersectionResult.arc2.geometry.vertices[0],
-            intersectionResult.arc2.position
-          );
+            const arc2v1 = new THREE.Vector3(0, 0, 0);
+            arc2v1.addVectors(
+              intersectionResult.arc2.geometry.vertices[0],
+              intersectionResult.arc2.position
+            );
 
-          const arc2v2 = new THREE.Vector3(0, 0, 0);
-          arc2v2.addVectors(
-            intersectionResult.arc2.geometry.vertices[
+            const arc2v2 = new THREE.Vector3(0, 0, 0);
+            arc2v2.addVectors(
+              intersectionResult.arc2.geometry.vertices[
               intersectionResult.arc2.geometry.vertices.length - 1
-            ],
-            intersectionResult.arc2.position
-          );
+                ],
+              intersectionResult.arc2.position
+            );
 
-          if (
-            arc1v1.distanceTo(intersectionResult.intersectPoint) > threshold &&
-            arc1v2.distanceTo(intersectionResult.intersectPoint) > threshold &&
-            arc2v1.distanceTo(intersectionResult.intersectPoint) > threshold &&
-            arc2v2.distanceTo(intersectionResult.intersectPoint) > threshold
-          ) {
-            console.error('INTERSECTION', entityToCheck, entity);
-            // console.warn(entity.geometry.vertices[0], entity.geometry.vertices[1], entityToCheck.geometry.vertices[0], entityToCheck.geometry.vertices[1]);
-            // [entityToCheck, entity]
+            if (
+              arc1v1.distanceTo(intersectionResult.intersectPoint) > threshold &&
+              arc1v2.distanceTo(intersectionResult.intersectPoint) > threshold &&
+              arc2v1.distanceTo(intersectionResult.intersectPoint) > threshold &&
+              arc2v2.distanceTo(intersectionResult.intersectPoint) > threshold
+            ) {
+              console.error('INTERSECTION', entityToCheck, entity);
+              // console.warn(entity.geometry.vertices[0], entity.geometry.vertices[1], entityToCheck.geometry.vertices[0], entityToCheck.geometry.vertices[1]);
+              // [entityToCheck, entity]
 
-            let error = new Error('There are entities intersected in object');
-            error.userData = {
-              error: 'intersection',
-              type: 'arc to arc',
-              msg: 'There are entities intersected in object',
-              entities: [entityToCheck, entity]
-            };
-            throw error;
+              let error = new Error('There are entities intersected in object');
+              error.userData = {
+                error: 'intersection',
+                type: 'arc to arc',
+                msg: 'There are entities intersected in object',
+                entities: [entityToCheck, entity]
+              };
+              throw error;
 
-            // throw  {
-            //   error: 'intersection',
-            //   type: 'arc to arc',
-            //   msg: 'There are entities intersected in object',
-            //   entities: [entityToCheck, entity]
-            // }
+              // throw  {
+              //   error: 'intersection',
+              //   type: 'arc to arc',
+              //   msg: 'There are entities intersected in object',
+              //   entities: [entityToCheck, entity]
+              // }
+            }
           }
-        }
-      } else {
-        // line to arc
-        let arc, line;
-
-        if (entity.geometry instanceof THREE.CircleGeometry) {
-          arc = entity;
-          line = entityToCheck;
         } else {
-          arc = entityToCheck;
-          line = entity;
-        }
+          // line to arc
+          let arc, line;
 
-        if (lineArcIntersect(line, arc)) {
-          // possibly intersection. check for threshold
+          if (entity.geometry instanceof THREE.CircleGeometry) {
+            arc = entity;
+            line = entityToCheck;
+          } else {
+            arc = entityToCheck;
+            line = entity;
+          }
 
-          const arc1v1 = new THREE.Vector3(0, 0, 0);
-          arc1v1.addVectors(arc.geometry.vertices[0], arc.position);
+          if (lineArcIntersect(line, arc)) {
+            // possibly intersection. check for threshold
 
-          const arc1v2 = new THREE.Vector3(0, 0, 0);
-          arc1v2.addVectors(
-            arc.geometry.vertices[arc.geometry.vertices.length - 1],
-            arc.position
-          );
+            const arc1v1 = new THREE.Vector3(0, 0, 0);
+            arc1v1.addVectors(arc.geometry.vertices[0], arc.position);
 
-          const line1v1 = line.geometry.vertices[0].clone();
+            const arc1v2 = new THREE.Vector3(0, 0, 0);
+            arc1v2.addVectors(
+              arc.geometry.vertices[arc.geometry.vertices.length - 1],
+              arc.position
+            );
 
-          const line1v2 = line.geometry.vertices[1].clone();
+            const line1v1 = line.geometry.vertices[0].clone();
 
-          if (
-            arc1v1.distanceTo(line1v1) > threshold &&
-            arc1v1.distanceTo(line1v2) > threshold &&
-            arc1v2.distanceTo(line1v1) > threshold &&
-            arc1v2.distanceTo(line1v2) > threshold
-          ) {
-            console.error('INTERSECTION', entityToCheck, entity);
-            const error = new Error('There are entities intersected in object');
-            error.userData = {
-              error: 'intersection',
-              type: 'line to arc',
-              msg: 'There are entities intersected in object',
-              entities: [arc, line]
-            };
-            throw error;
+            const line1v2 = line.geometry.vertices[1].clone();
+
+            if (
+              arc1v1.distanceTo(line1v1) > threshold &&
+              arc1v1.distanceTo(line1v2) > threshold &&
+              arc1v2.distanceTo(line1v1) > threshold &&
+              arc1v2.distanceTo(line1v2) > threshold
+            ) {
+              console.error('INTERSECTION', entityToCheck, entity);
+              const error = new Error('There are entities intersected in object');
+              error.userData = {
+                error: 'intersection',
+                type: 'line to arc',
+                msg: 'There are entities intersected in object',
+                entities: [arc, line]
+              };
+              throw error;
+            }
           }
         }
-      }
-    });
+      });
+    }
+
     entityToCheck.userData.noIntersections = true;
   });
 
