@@ -649,21 +649,22 @@ const createObject = (
   name,
   entities,
   threshold = 0.000001,
-  mode = 'standart'
+  mode = 'standart',
+  index
 ) => {
   let object;
   let { scene } = editor;
 
   let usedEntities = entities.length;
-  if (mode !== 'Free space') {
+  // if (mode !== 'Free space') {
     entities = entities.filter(e => !e.userData.belongsToObject);
-  }
+  // }
   usedEntities -= entities.length;
 
   try {
     scene.children.forEach(objectsContainer => {
       if (objectsContainer.name === 'Objects') {
-        if (mode !== 'Free space') {
+        // if (mode !== 'Free space') {
           objectsContainer.children.forEach(object => {
             if (object.name === name) {
               let error = new Error(
@@ -677,7 +678,8 @@ const createObject = (
               throw error;
             }
           });
-        }
+        // }
+
         // create object (entities container)
         // move entities from layers to object
         // render
@@ -693,7 +695,8 @@ const createObject = (
           object.userData['edgeModel'] = GeometryUtils.buildEdgeModel(
             { children: entities },
             threshold,
-            mode
+            mode,
+            index
           );
 
           // let size = GeometryUtils.calcSize(entities)
@@ -788,12 +791,12 @@ const createObject = (
                 // show problem line
                 console.error('show intersected lines', e);
 
-                this.highlightEntities(entities, true);
+                highlightEntities(editor, entities, true);
                 // cadCanvas.highlightEntities($scope.editor.activeEntities, true);
 
                 // e.data.entity.userData.showInTop = true;
-                this.highlightEntities(e.userData.data.entities);
-                setPointOfInterest(editor, e.userData.data.entities[0]);
+                // highlightEntities(editor, e.userData.data.entities);
+                // setPointOfInterest(editor, e.userData.data.entities[0]);
 
                 // this.render();
                 ToastService.msg(e.userData.msg + '\n' + e.userData.data.msg);
@@ -806,15 +809,14 @@ const createObject = (
                 ToastService.msg(e.userData.msg + '\n' + e.userData.data.msg);
 
                 break;
-              default:
-                {
-                  let text = e.userData.msg;
-                  if (e.userData.data && e.userData.data.msg) {
-                    text += `\n${e.userData.data.msg}`;
-                  }
-                  // alert(text);
-                  ToastService.msg(text);
+              default: {
+                let text = e.userData.msg;
+                if (e.userData.data && e.userData.data.msg) {
+                  text += `\n${e.userData.data.msg}`;
                 }
+                // alert(text);
+                ToastService.msg(text);
+              }
                 break;
             }
           } else {
@@ -839,8 +841,9 @@ const createObject = (
           throw e;
         // break;
       }
-      return false;
     }
+      return false;
+    // }
   }
 
   render(editor);

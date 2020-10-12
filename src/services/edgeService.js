@@ -11,6 +11,7 @@ import {
 } from './editObject';
 import helpLayerService from './helpLayerService';
 import sceneService from './sceneService';
+import consoleUtils from './consoleUtils';
 
 let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
   let actionChecker = false;
@@ -46,15 +47,6 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
         GeometryUtils.getDistance(point.point, linePoints[1]) > threshold
       ) {
         if (lineWithPoint.geometry.type === 'Geometry') {
-          if (
-            GeometryUtils.distanceToLine(point.point, lineWithPoint) > threshold
-          ) {
-            // console.log(GeometryUtils.distanceToLine(point.point, lineWithPoint));
-            console.log(
-              'треба дивитись до функцію переноса точок перетину і ліній або дописувати доп алгоритм'
-            );
-            // debugger;
-          }
           newLines = [
             createLine(linePoints[0], point.point),
             createLine(point.point, linePoints[1])
@@ -563,7 +555,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   });
   sceneService.render(editor);
 
-  testMyFunktion(
+  let voids = testMyFunktion(
     editor,
     collisionPoints,
     collisionAllPoints,
@@ -698,11 +690,15 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   const svg = createSVG(
     viewBox,
     mul,
+    // voids,
     objects,
     GeometryUtils.getThermalPoints(scene),
     svgForFlixo,
     collisionPoints
   );
+
+  // console.log (svg);
+  // sceneService.createSVG(svg);
 
   // $http.post('http://localhost:4000/api/flixo', {
   //     id: 204406510,
@@ -1163,44 +1159,6 @@ let searchTrueNextPoint = (
 
   let pointO = [closesPoint.point];
 
-  // let nextPointLine;
-  // let thisLine;
-  // let linePoint;
-  //
-  //
-  // let pointsNewLine = sceneService.findWayPoint(thisLine);
-  //
-  // let pointsOldLine = [];
-  // pointsOldLine[0] = [linePoint,nextPointLine.newFindLinePoint[nextPointLine.index]];
-  //
-  // if (GeometryUtils.getDistance(closesPoint.point,nextPointLine.newFindLinePoint[nextPointLine.index])<deviation){
-  //
-  // debugger;
-  // }
-  // if (GeometryUtils.getDistance(closesPoint.point,linePoint)<deviation){
-  //
-  // debugger;
-  // }
-  //
-  // let pointsOldLine = sceneService.findWayPoint (oldLine);
-  // проверка и настройка путь откуда
-  // debugger;
-  // проверка и настройка пути дальше
-  // if (
-  //   GeometryUtils.getDistance(closesPoint.point, pointsNewLine[0]) < deviation
-  // ) {
-  //   let nextLine = findNextLine(thisLine.parent, thisLine, pointsNewLine[0], entrainment);
-  //   pointsNewLine[0] = nextLine.newFindLinePoint[nextLine.index];
-  // // debugger;
-  // }
-  // if (
-  //   GeometryUtils.getDistance(closesPoint.point, pointsNewLine[1]) < deviation
-  // ) {
-  //   let nextLine = findNextLine(thisLine.parent, thisLine, pointsNewLine[1], entrainment);
-  //   pointsNewLine[1] = nextLine.newFindLinePoint[nextLine.index];
-  // // debugger;
-  // }
-
   // todo добавити/змінити на точку на наступній лінії
   let pointNewLineA = HelpLayerService.foundNewPoint(
     pointO[0],
@@ -1231,7 +1189,7 @@ let searchTrueNextPoint = (
 
   // фича
   console.log (GeometryUtils.getDistance(pointNewLineA, pointNewLineB));
-  if (GeometryUtils.getDistance(pointNewLineA, pointNewLineB) < 0.01) {
+  if (GeometryUtils.getDistance(pointNewLineA, pointNewLineB) < 0.0001) {
     let wayPoint = sceneService.findWayPoint(lines_nextObject[0], pointO[0], 'serch_way');
     let wayIndex = GeometryUtils.getDistance(wayPoint[0], pointO[0]) <
     GeometryUtils.getDistance(wayPoint[1], pointO[0]) ? 0 : 1;
@@ -1584,38 +1542,6 @@ let searchTrueNextPoint = (
 
     return nextLine;
   }
-
-  // if (thisLine.geometry.type === "Geometry"){
-  // if (intersectionCAwithOD.x && intersectionCAwithOD.y
-  //   && intersectionCAwithOB.x && intersectionCAwithOB.y
-  //   || !intersectionCAwithOD.x && !intersectionCAwithOD.y
-  //   && !intersectionCAwithOB.x && !intersectionCAwithOB.x){
-  // if ( !intersectionCBwithOD.isIntersects && !intersectionCBwithOA.isIntersects) {
-  //   if (intersectionCAwithOD.isIntersects && intersectionCAwithOB.isIntersects
-  //     || !intersectionCAwithOD.isIntersects && !intersectionCAwithOB.isIntersects) {
-  //     return 0;
-  //   }
-  // }
-  //   if (intersectionCBwithOD.isIntersects && intersectionCBwithOA.isIntersects
-  //     || !intersectionCBwithOD.isIntersects && !intersectionCBwithOA.isIntersects){
-  //     return 1;
-  //   }
-  // debugger;
-  // } else if (thisLine.geometry.type === "CircleGeometry"){
-  //   //
-  //   console.log ("stop");
-  // // debugger;
-  // }
-  //
-  // let angle0 = GeometryUtils.angleBetweenLines(lineAO, thisLine, 'degree');
-  // console.log (angle0);
-  // let angle1 = GeometryUtils.angleBetweenLines(lineAO, lineBO, 'degree');
-  // console.log (angle1);
-  // let angle2 = GeometryUtils.angleBetweenLines(lineAO, lineCO, 'degree');
-  // console.log (angle2);
-  // debugger;
-  // return index;
-
   return false;
 };
 
@@ -1886,7 +1812,6 @@ const nextPoint = (
               );
 
               if (thisLine === 'done') {
-                debugger;
                 pieceOfFreeSpace[0].forEach(line => {
                   line.userData.weDoneWithThisLine = true;
                 });
@@ -1916,7 +1841,7 @@ const nextPoint = (
                 freeSpace.push(thisLine);
                 pieceOfFreeSpace[0].push(thisLine);
               } else {
-                // debugger;
+                debugger;
               }
 
               wayPoint = sceneService.findWayPoint(thisLine);
@@ -2265,12 +2190,12 @@ const testMyFunktion = (
       //  повідомлення "he is alive")
       point.startFromThisPoint = true;
 
-      console.log(i);
       helpLayer.children = [];
       helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
       sceneService.render(editor);
       console.log (' точка ' + i + ' в процесі');
 
+      // pointStartIndex.splice(0, 2);
       pointStartIndex.forEach(index => {
         console.log (' точка ' + i + ' в процесі, а якщо конктретно то лінія ' + index);
         // debugger;
@@ -2524,23 +2449,89 @@ const testMyFunktion = (
   //  в якій закольцовується) від 21.09.2020
 
   // create free space objects
+  let edgeModels = [];
   freeSpacesAll.forEach((lineGroup, i) => {
     if (lineGroup[1].length < 2) {
       console.log('skip ' + i + ' object');
       // // debugger;
     } else {
-      // todo увеличить точность не теряя пустоты
-      let res = sceneService.createObject(
-        editor,
-        'freeSpaceZone №' + i,
-        lineGroup[1],
-        0.001,
-        'Free space'
-      );
-      console.log('done with ' + i + ' object');
+
+      // todo увеличить точность не теряя пустоты 08/10/2020
+      //  1) пробуємо використовувати buildEdgeModel замість createObject
+      //  2) дописуємо фічу затикачки дир в окрему функцию яку визиваємо в старті
+      //  функциї (точность залежить від маштабу) createObject
+      //  3) добиваємо до ума функцию cutLine і запускаємо перед buildEdgeModel
+      //  чи createObject
+      //  4) у випадку якщо залишаємо createObject, створюємо новий слой в сцені
+      //  паралельно з "Objects" і "HelpLayers"
+      //
+      // edgeModels.push ({
+      //   userData: {
+      //     edgeModel: GeometryUtils.buildEdgeModel(
+      //       { children: lineGroup[1] },
+      //       0.0001,
+      //       'Free space'
+      //     )
+      //   }
+      // });
+      let res;
+      if (i === 19) {
+        debugger;
+      }
+
+      if (i === 19) {
+        helpLayer.children = [];
+        lineGroup[0].forEach(line => {
+          let wayPoint = sceneService.findWayPoint(line);
+          wayPoint.forEach(point => {
+            helpLayer.add(helpLayerService.positionInLine(
+              editor,
+              [point]
+            ));
+          });
+
+          line.material.color.set(new THREE.Color(0xff0000));
+        });
+        console.log(lineGroup[1]);
+        sceneService.render(editor);
+        debugger;
+      }
+      if (i !== 19) {
+        res = sceneService.createObject(
+          editor,
+          'freeSpaceZone №' + i,
+          lineGroup[1],
+          0.0001,
+          'Free space',
+          i
+        );
+
+        if (res !== false) {
+          edgeModels.push(res);
+        }
+      }
+        // let edgeModel = GeometryUtils.buildEdgeModel(
+        //   { children:  lineGroup[1] },
+        //   0.0001,
+        //   'Free space'
+        // );
+        // console.log(edgeModels[edgeModels.length - 1]);
+        // debugger;
+
+        // debugger;
+        console.log('done with ' + i + ' object');
+      // } else {
+      //   let edgeModel = GeometryUtils.buildEdgeModel(
+      //     { children:  lineGroup[1] },
+      //     0.0001,
+      //     'Free space'
+      //   );
+      //   console.log(edgeModel);
+      //   debugger;
+      // }
     }
   });
-
+  return edgeModels;
   // let edgeModel = GeometryUtils.buildEdgeModel(
   //   { children:  lineGroup[1] },
   //   editor.options.threshold,
