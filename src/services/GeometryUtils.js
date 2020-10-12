@@ -1429,7 +1429,7 @@ function circleIntersectionAngle(vertex, circle, radius) {
  * @return []
  */
 const skipZeroLines = (entities, threshold = 0.000001) => {
-  console.log(threshold);
+  // console.log(threshold);
   // filter and remove zero lines
   return entities.filter(entity => {
     if (

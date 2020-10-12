@@ -2475,28 +2475,26 @@ const testMyFunktion = (
       //   }
       // });
       let res;
-      if (i === 19) {
-        debugger;
-      }
 
-      if (i === 19) {
-        helpLayer.children = [];
-        lineGroup[0].forEach(line => {
-          let wayPoint = sceneService.findWayPoint(line);
-          wayPoint.forEach(point => {
-            helpLayer.add(helpLayerService.positionInLine(
-              editor,
-              [point]
-            ));
-          });
+      // if (i => 19) {
+      //   helpLayer.children = [];
+      //   lineGroup[0].forEach(line => {
+      //     let wayPoint = sceneService.findWayPoint(line);
+      //     wayPoint.forEach(point => {
+      //       helpLayer.add(helpLayerService.positionInLine(
+      //         editor,
+      //         [point]
+      //       ));
+      //     });
+      //
+      //     line.material.color.set(new THREE.Color(0xff0000));
+      //   });
+      //   console.log(lineGroup[1]);
+      //   sceneService.render(editor);
+      //   // debugger;
+      // }
 
-          line.material.color.set(new THREE.Color(0xff0000));
-        });
-        console.log(lineGroup[1]);
-        sceneService.render(editor);
-        debugger;
-      }
-      if (i !== 19) {
+      // if (i !== 19) {
         res = sceneService.createObject(
           editor,
           'freeSpaceZone №' + i,
@@ -2507,9 +2505,15 @@ const testMyFunktion = (
         );
 
         if (res !== false) {
-          edgeModels.push(res);
+          console.log('area ' + i + ' void = ' +
+            res.userData.edgeModel.regions[0].area);
+          const geometryInfo = GeometryUtils.getObjectInfo(res);
+          console.log('area ' + i + ' void = ' + geometryInfo[0].region.area);
+          if (geometryInfo[0].region.area > 0.01) {
+            edgeModels.push(res);
+          }
         }
-      }
+      // }
         // let edgeModel = GeometryUtils.buildEdgeModel(
         //   { children:  lineGroup[1] },
         //   0.0001,
@@ -2520,6 +2524,7 @@ const testMyFunktion = (
 
         // debugger;
         console.log('done with ' + i + ' object');
+
       // } else {
       //   let edgeModel = GeometryUtils.buildEdgeModel(
       //     { children:  lineGroup[1] },
