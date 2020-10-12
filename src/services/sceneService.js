@@ -737,8 +737,11 @@ const createObject = (
               // console.log (object.userData.info.area.toFixed(4));
               // console.log (object.children.length);
               // debugger;
+            const geometryInfo = GeometryUtils.getObjectInfo(object);
+            // console.log('area ' + i + ' void = ' + geometryInfo[0].region.area);
+            if (geometryInfo[0].region.area > 0.01 || mode !== 'Free space') {
               objectsContainer.add(object);
-            // }
+            }
           }
         } else {
           let error = new Error(
