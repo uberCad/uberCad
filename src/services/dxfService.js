@@ -7,7 +7,9 @@ import * as THREE from '../extend/THREE';
 
 import sceneService from './sceneService';
 import GeometryUtils from './GeometryUtils';
-import { OrthographicControls } from '../classes/OrthographicControls';
+import {
+  OrthographicControls
+} from '../classes/OrthographicControls';
 
 export const parseDxf = dxf => {
   const parser = new DxfParser();
@@ -118,8 +120,16 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
 
   // Create scene from dxf object (data)
   const dims = {
-    min: { x: false, y: false, z: false },
-    max: { x: false, y: false, z: false }
+    min: {
+      x: false,
+      y: false,
+      z: false
+    },
+    max: {
+      x: false,
+      y: false,
+      z: false
+    }
   };
   const bbox = new THREE.Box3().setFromObject(scene);
   if (bbox.min.x && (dims.min.x === false || dims.min.x > bbox.min.x))
@@ -166,8 +176,8 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
     top: vpHeight / 2,
     right: vpWidth / 2,
     center: {
-      x: vpWidth / 2 + lowerLeftCorner.x,
-      y: vpHeight / 2 + lowerLeftCorner.y
+      x: center.x,
+      y: center.y
     }
   };
 
@@ -295,7 +305,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   function drawEllipse(entity, data) {
     const xrad = Math.sqrt(
       Math.pow(entity.majorAxisEndPoint.x, 2) +
-        Math.pow(entity.majorAxisEndPoint.y, 2)
+      Math.pow(entity.majorAxisEndPoint.y, 2)
     );
     const yrad = xrad * entity.axisRatio;
     const rotation = Math.atan2(
@@ -332,7 +342,9 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
       size: entity.height * (4 / 5),
       height: 1
     });
-    let material = new THREE.MeshBasicMaterial({ color: color });
+    let material = new THREE.MeshBasicMaterial({
+      color: color
+    });
     let text = new THREE.Mesh(geometry, material);
 
     // Measure what we rendered.
@@ -437,7 +449,10 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
     }
 
     let geometry = new THREE.BufferGeometry().setFromPoints(interpolatedPoints);
-    let material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
+    let material = new THREE.LineBasicMaterial({
+      linewidth: 1,
+      color: color
+    });
     return new THREE.Line(geometry, material);
   }
 
@@ -508,9 +523,9 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
         bulge = entity.vertices[i].bulge;
         startPoint = entity.vertices[i];
         endPoint =
-          i + 1 < entity.vertices.length
-            ? entity.vertices[i + 1]
-            : geometry.vertices[0];
+          i + 1 < entity.vertices.length ?
+          entity.vertices[i + 1] :
+          geometry.vertices[0];
 
         bulgeGeometry = new THREE.BulgeGeometry(startPoint, endPoint, bulge);
 
@@ -534,7 +549,10 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
         dashSize: 4
       });
     } else {
-      material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
+      material = new THREE.LineBasicMaterial({
+        linewidth: 1,
+        color: color
+      });
     }
 
     // if(lineType && lineType.pattern && lineType.pattern.length !== 0) {
@@ -569,7 +587,9 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
     );
     geometry.vertices.shift();
 
-    material = new THREE.LineBasicMaterial({ color: getColor(entity, data) });
+    material = new THREE.LineBasicMaterial({
+      color: getColor(entity, data)
+    });
 
     circle = new THREE.Line(geometry, material);
     circle.position.x = entity.center.x;
@@ -657,7 +677,9 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
       geometry.faces.push(new THREE.Face3(1, 3, 2));
     }
 
-    material = new THREE.MeshBasicMaterial({ color: getColor(entity, data) });
+    material = new THREE.MeshBasicMaterial({
+      color: getColor(entity, data)
+    });
 
     return new THREE.Mesh(geometry, material);
   }
@@ -681,7 +703,9 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
       geometry.rotateZ(zRotation);
     }
 
-    material = new THREE.MeshBasicMaterial({ color: getColor(entity, data) });
+    material = new THREE.MeshBasicMaterial({
+      color: getColor(entity, data)
+    });
 
     text = new THREE.Mesh(geometry, material);
     text.position.x = entity.startPoint.x;
@@ -785,11 +809,11 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
             // console.log('line', children, children.geometry, children.geometry.vertices)
             children.geometry.vertices = children.geometry.vertices.map(
               vertex =>
-                GeometryUtils.rotatePoint(
-                  entity.position,
-                  (entity.rotation * Math.PI) / 180,
-                  vertex
-                )
+              GeometryUtils.rotatePoint(
+                entity.position,
+                (entity.rotation * Math.PI) / 180,
+                vertex
+              )
             );
           }
         });
@@ -869,8 +893,14 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
       THREE.UniformsLib['fog'],
 
       {
-        pattern: { type: 'fv1', value: pattern },
-        patternLength: { type: 'f', value: totalLength }
+        pattern: {
+          type: 'fv1',
+          value: pattern
+        },
+        patternLength: {
+          type: 'f',
+          value: totalLength
+        }
       }
     ]);
 

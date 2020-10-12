@@ -181,7 +181,7 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
     // line.material.needsUpdate = true;
     // sceneService.render(editor)
   });
-  for (let i = 0; i < point.entities.length; ) {
+  for (let i = 0; i < point.entities.length;) {
     if (point.entities[i] !== null) {
       i += 1;
       // // debugger;
@@ -200,7 +200,9 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
 const combineEdgeModels = (editor, svgForFlixo = false) => {
   const {
     scene,
-    options: { threshold }
+    options: {
+      threshold
+    }
   } = editor;
   const objects = sceneService.getObjects(scene, true);
 
@@ -295,7 +297,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
             const checkLinePoint = sceneService.findWayPoint(checkLine);
             if (
               GeometryUtils.getDistance(checkLinePoint[0], point.point) <
-                0.001 ||
+              0.001 ||
               GeometryUtils.getDistance(checkLinePoint[1], point.point) < 0.001
             ) {
               point.entities.push(checkLine);
@@ -811,109 +813,109 @@ const createSVG = (
     // cavities here
 
     objects
-      .map((object, j) => {
-        if (
-          object.name.indexOf('freeSpaceZone') !== -1 &&
-          object.userData.edgeModel.regions[0] &&
-          15000 > object.userData.edgeModel.regions[0].area
-        ) {
-          let path = object.userData.edgeModel.regions[0].path;
-          let area = GeometryUtils.pathArea(
-            object.userData.edgeModel.regions[0].area
-          );
+    .map((object, j) => {
+      if (
+        object.name.indexOf('freeSpaceZone') !== -1 &&
+        object.userData.edgeModel.regions[0] &&
+        15000 > object.userData.edgeModel.regions[0].area
+      ) {
+        let path = object.userData.edgeModel.regions[0].path;
+        let area = GeometryUtils.pathArea(
+          object.userData.edgeModel.regions[0].area
+        );
 
-          let vertexList = [];
-          let last = path[path.length - 1];
-          let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
+        let vertexList = [];
+        let last = path[path.length - 1];
+        let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
             last.y / 1000
           ).toFixed(4)}`;
-          let pathD = `M${lastVertex} L`;
+        let pathD = `M${lastVertex} L`;
 
-          path.forEach(v => {
-            let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(
+        path.forEach(v => {
+          let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(
               4
             )}`;
-            if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-              pathD += `${vertex} `;
-              lastVertex = vertex;
-              vertexList.push(vertex);
-            }
+          if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+            pathD += `${vertex} `;
+            lastVertex = vertex;
+            vertexList.push(vertex);
+          }
 
-            // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
-          });
-          return (
-            `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
-            `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
-            `<area value="${area}"></area>\n` +
-            `</path>\n`
-          );
-        } else if (object.name.indexOf('freeSpaceZone') == -1) {
-          return object.userData.edgeModel.regions.map((regions, regIndex) => {
-            if (regIndex !== 0) {
-              let path = regions.path;
-              let area = GeometryUtils.pathArea(regions.area);
+          // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
+        });
+        return (
+          `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
+          `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
+          `<area value="${area}"></area>\n` +
+          `</path>\n`
+        );
+      } else if (object.name.indexOf('freeSpaceZone') == -1) {
+        return object.userData.edgeModel.regions.map((regions, regIndex) => {
+          if (regIndex !== 0) {
+            let path = regions.path;
+            let area = GeometryUtils.pathArea(regions.area);
 
-              let vertexList = [];
-              let last = path[path.length - 1];
-              let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
+            let vertexList = [];
+            let last = path[path.length - 1];
+            let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
                 last.y / 1000
               ).toFixed(4)}`;
-              let pathD = `M${lastVertex} L`;
+            let pathD = `M${lastVertex} L`;
 
-              path.forEach(v => {
-                let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(
+            path.forEach(v => {
+              let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(
                   4
                 )}`;
-                if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-                  pathD += `${vertex} `;
-                  lastVertex = vertex;
-                  vertexList.push(vertex);
-                }
+              if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+                pathD += `${vertex} `;
+                lastVertex = vertex;
+                vertexList.push(vertex);
+              }
 
-                // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
-              });
-              return (
-                `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
-                `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
-                `<area value="${area}"></area>\n` +
-                `</path>\n`
-              );
-            }
-          });
-        }
-      })
+              // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
+            });
+            return (
+              `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
+              `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
+              `<area value="${area}"></area>\n` +
+              `</path>\n`
+            );
+          }
+        });
+      }
+    })
 
-      // cavities
-      //   .map(pathData => {
-      //     debugger;
-      //     let path = pathData.path;
-      //     let area = GeometryUtils.pathArea(pathData.path);
-      //
-      //     let vertexList = [];
-      //     let last = path[path.length - 1];
-      //     let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
-      //       last.y / 1000
-      //     ).toFixed(4)}`;
-      //     let pathD = `M${lastVertex} L`;
-      //
-      //     path.forEach(v => {
-      //       let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
-      //       if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
-      //         pathD += `${vertex} `;
-      //         lastVertex = vertex;
-      //         vertexList.push(vertex);
-      //       }
-      //
-      //       // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
-      //     });
-      //     return (
-      //       `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
-      //       `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
-      //       `<area value="${area}"></area>\n` +
-      //       `</path>\n`
-      //     );
-      //   })
-      .join('') +
+    // cavities
+    //   .map(pathData => {
+    //     debugger;
+    //     let path = pathData.path;
+    //     let area = GeometryUtils.pathArea(pathData.path);
+    //
+    //     let vertexList = [];
+    //     let last = path[path.length - 1];
+    //     let lastVertex = `${(last.x / 1000).toFixed(4)}, ${(
+    //       last.y / 1000
+    //     ).toFixed(4)}`;
+    //     let pathD = `M${lastVertex} L`;
+    //
+    //     path.forEach(v => {
+    //       let vertex = `${(v.x / 1000).toFixed(4)},${(v.y / 1000).toFixed(4)}`;
+    //       if (vertex !== lastVertex && vertexList.indexOf(vertex) < 0) {
+    //         pathD += `${vertex} `;
+    //         lastVertex = vertex;
+    //         vertexList.push(vertex);
+    //       }
+    //
+    //       // circles += `<circle cx="${(v.x / 1000).toFixed(4)}" cy="${(v.y / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(255,20,20); stroke:black;stroke-width:0.00001" />`
+    //     });
+    //     return (
+    //       `<path d="${pathD} " style="fill:rgb(240,200,200);opacity:0.7;stroke:black;stroke-width:0.0001" >\n` +
+    //       `<matprop type="cavity_10077-2" id="O-2000" lambda="0" eps="0.9" density="0"></matprop>\n` +
+    //       `<area value="${area}"></area>\n` +
+    //       `</path>\n`
+    //     );
+    //   })
+    .join('') +
     `</g>
     <g id="temperature">
       <bcprop id="External" x="${(thermalPoints.cold1.x / 1000).toFixed(
@@ -946,20 +948,29 @@ const createSVG = (
             // dot += `<circle cx="${((collisionPoint.point.x + i + 3 + collisionPoint.id * 2) / 1000).toFixed(4)}" cy="${((collisionPoint.point.y - i - 3 - collisionPoint.id * 2) / 1000).toFixed(4)}" r="0.0002" style="fill:rgb(${collisionPoint.id === 1 ? '0,0,0' : '200,200,255'}); stroke:black;stroke-width:0.00001" />`;
           }
           return (
-            `<circle cx="${(collisionPoint.point.x / 1000).toFixed(4)}" cy="${(
-              collisionPoint.point.y / 1000
-            ).toFixed(4)}" r="${
-              collisionPoint.processed ? '0.0005' : '0.0005'
-            }" style="fill:rgb(${
-              collisionPoint.processed ? '255,200,200' : '200,200,255'
-            }); stroke:black;stroke-width:0.00001" />` + dot
-          );
-        })
-        .join('') +
-      `</g>`) ||
-    ''}
-  </svg>`
-  );
+            ` < circle cx = "${(collisionPoint.point.x / 1000).toFixed(4)}"
+    cy = "${(
+    collisionPoint.point.y / 1000
+  ).toFixed(4)
+}
+" r="
+$ {
+  collisionPoint.processed ? '0.0005' : '0.0005'
+}
+" style="
+fill: rgb($ {
+  collisionPoint.processed ? '255,200,200' : '200,200,255'
+});
+stroke: black;
+stroke - width: 0.00001 " />` + dot
+);
+})
+.join('') +
+  `</g>`) ||
+''
+} <
+/svg>`
+);
 };
 
 const searchLineWithPoint = (line, point, threshold) => {
@@ -1081,9 +1092,9 @@ let searchTrueNextPoint = (
 
   if (lines_nextObject.length > 2) { // потребує тесту коретності роботи на практиці
     let lineLength = [];
-    lines_nextObject.forEach( line => {
+    lines_nextObject.forEach(line => {
       let wayPoint = sceneService.findWayPoint(line);
-      lineLength.push (GeometryUtils.getDistance(wayPoint[0], wayPoint[1]));
+      lineLength.push(GeometryUtils.getDistance(wayPoint[0], wayPoint[1]));
     });
     do {
       let spliceIndex = lineLength.indexOf(Math.min(...lineLength));
@@ -1099,9 +1110,9 @@ let searchTrueNextPoint = (
     'serch_way'
   );
   let point_E_oldLine =
-    GeometryUtils.getDistance(closesPoint.point, pointsOldLine[0]) < deviation
-      ? pointsOldLine[1]
-      : pointsOldLine[0];
+    GeometryUtils.getDistance(closesPoint.point, pointsOldLine[0]) < deviation ?
+    pointsOldLine[1] :
+    pointsOldLine[0];
 
   // знаходимо точку куди ішли
   let pointsNextLine_oldObject = sceneService.findWayPoint(
@@ -1111,9 +1122,9 @@ let searchTrueNextPoint = (
   );
   let point_D_nextPointOldObject =
     GeometryUtils.getDistance(closesPoint.point, pointsNextLine_oldObject[0]) <
-    deviation
-      ? pointsNextLine_oldObject[1]
-      : pointsNextLine_oldObject[0];
+    deviation ?
+    pointsNextLine_oldObject[1] :
+    pointsNextLine_oldObject[0];
 
   // знаходимо точки куди ми можемо піти на новому об'єкті
   let pointsWay_1_newObject = sceneService.findWayPoint(
@@ -1123,9 +1134,9 @@ let searchTrueNextPoint = (
   );
   let point_A_newObject =
     GeometryUtils.getDistance(closesPoint.point, pointsWay_1_newObject[0]) <
-    deviation
-      ? pointsWay_1_newObject[1]
-      : pointsWay_1_newObject[0];
+    deviation ?
+    pointsWay_1_newObject[1] :
+    pointsWay_1_newObject[0];
 
   lines_nextObject[0].userData.nextPointIndex =
     point_A_newObject === pointsWay_1_newObject[0] ? 0 : 1;
@@ -1137,9 +1148,9 @@ let searchTrueNextPoint = (
   );
   let point_B_newObject =
     GeometryUtils.getDistance(closesPoint.point, pointsWay_2_newObject[0]) <
-    GeometryUtils.getDistance(closesPoint.point, pointsWay_2_newObject[1])
-      ? pointsWay_2_newObject[1]
-      : pointsWay_2_newObject[0];
+    GeometryUtils.getDistance(closesPoint.point, pointsWay_2_newObject[1]) ?
+    pointsWay_2_newObject[1] :
+    pointsWay_2_newObject[0];
 
   lines_nextObject[1].userData.nextPointIndex =
     point_B_newObject === pointsWay_2_newObject[0] ? 0 : 1;
@@ -1184,15 +1195,19 @@ let searchTrueNextPoint = (
     point_E_oldLine,
     5
   );
-  const { scene, camera, renderer } = editor;
+  const {
+    scene,
+    camera,
+    renderer
+  } = editor;
   let helpLayer = scene.getObjectByName('HelpLayer');
 
   // фича
-  console.log (GeometryUtils.getDistance(pointNewLineA, pointNewLineB));
+  console.log(GeometryUtils.getDistance(pointNewLineA, pointNewLineB));
   if (GeometryUtils.getDistance(pointNewLineA, pointNewLineB) < 0.0001) {
     let wayPoint = sceneService.findWayPoint(lines_nextObject[0], pointO[0], 'serch_way');
     let wayIndex = GeometryUtils.getDistance(wayPoint[0], pointO[0]) <
-    GeometryUtils.getDistance(wayPoint[1], pointO[0]) ? 0 : 1;
+      GeometryUtils.getDistance(wayPoint[1], pointO[0]) ? 0 : 1;
     let pointForSearch = wayPoint[wayIndex];
     lines_nextObject[1] = lines_nextObject[0];
     do {
@@ -1211,9 +1226,9 @@ let searchTrueNextPoint = (
       );
       point_B_newObject =
         GeometryUtils.getDistance(pointO[0], pointsWay_2_newObject[0]) <
-        GeometryUtils.getDistance(pointO[0], pointsWay_2_newObject[1])
-          ? pointsWay_2_newObject[1]
-          : pointsWay_2_newObject[0];
+        GeometryUtils.getDistance(pointO[0], pointsWay_2_newObject[1]) ?
+        pointsWay_2_newObject[1] :
+        pointsWay_2_newObject[0];
 
       pointNewLineB = HelpLayerService.foundNewPoint(
         pointO[0],
@@ -1468,8 +1483,8 @@ let searchTrueNextPoint = (
       pointAinLineOE,
       pointBinLineOE
     );
-    if (isNaN (minDistance)){
-      console.log (closesPoint);
+    if (isNaN(minDistance)) {
+      console.log(closesPoint);
       debugger;
     }
     console.log(minDistance);
@@ -1531,7 +1546,7 @@ let searchTrueNextPoint = (
             threshold
           );
           return;
-        } else if (pointInNewLine.startFromThisPoint && nextLine !== 'done'){
+        } else if (pointInNewLine.startFromThisPoint && nextLine !== 'done') {
           // debugger;
           pieceOfFreeSpace[0].push(nextLine);
           nextLine = 'done';
@@ -1716,7 +1731,7 @@ const nextPoint = (
                   let lineWay = sceneService.findWayPoint(line);
                   if (
                     GeometryUtils.getDistance(lineWay[0], point.point) <
-                      0.001 ||
+                    0.001 ||
                     GeometryUtils.getDistance(lineWay[0], point.point) < 0.001
                   ) {
                     point.entities.push(line);
@@ -2077,8 +2092,8 @@ const nextPoint = (
             linePoint = wayPoint[0];
             console.log(
               'Ну привіт. як твої справи? звісто ти можеш і відповісти але я всерівно того не бачу.' +
-                'Як би там не було, я не знаю навіщо ти зараз це читаєш, але знай ти натрапив на фукцию де я мучався не одну годину,' +
-                'все працюй далі... тут більше нічого не буде.... перпендикулярну парадігму тобі в чай.... '
+              'Як би там не було, я не знаю навіщо ти зараз це читаєш, але знай ти натрапив на фукцию де я мучався не одну годину,' +
+              'все працюй далі... тут більше нічого не буде.... перпендикулярну парадігму тобі в чай.... '
             );
             // let testPoint = findNextLine(object, thisLine, wayPoint[0]);
             return;
@@ -2155,7 +2170,9 @@ const testMyFunktion = (
   let freeSpacesAll = [];
   let freeSpace = [];
   let entrainment = 0.001;
-  const { scene } = editor;
+  const {
+    scene
+  } = editor;
   let helpLayer = scene.getObjectByName('HelpLayer');
   helpLayer.children = [];
 
@@ -2193,11 +2210,11 @@ const testMyFunktion = (
       helpLayer.children = [];
       helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
       sceneService.render(editor);
-      console.log (' точка ' + i + ' в процесі');
+      console.log(' точка ' + i + ' в процесі');
 
       // pointStartIndex.splice(0, 2);
       pointStartIndex.forEach(index => {
-        console.log (' точка ' + i + ' в процесі, а якщо конктретно то лінія ' + index);
+        console.log(' точка ' + i + ' в процесі, а якщо конктретно то лінія ' + index);
         // debugger;
         if (
           !point.entities[index].userData.weDoneWithThisLine &&
@@ -2212,7 +2229,10 @@ const testMyFunktion = (
           // let wayPoint = sceneService.findWayPoint(point.entities[index]);
           // console.log (GeometryUtils.getDistance(wayPoint[0], wayPoint[1]));
           // // debugger;
-          freeSpacesAll[freeSpacesAll.length] = [[], []];
+          freeSpacesAll[freeSpacesAll.length] = [
+            [],
+            []
+          ];
           nextPoint(
             editor,
             point.entities[index].parent,
@@ -2226,7 +2246,7 @@ const testMyFunktion = (
             threshold
           );
         } else if (!point.entities[index].userData.weDoneWithThisLine) {
-          console.log (point.entities[index]);
+          console.log(point.entities[index]);
           debugger;
         }
       });
@@ -2257,17 +2277,17 @@ const testMyFunktion = (
       let thisLineWayPoint = sceneService.findWayPoint(lines[objLength - 1]);
       if (
         GeometryUtils.getDistance(lastPoint[0], thisLineWayPoint[0]) <
-          10 * threshold ||
+        10 * threshold ||
         GeometryUtils.getDistance(lastPoint[0], thisLineWayPoint[1]) <
-          10 * threshold
+        10 * threshold
       ) {
         startPoint = lastPoint[1];
         thisPoint = lastPoint[0];
       } else if (
         GeometryUtils.getDistance(lastPoint[1], thisLineWayPoint[0]) <
-          10 * threshold ||
+        10 * threshold ||
         GeometryUtils.getDistance(lastPoint[1], thisLineWayPoint[1]) <
-          10 * threshold
+        10 * threshold
       ) {
         startPoint = lastPoint[0];
         thisPoint = lastPoint[1];
@@ -2277,17 +2297,17 @@ const testMyFunktion = (
         thisLineWayPoint = sceneService.findWayPoint(lines[objLength - 1]);
         if (
           GeometryUtils.getDistance(lastPoint[0], thisLineWayPoint[0]) <
-            10 * threshold ||
+          10 * threshold ||
           GeometryUtils.getDistance(lastPoint[0], thisLineWayPoint[1]) <
-            10 * threshold
+          10 * threshold
         ) {
           startPoint = lastPoint[1];
           thisPoint = lastPoint[0];
         } else if (
           GeometryUtils.getDistance(lastPoint[1], thisLineWayPoint[0]) <
-            10 * threshold ||
+          10 * threshold ||
           GeometryUtils.getDistance(lastPoint[1], thisLineWayPoint[1]) <
-            10 * threshold
+          10 * threshold
         ) {
           startPoint = lastPoint[0];
           thisPoint = lastPoint[1];
@@ -2314,9 +2334,9 @@ const testMyFunktion = (
             colPoint.forEach(point => {
               if (
                 GeometryUtils.getDistance(point.point, thisLineWayPoint[0]) <
-                  threshold ||
+                threshold ||
                 GeometryUtils.getDistance(point.point, thisLineWayPoint[1]) <
-                  threshold
+                threshold
               ) {
                 firstPointIndex = i;
               }
@@ -2372,8 +2392,7 @@ const testMyFunktion = (
           thetaStart: line.geometry.parameters.thetaStart,
           thetaLength: line.geometry.parameters.thetaLength
         };
-        let copyCircleGeometry = changGeomEditObj(
-          {
+        let copyCircleGeometry = changGeomEditObj({
             0: 'copy'
           },
           changedGeometry
@@ -2418,7 +2437,7 @@ const testMyFunktion = (
           }
           linePoint = wayPoint[1];
         } else if (distance0 > distance1) {
-          if (distance1 > 0.1 *  threshold && distance1 < 1) {
+          if (distance1 > 0.1 * threshold && distance1 < 1) {
             // debugger;
             let newLine = createLine(linePoint, wayPoint[1]);
             lineGroup[1].splice(lineIndex, 0, newLine);
@@ -2510,16 +2529,16 @@ const testMyFunktion = (
           edgeModels.push(res);
         }
       }
-        // let edgeModel = GeometryUtils.buildEdgeModel(
-        //   { children:  lineGroup[1] },
-        //   0.0001,
-        //   'Free space'
-        // );
-        // console.log(edgeModels[edgeModels.length - 1]);
-        // debugger;
+      // let edgeModel = GeometryUtils.buildEdgeModel(
+      //   { children:  lineGroup[1] },
+      //   0.0001,
+      //   'Free space'
+      // );
+      // console.log(edgeModels[edgeModels.length - 1]);
+      // debugger;
 
-        // debugger;
-        console.log('done with ' + i + ' object');
+      // debugger;
+      console.log('done with ' + i + ' object');
       // } else {
       //   let edgeModel = GeometryUtils.buildEdgeModel(
       //     { children:  lineGroup[1] },

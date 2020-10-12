@@ -870,7 +870,7 @@ export const onMouseMove = (event, editor) => {
 
     switch (tool) {
       case TOOL_SELECT:
-        if (editor.selection.active) {
+        if (editor.selection.active && event.buttons === 1) {
           selectionUpdate(event, editor)(dispatch);
         }
         break;
