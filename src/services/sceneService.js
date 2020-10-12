@@ -1224,7 +1224,12 @@ function delay(ms) {
 }
 
 const createSVG = svg => {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
+    // axios
+    //   .post(`http://localhost:31415/api/svg`, {data: svg})
+    //   .then(response => resolve(response.data))
+    //   .catch(reject);
+
     const svgContent = 'data:image/svg+xml;base64,' + window.btoa(svg);
 
     const win = window.open();
