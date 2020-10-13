@@ -650,6 +650,7 @@ const createObject = (
   entities,
   threshold = 0.000001,
   mode = 'standart',
+  minArea = 0.01,
   index
 ) => {
   let object;
@@ -738,7 +739,7 @@ const createObject = (
               // debugger;
             const geometryInfo = GeometryUtils.getObjectInfo(object);
             // console.log('area ' + i + ' void = ' + geometryInfo[0].region.area);
-            if (geometryInfo[0].region.area > 0.01 || mode !== 'Free space') {
+            if (geometryInfo[0].region.area > minArea || mode !== 'Free space') {
               objectsContainer.add(object);
             }
           }

@@ -10,7 +10,8 @@ import {
   circleIntersectionAngle as circlInterAngle
 } from '../services/editObject';
 
-let buildEdgeModel = (object, threshold = 0.000001, mode, index) => {
+let buildEdgeModel = (object, threshold = 0.000001,
+                      mode = 'standart', minArea, index) => {
   // skip zero length lines
   let entities = skipZeroLines([...object.children], threshold);
   let vertices = getVertices(entities);
@@ -271,6 +272,13 @@ let buildEdgeModel = (object, threshold = 0.000001, mode, index) => {
   let pathD = '';
   const subRegionsPathD = [];
   const vertexList = [];
+  if (mode === 'Free space') {
+    let geometryInfo = getObjectInfo({userData: {edgeModel: {regions: regions}}});
+    if (geometryInfo[0].region.area < minArea) {
+      console.log(geometryInfo[0].region.area);
+      return false;
+    }
+  }
   const insidePoint = getInsidePoint(regions);
   regions.forEach((region, idx) => {
     const last = region.path[region.path.length - 1];
@@ -563,6 +571,7 @@ let getInsidePoint = (regions, threshold) => {
     return farestPoint;
   }
 };
+
 const getObjectOuterEntities = object => {
   const arrayOfEntities = [];
   object.userData.edgeModel.regions[0].path.forEach(vertex => {
@@ -2788,7 +2797,6 @@ function getRegionClusters(path, amount = 3) {
 
 function getObjectInfo(object) {
   let res = getRegionClusters(object.userData.edgeModel.regions[0].path);
-
   let heaviestClusters = res.centroids
     .map((centroid, idx) => {
       return {

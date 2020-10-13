@@ -535,6 +535,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   //   } while (nullIndex < point.entities.length);
   // });
 
+  let allObjectArea = 0;
   // видалення ліній які були розділені з об'єкту
   objects.forEach(object => {
     let lineIndex = object.children.length - 1;
@@ -544,6 +545,8 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
       }
       lineIndex -= 1;
     } while (lineIndex > -1);
+    const geometryInfo = GeometryUtils.getObjectInfo(object);
+    allObjectArea += geometryInfo[0].area;
   });
 
   // відображення точок перетину на сцені
@@ -692,6 +695,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     mul,
     // voids,
     objects,
+    allObjectArea,
     GeometryUtils.getThermalPoints(scene),
     svgForFlixo,
     collisionPoints
@@ -748,6 +752,7 @@ const createSVG = (
   viewBox,
   mul,
   objects,
+  allObjectArea,
   thermalPoints,
   svgForFlixo,
   collisionPoints
@@ -812,10 +817,11 @@ const createSVG = (
 
     objects
       .map((object, j) => {
+        const geometryInfo = GeometryUtils.getObjectInfo(object);
         if (
           object.name.indexOf('freeSpaceZone') !== -1 &&
           object.userData.edgeModel.regions[0] &&
-          15000 > object.userData.edgeModel.regions[0].area
+          allObjectArea > geometryInfo[0].area
         ) {
           let path = object.userData.edgeModel.regions[0].path;
           let area = GeometryUtils.pathArea(
@@ -1481,28 +1487,28 @@ let searchTrueNextPoint = (
 
   let nextLine;
   if (pointAinLineOE === minDistance) {
-    // // debugger;
+    // debugger;
     helpPointA.material.color.set(new THREE.Color(0xffdc00));
     lines_nextObject[0].material.color.set(new THREE.Color(0x00ff00));
     lines_nextObject[1].material.color.set(new THREE.Color(0xff0000));
     nextLine = lines_nextObject[0];
   }
   if (pointBinLineOE === minDistance) {
-    // // debugger;
+    // debugger;
     helpPointB.material.color.set(new THREE.Color(0xffdc00));
     lines_nextObject[1].material.color.set(new THREE.Color(0x00ff00));
     lines_nextObject[0].material.color.set(new THREE.Color(0xff0000));
     nextLine = lines_nextObject[1];
   }
   if (pointAinLineOD === minDistance) {
-    // // debugger;
+    // debugger;
     helpPointB.material.color.set(new THREE.Color(0xffdc00));
     lines_nextObject[1].material.color.set(new THREE.Color(0x00ff00));
     lines_nextObject[0].material.color.set(new THREE.Color(0xff0000));
     nextLine = lines_nextObject[1];
   }
   if (pointBinLineOD === minDistance) {
-    // // debugger;
+    // debugger;
     helpPointA.material.color.set(new THREE.Color(0xffdc00));
     lines_nextObject[0].material.color.set(new THREE.Color(0x00ff00));
     lines_nextObject[1].material.color.set(new THREE.Color(0xff0000));
@@ -1563,17 +1569,6 @@ const findNextLine = (object, thisLine, linePoint, entrainment = 0.001) => {
           index: index
         };
       }
-      // } else if (line.geometry.type === 'CircleGeometry') {
-      //   index = closestPoint(points, linePoint);
-      //   p = isPoint(linePoint, entrainment, points[index]);
-      //   if (p) {
-      //     return {
-      //       newFindLinePoint:[point0, point1],
-      //       line: line,
-      //       index: index
-      //     };
-      //   }
-      // }
     }
   }
 };
@@ -2450,6 +2445,7 @@ const testMyFunktion = (
 
   // create free space objects
   let edgeModels = [];
+  let minArea = 0.01;
   freeSpacesAll.forEach((lineGroup, i) => {
     if (lineGroup[1].length < 2) {
       console.log('skip ' + i + ' object');
@@ -2501,15 +2497,14 @@ const testMyFunktion = (
           lineGroup[1],
           0.0001,
           'Free space',
+          minArea,
           i
         );
 
         if (res !== false) {
-          console.log('area ' + i + ' void = ' +
-            res.userData.edgeModel.regions[0].area);
           const geometryInfo = GeometryUtils.getObjectInfo(res);
           console.log('area ' + i + ' void = ' + geometryInfo[0].region.area);
-          if (geometryInfo[0].region.area > 0.01) {
+          if (geometryInfo[0].region.area > minArea) {
             edgeModels.push(res);
           }
         }
