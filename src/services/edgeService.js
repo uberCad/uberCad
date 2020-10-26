@@ -197,11 +197,9 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
   }
 };
 
-const combineEdgeModels = (editor, svgForFlixo = false) => {
-  const {
-    scene,
-    options: { threshold }
-  } = editor;
+const searchColPoints = (editor, svgForFlixo = false) => {
+  const { scene } = editor;
+  const threshold = editor.voidSearchOptions.ignoredDistance;
   const objects = sceneService.getObjects(scene, true);
 
   if (!objects.length) {
@@ -213,31 +211,31 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     throw error;
   }
 
-  let viewBox = objects[0].userData.edgeModel.svgData.viewBox;
-  const box = {
-    x: viewBox.x,
-    y: viewBox.y,
-    x2: +viewBox.x + +viewBox.width,
-    y2: +viewBox.y + +viewBox.height
-  };
-
-  // width, height, x, y
-  objects.forEach(object => {
-    const objViewBox = object.userData.edgeModel.svgData.viewBox;
-    box.x = Math.min(box.x, objViewBox.x);
-    box.y = Math.min(box.y, objViewBox.y);
-    box.x2 = Math.max(box.x2, +objViewBox.x + +objViewBox.width);
-    box.y2 = Math.max(box.y2, +objViewBox.y + +objViewBox.height);
-  });
-
-  // viewBox for SVG
-  viewBox = {
-    x: box.x,
-    y: box.y,
-    width: Math.abs(+box.x2 - +box.x),
-    height: Math.abs(+box.y2 - +box.y)
-  };
-  let mul = 25 / Math.max(viewBox.width, viewBox.height);
+  // let viewBox = objects[0].userData.edgeModel.svgData.viewBox;
+  // const box = {
+  //   x: viewBox.x,
+  //   y: viewBox.y,
+  //   x2: +viewBox.x + +viewBox.width,
+  //   y2: +viewBox.y + +viewBox.height
+  // };
+  //
+  // // width, height, x, y
+  // objects.forEach(object => {
+  //   const objViewBox = object.userData.edgeModel.svgData.viewBox;
+  //   box.x = Math.min(box.x, objViewBox.x);
+  //   box.y = Math.min(box.y, objViewBox.y);
+  //   box.x2 = Math.max(box.x2, +objViewBox.x + +objViewBox.width);
+  //   box.y2 = Math.max(box.y2, +objViewBox.y + +objViewBox.height);
+  // });
+  //
+  // // viewBox for SVG
+  // viewBox = {
+  //   x: box.x,
+  //   y: box.y,
+  //   width: Math.abs(+box.x2 - +box.x),
+  //   height: Math.abs(+box.y2 - +box.y)
+  // };
+  // let mul = 25 / Math.max(viewBox.width, viewBox.height);
 
   // todo Create copy of object with all points
   let collisionAllPoints = GeometryUtils.getCollisionPoints(objects, threshold);
@@ -339,6 +337,61 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     }
   } while (lineIndex < collisionPoints.length);
 
+  // відображення точок перетину на сцені
+  let helpLayer = scene.getObjectByName('HelpLayer');
+  helpLayer.children = [];
+  collisionPoints.forEach(point => {
+    helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
+    sceneService.render(editor);
+  });
+  sceneService.render(editor);
+  return { collisionPoints };
+};
+
+const combineEdgeModels = (editor, svgForFlixo = false) => {
+  const {
+    scene,
+    options: { threshold }
+  } = editor;
+  const objects = sceneService.getObjects(scene, true);
+
+  if (!objects.length) {
+    const error = new Error('No objects for edge-model');
+    error.userData = {
+      error: 'no objects',
+      msg: error.message
+    };
+    throw error;
+  }
+
+  let viewBox = objects[0].userData.edgeModel.svgData.viewBox;
+  const box = {
+    x: viewBox.x,
+    y: viewBox.y,
+    x2: +viewBox.x + +viewBox.width,
+    y2: +viewBox.y + +viewBox.height
+  };
+
+  // width, height, x, y
+  objects.forEach(object => {
+    const objViewBox = object.userData.edgeModel.svgData.viewBox;
+    box.x = Math.min(box.x, objViewBox.x);
+    box.y = Math.min(box.y, objViewBox.y);
+    box.x2 = Math.max(box.x2, +objViewBox.x + +objViewBox.width);
+    box.y2 = Math.max(box.y2, +objViewBox.y + +objViewBox.height);
+  });
+
+  // viewBox for SVG
+  viewBox = {
+    x: box.x,
+    y: box.y,
+    width: Math.abs(+box.x2 - +box.x),
+    height: Math.abs(+box.y2 - +box.y)
+  };
+  let mul = 25 / Math.max(viewBox.width, viewBox.height);
+
+  let collisionPoints = editor.voidSearchOptions.ColPoints;
+
   // пошук ліній які торкаються знайдених точок перетину
   collisionPoints.forEach(point => {
     point.entities.forEach(line => {
@@ -375,8 +428,6 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
         let findLineWithPoint = searchLineWithPoint(line, point, threshold);
         if (!point.entities.includes(findLineWithPoint)) {
           point.entities.push(findLineWithPoint);
-        } else {
-          // debugger;
         }
         point.entities.splice(lineIndex, 1);
       }
@@ -513,10 +564,17 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   let voids = testMyFunktion(
     editor,
     collisionPoints,
-    collisionAllPoints,
+    // collisionAllPoints,
     objects,
     threshold
   );
+  let maxArea = 0;
+  voids.forEach(object => {
+    const geometryInfo = GeometryUtils.getObjectInfo(object);
+    if (geometryInfo[0].area > allObjectArea && maxArea < geometryInfo[0].area){
+      maxArea = geometryInfo[0].area;
+    }
+  });
 
   sceneService.render(editor);
 
@@ -647,7 +705,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     mul,
     // voids,
     objects,
-    allObjectArea,
+    maxArea,
     GeometryUtils.getThermalPoints(scene),
     svgForFlixo,
     collisionPoints
@@ -655,7 +713,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
 
   // console.log (svg);
   // sceneService.createSVG(svg);
-
+  //
   // $http.post('http://localhost:4000/api/flixo', {
   //     id: 204406510,
   //     jsonrpc: "2.0",
@@ -685,7 +743,7 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   //
   //     // console.log('RESPO', response.data.message.error ? response.data.message.error : response.data.message.result);
   // });
-
+  //
   // console.log('data:image/svg+xml;base64,' + window.btoa(svg));
   // console.log('SVG ', svg);
 
@@ -704,7 +762,7 @@ const createSVG = (
   viewBox,
   mul,
   objects,
-  allObjectArea,
+  maxArea,
   thermalPoints,
   svgForFlixo,
   collisionPoints
@@ -773,7 +831,7 @@ const createSVG = (
         if (
           object.name.indexOf('freeSpaceZone') !== -1 &&
           object.userData.edgeModel.regions[0] &&
-          allObjectArea > geometryInfo[0].area
+          maxArea > geometryInfo[0].area
         ) {
           let path = object.userData.edgeModel.regions[0].path;
           let area = GeometryUtils.pathArea(
@@ -1321,13 +1379,15 @@ let searchTrueNextPoint = (
     if (
       GeometryUtils.getDistance(closesPoint.point, point_A_newObject) < 0.01
     ) {
-      console.log(
-        GeometryUtils.getDistance(closesPoint.point, point_A_newObject)
-      );
+      let wayPoint = sceneService.findWayPoint(lines_nextObject[0]);
+      let indexWay =
+        GeometryUtils.getDistance(closesPoint.point, wayPoint[0]) >
+        GeometryUtils.getDistance(closesPoint.point, wayPoint[1]) ?
+          0:1;
       newLine = findNextLine(
         lines_nextObject[0].parent,
         lines_nextObject[0],
-        point_A_newObject
+        wayPoint[indexWay]
       );
       let wayPointNewLine = sceneService.findWayPoint(
         newLine.line,
@@ -1347,11 +1407,20 @@ let searchTrueNextPoint = (
       console.log(
         GeometryUtils.getDistance(closesPoint.point, point_B_newObject)
       );
+      let wayPoint = sceneService.findWayPoint(lines_nextObject[1]);
+      let indexWay =
+        GeometryUtils.getDistance(closesPoint.point, wayPoint[0]) >
+        GeometryUtils.getDistance(closesPoint.point, wayPoint[1]) ?
+          0:1;
+      // debugger;
       newLine = findNextLine(
         lines_nextObject[1].parent,
         lines_nextObject[1],
-        point_B_newObject
+        wayPoint[indexWay]
       );
+      if (!newLine){
+        debugger;
+      }
       let wayPointNewLine = sceneService.findWayPoint(
         newLine.line,
         closesPoint.point,
@@ -1369,10 +1438,15 @@ let searchTrueNextPoint = (
       GeometryUtils.getDistance(closesPoint.point, point_D_nextPointOldObject) <
       0.01
     ) {
+      let wayPoint = sceneService.findWayPoint(nextLine_oldObject);
+      let indexWay =
+        GeometryUtils.getDistance(closesPoint.point, wayPoint[0]) >
+        GeometryUtils.getDistance(closesPoint.point, wayPoint[1]) ?
+          0:1;
       newLine = findNextLine(
         nextLine_oldObject.parent,
         nextLine_oldObject,
-        point_D_nextPointOldObject
+        wayPoint[indexWay]
       );
       let wayPointNewLine = sceneService.findWayPoint(
         newLine.line,
@@ -1389,7 +1463,16 @@ let searchTrueNextPoint = (
       ]);
     }
     if (GeometryUtils.getDistance(closesPoint.point, point_E_oldLine) < 0.01) {
-      newLine = findNextLine(oldLine.parent, oldLine, point_E_oldLine);
+      let wayPoint = sceneService.findWayPoint(oldLine);
+      let indexWay =
+        GeometryUtils.getDistance(closesPoint.point, wayPoint[0]) >
+        GeometryUtils.getDistance(closesPoint.point, wayPoint[1]) ?
+          0:1;
+      newLine = findNextLine(
+        oldLine.parent,
+        oldLine,
+        wayPoint[indexWay]
+      );
       let wayPointNewLine = sceneService.findWayPoint(
         newLine.line,
         closesPoint.point,
@@ -1438,7 +1521,8 @@ let searchTrueNextPoint = (
     }
     console.log(minDistance);
     if (minDistance > 1.5) {
-      debugger;
+      // todo в теорії можна почухать рєпу над розширенням функціонала пошуку напрямка
+
     }
     // debugger;
   }
@@ -1555,8 +1639,15 @@ const nextPoint = (
       linePoint = wayPoint[0];
     }
   }
+
   let collisionPointsInThisLine = [];
   let nextPointLine;
+
+  //
+  if (!isVoid(thisLine, linePoint, editor)) {
+    pieceOfFreeSpace[0] = [];
+    return;
+  }
 
   if (!pieceOfFreeSpace[0].includes(thisLine)) {
     freeSpace.push(thisLine);
@@ -1745,10 +1836,7 @@ const nextPoint = (
             closesPoint.weDoneWithThisPoint = true;
 
             if (closesPoint.startFromThisPoint) {
-              pieceOfFreeSpace[0].forEach(line => {
-                line.userData.weDoneWithThisLine = true;
-              });
-              console.log('he is alive!!!!!');
+              weFindVoid (pieceOfFreeSpace[0]);
               return;
             } else {
               // debugger;
@@ -1767,10 +1855,7 @@ const nextPoint = (
               );
 
               if (thisLine === 'done') {
-                pieceOfFreeSpace[0].forEach(line => {
-                  line.userData.weDoneWithThisLine = true;
-                });
-                console.log('he is alive!!!!!');
+                weFindVoid (pieceOfFreeSpace[0]);
                 return;
               }
 
@@ -2091,7 +2176,7 @@ const nextPoint = (
 const testMyFunktion = (
   editor,
   collisionPoints,
-  collisionAllPoints,
+  // collisionAllPoints,
   objects,
   threshold
 ) => {
@@ -2116,7 +2201,6 @@ const testMyFunktion = (
 
   //step 2 - call search free spece function
   collisionPoints.forEach((point, i) => {
-    // helpLayer.children = [];
     helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
     console.log(point.entities);
     point.entities.forEach(line => {
@@ -2194,7 +2278,7 @@ const testMyFunktion = (
   // // debugger;
 
   //step 3 - unmark line with collisionPoints
-  collisionAllPoints.forEach(point => {
+  collisionPoints.forEach(point => {
     point.entities.forEach(line => {
       line.userData.collisionPointsInf = [];
     });
@@ -2254,7 +2338,7 @@ const testMyFunktion = (
       }
       for (i = objLength - 1; i > 0; i--) {
         if (firstPointIndex === null) {
-          console.log(lines[i]);
+          // console.log(lines[i]);
           thisLineWayPoint = sceneService.findWayPoint(lines[i]);
           colPointThisLine = lines[i].userData.collisionPointsInf;
           if (colPointThisLine) {
@@ -2294,9 +2378,10 @@ const testMyFunktion = (
           }
         }
       }
-      console.log(firstPointIndex);
+      // console.log(firstPointIndex);
+      // console.log(i);
       // // // debugger;
-      if (firstPointIndex) {
+      if (firstPointIndex && firstPointIndex !== null) {
         lines.splice(0, firstPointIndex);
         console.log(lineGroup[1]);
         // // // debugger;
@@ -2305,7 +2390,6 @@ const testMyFunktion = (
       // // debugger;
     }
   });
-
   // create line for create free space objects
   freeSpacesAll.forEach((lineGroup, i) => {
     lineGroup[1] = [];
@@ -2355,11 +2439,11 @@ const testMyFunktion = (
           let searchPoint = sceneService.findWayPoint(
             lineGroup[1][lineGroup[1].length - 1]
           );
-          let minDist = 1;
+          let minDist = null;
           searchPoint.forEach(pointA => {
             wayPoint.forEach(pointB => {
               const dist = GeometryUtils.getDistance(pointA, pointB);
-              if (minDist > dist) {
+              if (minDist > dist || minDist === null) {
                 linePoint = pointA;
                 minDist = dist;
               }
@@ -2409,7 +2493,7 @@ const testMyFunktion = (
 
   // create free space objects
   let edgeModels = [];
-  let minArea = 0.01;
+
   freeSpacesAll.forEach((lineGroup, i) => {
     if (lineGroup[1].length < 2) {
       console.log('skip ' + i + ' object');
@@ -2434,7 +2518,7 @@ const testMyFunktion = (
       //     )
       //   }
       // });
-      let res;
+      let res = false;
 
       // if (i => 19) {
       //   helpLayer.children = [];
@@ -2451,7 +2535,7 @@ const testMyFunktion = (
       //   });
       //   console.log(lineGroup[1]);
       //   sceneService.render(editor);
-      //   // debugger;
+      //   debugger;
       // }
 
       // if (i !== 19) {
@@ -2461,7 +2545,7 @@ const testMyFunktion = (
         lineGroup[1],
         0.0001,
         'Free space',
-        minArea,
+        editor.voidSearchOptions.minArea,
         i
       );
 
@@ -2470,86 +2554,117 @@ const testMyFunktion = (
           console.log(
             'area ' + i + ' void = ' + geometryInfo[0].region.area
           );
-          if (geometryInfo[0].region.area > minArea) {
+          if (geometryInfo[0].region.area > editor.voidSearchOptions.minArea) {
             edgeModels.push(res);
           }
         }
-      // }
-      // let edgeModel = GeometryUtils.buildEdgeModel(
-      //   { children:  lineGroup[1] },
-      //   0.0001,
-      //   'Free space'
-      // );
-      // console.log(edgeModels[edgeModels.length - 1]);
-      // debugger;
+        // todo фильтр пустоти знаходяться всередині інших об'єктів insidePolygon(path, midPoint)
 
-      // debugger;
+
+
       console.log('done with ' + i + ' object');
-
-      // } else {
-      //   let edgeModel = GeometryUtils.buildEdgeModel(
-      //     { children:  lineGroup[1] },
-      //     0.0001,
-      //     'Free space'
-      //   );
-      //   console.log(edgeModel);
-      //   debugger;
-      // }
     }
   });
   return edgeModels;
-  // let edgeModel = GeometryUtils.buildEdgeModel(
-  //   { children:  lineGroup[1] },
-  //   editor.options.threshold,
-  //   'Free space'
-  // );
-  //
-  // skive (lineGroup[0], editor);
-  //
-  //
-  // recolor find free Space
-  // drawLine (freeSpace, editor);
 };
 
-// let cutLine = (line, pointStart, cutPoint) => {
-//   let newLine = [];
-//   // console.log(line);
-//   // // debugger;
-//   // let index = array.indexOf(line);
-//   // if (index) {
-//   //   // debugger;
-//   if (line.geometry.type === 'Geometry') {
-//     newLine.push(createLine(
-//       line.geometry.vertices[0],
-//       cutPoint
-//     ));
-//     newLine.push(createLine(
-//       cutPoint,
-//       line.geometry.vertices[1]
-//     ));
-//   } else if (line.geometry.type === 'CircleGeometry') {
-//     let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-//     let copyCircleGeometry = changeArcGeometry(
-//       { 0: 'copy' },
-//       {
-//         radius: line.geometry.parameters.radius,
-//         thetaStart: line.geometry.parameters.thetaStart,
-//         thetaLength: line.geometry.parameters.thetaLength
-//       }
-//     );
-//     newLine = new THREE.Line(copyCircleGeometry, materialLine);
-//     newLine.position.x = line.position.x;
-//     newLine.position.y = line.position.y;
-//     // console.log(newLine);
-//     // // debugger;
-//   }
-//   // array[index] = newLine;
+const isVoid = (line, linePoint, editor) => {
+  let isVoid = true;
+  let pointIndex = line.userData.nextPointIndex;
+  let objects = editor.scene.getObjectByName('Objects');
+  objects.children.forEach(object => {
+    if (GeometryUtils.insidePolygon(
+      object.userData.edgeModel.regions[0].path,
+      linePoint) &&
+      line.parent !== object
+    ){
+      isVoid = false;
+    }
+  });
+
+  return isVoid;
+};
+
+const weFindVoid = (lines) => {
+  lines.forEach(line => {
+    line.userData.weDoneWithThisLine = true;
+  });
+  console.log('he is alive!!!!!');
+  return;
+};
+
+// let cutLine = (lineGroup) => {
+//   // let newLine = [];
+//   // // console.log(line);
+//   // // // debugger;
+//   // // let index = array.indexOf(line);
+//   // // if (index) {
+//   // //   // debugger;
+//   // if (line.geometry.type === 'Geometry') {
+//   //   newLine.push(createLine(
+//   //     line.geometry.vertices[0],
+//   //     cutPoint
+//   //   ));
+//   //   newLine.push(createLine(
+//   //     cutPoint,
+//   //     line.geometry.vertices[1]
+//   //   ));
+//   // } else if (line.geometry.type === 'CircleGeometry') {
+//   //   let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+//   //   let copyCircleGeometry = changeArcGeometry(
+//   //     { 0: 'copy' },
+//   //     {
+//   //       radius: line.geometry.parameters.radius,
+//   //       thetaStart: line.geometry.parameters.thetaStart,
+//   //       thetaLength: line.geometry.parameters.thetaLength
+//   //     }
+//   //   );
+//   //   newLine = new THREE.Line(copyCircleGeometry, materialLine);
+//   //   newLine.position.x = line.position.x;
+//   //   newLine.position.y = line.position.y;
+//   //   // console.log(newLine);
+//   //   // // debugger;
 //   // }
-//   // console.log (newLine);
-//   // // debugger;
-//   return newLine;
+//   // // array[index] = newLine;
+//   // // }
+//   // // console.log (newLine);
+//   // // // debugger;
+//   // return newLine;
+//   if (lineGroup.length > 1) {
+//     lineGroup.forEach( (line, i) => {
+//       let beforeIndex = i === 0? lineGroup.length - 1 : i-1;
+//       let intersect = GeometryUtils.entitiesIntersectInfo(
+//         lineGroup[beforeIndex],
+//         lineGroup[i],
+//         0.001);
+//       // debugger;
+//       if (intersect) {
+//
+//         let wayPoints = [
+//           sceneService.findWayPoint(lineGroup[beforeIndex]),
+//           sceneService.findWayPoint(lineGroup[i])
+//         ];
+//         console.log ('way to interPoint');
+//         intersect.points.forEach(interPoint => {
+//           let checker = 0;
+//           wayPoints.forEach(wayPoint => {
+//             wayPoint.forEach(point => {
+//               console.log (GeometryUtils.getDistance(interPoint.point, point));
+//               if (GeometryUtils.getDistance(interPoint.point, point) < 0.001) {
+//                 checker += 1;
+//               }
+//             });
+//           });
+//           if (checker < 2){
+//             debugger;
+//           }
+//         });
+//       }
+//     });
+//   }
 // };
 
 export default {
+  searchColPoints,
   combineEdgeModels
 };

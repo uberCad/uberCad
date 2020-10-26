@@ -6,6 +6,7 @@ import sceneService from '../../services/sceneService';
 import MaterialComponent from '../Material/materrialComponentContainer';
 import Calculate from './CalculatePrice/container';
 import AddToBD from './AddToBD/container';
+import VoidSearchPanel from './VoidSearchPanel/container';
 import PanelWrapper from '../atoms/panel-wrapper';
 import ButtonIcon from '../atoms/button-icon';
 
@@ -156,6 +157,13 @@ const PanelObjects: React.FC<Props> = (props: Props) => {
             )}
           </FormattedMessage>
         )}
+
+        {objects?.children.length > 1 && (
+          <VoidSearchPanel
+            lang={props.lang}
+          />
+        )}
+
         <FormattedMessage id="panelObject.showAll" defaultMessage="Show all">
           {value => (
             <ButtonIcon

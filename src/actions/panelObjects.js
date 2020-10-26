@@ -8,7 +8,7 @@ import consoleUtils from '../services/consoleUtils';
 
 import { spinnerHide, spinnerShow } from './spinner';
 import { CAD_TOGGLE_VISIBLE_LAYER, CAD_COMBINE_EDGE_MODELS } from './cad';
-import { SPINNER_HIDE } from './spinner';
+import { SPINNER_SHOW, SPINNER_HIDE } from './spinner';
 
 export const PANEL_OBJECTS_TOGGLE = 'PANEL_OBJECTS_TOGGLE';
 export const SNAPSHOT_LOAD_OBJECT = 'SNAPSHOT_LOAD_OBJECT';
@@ -40,6 +40,17 @@ export const toggleVisible = (layer, visible, editor) => {
         previousScene
       }
     });
+  };
+};
+
+export const searchColPoints = editor => {
+  return dispatch => {
+    dispatch({ type: SPINNER_SHOW });
+      const {collisionPoints} = edgeService.searchColPoints(editor, true);
+      console.log (editor.voidSearchOptions);
+      editor.voidSearchOptions.ColPoints = collisionPoints;
+    console.log (editor.voidSearchOptions);
+    dispatch({ type: SPINNER_HIDE });
   };
 };
 

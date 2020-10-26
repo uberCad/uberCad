@@ -229,17 +229,7 @@ export default class addElementToDB extends Component {
         </FormattedMessage>
 
         <Modal show={this.state.show} onHide={this.handleClose}>
-          {/*// todo КОСТИЛІЩЕ.... ну або подивись можливо можна упростити процес з onClose*/}
-          {
-            <MaterialComponent
-              addElementToDB={!this.state.material}
-              onClose={() => {
-                this.setState({
-                  material: this.props.activeObject.userData.material.name
-                });
-              }}
-            />
-          }
+
 
           <Modal.Header closeButton>
             <FormattedMessage
@@ -311,6 +301,17 @@ export default class addElementToDB extends Component {
                 >
                   {value => <ControlLabel>{value}</ControlLabel>}
                 </FormattedMessage>
+
+                <MaterialComponent
+                  addElementToDB={!this.state.material}
+                  onClose={() => {
+                    this.setState({
+                      material: this.props.activeObject.userData.material.name,
+                      icon: false
+                    });
+                  }}
+                />
+
                 <FormattedMessage
                   id="addElementToDB.modal.inputPlaceholderMaterial"
                   defaultMessage=" Choose material"
@@ -326,7 +327,6 @@ export default class addElementToDB extends Component {
                     />
                   )}
                 </FormattedMessage>
-                <MaterialComponent />
 
                 <FormControl.Feedback />
               </FormGroup>

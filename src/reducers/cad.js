@@ -133,6 +133,8 @@ let initialState = {
     message: ''
   },
 
+  voidSearchOptions: {},
+
   loading: false,
   didInvalidate: false,
   items: [],

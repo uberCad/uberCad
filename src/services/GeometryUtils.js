@@ -509,6 +509,9 @@ let getInsidePoint = (regions, threshold) => {
       }
     });
 
+
+    // todo глянути на можливість оптимізації (path[parseInt(Math.random() *
+    //  path.length, 10)] - може давати повтор точки)
     let bestPoints = 0;
     for (let i = 0; i < 3; i++) {
       let attempts = 0;

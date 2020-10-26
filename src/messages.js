@@ -61,6 +61,16 @@ export default {
       },
       save: 'Open'
     },
+
+    voidSearch: {
+      searchParam: 'take search parameters',
+      modal: {
+        minArea: 'minimum object area',
+        ignoredDistance: 'ignored distance between objects'
+      },
+      search: 'Show points'
+    },
+
     addElementToDB: {
       newProgect: 'Add new element',
       modal: {
@@ -211,6 +221,16 @@ export default {
       },
       save: 'Открыть'
     },
+
+    voidSearch: {
+      searchParam: 'параметры поиска',
+      modal: {
+        minArea: 'минимальная площадь объекта',
+        ignoredDistance: 'игнорируемые расстояние между объектами'
+      },
+      search: 'Показать точки'
+    },
+
     addElementToDB: {
       newProgect: 'Добавить новый элемент',
       modal: {

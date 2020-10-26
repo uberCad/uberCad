@@ -697,6 +697,7 @@ const createObject = (
             { children: entities },
             threshold,
             mode,
+            minArea,
             index
           );
 
@@ -1455,24 +1456,33 @@ const findWayPoint = (line, closesPoint = null, mode = 'normal') => {
         line.position.y
     };
     if (mode === 'serch_way') {
+      let distance = GeometryUtils.getDistance(points[0], points[1]);
       if (closesPoint !== null) {
         if (
           GeometryUtils.getDistance(closesPoint, points[0]) <
           GeometryUtils.getDistance(closesPoint, points[1])
         ) {
-          points[1] = {
-            x: line.geometry.vertices[1].x + line.position.x,
-            y: line.geometry.vertices[1].y + line.position.y
-          };
+          points[1] = HelpLayerService.foundNewPoint(
+            closesPoint,
+            {
+              x: line.geometry.vertices[1].x + line.position.x,
+              y: line.geometry.vertices[1].y + line.position.y
+            },
+            distance
+          );
         } else {
-          points[0] = {
-            x:
-              line.geometry.vertices[line.geometry.vertices.length - 2].x +
-              line.position.x,
-            y:
-              line.geometry.vertices[line.geometry.vertices.length - 2].y +
-              line.position.y
-          };
+          points[0] =  HelpLayerService.foundNewPoint(
+            closesPoint,
+            {
+              x:
+                line.geometry.vertices[line.geometry.vertices.length - 2].x +
+                line.position.x,
+              y:
+                line.geometry.vertices[line.geometry.vertices.length - 2].y +
+                line.position.y
+            },
+            distance
+          );
         }
       } else {
         console.log('you need "point"');
