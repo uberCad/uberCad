@@ -30,6 +30,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   const entities = {
     Layers: editor ? check('Layers') : addContainer('Layers'),
     Objects: editor ? check('Objects') : addContainer('Objects'),
+    VoidsLayer: editor ? check('VoidsLayer') : addContainer('VoidsLayer'),
     HelpLayer: editor ? check('HelpLayer') : addContainer('HelpLayer'),
     newLineLayer: editor ? check('newLineLayer') : addContainer('newLineLayer')
   };
@@ -939,6 +940,7 @@ export function Viewer(data = null, container, snapshot = null, font, editor) {
   this.getEntity = entityName => entities[entityName];
   this.getLayers = () => entities.Layers;
   this.getObjects = () => entities.Objects;
+  this.getVoidsLayer = () => entities.VoidsLayer;
   this.getHelpLayer = () => entities.HelpLayer;
   this.getNewLineLayer = () => entities.newLineLayer;
 }

@@ -10,8 +10,21 @@ import { spinnerHide, spinnerShow } from './spinner';
 import { CAD_TOGGLE_VISIBLE_LAYER, CAD_COMBINE_EDGE_MODELS } from './cad';
 import { SPINNER_SHOW, SPINNER_HIDE } from './spinner';
 
+export const PANEL_VOIDS_TOGGLE = 'PANEL_VOIDS_TOGGLE';
 export const PANEL_OBJECTS_TOGGLE = 'PANEL_OBJECTS_TOGGLE';
 export const SNAPSHOT_LOAD_OBJECT = 'SNAPSHOT_LOAD_OBJECT';
+
+export const toggleVoids = (editor, object) => {
+  sceneService.setPointOfInterest(editor, object ? object : editor.scene);
+  return dispatch => {
+    dispatch({
+      type: PANEL_VOIDS_TOGGLE,
+      payload: {
+        activeObject: object
+      }
+    });
+  };
+};
 
 export const toggleObject = (editor, object) => {
   sceneService.setPointOfInterest(editor, object ? object : editor.scene);

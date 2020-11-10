@@ -4,9 +4,11 @@ import './Sidebar.css';
 import ActiveEntities from '../ActiveEntities/activeEntitiesComponentContainer';
 import PanelLayers from '../PanelLayers/panelLayersComponentContainer';
 import PanelObjects from '../PanelObjects/container';
+import PanelVoids from '../PanelVoids/container';
 import PanelSnapshots from '../PanelSnapshots/panelSnapshotsComponentContainer';
 import PanelEdit from '../PanelEdit/panelEditComponentContainer';
 import PanelInfo from '../PanelInfo/panelInfoComponentContainer';
+import sceneService from '../../services/sceneService';
 
 export default class SidebarComponent extends Component {
   toggleSidebar = () => {
@@ -18,6 +20,13 @@ export default class SidebarComponent extends Component {
       dataset: { panelIdx, tabIdx }
     }
   }) => {
+    if (+tabIdx === 0 && +panelIdx === 1){
+      sceneService.showAll(this.props.editor, 'Objects', 'show');
+      sceneService.showAll(this.props.editor, 'Voids', 'hide');
+    } else if (+tabIdx === 1 && +panelIdx === 1){
+      sceneService.showAll(this.props.editor, 'Objects', 'hide');
+      sceneService.showAll(this.props.editor, 'Voids', 'show');
+    }
     this.props.toggleTab(parseInt(panelIdx, 10), parseInt(tabIdx, 10));
   };
 
@@ -72,6 +81,9 @@ export default class SidebarComponent extends Component {
                       break;
                     case 'PanelObjects':
                       component = <PanelObjects />;
+                      break;
+                    case 'PanelVoids':
+                      component = <PanelVoids />;
                       break;
                     case 'PanelEdit':
                       component = <PanelEdit />;

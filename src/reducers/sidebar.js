@@ -2,6 +2,7 @@ import update from 'immutability-helper';
 
 import { SIDEBAR_TOGGLE, TOGGLE_TAB } from '../actions/sidebar';
 import { PANEL_OBJECTS_TOGGLE } from '../actions/panelObjects';
+import { PANEL_VOIDS_TOGGLE } from '../actions/panelObjects';
 import { LOCALE_SET } from '../actions/locale';
 import { EDIT_IS_EDIT } from '../actions/editorActions/edit';
 import { MATERIAL_SET } from '../actions/materials';
@@ -34,6 +35,13 @@ let initialState = {
         title_ru: 'Объекты',
         title: 'Objects',
         component: 'PanelObjects',
+        active: false
+      },
+      {
+        title_en: 'Voids',
+        title_ru: 'Пустоты',
+        title: 'Voids',
+        component: 'PanelVoids',
         active: false
       },
       {
@@ -81,6 +89,13 @@ const options = (state = initialState, action) => {
         ...state,
         activeObject: action.payload.activeObject
       };
+
+    case PANEL_VOIDS_TOGGLE:
+      return {
+        ...state,
+        activeObject: action.payload.activeObject
+      };
+
     case SIDEBAR_TOGGLE:
       return {
         ...state,

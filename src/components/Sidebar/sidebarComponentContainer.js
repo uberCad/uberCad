@@ -7,6 +7,11 @@ const mapStateToProps = (state, ownProps) => {
     active: state.sidebar.active,
     panels: state.sidebar.panels,
     editor: {
+      scene: state.cad.scene,
+      camera: state.cad.camera,
+      activeEntities: state.cad.activeEntities,
+      options: state.options,
+      isEdit: state.cad.editMode.isEdit,
       renderer: state.cad.renderer,
       cadCanvas: state.cad.cadCanvas
     },

@@ -114,7 +114,11 @@ const doSelection = (selectResultAll, editor) => {
       }
     });
   } else {
-    selectResult = selectResultAll;
+    selectResultAll.forEach(element => {
+      if (element.parent.visible === true) {
+        selectResult.push(element);
+      }
+    });
   }
   highlightEntities(editor, editor.activeEntities, true, undefined, false);
   switch (editor.options.selectMode) {
@@ -606,7 +610,7 @@ const animateCameraMove = (editor, step, dollyFactor, stepsLeft) => {
   cadCanvas.render();
 };
 
-const showAll = (editor, mode) => {
+const showAll = (editor, mode, hide_show = false) => {
   const current = {
     object:
       mode === 'activeEntities'
@@ -615,7 +619,11 @@ const showAll = (editor, mode) => {
     elements:
       mode === 'activeEntities'
         ? editor.activeEntities
-        : editor.scene.children[0].children
+        : mode === 'Objects'
+    ? editor.scene.getObjectByName('Objects').children
+    : mode === 'Voids'
+          ? editor.scene.getObjectByName('VoidsLayer').children
+          : editor.scene.getObjectByName('Layers').children,
   };
   const objectElementsReport = {
     visible: 0,
@@ -626,21 +634,17 @@ const showAll = (editor, mode) => {
       objectElementsReport.visible++;
     }
   }
-  const iterator = entityIterator(current.object, true);
 
-  let entity = iterator.next();
-  while (!entity.done) {
-    try {
-      if (objectElementsReport.visible === objectElementsReport.length) {
-        entity.value.visible = !entity.value.visible;
-      } else {
-        entity.value.visible = true;
-      }
-      entity = iterator.next();
-    } catch (e) {
-      console.error(e, 'sceneService => showAll()');
-    }
+  if (hide_show === 'hide'){
+    objectElementsReport.visible = objectElementsReport.length;
+  } else if (hide_show === 'show'){
+    objectElementsReport.visible = objectElementsReport.length - 1;
   }
+  current.elements.forEach (elem =>{
+    elem.visible =
+          objectElementsReport.visible === objectElementsReport.length ?
+          false : true;
+  });
   render(editor);
 };
 
@@ -651,6 +655,7 @@ const createObject = (
   threshold = 0.000001,
   mode = 'standart',
   minArea = 0.01,
+  objectsContainer = editor.scene.getObjectByName('Objects'),
   index
 ) => {
   let object;
@@ -663,8 +668,8 @@ const createObject = (
   usedEntities -= entities.length;
 
   try {
-    scene.children.forEach(objectsContainer => {
-      if (objectsContainer.name === 'Objects') {
+    // scene.children.forEach(objectsContainer => {
+      if (objectsContainer.name === 'Objects' || 'VoidsLayer') {
         // if (mode !== 'Free space') {
           objectsContainer.children.forEach(object => {
             if (object.name === name) {
@@ -762,7 +767,7 @@ const createObject = (
           // };
         }
       }
-    });
+    // });
   } catch (e) {
     if (mode !== 'Free space') {
       switch (e.userData.error) {
@@ -877,6 +882,18 @@ const groupEntities = (editor, entities, objectName) => {
     } catch (e) {
       console.error(e);
       return false;
+    }
+  }
+};
+
+const getVoidsLayer = (scene, returnObjects = false) => {
+  for (let container of scene.children) {
+    if (container.name === 'VoidsLayer') {
+      if (returnObjects) {
+        return container.children;
+      } else {
+        return container;
+      }
     }
   }
 };
@@ -1547,6 +1564,7 @@ export default {
   groupEntities,
   createObject,
   getObjects,
+  getVoidsLayer,
   getLayers,
   fixSceneAfterImport,
   sendToFlixo,

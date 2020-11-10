@@ -1,17 +1,14 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import PanelObjects, { IDispatchProps, IProps } from './index';
-// import { spinnerShow } from '../../actions/spinner';
+import PanelVoidsLayer, { IDispatchProps, IProps } from './index';
 
 import {
   toggleVisible,
-  combineEdgeModels,
   toggleObject,
   loadObjectSnapshot
 } from '../../actions/panelObjects';
 import { showAll } from '../../actions/activeEntities';
-import { ungroup } from '../../actions/edit';
 import { isEdit } from '../../actions/editorActions/edit';
 
 const mapStateToProps = (state, ownProps): IProps => {
@@ -39,15 +36,8 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => {
     toggleVisible(visible, editor, entity) {
       toggleVisible(entity, visible, editor)(dispatch);
     },
-    combineEdgeModels(editor) {
-      /* tslint:disable */
-      // spinnerShow('edgeModel')(dispatch)?.then(() =>
-      combineEdgeModels(editor)(dispatch)
-      // );
-      /* tslint:enable */
-    },
     showAll(editor) {
-      showAll(editor, 'Objects')(dispatch);
+      showAll(editor, 'Voids')(dispatch);
     },
     isEdit(option, editor, object) {
       isEdit(option, editor, object)(dispatch);
@@ -57,11 +47,8 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => {
     },
     loadObjectSnapshot(key, cadCanvas) {
       loadObjectSnapshot(key, cadCanvas)(dispatch);
-    },
-    ungroup(editor, object) {
-      ungroup(editor, object)(dispatch);
     }
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PanelObjects);
+export default connect(mapStateToProps, mapDispatchToProps)(PanelVoidsLayer);

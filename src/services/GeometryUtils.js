@@ -513,10 +513,17 @@ let getInsidePoint = (regions, threshold) => {
     // todo глянути на можливість оптимізації (path[parseInt(Math.random() *
     //  path.length, 10)] - може давати повтор точки)
     let bestPoints = 0;
+    let firstPointIndex = 0;
+    let pointChecker = [];
+    path.forEach(point => {
+      pointChecker[pointChecker.length] = [];
+    });
     for (let i = 0; i < 3; i++) {
       let attempts = 0;
       while (points.length < i * 3 + 3 || attempts < 20) {
-        let secondPoint = path[parseInt(Math.random() * path.length, 10)];
+        let secondPointIndex = parseInt(Math.random() * path.length, 10)
+        let secondPoint = path[secondPointIndex];
+        pointChecker[firstPointIndex].push(secondPointIndex);
 
         let midPoint = {
           x: (firstPoint.x + secondPoint.x) / 2,
@@ -558,7 +565,8 @@ let getInsidePoint = (regions, threshold) => {
         }
         attempts++;
       }
-      firstPoint = path[parseInt(Math.random() * path.length, 10)];
+      firstPointIndex = parseInt(Math.random() * path.length, 10);
+      firstPoint = path[firstPointIndex];
     }
 
     if (points.length) {
