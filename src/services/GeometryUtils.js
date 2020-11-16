@@ -592,6 +592,7 @@ const getObjectOuterEntities = object => {
   });
   return arrayOfEntities;
 };
+
 const getCollisionPoints = (objects, threshold = 0.000001) => {
   const collisionPoints = [];
   // if object bounding boxes intersect or tangent then

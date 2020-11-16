@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="59.332px" height="59.332px" viewBox="0 0 59.332 59.332" style="enable-background:new 0 0 59.332 59.332;"
+	 xml:space="preserve">
+
+	<g>
+		<line x1="0.13" y1="49.2" x2="10.87" y2="49.2"  stroke-width="1.2"/>
+		<line x1="0.13" y1="58.8" x2="10.87" y2="58.8"  stroke-width="1.2"/>
+
+		<line x1="0.74" y1="59" x2="0.74" y2="48.61"  stroke-width="1.2"/>
+		<line x1="10.29" y1="59" x2="10.29" y2="48.61"  stroke-width="1.2"/>
+	</g>
+
+	<g>
+		<line x1="49.2" y1="0.13" x2="49.2" y2="10.87" stroke="#FFFFFF" stroke-width="1.2"/>
+		<line x1="58.8" y1="0.13" x2="58.8" y2="10.87" stroke="#FFFFFF" stroke-width="1.2"/>
+
+		<line x1="59" y1="0.74" x2="48.61" y2="0.74" stroke="#FFFFFF" stroke-width="1.2"/>
+		<line x1="59" y1="10.29" x2="48.61" y2="10.29" stroke="#FFFFFF" stroke-width="1.2"/>
+	</g>
+
+	<g>
+		<line x1="5" y1="49" x2="5" y2="3.8" stroke="#FFFFFF" stroke-width="3"/>
+	</g>
+	<g>
+		<line x1="49" y1="5" x2="3.8" y2="5" stroke="#FFFFFF" stroke-width="3"/>
+	</g>
+	<g>
+		<line x1="5" y1="48" x2="48" y2="5" stroke="#FFFFFF" stroke-width="3"/>
+	</g>
+</svg>

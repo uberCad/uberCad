@@ -565,7 +565,6 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   let voids = testMyFunktion(
     editor,
     collisionPoints,
-    // collisionAllPoints,
     threshold
   );
 
@@ -1735,6 +1734,7 @@ let searchTrueNextPoint = (
 };
 
 const findNextLine = (object, thisLine, linePoint, entrainment = 0.001) => {
+  let alternative = {};
   for (let i = 0; i < object.children.length; i++) {
     let line = object.children[i];
     let p = false;
@@ -1747,15 +1747,25 @@ const findNextLine = (object, thisLine, linePoint, entrainment = 0.001) => {
       if (index !== -1) {
         p = isPoint(linePoint, entrainment, points[index]);
         if (p) {
-          return {
-            newFindLinePoint: [points[1], points[0]],
-            line: line,
-            index: index
-          };
+          if (!line.userData.weDoneWithThisLine) {
+            return {
+              newFindLinePoint: [points[1], points[0]],
+              line: line,
+              index: index
+            };
+          } else {
+            alternative = {
+              newFindLinePoint: [points[1], points[0]],
+              line: line,
+              index: index
+            };
+          }
         }
       }
     }
   }
+  // debugger;
+  return alternative;
 };
 
 const nextPoint = (
@@ -2359,15 +2369,15 @@ const testMyFunktion = (
   //
 
   collisionPoints.forEach((point, i) => {
-    helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
-    console.log(point.entities);
-    point.entities.forEach(line => {
-      // line.material.color.set(new THREE.Color(0x0000ff)); // синій
-    });
-    sceneService.render(editor);
-    point.entities.forEach(line => {
-      // line.material.color.set(new THREE.Color(0xffaa00)); // оранжевий
-    });
+    // helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
+    // console.log(point.entities);
+    // point.entities.forEach(line => {
+    //   // line.material.color.set(new THREE.Color(0x0000ff)); // синій
+    // });
+    // sceneService.render(editor);
+    // point.entities.forEach(line => {
+    //   // line.material.color.set(new THREE.Color(0xffaa00)); // оранжевий
+    // });
     // debugger;
 
     let pointStartIndex = [];
@@ -2380,24 +2390,9 @@ const testMyFunktion = (
     } while (point.entities[testIndex]);
     // // debugger;
     if (pointStartIndex.length > 0) {
-      // todo так як ми розділили лінії на точках перетину, з'являється резон
-      //  маркувати не точки (так як одна точка може юзатись пару раз, а лінії
-      //  так як після розділу одна лінія може бути тільки в одному об'єкті
-      //  пс. маркувати лінії тільки у випадку закольцовки області (косольне
-      //  повідомлення "he is alive")
       point.startFromThisPoint = true;
-
       helpLayer.children = [];
-      helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
-      sceneService.render(editor);
-      console.log(' точка ' + i + ' в процесі');
-
-      // pointStartIndex.splice(0, 2);
       pointStartIndex.forEach(index => {
-        console.log(
-          ' точка ' + i + ' в процесі, а якщо конктретно то лінія ' + index
-        );
-        // debugger;
         if (
           !point.entities[index].userData.weDoneWithThisLine &&
           point.entities[index].userData.collisionPointsInf.length === 1
@@ -2436,7 +2431,6 @@ const testMyFunktion = (
   // console.log (freeSpacesAll);
   // debugger;
   let objects = editor.scene.getObjectByName('Objects');
-
   objects.children.forEach(object => {
     object.children.forEach(line => {
       if (!line.userData.weDoneWithThisLine){
@@ -2446,11 +2440,6 @@ const testMyFunktion = (
     });
   });
 
-  // console.log (freeSpacesAll);
-  // debugger;
-
-  // // debugger;
-
   //step 3 - unmark line with collisionPoints
   collisionPoints.forEach(point => {
     point.entities.forEach(line => {
@@ -2458,8 +2447,6 @@ const testMyFunktion = (
     });
   });
 
-
-// todo start
   // filter not need line in find object
   freeSpacesAll.forEach((lineGroup, i) => {
     let lines = lineGroup[0];
@@ -2554,18 +2541,14 @@ const testMyFunktion = (
           }
         }
       }
-      // console.log(firstPointIndex);
-      // console.log(i);
-      // // // debugger;
       if (firstPointIndex && firstPointIndex !== null) {
         lines.splice(0, firstPointIndex);
-        console.log(lineGroup[1]);
-        // // // debugger;
       }
     } else {
-      // // debugger;
+      // debugger;
     }
   });
+
   // create line for create free space objects
   freeSpacesAll.forEach((lineGroup, i) => {
     lineGroup[1] = [];
@@ -2605,9 +2588,6 @@ const testMyFunktion = (
       newLine.userData.collisionPointsInf = line.userData.collisionPointsInf;
       lineGroup[1].push(newLine);
     });
-
-    // фича 2 cut line
-    // cutLine (lineGroup[1]);
 
     let linePoint = null;
     if (lineGroup[1].length > 1) {
@@ -2657,8 +2637,8 @@ const testMyFunktion = (
       } while (lineIndex < lineGroup[1].length);
     }
   });
-//  todo stop
 
+  // delete 0 voids
   let lineIndex = 0;
   do {
     if (freeSpacesAll[lineIndex][1].length < 2) {
@@ -2674,57 +2654,11 @@ const testMyFunktion = (
 
   // create free space objects
   let edgeModels = [];
-
-  // console.log (freeSpacesAll);
-  // debugger;
   freeSpacesAll.forEach((lineGroup, i) => {
     if (lineGroup[1].length < 2) {
       console.log('skip ' + i + ' object');
-      // // debugger;
     } else {
-
-      // todo увеличить точность не теряя пустоты 08/10/2020
-      //  1) пробуємо використовувати buildEdgeModel замість createObject
-      //  2) дописуємо фічу затикачки дир в окрему функцию яку визиваємо в старті
-      //  функциї (точность залежить від маштабу) createObject
-      //  3) добиваємо до ума функцию cutLine і запускаємо перед buildEdgeModel
-      //  чи createObject
-      //  4) у випадку якщо залишаємо createObject, створюємо новий слой в сцені
-      //  паралельно з "Objects" і "HelpLayers"
-      //
-      // edgeModels.push ({
-      //   userData: {
-      //     edgeModel: GeometryUtils.buildEdgeModel(
-      //       { children: lineGroup[1] },
-      //       0.0001,
-      //       'Free space'
-      //     )
-      //   }
-      // });
-
       let res = false;
-
-      // if (i === 3) {
-      //   helpLayer.children = [];
-      //   lineGroup[0].forEach(line => {
-      //     let wayPoint = sceneService.findWayPoint(line);
-      //     wayPoint.forEach(point => {
-      //       helpLayer.add(helpLayerService.positionInLine(
-      //         editor,
-      //         [point]
-      //       ));
-      //     });
-      //
-      //     line.material.color.set(new THREE.Color(0xff0000));
-      //   });
-      //   console.log(lineGroup[1]);
-      //   sceneService.render(editor);
-      //   debugger;
-      // }
-      // if (i !== 19) {
-      // console.log (lineGroup[1]);
-      // debugger;
-
       res = sceneService.createObject(
         editor,
         'freeSpaceZone №' + i,
@@ -2736,21 +2670,16 @@ const testMyFunktion = (
         i
       );
 
-        if (res !== false) {
-          res.visible = false;
-          const geometryInfo = GeometryUtils.getObjectInfo(res);
-          console.log(
-            'area ' + i + ' void = ' + geometryInfo[0].region.area
-          );
-          if (geometryInfo[0].region.area > editor.voidSearchOptions.minArea) {
-            edgeModels.push(res);
-          }
+      if (res !== false) {
+        res.visible = false;
+        const geometryInfo = GeometryUtils.getObjectInfo(res);
+        console.log(
+          'area ' + i + ' void = ' + geometryInfo[0].region.area
+        );
+        if (geometryInfo[0].region.area > editor.voidSearchOptions.minArea) {
+          edgeModels.push(res);
         }
-        // todo фильтр пустоти знаходяться всередині інших об'єктів insidePolygon(path, midPoint)
-
-
-
-      console.log('done with ' + i + ' object');
+      }
     }
   });
   helpLayer.children = [];
@@ -2854,6 +2783,7 @@ const weFindVoid = (lines) => {
 // };
 
 export default {
+  findNextLine,
   searchColPoints,
   combineEdgeModels
 };

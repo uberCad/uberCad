@@ -142,7 +142,7 @@ const PanelObjects: React.FC<Props> = (props: Props) => {
       </div>
 
       <div className="toolbar">
-        {objects?.children.length > 1 && (
+        {/*objects?.children.length > 1 && (
           <FormattedMessage
             id="panelObject.combineEdgeModels"
             defaultMessage="Combine edge models"
@@ -156,7 +156,7 @@ const PanelObjects: React.FC<Props> = (props: Props) => {
               />
             )}
           </FormattedMessage>
-        )}
+        )*/}
 
         {objects?.children.length > 1 && (
           <VoidSearchPanel
