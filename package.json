@@ -16,7 +16,7 @@
     "@types/react-test-renderer": "^16.9.3",
     "@types/three": "^0.103.2",
     "antd": "^3.26.2",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "body-parser": "^1.18.3",
     "bootstrap": "^3.3.7",
     "dxf-parser": "0.5.1",
