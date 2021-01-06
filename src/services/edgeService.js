@@ -171,9 +171,6 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
         }
       }
     }
-    // line.material.color = new THREE.Color(0x000000);
-    // line.material.needsUpdate = true;
-    // sceneService.render(editor)
   });
   for (let i = 0; i < point.entities.length; ) {
     if (point.entities[i] !== null) {
@@ -855,7 +852,7 @@ const voindsInObject = (editor, object, line) =>{
     checkLine = findNextLine (object, checkLine.line, checkLine.newFindLinePoint[checkLine.index]);
     // debugger;
     console.log (checkLine);
-    if (checkLine && !checkLine.line.userData.weDoneWithThisLine){
+    if (checkLine.line && !checkLine.line.userData.weDoneWithThisLine){
       checkLine.line.userData.weDoneWithThisLine = true;
       if (checkLine.line.userData.startFromThisPoint === true){
         checkLine.line.userData.startFromThisPoint = false;
@@ -1207,7 +1204,7 @@ let searchTrueNextPoint = (
         lines_nextObject.push(checkLine);
       }
     } else {
-      // debugger;
+      debugger;
     }
   });
   if (lines_nextObject.length < 2) {
@@ -1868,7 +1865,8 @@ const nextPoint = (
         console.log('закольцована полость');
         return;
       }
-      if (line.userData.weDoneWithThisLine) {
+
+      if (!line || line.userData.weDoneWithThisLine) {
         pieceOfFreeSpace[0] = [];
         console.log('використаний елемент раніше');
         return;
@@ -2368,6 +2366,7 @@ const testMyFunktion = (
   // });
   //
 
+  // find voids
   collisionPoints.forEach((point, i) => {
     // helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
     // console.log(point.entities);
@@ -2428,14 +2427,12 @@ const testMyFunktion = (
     }
   });
 
-  // console.log (freeSpacesAll);
-  // debugger;
+  // find voids in object
   let objects = editor.scene.getObjectByName('Objects');
   objects.children.forEach(object => {
     object.children.forEach(line => {
       if (!line.userData.weDoneWithThisLine){
         freeSpacesAll[freeSpacesAll.length] = [voindsInObject(editor, object, line)];
-        // voids.push(voindsInObject(editor, object, line));
       }
     });
   });
@@ -2589,6 +2586,16 @@ const testMyFunktion = (
       lineGroup[1].push(newLine);
     });
 
+    if (lineGroup[1].length > 2 && editor.voidSearchOptions.autoFix) {
+      lineGroup[1] = sceneService.objectFix(
+        editor,
+        lineGroup[1],
+        editor.voidSearchOptions.ignoredDistance,
+        'done',
+        i
+      );
+    }
+
     let linePoint = null;
     if (lineGroup[1].length > 1) {
       let lineIndex = 0;
@@ -2609,6 +2616,13 @@ const testMyFunktion = (
               }
             });
           });
+          if (minDist > 1) {
+            console.log ('minDist = ' + minDist);
+            console.log (i);
+            console.log (line);
+            console.log (wayPoint);
+            console.log (linePoint);
+          }
         }
         let distance0 = GeometryUtils.getDistance(wayPoint[0], linePoint);
         let distance1 = GeometryUtils.getDistance(wayPoint[1], linePoint);

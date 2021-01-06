@@ -20,7 +20,8 @@ let buildEdgeModel = (object, threshold = 0.000001,
   // check for intersections
   entities.forEach(entityToCheck => {
     delete entityToCheck.userData.noIntersections;
-    if (mode !== 'Free space') {
+    if (mode !== 'Free space' && mode !== 'Auto fix on') {
+      debugger;
       entities.forEach(entity => {
         if (entity === entityToCheck || entity.userData.noIntersections) {
           return;
@@ -272,7 +273,7 @@ let buildEdgeModel = (object, threshold = 0.000001,
   let pathD = '';
   const subRegionsPathD = [];
   const vertexList = [];
-  if (mode === 'Free space') {
+  if (mode === 'Free space' && mode !== 'Auto fix on') {
     let geometryInfo = getObjectInfo({userData: {edgeModel: {regions: regions}}});
     if (geometryInfo[0].region.area < minArea) {
       console.log(geometryInfo[0].region.area);
@@ -428,7 +429,7 @@ let buildChain = (
     }
   });
 
-  if (minDistance.distance > threshold && mode !== 'Free space') {
+  if (minDistance.distance > threshold && mode !== 'Free space' && mode !== 'Auto fix on') {
     let error = new Error('Interruption detected. Operation canceled');
     error.userData = {
       error: 'interruption',
@@ -1162,8 +1163,8 @@ let arcsIntersect = (arc1, arc2, mode) => {
     // let y = ((b - d) * (r1 * r1 - r2 * r2)) / (2 * (Math.pow(c - a, 2) + Math.pow(d - b, 2))) - (d + b) / 2;
     // // console.log({x, y});
     // TODO handle arcs tagnency
-    if (mode !== 'Free space') {
-      window.alert('arcs tagnency. How to handle?');
+    if (mode !== 'Free space' && mode !== 'Auto fix on') {
+      // window.alert('arcs tagnency. How to handle?');
     }
     // calculate tangency point
   } else {
@@ -3418,7 +3419,7 @@ function filterSelfIntersectingPaths(paths = []) {
   return result;
 }
 
-const newCurve = (center, radius, startPoint, endPoint) => {
+const newCurve = (center, radius, startPoint, endPoint, mode = 'create') => {
   let curveParam = {
     newCurveCenter: center,
     thetaStart: circlInterAngle(startPoint, center),
@@ -3477,6 +3478,9 @@ const newCurve = (center, radius, startPoint, endPoint) => {
   // debugger;
   copyCircle.userData.originalColor = copyCircle.material.color.clone();
   copyCircle.userData.id = uuid.v4();
+  if (mode === 'fix'){
+    return copyCircle.geometry;
+  }
   return copyCircle;
 };
 

@@ -48,6 +48,7 @@ export default class VoidSearchPanel extends Component {
     this.props.editor.voidSearchOptions.threshold = 0.001;
     this.props.editor.voidSearchOptions.minArea = 0.001;
     this.props.editor.voidSearchOptions.ignoredDistance = 0.00001;
+    this.props.editor.voidSearchOptions.autoFix = true;
     this.setState({ error: '' });
     this.setState({
       show: true,
@@ -99,6 +100,10 @@ export default class VoidSearchPanel extends Component {
       this.setState({ ignoredDistance: value });
       this.props.editor.voidSearchOptions.ignoredDistance = +value;
     }
+  };
+
+  onChangeAutoFix = ({ currentTarget: { checked } }) => {
+    this.props.editor.voidSearchOptions.autoFix = checked;
   };
 
   render() {
@@ -195,6 +200,30 @@ export default class VoidSearchPanel extends Component {
                     />
                   )}
                 </FormattedMessage>
+
+                <FormattedMessage
+                  id="voidSearch.modal.autofix"
+                >
+                  {value => (
+                    <input
+                      type="checkbox"
+                      title={value}
+                      defaultChecked={true}
+                      onChange={this.onChangeAutoFix}
+                    />
+                  )}
+                </FormattedMessage>
+                <FormattedMessage
+                  id="voidSearch.modal.autofixlabelSameLayer"
+                  defaultMessage="Voids autoFix"
+                >
+                  {value => (
+                    <label htmlFor="editor-options-singleLayerSelect">
+                      {value}
+                    </label>
+                  )}
+                </FormattedMessage>
+
           {/*      <FormattedMessage*/}
           {/*        id="voidSearch.modal.inputType"*/}
           {/*        defaultMessage="Element title"*/}

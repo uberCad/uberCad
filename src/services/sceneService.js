@@ -19,8 +19,9 @@ import {
   closestPoint,
   createLine,
   changeArcGeometry,
+  changeGeometry,
   changeArcGeometry as changGeomEditObj,
-  circleIntersectionAngle as circlInterAngle
+  circleIntersectionAngle as circlInterAngle, addHelpPoints
 } from './editObject';
 import helpLayerService from './helpLayerService';
 import edgeService from './edgeService';
@@ -649,12 +650,10 @@ const showAll = (editor, mode, hide_show = false) => {
   render(editor);
 };
 
-const objectFix = (editor, entities, threshold) => {
-  // console.log (entities);
-  // debugger;
+const objectFix = (editor, entities, threshold, sort = 'no', objectNumber) => {
+
+  addHelpPoints(editor, editor.scene, editor.camera.top / 50, true);
   entities = GeometryUtils.skipZeroLines([...entities], threshold);
-  // console.log (entities);
-  // debugger;
   let helpLayer = editor.scene.getObjectByName('HelpLayer');
   let linePoint = null;
   if (entities.length > 1) {
@@ -664,132 +663,410 @@ const objectFix = (editor, entities, threshold) => {
     let areaIndex = 0;
     let pointIndex = 0;
     let wayPoint;
+
     do {
-      if (!area[areaIndex]){
+      if (!area[areaIndex]) {
         let indexSearchLine = 0;
         do {
-          if (!entities[indexSearchLine].userData.weDoneWithThisLine){
+          if (!entities[indexSearchLine].userData.weDoneWithThisLine) {
             area[areaIndex] = [];
             area[areaIndex].push(entities[indexSearchLine]);
             lineIndex += 1;
             entities[indexSearchLine].userData.weDoneWithThisLine = true;
-            wayPoint = findWayPoint(area[areaIndex][area[areaIndex].length-1]);
-            entities[indexSearchLine].material.color.set(new THREE.Color(0x0000ff)); // синій
-            render(editor);
-            entities[indexSearchLine].material.color.set(new THREE.Color(0xffaa00)); // оранжевий
-            // debugger;
+            wayPoint = findWayPoint(area[areaIndex][area[areaIndex].length - 1]);
           }
           indexSearchLine += 1;
         } while (!area[areaIndex] && indexSearchLine < entities.length);
       }
 
-      let nextLine = edgeService.findNextLine(
-        {children: entities},
-        area[areaIndex][area[areaIndex].length-1],
-        wayPoint[pointIndex]
-      );
-
-      if (nextLine && nextLine.line.userData.weDoneWithThisLine){
+      let nextLine = {};
+      if (sort === 'no') {
         nextLine = edgeService.findNextLine(
-          {children: entities},
-          area[areaIndex][area[areaIndex].length-1],
-          wayPoint[pointIndex === 1? 0:1]
+          { children: entities },
+          area[areaIndex][area[areaIndex].length - 1],
+          wayPoint[pointIndex]
+        );
+      } else if (sort === 'done') {
+        nextLine.line = entities[lineIndex];
+      }
+
+      if (nextLine.line && nextLine.line.userData.weDoneWithThisLine) {
+        // debugger;
+        nextLine = edgeService.findNextLine(
+          { children: entities },
+          area[areaIndex][area[areaIndex].length - 1],
+          wayPoint[pointIndex === 1 ? 0 : 1]
         );
       }
-      if (!nextLine.line){
+      if (!nextLine.line) {
         // debugger;
-        nextLine = closestLine (entities, wayPoint[pointIndex]);
+        nextLine = closestLine(entities, wayPoint[pointIndex]);
       }
-
-      // console.log (nextLine.line);
-      nextLine.line.material.color.set(new THREE.Color(0xffaa00)); // оранжевий
-      render(editor);
-      // debugger;
 
       if (
         // !nextLine.line.userData.weDoneWithThisLine &&
-        !area[areaIndex].includes(nextLine.line)){
+        !area[areaIndex].includes(nextLine.line)) {
         nextLine.line.userData.weDoneWithThisLine = true;
-        pointIndex = nextLine === 0? 1:0;
+        pointIndex = nextLine === 0 ? 1 : 0;
         wayPoint = nextLine.newFindLinePoint;
-        area[areaIndex].push (nextLine.line);
+        area[areaIndex].push(nextLine.line);
         lineIndex += 1;
       } else {
-        console.log (area[areaIndex].indexOf(nextLine.line));
+        console.log(area[areaIndex].indexOf(nextLine.line));
         if (area[areaIndex].indexOf(nextLine.line) !== 0) {
           debugger;
         }
         areaIndex += 1;
       }
-      console.log (area[areaIndex]);
-      // debugger;
+      console.log(area[areaIndex]);
     } while (lineIndex < entities.length);
 
     // пошук ближчої точки обрізкаліній при необхідності
 
     // перевірка на лишні лінії
-    console.log (area);
-    // debugger;
-
-    area.forEach( lineGroup => {
+    entities = [];
+    area.forEach((lineGroup, lineGroupIndex) => {
+      lineGroup.forEach((line, lineIndex) => {
+        // line.material.color.set(new THREE.Color(0xffaa00)); // оранжевий
+        // render(editor);
+        //todo пошук дубліката ліній( дві лінії які майже ідеально накладуються
+        // друг на друга
+        let lineWayPoint = findWayPoint(line);
+        for (let chLiI = lineIndex + 1; chLiI < lineGroup.length; chLiI++) {
+          // lineGroup[chLiI].material.color.set(new THREE.Color(0x00ff00)); // оранжевий
+          // render(editor);
+          if (line.geometry.type === lineGroup[chLiI].geometry.type) {
+            let checkLineWayPoint = findWayPoint(lineGroup[chLiI]);
+            let pointDist = [
+              GeometryUtils.getDistance(lineWayPoint[0], checkLineWayPoint[0]),
+              GeometryUtils.getDistance(lineWayPoint[1], checkLineWayPoint[1]),
+              GeometryUtils.getDistance(lineWayPoint[0], checkLineWayPoint[1]),
+              GeometryUtils.getDistance(lineWayPoint[1], checkLineWayPoint[0])
+            ];
+            // todo поправити граничні допуски перевірки
+            let ignoreDist = GeometryUtils.getDistance(lineWayPoint[0], lineWayPoint[1]) / 100
+            if ((pointDist[0] < ignoreDist && pointDist[1] < ignoreDist) ||
+              (pointDist[2] < ignoreDist && pointDist[3] < ignoreDist)) {
+              if ((line.geometry.type === 'CircleGeometry' &&
+                GeometryUtils.getDistance(lineWayPoint[2], checkLineWayPoint[2]) < threshold) ||
+                line.geometry.type === 'Geometry') {
+                lineGroup.splice(chLiI, 1);
+                chLiI -= 1;
+              }
+            }
+          }
+          // lineGroup[chLiI].material.color.set(new THREE.Color(0x0000ff)); // синій
+        }
+        // line.material.color.set(new THREE.Color(0x0000ff)); // синій
+      });
+      let linePoint = null;
+      let thisLineIndex;
+      let previousPointIndex;
       lineIndex = 0;
       do {
-      let line = lineGroup[lineIndex];
-      let wayPoint = findWayPoint(line);
-      if (linePoint === null) {
-        let searchPoint = findWayPoint(
-          lineGroup[lineGroup.length - 1]
-        );
-        let minDist = null;
-        searchPoint.forEach(pointA => {
-          wayPoint.forEach(pointB => {
-            const dist = GeometryUtils.getDistance(pointA, pointB);
-            if (minDist > dist || minDist === null) {
-              linePoint = pointA;
-              minDist = dist;
-            }
+        let line = lineGroup[lineIndex];
+        let wayPoint = findWayPoint(line);
+        if (linePoint === null) {
+          let searchPoint = findWayPoint(
+            lineGroup[lineIndex > 0 ? lineIndex - 1 : lineGroup.length - 1]
+          );
+          let minDist = null;
+          searchPoint.forEach((pointA, pointAIndex) => {
+            wayPoint.forEach(pointB => {
+              const dist = GeometryUtils.getDistance(pointA, pointB);
+              if (minDist > dist || minDist === null) {
+                previousPointIndex = pointAIndex;
+                linePoint = pointA;
+                minDist = dist;
+              }
+            });
           });
-        });
-      }
-      let distance0 = GeometryUtils.getDistance(wayPoint[0], linePoint);
-      let distance1 = GeometryUtils.getDistance(wayPoint[1], linePoint);
-      console.log (distance0);
-      console.log (distance1);
+        }
 
-      if (distance0 > 1 || distance1 > 1) {
-        debugger;
-      }
+        let distance = [];
+        distance[0] = GeometryUtils.getDistance(wayPoint[0], linePoint);
+        distance[1] = GeometryUtils.getDistance(wayPoint[1], linePoint);
+        // console.log(distance[0]);
+        // console.log(distance[1]);
+        //
+        // if (distance[0] > 1 && distance[1] > 1) {
+        //   debugger;
+        // }
+        thisLineIndex = distance[0] < distance[1] ? 0 : 1;
 
+        let alternativePoint = [];
 
-      //newLine
-      if (distance0 < distance1) {
-        if (distance0 > 0.1 * threshold && distance0 < 1) {
-          // debugger;
-          let newLine = createLine(linePoint, wayPoint[0]);
-          // helpLayer.add(newLine);
-          // render(editor);
-          // debugger;
-          lineGroup.splice (lineIndex, 0, newLine);
-          entities.push (newLine);
+        let overlay = false;
+        let changeLine;
+        let cutPoint;
+        let changePointIndex;
 
+        //todo пошук ліній які накладуються
+        if (lineGroup[lineIndex > 0 ? lineIndex - 1 : lineGroup.length - 1
+            ].geometry.type === 'Geometry' &&
+          lineGroup[lineIndex].geometry.type === 'Geometry') {
+          alternativePoint.push(
+            helpLayerService.positionInLine(
+              editor,
+              lineGroup[lineIndex],
+              lineGroup[lineIndex > 0 ? lineIndex - 1 : lineGroup.length - 1]
+                .geometry.vertices[previousPointIndex === 0 ? 1 : 0]
+            )
+          );
+          alternativePoint.push(
+            helpLayerService.positionInLine(
+              editor,
+              lineGroup[lineIndex > 0 ? lineIndex - 1 : lineGroup.length - 1],
+              wayPoint[thisLineIndex === 0 ? 1 : 0]
+            )
+          );
+          let dist = [];
+          dist.push(GeometryUtils.getDistance(
+            alternativePoint[0].position,
+            lineGroup[lineIndex > 0 ? lineIndex - 1 : lineGroup.length - 1]
+              .geometry.vertices[previousPointIndex === 0 ? 1 : 0]
+          ));
+          dist.push(GeometryUtils.getDistance(
+            alternativePoint[1].position,
+            wayPoint[thisLineIndex === 0 ? 1 : 0]
+          ));
+          console.log(dist);
+          if (dist[0] <= threshold || dist[1] <= threshold) {
+            console.log(overlay);
+            console.log(dist);
+            //края з яких проектуються точки і порівнюються відстані
+            helpLayer.children = [];
+            helpLayer.add(
+              helpLayerService.positionInLine(
+                editor,
+                [wayPoint[thisLineIndex === 0 ? 1 : 0]]
+              )
+            );
+            helpLayer.add(
+              helpLayerService.positionInLine(
+                editor,
+                lineGroup[lineIndex > 0 ? lineIndex - 1 : lineGroup.length - 1]
+                  .geometry.vertices[previousPointIndex === 0 ? 1 : 0]
+              )
+            );
+            render(editor);
+            debugger;
+            helpLayer.children = [];
+            helpLayer.add(alternativePoint[0]);
+            render(editor);
+            debugger;
+            helpLayer.children = [];
+            helpLayer.add(alternativePoint[1]);
+            render(editor);
+            debugger;
+            // ставимо в хедпплінти по очерді проектуємо тучку і точку перевірки з виводом на сцену
+            // виділяємо кольором лінію з якою працюємо
+            debugger;
+            // if (objectNumber === 135) {
+            if (dist[0] < dist[1]) {
+              changeLine = lineGroup[lineIndex];
+              cutPoint = lineGroup[lineIndex > 0 ? lineIndex - 1 : lineGroup.length - 1]
+                .geometry.vertices[previousPointIndex === 0 ? 1 : 0];
+              changePointIndex = thisLineIndex;
+              if (lineIndex > 0) {
+                lineGroup.splice(lineIndex - 1, 1);
+                lineIndex -= 1;
+              } else {
+                lineGroup.splice(lineGroup.length - 1, 1);
+              }
+              linePoint = null;
+
+            } else {
+              changeLine = lineGroup[lineIndex > 0 ? lineIndex - 1 : lineGroup.length - 1];
+              cutPoint = lineGroup[lineIndex]
+                .geometry.vertices[thisLineIndex === 0 ? 1 : 0];
+              changePointIndex = previousPointIndex;
+              lineGroup.splice(lineIndex, 1);
+              debugger;
+            }
+            // helpLayer.children = [];
+            // helpLayer.add(alternativePoint[0]);
+            // render(editor);
+            // console.log(objectNumber);
+            // debugger;
+            // helpLayer.children = [];
+            // helpLayer.add(alternativePoint[1]);
+            // render(editor);
+            // console.log(objectNumber);
+            // debugger;
+            // }
+            overlay = true;
+          }
+        }
+
+        if (!overlay) {
+          alternativePoint = [];
+          alternativePoint.push(
+            helpLayerService.positionInLine(
+              editor,
+              lineGroup[lineIndex],
+              linePoint
+            )
+          );
+          alternativePoint.push(
+            helpLayerService.positionInLine(
+              editor,
+              lineGroup[lineIndex > 0 ? lineIndex - 1 : lineGroup.length - 1],
+              wayPoint[thisLineIndex]
+            )
+          );
+
+          // if (lineIndex > 12) {
+          //   lineGroup[lineIndex].material.color.set(new THREE.Color(0x0000ff)); // синій
+          //   render(editor);
+          //   debugger;
+          //   lineGroup[lineIndex].material.color.set(new THREE.Color(0xffaa00)); // оранжевий
+          //   render(editor);
+          //   debugger;
+          //   helpLayer.children = [];
+          //   helpLayer.add(alternativePoint[0]);
+          //   helpLayer.add(alternativePoint[1]);
+          //   render(editor);
+          //   debugger;
+          //   // helpLayer.add(helpLayerService.positionInLine(editor, [wayPoint[0]]));
+          //   // render(editor);
+          //   // debugger;
+          //   // helpLayer.add(helpLayerService.positionInLine(editor, [wayPoint[1]]));
+          //   // render(editor);
+          //   // debugger;
+          // }
+
+          distance[2] = GeometryUtils.getDistance(
+            alternativePoint[0].position,
+            linePoint
+          );
+          distance[3] = GeometryUtils.getDistance(
+            alternativePoint[1].position,
+            wayPoint[thisLineIndex]
+          );
+          if (distance[2] < distance[thisLineIndex] ||
+            distance[3] < distance[thisLineIndex]) {
+            if (distance[2] < distance[3]) {
+              changeLine = lineGroup[lineIndex];
+              cutPoint = alternativePoint[0].position;
+              changePointIndex = thisLineIndex;
+              wayPoint[changePointIndex] = cutPoint;
+            } else {
+              changeLine = lineGroup[lineIndex > 0 ? lineIndex - 1 : lineGroup.length - 1];
+              cutPoint = alternativePoint[1].position;
+              changePointIndex = previousPointIndex;
+              linePoint = cutPoint;
+            }
+          }
+          if (cutPoint) {
+            // changeLine.material.color.set(new THREE.Color(0xffaa00)); // оранжевий
+            // helpLayer.children = [];
+            // helpLayer.add(helpLayerService.positionInLine(editor, [cutPoint]));
+            // render(editor);
+            // debugger;
+            // changeLine.material.color.set(new THREE.Color(0x0000ff)); // синій
+
+            // console.log (editor.activeEntities);
+            editor.activeEntities = [changeLine];
+
+            // if (objectNumber === 135) {
+            //   changeLine.material.color.set(new THREE.Color(0x0000ff)); // синій
+            //   render(editor);
+            //   debugger;
+            //   changeLine.material.color.set(new THREE.Color(0xffaa00)); // оранжевий
+            //   render(editor);
+            //   debugger;
+            // }
+
+            if (changeLine.geometry.type === 'Geometry') {
+              changeLine.geometry.vertices[changePointIndex].x = cutPoint.x;
+              changeLine.geometry.vertices[changePointIndex].y = cutPoint.y;
+            } else if (changeLine.geometry.type === 'CircleGeometry') {
+              // todo 23,11,2020 треба дививтись
+              let circlePoints = findWayPoint(changeLine);
+              // circlePoints[changePointIndex] = cutPoint;
+              // GeometryUtils.newCurve(
+              //   changeLine.position,
+              //   changeLine.geometry.parameters.radius,
+              //   circlePoints[0],
+              //   circlePoints[1],
+              //   editor
+              // )
+              // debugger;
+              if (!changeLine.userData.helpGeometry) {
+                changeLine.userData.helpGeometry = {
+                  helpLength: changeLine.geometry.parameters.thetaLength,
+                  helpStart: changeLine.geometry.parameters.thetaStart
+                };
+              }
+              addHelpPoints(editor, editor.scene, editor.camera.top / 50, true);
+              changeLine.material.color.set(new THREE.Color(0xffaa00)); // оранжевий
+              render(editor);
+
+              let wayPoint = findWayPoint(changeLine);
+              // changeLine.geometry = GeometryUtils.newCurve(
+              //   changeLine.position,
+              //   changeLine.geometry.radius,
+              //   changePointIndex === 0? cutPoint: wayPoint[0],
+              //   changePointIndex === 1? cutPoint: wayPoint[1],
+              //   'fix'
+              // );
+
+              changeGeometry([changeLine], [changePointIndex + 1], cutPoint, editor.scene, editor, 'CircleFix');
+              changeLine.material.color.set(new THREE.Color(0x0000ff)); // синій
+            }
+
+            // helpLayer.children = [];
+            // helpLayer.add(helpLayerService.positionInLine(editor, [cutPoint]));
+            // render(editor);
+          }
+        }
+
+        helpLayer.children = [];
+        if (!overlay) {
+          distance[5] = GeometryUtils.getDistance(wayPoint[thisLineIndex], linePoint)
+
+          if (distance[5] > threshold) {
+            let newLine = createLine(linePoint, wayPoint[thisLineIndex]);
+            lineGroup.splice(lineIndex, 0, newLine);
+            // entities.push(newLine);
+            lineIndex += 1;
+          }
+          previousPointIndex = distance[0] < distance[1] ? 1 : 0;
+          linePoint = wayPoint[previousPointIndex];
+
+          // if (distance0 < distance1) {
+          //   if (distance0 > 0.1 * threshold && distance0 < 1) {
+          //     let newLine = createLine(linePoint, wayPoint[0]);
+          //     lineGroup.splice(lineIndex, 0, newLine);
+          //     entities.push(newLine);
+          //
+          //     lineIndex += 1;
+          //   }
+          //   linePoint = wayPoint[1];
+          // } else if (distance0 > distance1) {
+          //   if (distance1 > 0.1 * threshold && distance1 < 1) {
+          //     // debugger;
+          //     let newLine = createLine(linePoint, wayPoint[1]);
+          //     lineGroup.splice(lineIndex, 0, newLine);
+          //     entities.push(newLine);
+          //     lineIndex += 1;
+          //   }
+          //   linePoint = wayPoint[0];
+          // }
           lineIndex += 1;
         }
-        linePoint = wayPoint[1];
-      } else if (distance0 > distance1) {
-        if (distance1 > 0.1 * threshold && distance1 < 1) {
-          // debugger;
-          let newLine = createLine(linePoint, wayPoint[1]);
-          lineGroup.splice(lineIndex, 0, newLine);
-          entities.push (newLine);
-          lineIndex += 1;
-        }
-        linePoint = wayPoint[0];
-      }
-      lineIndex += 1;
-    } while (lineIndex < lineGroup.length);
+        // console.log(overlay);
+        // console.log(lineIndex);
+      } while (lineIndex < lineGroup.length);
+      entities.push(...lineGroup);
     });
   }
+  helpLayer.children = [];
+  render(editor);
 
+  debugger
+  editor.activeEntities = entities;
   // debugger;
   return entities;
 };
@@ -845,7 +1122,8 @@ const createObject = (
 
   try {
     // scene.children.forEach(objectsContainer => {
-      if (objectsContainer.name === 'Objects' || 'VoidsLayer') {
+      if (objectsContainer.name === 'Objects' ||
+        objectsContainer.name === 'VoidsLayer') {
         // if (mode !== 'Free space') {
           objectsContainer.children.forEach(object => {
             if (object.name === name) {
@@ -1039,7 +1317,8 @@ const createObject = (
 let lastObjectName = '';
 const groupEntities = (editor, entities, objectName) => {
   if (!objectName) {
-    objectName = window.prompt('Set object name', lastObjectName);
+    // todo зробити вікно в стилі проекту з владками імені точності і включалкой автофікса
+    objectName = window.prompt('Set object name pls', lastObjectName);
   }
 
   if (objectName) {
@@ -1051,13 +1330,20 @@ const groupEntities = (editor, entities, objectName) => {
       //   line.material.color.set(new THREE.Color(0xffaa00)); // оранжевий
       //   debugger;
       // });
-      entities = objectFix(editor, entities, editor.options.threshold);
 
+      // debugger;
+      console.log(editor);
+      debugger;
+      //todo вставити перевірку на включалку автофікса при створенні нового обєкту
+      entities = objectFix(editor, entities, editor.options.threshold);
+      debugger;
       let object = createObject(
         editor,
         objectName,
         entities,
-        editor.options.threshold
+        editor.options.threshold,
+        'Auto fix on'
+        // 'Free space'
       );
       if (object) {
         lastObjectName = '';
@@ -1656,6 +1942,15 @@ const findWayPoint = (line, closesPoint = null, mode = 'normal') => {
         line.geometry.vertices[line.geometry.vertices.length - 1].y +
         line.position.y
     };
+    //если у дуги всегда одноковое количество сигментов можна прописать статичные числа
+    points[2] = {
+      x:
+        line.geometry.vertices[Math.floor(line.geometry.vertices.length/2)].x +
+        line.position.x,
+      y:
+        line.geometry.vertices[Math.floor(line.geometry.vertices.length/2)].y +
+        line.position.y
+    };
     if (mode === 'serch_way') {
       let distance = GeometryUtils.getDistance(points[0], points[1]);
       if (closesPoint !== null) {
@@ -1746,6 +2041,7 @@ export default {
   setPointOfInterest,
   showAll,
   groupEntities,
+  objectFix,
   createObject,
   getObjects,
   getVoidsLayer,

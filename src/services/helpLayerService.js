@@ -1,6 +1,7 @@
 import * as THREE from '../extend/THREE';
 import { changeGeometry /*, createLine*/ } from './editObject';
 import sceneService from './sceneService';
+import GeometryUtils from './GeometryUtils';
 
 let highlightVertex = (vertices, editor, timeout = 0, radius = 10) => {
   let { cadCanvas } = editor;
@@ -239,7 +240,7 @@ let lengthNewLine = (editor, event) => {
   } else {
     pointCurveCenter = positionInLine(
       editor,
-      helpCenterLine.geometry.vertices,
+      helpCenterLine,
       clickResult.point,
       pointCurveCenter
     );
@@ -255,8 +256,40 @@ let lengthNewLine = (editor, event) => {
     h - height - BD
  */
 const positionInLine = (editor, lineWithPoint, pointB, point) => {
+  let helpLayer = editor.scene.getObjectByName('HelpLayer');
   const { camera } = editor;
-  if (point) {
+  if (lineWithPoint.x){
+    lineWithPoint = [lineWithPoint];
+    debugger;
+  }
+  if (!Array.isArray(lineWithPoint)) {
+    console.log(lineWithPoint);
+    if (lineWithPoint.geometry.type === 'Geometry') {
+      lineWithPoint = lineWithPoint.geometry.vertices;
+    }
+    // debugger;
+  }
+  if (!point) {
+    const pointGeometry = new THREE.CircleGeometry(
+      camera.top / 100,
+      32,
+      0,
+      2 * Math.PI
+    );
+    pointGeometry.vertices.shift();
+    const pointMaterial = new THREE.LineBasicMaterial({
+      color: 0xff00ff,
+      opacity: 0.8,
+      transparent: true
+    });
+    point = new THREE.Line(pointGeometry, pointMaterial);
+    if (Array.isArray(lineWithPoint)) {
+      console.log (lineWithPoint);
+      point.position.x = lineWithPoint[0].x;
+      point.position.y = lineWithPoint[0].y;
+    }
+  }
+  if (Array.isArray(lineWithPoint) && pointB) {
     const pointA = lineWithPoint[0];
     const pointC = lineWithPoint[1];
     const lineAC = lengthLine(pointA, pointC);
@@ -275,22 +308,50 @@ const positionInLine = (editor, lineWithPoint, pointB, point) => {
       point.position.x = pointD.x;
       point.position.y = pointD.y;
     }
-  } else {
-    const pointGeometry = new THREE.CircleGeometry(
-      camera.top / 100,
-      32,
-      0,
-      2 * Math.PI
-    );
-    pointGeometry.vertices.shift();
-    const pointMaterial = new THREE.LineBasicMaterial({
-      color: 0xff00ff,
-      opacity: 0.8,
-      transparent: true
-    });
-    point = new THREE.Line(pointGeometry, pointMaterial);
-    point.position.x = lineWithPoint[0].x;
-    point.position.y = lineWithPoint[0].y;
+  } else if (!Array.isArray(lineWithPoint)) {
+    if ( lineWithPoint.geometry.type === 'CircleGeometry') {
+      let circlePoints = [];
+      let distanceToCirclePoints = [];
+      let pointIndex;
+      lineWithPoint.geometry.vertices.forEach((verticesPoint, i) => {
+        circlePoints[i] = {
+          x: verticesPoint.x + lineWithPoint.position.x,
+          y: verticesPoint.y + lineWithPoint.position.y
+        };
+        distanceToCirclePoints[i] = GeometryUtils.getDistance(
+          pointB,
+          circlePoints[i]
+        );
+      });
+      let distance = Math.min(...distanceToCirclePoints);
+      pointIndex = distanceToCirclePoints.indexOf(distance);
+      // point.position.x = circlePoints[pointIndex].x;
+      // point.position.y = circlePoints[pointIndex].y;
+
+      let minDistance;
+      let circlePoint;
+      if (pointIndex > 0) {
+        distance = GeometryUtils.getDistance(
+          pointB,
+          circlePoints[pointIndex-1]
+        );
+        if (!minDistance || distance < minDistance){
+          minDistance = distance;
+          circlePoint = circlePoints[pointIndex-1];
+        }
+      }
+      if (pointIndex < circlePoints.length-1) {
+        distance = GeometryUtils.getDistance(
+          pointB,
+          circlePoints[pointIndex+1]
+        );
+        if (!minDistance || distance < minDistance){
+          minDistance = distance;
+          circlePoint = circlePoints[pointIndex+1];
+        }
+      }
+      point = positionInLine(editor, [circlePoints[pointIndex], circlePoint], pointB, point);
+    }
   }
   return point;
 };

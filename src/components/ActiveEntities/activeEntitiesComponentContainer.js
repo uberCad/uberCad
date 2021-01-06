@@ -21,6 +21,7 @@ const mapStateToProps = (state, ownProps) => {
       copyEntities: state.cad.copyEntities, // todo тимчасове зберігання копіюємих об'єктів
       options: state.options,
       isEdit: state.cad.editMode.isEdit,
+      editMode: state.cad.editMode,
       activeLine: state.cad.activeLine
     },
     ...ownProps
