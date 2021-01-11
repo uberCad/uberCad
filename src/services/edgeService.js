@@ -89,48 +89,6 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
                 editor
               )
             ];
-
-            // newLine.position = lineWithPoint.position;
-            // let newChangeLine = GeometryUtils.newCurve (lineWithPoint.position,
-            //   lineWithPoint.geometry.parameters.radius, circlePoints[pointIndex],
-            //   circlePoints[circlePoints.length -1], editor);
-            // lineWithPoint.geometry.parameters = {
-            //   radius:  newChangeLine.geometry.parameters.radius,
-            //   segments:  newChangeLine.geometry.parameters.segments ,
-            //   thetaLength:  newChangeLine.geometry.parameters.thetaLength ,
-            //   thetaStart:  newChangeLine.geometry.parameters.thetaStart
-            // }
-            // lineWithPoint.geometry.vertices.forEach( (vertic, i) => {
-            //   vertic.x = newChangeLine.geometry.vertices[i].x;
-            //   vertic.y = newChangeLine.geometry.vertices[i].y;
-            // });
-            // let materialLine = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-            // let copyCircleGeometry = changeArcGeometry(
-            //   { 0: 'copy' },
-            //   {
-            //     radius: lineWithPoint.geometry.parameters.radius,
-            //     thetaStart: lineWithPoint.geometry.parameters.thetaStart,
-            //     thetaLength: lineWithPoint.geometry.parameters.thetaLength
-            //   }
-            // );
-            // console.log(newLine);
-            // lineWithPoint.geometry.vertices.splice(pointIndex + 1,
-            //   lineWithPoint.geometry.vertices.length - pointIndex - 1);
-            // console.log(newLine);
-            // newLine = new THREE.Line(copyCircleGeometry, materialLine);
-            // newLine.position.x = lineWithPoint.position.x;
-            // newLine.position.y = lineWithPoint.position.y;
-            // console.log(newLine.geometry.vertices);
-            // newLine.geometry.vertices.splice(0, pointIndex);
-            // console.log(newLine.geometry.vertices);
-            // lineWithPoint.geometry.vertices [lineWithPoint.geometry.vertices.length - 1].x =
-            //   - lineWithPoint.position.x + point.point.x;
-            // lineWithPoint.geometry.vertices [lineWithPoint.geometry.vertices.length - 1].y =
-            //   - lineWithPoint.position.y + point.point.y;
-            // newLine.geometry.vertices [0].x =
-            //   - newLine.position.x + point.point.x;
-            // newLine.geometry.vertices [0].y =
-            //   - newLine.position.y + point.point.y;
           }
         }
 
@@ -142,14 +100,13 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
           if (!point.entities.includes(newLines[0])) {
             point.entities.push(newLines[0]);
           } else {
-            // debugger;
+            debugger;
           }
           if (!point.entities.includes(newLines[1])) {
             point.entities.push(newLines[1]);
           } else {
-            // debugger;
+            debugger;
           }
-          // // debugger;
           sceneService.drawLine([newLines[1]], editor, 0xff0000);
           sceneService.drawLine([newLines[0]], editor, 0x00ff00);
           actionChecker = true;
@@ -157,9 +114,6 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
           lineWithPoint.geometry.verticesNeedUpdate = true;
           newLines[0].name = 'NEW LINE';
           newLines[1].name = 'NEW LINE';
-          // console.log(object.children);
-          // // debugger;
-          // object.geometry.verticesNeedUpdate = true;
           object.add(newLines[0]);
           object.add(newLines[1]);
 
@@ -175,7 +129,6 @@ let lineDivision = (editor, point, collisionPoints, threshold = 0.0001) => {
   for (let i = 0; i < point.entities.length; ) {
     if (point.entities[i] !== null) {
       i += 1;
-      // // debugger;
     } else {
       point.entities.splice(i, 1);
     }
@@ -203,39 +156,13 @@ const searchColPoints = (editor, svgForFlixo = false) => {
     throw error;
   }
 
-  // let viewBox = objects[0].userData.edgeModel.svgData.viewBox;
-  // const box = {
-  //   x: viewBox.x,
-  //   y: viewBox.y,
-  //   x2: +viewBox.x + +viewBox.width,
-  //   y2: +viewBox.y + +viewBox.height
-  // };
-  //
-  // // width, height, x, y
-  // objects.forEach(object => {
-  //   const objViewBox = object.userData.edgeModel.svgData.viewBox;
-  //   box.x = Math.min(box.x, objViewBox.x);
-  //   box.y = Math.min(box.y, objViewBox.y);
-  //   box.x2 = Math.max(box.x2, +objViewBox.x + +objViewBox.width);
-  //   box.y2 = Math.max(box.y2, +objViewBox.y + +objViewBox.height);
-  // });
-  //
-  // // viewBox for SVG
-  // viewBox = {
-  //   x: box.x,
-  //   y: box.y,
-  //   width: Math.abs(+box.x2 - +box.x),
-  //   height: Math.abs(+box.y2 - +box.y)
-  // };
-  // let mul = 25 / Math.max(viewBox.width, viewBox.height);
-
   // todo Create copy of object with all points
   let collisionAllPoints = GeometryUtils.getCollisionPoints(objects, threshold);
   let collisionPoints = GeometryUtils.filterOverlappingCollisionPoints(
     collisionAllPoints
   );
 
-  // фільтр на повтор ліній в параметрах точці перетину
+  // удаление повторяющихся линий
   collisionPoints.forEach(point => {
     // todo костиль
     let arr = [];
@@ -245,14 +172,14 @@ const searchColPoints = (editor, svgForFlixo = false) => {
       if (point.entities[i] !== null) {
         let wayPoint = sceneService.findWayPoint(line);
 
-        // фільтр на повтор ліній в параметрах точці перетину
+        // фильтр на повтор линий
         point.entities.forEach((checkLine, j) => {
           if (i !== j && line === checkLine) {
             point.entities[j] = null;
           }
         });
 
-        // костиль - перевірка відстанні ліній до точки перетину, фільтр зайвих ліній
+        // костиль - проверка ростояния от линии до точки пересичения
         if (point.entities[i] !== null) {
           let distance;
           if (line.geometry instanceof THREE.CircleGeometry) {
@@ -279,7 +206,7 @@ const searchColPoints = (editor, svgForFlixo = false) => {
             point.entities[i] = null;
           }
         }
-        // фільтр нольових ліній
+        // фильтр линии с длиной 0
         if (point.entities[i] !== null) {
           if (GeometryUtils.getDistance(wayPoint[0], wayPoint[1]) < 0.01) {
             console.log(GeometryUtils.getDistance(wayPoint[0], wayPoint[1]));
@@ -300,7 +227,7 @@ const searchColPoints = (editor, svgForFlixo = false) => {
 
   collisionPoints = GeometryUtils.filterCollisionPoints(collisionPoints);
 
-  // пошук точкок які знаходяться на відстані менше ніж 0.01 від інших точок
+  // поиск и отсев точкок которые расположены на ростоянии мение 0.01 от других точок
   collisionPoints.forEach((point, pointInd) => {
     if (!point.needDelete) {
       collisionPoints.forEach((checkPoint, pointInd) => {
@@ -319,7 +246,7 @@ const searchColPoints = (editor, svgForFlixo = false) => {
     }
   });
 
-  // видалення точок які знаходяться в притул до інших
+  // отсев точкок которые расположены на ростоянии мение 0.01 от других точок
   let lineIndex = 0;
   do {
     if (collisionPoints[lineIndex].needDelete) {
@@ -329,12 +256,8 @@ const searchColPoints = (editor, svgForFlixo = false) => {
     }
   } while (lineIndex < collisionPoints.length);
 
-  // пошук ліній які торкаються знайдених точок перетину
+  // поиск прилягающих линий к точкам collisionPoints
   collisionPoints.forEach(point => {
-    // if (point.id === 44){
-    //   console.log (point);
-    //   debugger;
-    // }
     point.entities.forEach(line => {
       const wayPoint = sceneService.findWayPoint(line);
       if (
@@ -355,24 +278,21 @@ const searchColPoints = (editor, svgForFlixo = false) => {
         });
       }
     });
-    // if (point.id === 44){
-    //   console.log (point);
-    //   debugger;
-    // }
   });
 
-  // відображення точок перетину на сцені
-  let helpLayer = scene.getObjectByName('HelpLayer');
-  helpLayer.children = [];
-  collisionPoints.forEach(point => {
-    helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
-    sceneService.render(editor);
-  });
-  sceneService.render(editor);
-  console.log ('check');
-  objects.forEach(object => {
-    console.log(object.name + '  ' + object.children.length);
-  });
+  // отображение точок пересичения
+  // let helpLayer = scene.getObjectByName('HelpLayer');
+  // helpLayer.children = [];
+  // collisionPoints.forEach(point => {
+  //   helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
+  //   sceneService.render(editor);
+  // });
+  // sceneService.render(editor);
+  // console.log ('check');
+  // objects.forEach(object => {
+  //   console.log(object.name + '  ' + object.children.length);
+  // });
+
   return { collisionPoints };
 };
 
@@ -426,12 +346,12 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     console.log(object.name + '  ' + object.children.length);
   });
 
-  // розділення ліній по точка перетину
+  // раздиление линий на несколько в точках пересичения с друглими линиями
   collisionPoints.forEach((point, pointInd) => {
     lineDivision(editor, point, collisionPoints, 0.001);
   });
 
-  // перевірка чи не потрапила стара лінія в параметри точки перетину
+  // отсев старых(линий до роздиления) линий от сформированих относительно точок пересичения
   collisionPoints.forEach(point => {
     point.entities.forEach((line, lineIndex) => {
       if (line.userData.newLines) {
@@ -444,120 +364,16 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
     });
   });
 
-  // фільтр на повтор ліній в параметрах точці перетину
-  // collisionPoints.forEach(point => {
-  //   point.entities.forEach((line, i) => {
-  //     if (point.entities[i] !== null) {
-  //       let wayPoint = sceneService.findWayPoint(line);
-  //
-  //       // фільтр на повтор ліній в параметрах точці перетину
-  //       point.entities.forEach((checkLine, j) => {
-  //         if (i !== j && line === checkLine) {
-  //           point.entities[j] = null;
-  //         }
-  //       });
-  //
-  //       // костиль - перевірка відстанні ліній до точки перетину, фільтр зайвих ліній
-  //       if (point.entities[i] !== null) {
-  //         let distance;
-  //         if (line.geometry instanceof THREE.CircleGeometry) {
-  //           let circlePoints = [];
-  //           let distanceToCirclePoints = [];
-  //           line.geometry.vertices.forEach((verticesPoint, i) => {
-  //             circlePoints[i] = {
-  //               x: verticesPoint.x + line.position.x,
-  //               y: verticesPoint.y + line.position.y
-  //             };
-  //             distanceToCirclePoints[i] = GeometryUtils.getDistance(
-  //               point.point,
-  //               circlePoints[i]
-  //             );
-  //           });
-  //           distance = Math.min(...distanceToCirclePoints);
-  //         } else if (point.entities[i].geometry.type === 'Geometry') {
-  //           distance = GeometryUtils.distanceToLine(point.point, point.entities[i]);
-  //         }
-  //         console.log(point.entities[i].geometry.type);
-  //         console.log(distance);
-  //         // debugger;
-  //         if (distance > 0.1) {
-  //           point.entities[i] = null;
-  //           // debugger;
-  //         }
-  //
-  //         // if (
-  //         //   GeometryUtils.getDistance(wayPoint[0], point.point) > 0.01 &&
-  //         //   GeometryUtils.getDistance(wayPoint[1], point.point) > 0.01
-  //         // ) {
-  //         //   point.entities[i] = null;
-  //         //   debugger;
-  //         // }
-  //       }
-  //
-  //       // фільтр нольових ліній
-  //       if (point.entities[i] !== null) {
-  //         if (GeometryUtils.getDistance(wayPoint[0], wayPoint[1]) < 0.001) {
-  //           console.log(GeometryUtils.getDistance(wayPoint[0], wayPoint[1]));
-  //           point.entities[i] = null;
-  //           debugger;
-  //         }
-  //       }
-  //
-  //       // фільтр на повтор ліній в параметрах точці перетину
-  //       point.entities.forEach((checkLine, j) => {
-  //         if (i !== j && line === checkLine) {
-  //           point.entities[j] = null;
-  //         }
-  //       });
-  //
-  //       // if (point.entities[i] !== null) {
-  //       //   if (point.id === 141 || point.id === 141) {
-  //       //     let distance;
-  //       //     if (line.geometry instanceof THREE.CircleGeometry) {
-  //       //       let circlePoints = [];
-  //       //       let distanceToCirclePoints = [];
-  //       //       line.geometry.vertices.forEach((verticesPoint, i) => {
-  //       //         circlePoints[i] = {
-  //       //           x: verticesPoint.x + line.position.x,
-  //       //           y: verticesPoint.y + line.position.y
-  //       //         };
-  //       //         distanceToCirclePoints[i] = GeometryUtils.getDistance(
-  //       //           point.point,
-  //       //           circlePoints[i]
-  //       //         );
-  //       //       });
-  //       //       distance = Math.min(...distanceToCirclePoints);
-  //       //     } else if (point.entities[i].geometry.type === 'Geometry') {
-  //       //       distance = GeometryUtils.distanceToLine(point.point, point.entities[i]);
-  //       //     }
-  //       //     console.log(point.entities[i].geometry.type);
-  //       //     console.log(distance);
-  //       //     console.log(point);
-  //       //     debugger;
-  //       //   }
-  //       // }
-  //     }
-  //   });
-  //   let nullIndex = 0;
-  //   do {
-  //     if (point.entities[nullIndex] === null) {
-  //       point.entities.splice(nullIndex, 1);
-  //     } else {
-  //       nullIndex += 1;
-  //     }
-  //   } while (nullIndex < point.entities.length);
-  // });
-
   let allObjectArea = 0;
 
-  // відображення точок перетину на сцені
-  let helpLayer = scene.getObjectByName('HelpLayer');
-  helpLayer.children = [];
-  collisionPoints.forEach(point => {
-    helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
-    sceneService.render(editor);
-  });
-  sceneService.render(editor);
+  // отображение точок пересичения
+  // let helpLayer = scene.getObjectByName('HelpLayer');
+  // helpLayer.children = [];
+  // collisionPoints.forEach(point => {
+  //   helpLayer.add(helpLayerService.positionInLine(editor, [point.point]));
+  //   sceneService.render(editor);
+  // });
+  // sceneService.render(editor);
 
   let voids = testMyFunktion(
     editor,
@@ -569,7 +385,6 @@ const combineEdgeModels = (editor, svgForFlixo = false) => {
   objects.forEach(object => {
     let lineIndex = object.children.length - 1;
     do {
-      // object.children[lineIndex].material.color.set(new THREE.Color(0x0000ff));
       if (object.children[lineIndex].userData.weDoneWithThisLine) {
         object.children[lineIndex].userData.weDoneWithThisLine = false;
       }
@@ -1658,7 +1473,7 @@ let searchTrueNextPoint = (
     }
     console.log(minDistance);
     if (minDistance > 1.5) {
-      // todo в теорії можна почухать рєпу над розширенням функціонала пошуку напрямка
+      // todo возможно нужно пересмотреть алгоритм поиска пути
 
     }
     // debugger;
@@ -1805,7 +1620,7 @@ const nextPoint = (
     pieceOfFreeSpace[0].push(thisLine);
   } else {
     // return;
-    console.log('диви сюди');
+    console.log('если вызвалась консоль нужно просмотреть алгоритм работы');
     // debugger;
     return;
   }
@@ -1860,15 +1675,14 @@ const nextPoint = (
       if (pieceOfFreeSpace[0].includes(line)) {
         console.log(pieceOfFreeSpace[0].indexOf(line));
         pieceOfFreeSpace[0] = [];
-        // debugger;
-        // todo сюди можливо ще треба буде глянути
         console.log('закольцована полость');
         return;
       }
 
       if (!line || line.userData.weDoneWithThisLine) {
         pieceOfFreeSpace[0] = [];
-        console.log('використаний елемент раніше');
+        console.log('линия использовалась в предедущих полостях');
+        // такого не должно быть, но иногда возможно, ошыбка в поиске пути.
         return;
       }
 
@@ -1955,7 +1769,7 @@ const nextPoint = (
             closesPoint.weDoneWithThisPoint &&
             !closesPoint.startFromThisPoint
           ) {
-            console.log('точкки пішли по другому кругу');
+            console.log('точки которые уже использовались рание');
           }
           if (startFreeSpaceLengt !== freeSpace.length) {
             checkPoint = true;
@@ -2721,7 +2535,8 @@ const weFindVoid = (lines) => {
   lines.forEach(line => {
     line.userData.weDoneWithThisLine = true;
   });
-  console.log('he is alive!!!!!');
+  console.log ('we find void');
+  // отрабатывает при удачном нахождении полости
   return;
 };
 

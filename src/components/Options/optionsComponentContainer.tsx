@@ -22,7 +22,6 @@ import { disablePoint } from '../../actions/pointInfo';
 import { copyClick, pasteClick, redo, undo } from '../../actions/cad';
 import { addSnapshot } from '../../actions/panelSnapshots';
 
-// todo mapStateToProps об'являється двічі тут і в .\src\components\ActiveEntities\activeEntitiesComponentContainer.js
 const mapStateToProps = (state, ownProps) => {
   return {
     lang: state.locale.lang,
@@ -31,8 +30,8 @@ const mapStateToProps = (state, ownProps) => {
       camera: state.cad.camera,
       renderer: state.cad.renderer,
       cadCanvas: state.cad.cadCanvas,
-      activeEntities: state.cad.activeEntities,
-      copyEntities: state.cad.copyEntities, // todo тимчасове зберігання копіюємих об'єктів
+      activeEntities: state.cad.activeEntities, // выделиные линии
+      copyEntities: state.cad.copyEntities, // временное хранилище линий для копирования
       options: state.options,
       editMode: state.cad.editMode,
       isEdit: state.cad.editMode.isEdit,

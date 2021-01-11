@@ -244,7 +244,7 @@ const cad = (state = initialState, action) => {
       });
 
     case EDIT_UNGROUP:
-      console.log(5);
+      // console.log(5);
       return {
         ...state,
         sceneChildrenHistory: [
@@ -321,7 +321,7 @@ const cad = (state = initialState, action) => {
       };
 
     case EDIT_MOVE_OBJECT_ACTIVE:
-      console.log(1);
+      // console.log(1);
       return update(state, {
         editMode: {
           move: {
@@ -335,7 +335,7 @@ const cad = (state = initialState, action) => {
         }
       });
     case EDIT_MOVE_OBJECT_CANCEL:
-      console.log(2);
+      // console.log(2);
       return update(state, {
         editMode: {
           move: {
@@ -344,7 +344,7 @@ const cad = (state = initialState, action) => {
         }
       });
     case EDIT_MOVE_OBJECT_POINT:
-      console.log(3, state.sceneChildrenHistory);
+      // console.log(3, state.sceneChildrenHistory);
       return {
         ...state,
         editMode: update(state.editMode, {
@@ -356,7 +356,7 @@ const cad = (state = initialState, action) => {
         })
       };
     case EDIT_MOVE_DISABLE_POINT:
-      console.log(4);
+      // console.log(4);
       return {
         ...state,
         sceneChildrenHistory: [
@@ -815,14 +815,14 @@ const cad = (state = initialState, action) => {
         })
       };
     case SNAPSHOT_LOAD_SCENE:
-      console.log(3);
+      // console.log(3);
       return {
         ...state,
         scene: action.payload.scene,
         isChanged: action.payload.isChanged
       };
     case SNAPSHOT_LOAD_OBJECT:
-      console.log(2);
+      // console.log(2);
       return {
         ...state,
         scene: action.payload.scene,
@@ -830,7 +830,7 @@ const cad = (state = initialState, action) => {
         isChanged: action.payload.isChanged
       };
     case CAD_DRAW_DXF: {
-      console.log(1);
+      // console.log(1);
       const firstScene = action.payload.scene.clone();
       return {
         ...state,
@@ -1232,7 +1232,7 @@ const cad = (state = initialState, action) => {
         })
       };
     case CAD_GROUP_ENTITIES:
-      console.log(6);
+      // console.log(6);
       return update(state, {
         scene: {
           children: {

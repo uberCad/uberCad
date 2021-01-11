@@ -27,10 +27,10 @@ export default class CadComponent extends Component {
     this.props.spinnerShow();
     // if (projectId === 'editObjectElement') {
     // this.props.drawDxf(null, this.container, null);
-    // в this.props.drawDxf(null, this.container, null); треба подавати або елемент з БД
-    // або загружаємий файл з ПК для створеннм нової сцени і редагування об'єкта
-    // todo тут має підгружатись алемент з бібліотеки або загружаємий елемент, важливо!!!
-    // }
+
+    // todo в this.props.drawDxf(null, this.container, null); нужно подавать элемент с БД
+    //  или загруженый файл с ПК для создания новои сцены 'єкта
+    // todo тут нужно подгружать элемент с библиотеки или загружаемий елемент с файла, важно!!!
 
     api
       .get(

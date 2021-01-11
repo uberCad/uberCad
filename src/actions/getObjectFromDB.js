@@ -1,4 +1,4 @@
-// todo все що нижче перековиряти для обєктів з БД
+// todo нужно пересмотреть для роботы с обектами с БД
 import { spinnerShow, spinnerHide } from './spinner';
 import Api from '../services/apiService';
 

@@ -511,8 +511,7 @@ let getInsidePoint = (regions, threshold) => {
     });
 
 
-    // todo глянути на можливість оптимізації (path[parseInt(Math.random() *
-    //  path.length, 10)] - може давати повтор точки)
+    // todo посмотреть на возможность оптимизации (path[parseInt(Math.random() * path.length, 10)]
     let bestPoints = 0;
     let firstPointIndex = 0;
     let pointChecker = [];
@@ -612,7 +611,7 @@ const getCollisionPoints = (objects, threshold = 0.000001) => {
     objects
       .filter(obj => {
         return (
-          // todo перша приблуда яку треба юзати при переміщені об'єкта при вставкі isBoundingBoxesCollide
+          // todo первая приблуда которою нужно юзать при перемещении обекта при вставке isBoundingBoxesCollide
           // check current element with first if both got checkedIntersection also if there boundingBoxes got same points
           !obj.userData.checkedIntersection &&
           isBoundingBoxesCollide(
@@ -724,12 +723,6 @@ let lineArcIntersectNew = (line, arc, threshold = 0) => {
     arc,
     line
   };
-
-  // point = {
-  //   point,
-  //   distance,
-  //   arcAngle
-  // }
 
   let x1 = line.geometry.vertices[0].x;
   let y1 = line.geometry.vertices[0].y;

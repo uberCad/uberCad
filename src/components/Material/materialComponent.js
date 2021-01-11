@@ -29,7 +29,7 @@ export default class MaterialComponent extends Component {
   handleClose = () => {
     this.setState({ show: false });
 
-    // todo КОСТИЛІЩЕ.... ну або подивись можливо можна упростити процес
+    // todo пересмотреть выбор материала при закритии окна
     if (
       this.props.activeObject.userData.material &&
       !this.props.activeObject.userData.material.name

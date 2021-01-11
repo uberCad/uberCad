@@ -362,6 +362,7 @@ export const onMouseDown = (event, editor) => {
               if (!editor.editMode.activeLine.length) {
                 editor.editMode.activeLine = editor.activeEntities;
               }
+              // додати 
               selectPoint(editor.editMode.activeLine, event, editor)(dispatch);
             }
           }

@@ -494,6 +494,12 @@ const changeGeometry = (lines, indexesOfLines, point, scene, editor, mode = 'sta
         };
         line.userData.helpGeometry = changedGeometry;
 
+        // line.material.color.set(new THREE.Color(0xffaa00)); // оранжевий
+        // if (mode === 'CircleFix') {
+        //   console.log('geometry');
+        //   console.log(line.geometry.parameters);
+        //   debugger;
+        // }
         if (indexesOfLines[i] === 0) {
           // *index === 0 move center arc
           // центр круга
@@ -575,6 +581,14 @@ const changeGeometry = (lines, indexesOfLines, point, scene, editor, mode = 'sta
             changedGeometry.thetaStart) > Math.PI / 2)
           line.geometry = changeArcGeometry(line.geometry, changedGeometry);
         }
+        // if (mode === 'CircleFix') {
+        //   console.log('geometry');
+        //   console.log(line.geometry.parameters);
+        //   sceneService.render(editor);
+        //   debugger;
+        // }
+        // line.material.color.set(new THREE.Color(0x0000ff)); // синій
+        // sceneService.render(editor);
         circleHelpPoint(line, scene);
         console.log('Show me selectLines', selectLines);
         if (selectLines) {

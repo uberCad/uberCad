@@ -655,7 +655,19 @@ const objectFix = (editor, entities, threshold, sort = 'no', objectNumber) => {
   addHelpPoints(editor, editor.scene, editor.camera.top / 50, true);
   entities = GeometryUtils.skipZeroLines([...entities], threshold);
   let helpLayer = editor.scene.getObjectByName('HelpLayer');
-  let linePoint = null;
+
+  // if (objectNumber === 135) {
+  //   entities.forEach(line => {
+  //     helpLayer.children = [];
+  //     let wayPoint = findWayPoint(line);
+  //     wayPoint.forEach(point => {
+  //       helpLayer.add(helpLayerService.positionInLine(editor, [point]));
+  //     })
+  //     render(editor)
+  //     debugger;
+  //   })
+  // }
+
   if (entities.length > 1) {
     let lineIndex = 0;
     // спробувати упорядкувати лінії
@@ -1397,21 +1409,10 @@ let skive = (object, cutPointIndex, colPoint, threshold = 0.001) => {
     let thisLinePoints = findWayPoint(thisLine);
     let nextLinePoints = findWayPoint(object[1]);
     let pointIndex;
-    // if (GeometryUtils.getDistance(thisLinePoints[0], nextLinePoints[0]) < threshold
-    //   || GeometryUtils.getDistance(thisLinePoints[1], nextLinePoints[0]) < threshold){
-    //   pointIndex = 1;
-    // } else if (GeometryUtils.getDistance(thisLinePoints[0], nextLinePoints[1]) < threshold
-    //   || GeometryUtils.getDistance(thisLinePoints[1], nextLinePoints[1]) < threshold){
-    //   pointIndex = 0;
-    // } else {
-    //   // console.log ('точка перетену або ерор');
-    //   debugger;
-    // }
 
     object.forEach((line, i) => {
       let collisionPoints = line.userData.collisionPointsInf;
       if (collisionPoints) {
-        // console.log(line.userData.collisionPointsInf);
         let lineIndex = null;
         let linePoints = findWayPoint(line);
         for (let j = 0; j < object.length; j++) {
