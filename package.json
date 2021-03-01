@@ -43,7 +43,7 @@
     "socket.io-client": "^2.3.0",
     "stats.js": "^0.17.0",
     "styled-components": "^5.1.1",
-    "three": "^0.110.0",
+    "three": "^0.125.0",
     "three-dxf": "^0.3.1",
     "three-orbit-controls": "^82.1.0",
     "typesafe-actions": "^5.1.0",
